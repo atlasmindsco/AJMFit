@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   description:
     "You're already showing up. Let's make it count. Custom training programs, accountability coaching, and real results with AJMFit.",
   keywords: ['personal training', 'online coaching', 'fitness', 'AJMFit', 'home workouts', 'ISSA certified'],
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
   openGraph: {
     title: 'AJMFit — Personal Training That Counts',
     description: "You're already showing up. Let's make it count.",
