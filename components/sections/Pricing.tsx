@@ -1,11 +1,12 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
 interface Tier {
   name: string
-  price: string
+  monthlyPrice: number
   tagline: string
   features: string[]
   featured?: boolean
@@ -14,7 +15,7 @@ interface Tier {
 const tiers: Tier[] = [
   {
     name: 'The Blueprint',
-    price: '$297',
+    monthlyPrice: 297,
     tagline: 'Your foundation. Built right.',
     features: [
       'Custom 3-4 day/week workout plan',
@@ -26,7 +27,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Accelerator',
-    price: '$497',
+    monthlyPrice: 497,
     tagline: 'For those ready to level up.',
     featured: true,
     features: [
@@ -39,7 +40,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Full Experience',
-    price: '$697',
+    monthlyPrice: 697,
     tagline: 'Maximum output. Zero guesswork.',
     features: [
       'Everything in The Accelerator',
@@ -49,6 +50,10 @@ const tiers: Tier[] = [
     ],
   },
 ]
+
+function getWeeklyPrice(monthly: number): number {
+  return Math.ceil(monthly / 4)
+}
 
 const containerVariants = {
   hidden: {},
@@ -67,6 +72,8 @@ const cardVariants = {
 }
 
 export default function Pricing() {
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'weekly'>('monthly')
+
   return (
     <section className="py-28 md:py-36 relative bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -87,6 +94,52 @@ export default function Pricing() {
           </h2>
         </motion.div>
 
+        {/* Payment Plan Toggle */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-14 flex flex-col items-center"
+        >
+          <p className="font-display font-semibold text-xs uppercase tracking-[0.25em] text-brand-slate mb-5">
+            Payment Plans Available
+          </p>
+          <div className="relative inline-flex items-center bg-brand-offwhite rounded-sm border border-brand-navy/[0.08] p-1">
+            {/* Sliding indicator */}
+            <motion.div
+              className="absolute top-1 bottom-1 rounded-sm bg-brand-navy"
+              layout
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              style={{
+                left: billingCycle === 'monthly' ? 4 : '50%',
+                width: 'calc(50% - 4px)',
+              }}
+            />
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={`relative z-10 px-7 py-3 font-display font-bold text-sm uppercase tracking-[0.12em] transition-colors duration-200 ${
+                billingCycle === 'monthly' ? 'text-white' : 'text-brand-navy'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle('weekly')}
+              className={`relative z-10 px-7 py-3 font-display font-bold text-sm uppercase tracking-[0.12em] transition-colors duration-200 ${
+                billingCycle === 'weekly' ? 'text-white' : 'text-brand-navy'
+              }`}
+            >
+              Weekly
+            </button>
+          </div>
+          <p className="mt-4 text-xs font-body text-brand-slate">
+            {billingCycle === 'weekly'
+              ? 'Billed weekly — same program, easier on the wallet'
+              : 'Billed once per month at the start of each cycle'}
+          </p>
+        </motion.div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -94,92 +147,107 @@ export default function Pricing() {
           viewport={{ once: true, margin: '-60px' }}
           className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch"
         >
-          {tiers.map((tier) => (
-            <motion.div
-              key={tier.name}
-              variants={cardVariants}
-              className={`relative flex flex-col rounded-sm overflow-hidden ${
-                tier.featured
-                  ? 'bg-brand-navy text-white lg:scale-105 shadow-[0_8px_60px_rgba(27,45,80,0.2)]'
-                  : 'bg-brand-offwhite border border-brand-navy/[0.08] text-brand-navy'
-              }`}
-            >
-              {tier.featured && (
-                <div className="bg-brand-orange text-white text-center py-2 font-display font-bold text-xs uppercase tracking-[0.2em]">
-                  Most Popular
-                </div>
-              )}
+          {tiers.map((tier) => {
+            const displayPrice =
+              billingCycle === 'monthly'
+                ? tier.monthlyPrice
+                : getWeeklyPrice(tier.monthlyPrice)
 
-              <div className="p-8 md:p-10 flex flex-col flex-1">
-                <h3
-                  className={`font-display font-bold text-lg uppercase tracking-wide ${
-                    tier.featured ? 'text-brand-orange' : 'text-brand-blue'
-                  }`}
-                >
-                  {tier.name}
-                </h3>
+            return (
+              <motion.div
+                key={tier.name}
+                variants={cardVariants}
+                className={`relative flex flex-col rounded-sm overflow-hidden ${
+                  tier.featured
+                    ? 'bg-brand-navy text-white lg:scale-105 shadow-[0_8px_60px_rgba(27,45,80,0.2)]'
+                    : 'bg-brand-offwhite border border-brand-navy/[0.08] text-brand-navy'
+                }`}
+              >
+                {tier.featured && (
+                  <div className="bg-brand-orange text-white text-center py-2 font-display font-bold text-xs uppercase tracking-[0.2em]">
+                    Most Popular
+                  </div>
+                )}
 
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span
-                    className={`font-display font-extrabold text-5xl tracking-tight ${
-                      tier.featured ? 'text-white' : 'text-brand-navy'
+                <div className="p-8 md:p-10 flex flex-col flex-1">
+                  <h3
+                    className={`font-display font-bold text-lg uppercase tracking-wide ${
+                      tier.featured ? 'text-brand-orange' : 'text-brand-blue'
                     }`}
                   >
-                    {tier.price}
-                  </span>
-                  <span
-                    className={`text-sm font-body ${
-                      tier.featured ? 'text-white/50' : 'text-brand-slate'
-                    }`}
-                  >
-                    /month
-                  </span>
-                </div>
+                    {tier.name}
+                  </h3>
 
-                <p
-                  className={`mt-3 text-sm font-body ${
-                    tier.featured ? 'text-white/60' : 'text-brand-slate'
-                  }`}
-                >
-                  {tier.tagline}
-                </p>
-
-                <div
-                  className={`mt-8 h-px ${
-                    tier.featured ? 'bg-white/10' : 'bg-brand-navy/10'
-                  }`}
-                />
-
-                <ul className="mt-8 flex flex-col gap-4 flex-1">
-                  {tier.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="mt-1 shrink-0 text-xs text-brand-orange">
-                        ◆
-                      </span>
-                      <span
-                        className={`text-sm font-body leading-relaxed ${
-                          tier.featured ? 'text-white/70' : 'text-brand-slate'
+                  <div className="mt-4 flex items-baseline gap-1">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={`${tier.name}-${billingCycle}`}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                        className={`font-display font-extrabold text-5xl tracking-tight ${
+                          tier.featured ? 'text-white' : 'text-brand-navy'
                         }`}
                       >
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                        ${displayPrice}
+                      </motion.span>
+                    </AnimatePresence>
+                    <span
+                      className={`text-sm font-body ${
+                        tier.featured ? 'text-white/50' : 'text-brand-slate'
+                      }`}
+                    >
+                      /{billingCycle === 'monthly' ? 'month' : 'week'}
+                    </span>
+                  </div>
 
-                <div className="mt-10">
-                  <Button
-                    href="/apply"
-                    variant={tier.featured ? 'primary' : 'secondary'}
-                    fullWidth
+                  <p
+                    className={`mt-3 text-sm font-body ${
+                      tier.featured ? 'text-white/60' : 'text-brand-slate'
+                    }`}
                   >
-                    Get Started
-                  </Button>
+                    {tier.tagline}
+                  </p>
+
+                  <div
+                    className={`mt-8 h-px ${
+                      tier.featured ? 'bg-white/10' : 'bg-brand-navy/10'
+                    }`}
+                  />
+
+                  <ul className="mt-8 flex flex-col gap-4 flex-1">
+                    {tier.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="mt-1 shrink-0 text-xs text-brand-orange">
+                          ◆
+                        </span>
+                        <span
+                          className={`text-sm font-body leading-relaxed ${
+                            tier.featured ? 'text-white/70' : 'text-brand-slate'
+                          }`}
+                        >
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-10">
+                    <Button
+                      href="/apply"
+                      variant={tier.featured ? 'primary' : 'secondary'}
+                      fullWidth
+                    >
+                      Get Started
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )
+          })}
         </motion.div>
+
       </div>
     </section>
   )
