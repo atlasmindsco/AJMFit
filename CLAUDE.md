@@ -52,3 +52,8 @@
 - Do not stop after one screenshot pass
 - Do not use `transition-all`
 - Do not use default Tailwind blue/indigo as primary color
+
+## ClickUp Sync
+clickup_workspace: 9017723361
+clickup_list_id: 901711321605
+clickup_list_name: AJM FIT

@@ -1,0 +1,7 @@
+docs/
+assets/
+scripts/
+*.pdf
+walkthrough.html
+PROJECT_MEMORY.md
+.env.netlify

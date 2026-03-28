@@ -31,3 +31,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+
+# Local Netlify folder
+.netlify
+
+# Exercise images (downloaded via scripts/download-exercises.mjs, too large for git)
+/public/exercises/images/
+docs/High%20Res_CPT.pdf
+docs/*.pdf
+assets/Intro video*
+assets/hero_video.mp4
+public/hero-video.mp4

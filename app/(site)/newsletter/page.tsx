@@ -38,12 +38,29 @@ export default function NewsletterPage() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email) return
-    // [PLACEHOLDER] — wire up to newsletter API
-    console.log('Newsletter signup:', email)
-    setSubmitted(true)
+    if (!email || loading) return
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!res.ok) throw new Error('Signup failed')
+      setSubmitted(true)
+    } catch {
+      setError('Something went wrong. Try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -107,10 +124,13 @@ export default function NewsletterPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 px-5 py-4 bg-brand-offwhite border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
             />
-            <Button type="submit" variant="primary">
-              Subscribe
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Subscribing...' : 'Subscribe'}
             </Button>
           </motion.form>
+        )}
+        {error && (
+          <p className="mt-3 text-red-500 text-sm font-body text-center">{error}</p>
         )}
       </section>
 

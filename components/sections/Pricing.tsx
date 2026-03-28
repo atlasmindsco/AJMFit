@@ -138,6 +138,9 @@ export default function Pricing() {
               ? 'Billed weekly — same program, easier on the wallet'
               : 'Billed once per month at the start of each cycle'}
           </p>
+          <p className="mt-3 font-display font-bold text-sm uppercase tracking-[0.1em] text-brand-navy">
+            Every plan starts with a free 7-day trial — no commitment required.
+          </p>
         </motion.div>
 
         <motion.div

@@ -40,22 +40,15 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="relative aspect-[4/5] bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-white/60 to-transparent z-10" />
-            {/* [PLACEHOLDER] — Replace with actual photo */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <Image
-                  src="/AJMfit.png"
-                  alt="AJMFit"
-                  width={120}
-                  height={120}
-                  className="mx-auto mb-4 opacity-20"
-                />
-                <p className="text-brand-navy/20 text-sm font-display uppercase tracking-widest">
-                  [PLACEHOLDER: Photo]
-                </p>
-              </div>
-            </div>
+            <Image
+              src="/about-photo.jpg"
+              alt="AJMFit founder"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/30 via-transparent to-transparent z-10" />
           </motion.div>
 
           {/* Story copy */}
@@ -69,17 +62,49 @@ export default function AboutPage() {
               Built On <span className="text-brand-orange">Accountability</span>
             </h2>
 
-            {/* [PLACEHOLDER] — Replace with real story copy */}
-            <div className="space-y-5 text-brand-slate font-body leading-[1.8]">
-              <p>
-                [PLACEHOLDER] I started AJMFit because I saw too many people putting in the work but not getting the results. Not because they lacked effort — but because they lacked the right plan and someone to hold them to a higher standard.
-              </p>
-              <p>
-                [PLACEHOLDER] Fitness changed my life. Not just physically, but mentally and spiritually. It taught me discipline, patience, and what it means to be a good steward of the body you&rsquo;ve been given.
-              </p>
-              <p>
-                [PLACEHOLDER] That&rsquo;s why every program I build isn&rsquo;t just about reps and sets — it&rsquo;s about maximizing the potential you already have. You showed up. My job is to make sure that effort actually counts.
-              </p>
+            <div className="space-y-8 text-brand-slate font-body leading-[1.8]">
+              <div className="flex items-start gap-5">
+                <div className="shrink-0 mt-1.5">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                    <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                  </svg>
+                </div>
+                <p>
+                  I started AJMFit because I saw too many people putting in the work but not getting the results. Not because they lacked effort — but because they lacked the right plan and someone to hold them to a higher standard.
+                </p>
+              </div>
+              <div className="flex items-start gap-5">
+                <div className="shrink-0 mt-1.5">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                    <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                  </svg>
+                </div>
+                <p>
+                  Fitness changed my life. Not just physically, but mentally and spiritually. It taught me discipline, patience, and what it means to be a good steward of the body you&rsquo;ve been given.
+                </p>
+              </div>
+              <div className="flex items-start gap-5">
+                <div className="shrink-0 mt-1.5">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                    <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+                    <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+                  </svg>
+                </div>
+                <p>
+                  That&rsquo;s why every program I build isn&rsquo;t just about reps and sets — it&rsquo;s about maximizing the potential you already have. You showed up. My job is to make sure that effort actually counts.
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>

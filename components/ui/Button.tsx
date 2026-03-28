@@ -13,6 +13,7 @@ interface ButtonProps {
   onClick?: () => void
   className?: string
   fullWidth?: boolean
+  disabled?: boolean
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -31,10 +32,11 @@ export default function Button({
   onClick,
   className = '',
   fullWidth = false,
+  disabled = false,
 }: ButtonProps) {
   const base = `inline-flex items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-shadow duration-200 ${
     fullWidth ? 'w-full' : ''
-  } ${variantStyles[variant]} ${className}`
+  } ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${variantStyles[variant]} ${className}`
 
   if (href) {
     return (
@@ -57,6 +59,7 @@ export default function Button({
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={base}
     >
       {children}

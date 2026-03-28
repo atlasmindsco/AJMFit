@@ -29,6 +29,7 @@ const step3Schema = z.object({
   tier: z.enum(['blueprint', 'accelerator', 'full-experience'], {
     required_error: 'Select a tier',
   }),
+  billingCycle: z.enum(['monthly', 'weekly']),
   referral: z.string().optional(),
 })
 
@@ -40,15 +41,55 @@ const schemas = [step1Schema, step2Schema, step3Schema] as const
 // ---- Constants ----
 
 const equipmentOptions = [
+  { value: 'gym', label: 'Gym' },
   { value: 'dumbbells', label: 'Dumbbells' },
+  { value: 'calisthenics', label: 'Calisthenics' },
   { value: 'resistance-bands', label: 'Resistance Bands' },
+  { value: 'kettlebells', label: 'Kettlebells' },
+  { value: 'landmine', label: 'Landmine' },
   { value: 'full-home-gym', label: 'Full Home Gym' },
 ]
 
 const tierOptions = [
-  { value: 'blueprint', label: 'The Blueprint — $297/mo' },
-  { value: 'accelerator', label: 'The Accelerator — $497/mo' },
-  { value: 'full-experience', label: 'The Full Experience — $697/mo' },
+  {
+    value: 'blueprint',
+    label: 'The Blueprint',
+    monthlyPrice: 297,
+    tagline: 'Your foundation. Built right.',
+    features: [
+      'Custom 3-4 day/week workout plan',
+      'New plan every 30 days (3 phases)',
+      'Scaled to your equipment',
+      'M-F messaging access',
+      'Supplement recommendations',
+    ],
+  },
+  {
+    value: 'accelerator',
+    label: 'The Accelerator',
+    monthlyPrice: 497,
+    tagline: 'For those ready to level up.',
+    featured: true,
+    features: [
+      'Everything in The Blueprint',
+      'Weekly 30-45 min video check-in',
+      'Form feedback via video review',
+      'Progress tracking & adjustments',
+      'Priority response M-F',
+    ],
+  },
+  {
+    value: 'full-experience',
+    label: 'The Full Experience',
+    monthlyPrice: 697,
+    tagline: 'Maximum output. Zero guesswork.',
+    features: [
+      'Everything in The Accelerator',
+      '2x live 45-min virtual training sessions/week',
+      'Real-time coaching & intensity',
+      'Live form correction every session',
+    ],
+  },
 ]
 
 const fitnessLevels = [
@@ -69,6 +110,7 @@ const errorBase = 'text-red-600 text-xs font-body mt-1'
 export default function IntakeForm() {
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
+  const [hoveredTier, setHoveredTier] = useState<string | null>(null)
 
   const {
     register,
@@ -82,6 +124,7 @@ export default function IntakeForm() {
     mode: 'onTouched',
     defaultValues: {
       equipment: [],
+      billingCycle: 'monthly',
     },
   })
 
@@ -226,13 +269,13 @@ export default function IntakeForm() {
 
               <div>
                 <label className={labelBase}>Equipment Available</label>
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {equipmentOptions.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onClick={() => toggleEquipment(opt.value)}
-                      className={`px-5 py-3 rounded-sm text-sm font-display font-semibold uppercase tracking-wide border transition-colors duration-200 ${
+                      className={`px-4 py-3 rounded-sm text-sm font-display font-semibold uppercase tracking-wide border transition-colors duration-200 text-center ${
                         currentEquipment.includes(opt.value)
                           ? 'bg-brand-orange border-brand-orange text-white'
                           : 'bg-transparent border-brand-navy/15 text-brand-slate hover:border-brand-navy/30'
@@ -280,38 +323,121 @@ export default function IntakeForm() {
 
               <div>
                 <label className={labelBase}>Which tier interests you?</label>
-                <div className="flex flex-col gap-3">
-                  {tierOptions.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className={`flex items-center gap-4 px-5 py-4 rounded-sm border transition-colors duration-200 cursor-pointer ${
-                        watch('tier') === opt.value
-                          ? 'border-brand-orange bg-brand-orange/10'
-                          : 'border-brand-navy/10 bg-brand-offwhite hover:border-brand-navy/20'
+
+                {/* Billing cycle toggle */}
+                <div className="flex items-center justify-center gap-1 mb-4">
+                  <div className="relative inline-flex items-center bg-brand-offwhite rounded-sm border border-brand-navy/[0.08] p-0.5">
+                    <div
+                      className="absolute top-0.5 bottom-0.5 rounded-sm bg-brand-navy transition-all duration-200"
+                      style={{
+                        left: watch('billingCycle') === 'monthly' ? 2 : '50%',
+                        width: 'calc(50% - 2px)',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setValue('billingCycle', 'monthly')}
+                      className={`relative z-10 px-5 py-2 font-display font-bold text-xs uppercase tracking-[0.12em] transition-colors duration-200 ${
+                        watch('billingCycle') === 'monthly' ? 'text-white' : 'text-brand-navy'
                       }`}
                     >
-                      <input
-                        type="radio"
-                        value={opt.value}
-                        {...register('tier')}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          watch('tier') === opt.value
-                            ? 'border-brand-orange'
-                            : 'border-brand-navy/30'
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setValue('billingCycle', 'weekly')}
+                      className={`relative z-10 px-5 py-2 font-display font-bold text-xs uppercase tracking-[0.12em] transition-colors duration-200 ${
+                        watch('billingCycle') === 'weekly' ? 'text-white' : 'text-brand-navy'
+                      }`}
+                    >
+                      Weekly
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {tierOptions.map((opt) => {
+                    const isSelected = watch('tier') === opt.value
+                    const isExpanded = hoveredTier === opt.value
+                    const isWeekly = watch('billingCycle') === 'weekly'
+                    const displayPrice = isWeekly
+                      ? Math.ceil(opt.monthlyPrice / 4)
+                      : opt.monthlyPrice
+                    const priceLabel = isWeekly ? '/wk' : '/mo'
+                    return (
+                      <div
+                        key={opt.value}
+                        onMouseEnter={() => setHoveredTier(opt.value)}
+                        onMouseLeave={() => setHoveredTier(null)}
+                        onTouchStart={() => setHoveredTier(isExpanded ? null : opt.value)}
+                        className={`relative rounded-sm border overflow-hidden transition-all duration-200 ${
+                          isSelected
+                            ? 'border-brand-orange bg-brand-orange/5 shadow-[0_2px_16px_rgba(240,139,30,0.1)]'
+                            : 'border-brand-navy/10 bg-brand-offwhite hover:border-brand-navy/20'
                         }`}
                       >
-                        {watch('tier') === opt.value && (
-                          <span className="w-2 h-2 rounded-full bg-brand-orange" />
+                        {opt.featured && (
+                          <div className="bg-brand-orange text-white text-center py-1.5 font-display font-bold text-[10px] uppercase tracking-[0.2em]">
+                            Most Popular
+                          </div>
                         )}
-                      </span>
-                      <span className="font-display font-semibold text-sm uppercase tracking-wide text-brand-navy">
-                        {opt.label}
-                      </span>
-                    </label>
-                  ))}
+                        <label className="flex items-center gap-3 px-5 py-4 cursor-pointer">
+                          <input
+                            type="radio"
+                            value={opt.value}
+                            {...register('tier')}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                              isSelected
+                                ? 'border-brand-orange'
+                                : 'border-brand-navy/30'
+                            }`}
+                          >
+                            {isSelected && (
+                              <span className="w-2 h-2 rounded-full bg-brand-orange" />
+                            )}
+                          </span>
+                          <div className="flex-1 flex items-baseline justify-between gap-2">
+                            <span className="font-display font-bold text-sm uppercase tracking-wide text-brand-navy">
+                              {opt.label}
+                            </span>
+                            <span className="font-display font-extrabold text-lg text-brand-navy shrink-0">
+                              ${displayPrice}<span className="text-xs font-semibold text-brand-slate">{priceLabel}</span>
+                            </span>
+                          </div>
+                        </label>
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-5 pb-4 border-t border-brand-navy/[0.06]">
+                                <p className="mt-3 text-xs font-body text-brand-slate italic">
+                                  {opt.tagline}
+                                </p>
+                                <ul className="mt-3 flex flex-col gap-1.5">
+                                  {opt.features.map((feature, i) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                      <span className="mt-0.5 shrink-0 text-[10px] text-brand-orange">◆</span>
+                                      <span className="text-xs font-body text-brand-slate leading-relaxed">
+                                        {feature}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )
+                  })}
                 </div>
                 {errors.tier && <p className={errorBase}>{errors.tier.message}</p>}
               </div>

@@ -5,22 +5,28 @@ import { motion, useSpring } from 'framer-motion'
 
 export default function CustomCursor() {
   const [visible, setVisible] = useState(false)
+  const [supported, setSupported] = useState(false)
   const [hoveringInteractive, setHoveringInteractive] = useState(false)
 
-  const cursorX = useSpring(0, { stiffness: 1000, damping: 50 })
-  const cursorY = useSpring(0, { stiffness: 1000, damping: 50 })
-  const ringX = useSpring(0, { stiffness: 150, damping: 20 })
-  const ringY = useSpring(0, { stiffness: 150, damping: 20 })
+  const cursorX = useSpring(0, { stiffness: 800, damping: 45 })
+  const cursorY = useSpring(0, { stiffness: 800, damping: 45 })
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(pointer: fine)')
     if (!mediaQuery.matches) return
 
+    setSupported(true)
+
+    // Hide native cursor via CSS when custom cursor is supported
+    document.documentElement.style.cursor = 'none'
+    const style = document.createElement('style')
+    style.id = 'custom-cursor-hide'
+    style.textContent = '*, *::before, *::after { cursor: none !important; }'
+    document.head.appendChild(style)
+
     const move = (e: MouseEvent) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
-      ringX.set(e.clientX)
-      ringY.set(e.clientY)
       if (!visible) setVisible(true)
     }
 
@@ -57,44 +63,49 @@ export default function CustomCursor() {
       document.removeEventListener('mouseout', handleOut)
       document.removeEventListener('mouseleave', handleLeave)
       document.removeEventListener('mouseenter', handleEnter)
+      document.documentElement.style.cursor = ''
+      const el = document.getElementById('custom-cursor-hide')
+      if (el) el.remove()
     }
-  }, [cursorX, cursorY, ringX, ringY, visible])
+  }, [cursorX, cursorY, visible])
 
-  if (!visible) return null
+  if (!supported || !visible) return null
 
   return (
-    <>
-      {/* Dot */}
-      <motion.div
-        className="fixed top-0 left-0 z-[9999] pointer-events-none"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
+    <motion.div
+      className="fixed top-0 left-0 z-[9999] pointer-events-none"
+      style={{
+        x: cursorX,
+        y: cursorY,
+        translateX: '-50%',
+        translateY: '-50%',
+      }}
+      animate={{
+        scale: hoveringInteractive ? 1.3 : 1,
+        rotate: hoveringInteractive ? 20 : 0,
+      }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
+      {/* Dumbbell SVG */}
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="drop-shadow-[0_1px_3px_rgba(27,45,80,0.3)]"
       >
-        <div className="w-2 h-2 rounded-full bg-brand-navy" />
-      </motion.div>
-
-      {/* Ring follower */}
-      <motion.div
-        className="fixed top-0 left-0 z-[9998] pointer-events-none"
-        style={{
-          x: ringX,
-          y: ringY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
-        animate={{
-          width: hoveringInteractive ? 56 : 36,
-          height: hoveringInteractive ? 56 : 36,
-          opacity: hoveringInteractive ? 0.5 : 0.25,
-        }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      >
-        <div className="w-full h-full rounded-full border-2 border-brand-navy" />
-      </motion.div>
-    </>
+        {/* Left weight plate (outer) */}
+        <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+        {/* Left weight plate (inner) */}
+        <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+        {/* Bar */}
+        <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+        {/* Right weight plate (inner) */}
+        <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
+        {/* Right weight plate (outer) */}
+        <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
+      </svg>
+    </motion.div>
   )
 }
