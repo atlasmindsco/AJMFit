@@ -131,6 +131,14 @@ export default function ProgramsPage() {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseDB | null>(null)
   const [showEndImage, setShowEndImage] = useState(false)
 
+  // Auto-cycle between start/end images in modal
+  useEffect(() => {
+    if (!selectedExercise?.images[1]) return
+    setShowEndImage(false)
+    const interval = setInterval(() => setShowEndImage((p) => !p), 2500)
+    return () => clearInterval(interval)
+  }, [selectedExercise])
+
   useEffect(() => {
     if (activeTab === 'library' && exerciseDB.length === 0) {
       setLibLoading(true)
@@ -471,24 +479,20 @@ export default function ProgramsPage() {
                   </div>
 
                   {/* Images */}
-                  <div
-                    className="bg-white/[0.03] px-6 py-8 flex items-center justify-center relative"
-                    onMouseEnter={() => setShowEndImage(true)}
-                    onMouseLeave={() => setShowEndImage(false)}
-                  >
+                  <div className="bg-white/[0.03] px-6 py-8 flex items-center justify-center relative">
                     {selectedExercise.images.length > 0 ? (
                       <div className="relative max-h-[260px] w-full flex items-center justify-center">
                         <img
                           src={selectedExercise.images[0]}
                           alt={`${selectedExercise.name} — start`}
-                          className="max-h-[260px] object-contain rounded-lg transition-opacity duration-300"
+                          className="max-h-[260px] object-contain rounded-lg transition-opacity duration-[1500ms]"
                           style={{ opacity: showEndImage && selectedExercise.images[1] ? 0 : 1 }}
                         />
                         {selectedExercise.images[1] && (
                           <img
                             src={selectedExercise.images[1]}
                             alt={`${selectedExercise.name} — end`}
-                            className="max-h-[260px] object-contain rounded-lg absolute inset-0 m-auto transition-opacity duration-300"
+                            className="max-h-[260px] object-contain rounded-lg absolute inset-0 m-auto transition-opacity duration-[1500ms]"
                             style={{ opacity: showEndImage ? 1 : 0 }}
                           />
                         )}
@@ -505,7 +509,7 @@ export default function ProgramsPage() {
 
                   {selectedExercise.images.length > 1 && (
                     <p className="text-center text-[10px] font-body text-white/20 -mt-4 mb-2">
-                      Hover image to see end position
+                      Auto-cycling start / end position
                     </p>
                   )}
 
