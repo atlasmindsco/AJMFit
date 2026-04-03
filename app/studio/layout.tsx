@@ -24,7 +24,7 @@ export default function ClientPortalLayout({
   const [chatOpen, setChatOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-[#111]">
       {/* Top Navbar */}
       <nav className="bg-[#111111] border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">

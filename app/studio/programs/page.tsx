@@ -330,7 +330,7 @@ export default function ProgramsPage() {
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8">
         {/* Program Header */}
-        <div className="bg-[#141414] rounded-xl border border-white/[0.06] p-6 mb-4">
+        <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-6 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
             <div>
               <div className="flex items-center gap-2">
@@ -366,9 +366,9 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 1: PROGRAM PREVIEW ════════ */}
           {view === 'preview' && (
             <motion.div key="preview" {...slideBack}>
-              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Overview / Program toggle */}
-                <div className="flex items-center border-b border-white/[0.06]">
+                <div className="flex items-center border-b border-white/[0.10]">
                   <button
                     onClick={() => setPreviewTab('overview')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
@@ -396,19 +396,19 @@ export default function ProgramsPage() {
                   <div className="p-5 space-y-5">
                     {/* Quick stats */}
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
                         </p>
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
                         <p className="text-[#22C55E] font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
@@ -427,9 +427,9 @@ export default function ProgramsPage() {
                         { label: 'Started', value: currentProgram.startDate },
                         { label: 'Duration', value: `${currentProgram.weeks.total} weeks` },
                       ].map((item) => (
-                        <div key={item.label} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
-                          <span className="text-white/40 text-sm font-body">{item.label}</span>
-                          <span className="text-white font-body font-semibold text-sm">{item.value}</span>
+                        <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
+                          <span className="text-white/50 text-sm font-body shrink-0">{item.label}</span>
+                          <span className="text-white font-body font-semibold text-sm text-right">{item.value}</span>
                         </div>
                       ))}
                     </div>
@@ -438,12 +438,10 @@ export default function ProgramsPage() {
                     <div className="space-y-2">
                       <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
                       {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => (
-                        <div key={day.day} className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/[0.02]">
-                          <div className="flex items-center gap-3">
-                            <span className="text-white/30 text-xs font-body w-12">{day.day.slice(0, 3)}</span>
-                            <span className="text-white font-body font-semibold text-sm">{day.name}</span>
-                          </div>
-                          <span className="text-white/30 text-xs font-body">{day.muscles}</span>
+                        <div key={day.day} className="flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04]">
+                          <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
+                          <span className="text-white font-body font-semibold text-sm shrink-0">{day.name}</span>
+                          <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
                         </div>
                       ))}
                     </div>
@@ -485,8 +483,8 @@ export default function ProgramsPage() {
                             }}
                             className={`w-full flex items-center gap-4 p-3 rounded-xl text-left group ${
                               isRest
-                                ? 'bg-[#1C1C1C] border border-white/[0.04] cursor-default'
-                                : 'bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
+                                ? 'bg-[#1A1A1A] border border-white/[0.06] cursor-default'
+                                : 'bg-[#222] border border-white/[0.10] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
                             }`}
                           >
                             {/* Thumbnail or rest icon */}
@@ -566,9 +564,9 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 2: WORKOUT OVERVIEW ════════ */}
           {view === 'workout' && selected && (
             <motion.div key="workout" {...slideIn}>
-              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-white/[0.06]">
+                <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
                     onClick={() => { setView('preview'); setSelectedDay(null) }}
                     className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
@@ -613,7 +611,7 @@ export default function ProgramsPage() {
                                   setView('exercise')
                                 }
                               }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#1E1E1E] hover:border-white/[0.10] transition-colors duration-200 text-left"
+                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#222] border border-white/[0.10] hover:bg-[#1E1E1E] hover:border-white/[0.10] transition-colors duration-200 text-left"
                             >
                               {/* Thumbnail with play overlay */}
                               <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
@@ -684,9 +682,9 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 3: EXERCISE DETAIL ════════ */}
           {view === 'exercise' && selectedExerciseData && (
             <motion.div key="exercise" {...slideIn}>
-              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-white/[0.06]">
+                <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
                     onClick={() => { setView('workout'); setSelectedExercise(null) }}
                     className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
@@ -802,14 +800,14 @@ export default function ProgramsPage() {
       {/* SIDEBAR */}
       <div className="lg:col-span-4 space-y-4">
         {/* Recent Workout Logs */}
-        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
-          <div className="px-5 py-4 border-b border-white/[0.06]">
+        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+          <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Recent Logs</h2>
           </div>
           <div className="p-5 space-y-3">
             {recentLogs.map((log) => (
               <div key={log.date} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.10] flex items-center justify-center shrink-0">
                   <span className="text-white/40 text-[10px] font-display font-bold">{log.date}</span>
                 </div>
                 <div className="min-w-0">
@@ -827,18 +825,18 @@ export default function ProgramsPage() {
         </motion.div>
 
         {/* Coach Notes */}
-        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
-          <div className="px-5 py-4 border-b border-white/[0.06]">
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+          <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Coach Notes</h2>
           </div>
           <div className="p-5 space-y-4">
-            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <div className="p-3 rounded-lg bg-white/[0.06] border border-white/[0.10]">
               <p className="text-white/70 text-sm font-body leading-relaxed">
                 &ldquo;Great progress on bench — you&apos;re ready to push to 190 next week. Keep rest times strict on accessories.&rdquo;
               </p>
               <p className="text-white/30 text-xs font-body mt-2">— Anthony, Mar 26</p>
             </div>
-            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <div className="p-3 rounded-lg bg-white/[0.06] border border-white/[0.10]">
               <p className="text-white/70 text-sm font-body leading-relaxed">
                 &ldquo;Focus on mind-muscle connection during pull-ups. Slow the eccentric to 3 seconds.&rdquo;
               </p>
@@ -848,8 +846,8 @@ export default function ProgramsPage() {
         </motion.div>
 
         {/* Past Programs */}
-        <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
-          <div className="px-5 py-4 border-b border-white/[0.06]">
+        <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+          <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Past Programs</h2>
           </div>
           <div className="p-5 space-y-3">
@@ -886,7 +884,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
   }, [images])
 
   return (
-    <div className="relative w-full h-56 rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/[0.06]">
+    <div className="relative w-full h-56 rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/[0.10]">
       <img
         src={images[0]}
         alt={`${name} — start`}
@@ -910,7 +908,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
 
 function SetupCard({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.06] border border-white/[0.10]">
       <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center">
         {icon === 'equipment' && (
           <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
