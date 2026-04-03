@@ -320,7 +320,7 @@ const fadeIn = {
 
 export default function ProgramsPage() {
   const [view, setView] = useState<ProgramView>('preview')
-  const [previewTab, setPreviewTab] = useState<'overview' | 'program'>('program')
+  const [previewTab, setPreviewTab] = useState<'overview' | 'program'>('overview')
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
@@ -495,13 +495,31 @@ export default function ProgramsPage() {
                     {/* Weekly split summary */}
                     <div className="space-y-2">
                       <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
-                      {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => (
-                        <div key={day.day} className="flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04]">
-                          <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
-                          <span className="text-white font-body font-semibold text-sm shrink-0">{day.name}</span>
-                          <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
-                        </div>
-                      ))}
+                      {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => {
+                        const dayIndex = weeklyPlan.indexOf(day)
+                        return (
+                          <button
+                            key={day.day}
+                            onClick={() => { setSelectedDay(dayIndex); setView('workout') }}
+                            className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
+                          >
+                            <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
+                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#3B82F6] transition-colors duration-200">{day.name}</span>
+                            <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
+                            {day.completed ? (
+                              <div className="w-5 h-5 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <svg className="w-4 h-4 text-white/20 group-hover:text-white/40 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                              </svg>
+                            )}
+                          </button>
+                        )
+                      })}
                     </div>
 
                     {/* CTA to view program */}
