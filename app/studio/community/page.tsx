@@ -108,7 +108,7 @@ const forumPosts = [
     replies: 6,
     likes: 15,
     pinned: false,
-    preview: 'For those on the Lean Muscle Builder program, Phase 2 (Hypertrophy) kicks off Monday. Here\'s what to expect...',
+    preview: 'For those on the Muscle Builder program, Phase 2 (Hypertrophy) kicks off Monday. Here\'s what to expect...',
     isCoach: true,
   },
 ]

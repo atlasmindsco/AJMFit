@@ -147,6 +147,60 @@ const weeklyPlan = [
   },
 ]
 
+/* ── Personal Records (per exercise) ── */
+interface PRRecord {
+  weight: number     // lbs
+  reps: number
+  date: string       // when PR was set
+  previous?: number  // previous PR weight for comparison
+}
+
+const exercisePRs: Record<string, PRRecord> = {
+  'Barbell Bench Press':   { weight: 185, reps: 8, date: 'Mar 26', previous: 175 },
+  'Incline Dumbbell Press':{ weight: 65,  reps: 10, date: 'Mar 19', previous: 60 },
+  'Overhead Press':        { weight: 115, reps: 8, date: 'Mar 12', previous: 110 },
+  'Lateral Raises':        { weight: 25,  reps: 14, date: 'Mar 26' },
+  'Tricep Pushdowns':      { weight: 60,  reps: 15, date: 'Mar 19' },
+  'Barbell Squat':         { weight: 225, reps: 6, date: 'Mar 25', previous: 215 },
+  'Romanian Deadlift':     { weight: 185, reps: 10, date: 'Mar 18', previous: 175 },
+  'Leg Press':             { weight: 360, reps: 10, date: 'Mar 25', previous: 340 },
+  'Walking Lunges':        { weight: 50,  reps: 12, date: 'Mar 11' },
+  'Calf Raises':           { weight: 80,  reps: 18, date: 'Mar 25' },
+  'Pull-Ups (Weighted)':   { weight: 25,  reps: 8, date: 'Mar 22', previous: 20 },
+  'Barbell Row':           { weight: 165, reps: 10, date: 'Mar 22', previous: 155 },
+  'Seated Cable Row':      { weight: 140, reps: 12, date: 'Mar 15' },
+  'Face Pulls':            { weight: 40,  reps: 18, date: 'Mar 22' },
+  'Barbell Curls':         { weight: 75,  reps: 10, date: 'Mar 15', previous: 70 },
+  'Hip Thrusts':           { weight: 225, reps: 10, date: 'Mar 8', previous: 205 },
+  'Front Squat':           { weight: 155, reps: 8, date: 'Mar 8', previous: 145 },
+  'Leg Curl':              { weight: 100, reps: 12, date: 'Mar 1' },
+  'Cable Woodchops':       { weight: 35,  reps: 12, date: 'Mar 1' },
+}
+
+/* ── Exercise Alternatives (same muscle group substitutions) ── */
+const exerciseAlternatives: Record<string, string[]> = {
+  'Barbell Bench Press':    ['Dumbbell Bench Press', 'Machine Chest Press', 'Push-Ups'],
+  'Incline Dumbbell Press': ['Incline Barbell Press', 'Incline Machine Press', 'Low Cable Fly'],
+  'Overhead Press':         ['Dumbbell Shoulder Press', 'Machine Shoulder Press', 'Landmine Press'],
+  'Lateral Raises':         ['Cable Lateral Raise', 'Machine Lateral Raise', 'Resistance Band Lateral Raise'],
+  'Tricep Pushdowns':       ['Overhead Tricep Extension', 'Dumbbell Kickbacks', 'Close-Grip Push-Ups'],
+  'Barbell Squat':          ['Goblet Squat', 'Leg Press', 'Smith Machine Squat'],
+  'Romanian Deadlift':      ['Dumbbell Romanian Deadlift', 'Good Mornings', 'Cable Pull-Through'],
+  'Leg Press':              ['Hack Squat', 'Bulgarian Split Squat', 'Goblet Squat'],
+  'Walking Lunges':         ['Reverse Lunges', 'Step-Ups', 'Split Squat'],
+  'Calf Raises':            ['Seated Calf Raise', 'Leg Press Calf Raise', 'Single-Leg Calf Raise'],
+  'Pull-Ups (Weighted)':    ['Lat Pulldown', 'Assisted Pull-Up Machine', 'Resistance Band Pull-Ups'],
+  'Barbell Row':            ['Dumbbell Row', 'T-Bar Row', 'Cable Row'],
+  'Seated Cable Row':       ['Dumbbell Row', 'Machine Row', 'Resistance Band Row'],
+  'Face Pulls':             ['Reverse Pec Deck', 'Band Pull-Aparts', 'Rear Delt Fly'],
+  'Barbell Curls':          ['Dumbbell Curls', 'Cable Curls', 'Hammer Curls'],
+  'Hip Thrusts':            ['Glute Bridge', 'Cable Pull-Through', 'Machine Hip Extension'],
+  'Front Squat':            ['Goblet Squat', 'Zercher Squat', 'Leg Press (High Foot)'],
+  'Leg Curl':               ['Nordic Curl', 'Dumbbell Leg Curl', 'Stability Ball Curl'],
+  'Cable Woodchops':        ['Dumbbell Woodchops', 'Medicine Ball Rotations', 'Pallof Press'],
+  'Plank Hold':             ['Dead Bug', 'Ab Wheel Rollout', 'Hollow Body Hold'],
+}
+
 /* ── Exercise Log History ── */
 const recentLogs = [
   { date: 'Mar 26', workout: 'Chest', topSet: 'Bench Press — 185 lbs x 8', prs: 1 },
@@ -271,6 +325,10 @@ export default function ProgramsPage() {
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
   const [imagePreview, setImagePreview] = useState<Record<string, boolean>>({})
+  const [expandedWorkoutExercise, setExpandedWorkoutExercise] = useState<string | null>(null)
+  const [setLogs, setSetLogs] = useState<Record<string, { weight: string; reps: string }[]>>({})
+  const [swapMenuOpen, setSwapMenuOpen] = useState<string | null>(null)
+  const [swappedExercises, setSwappedExercises] = useState<Record<string, string>>({})
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
   const progressPct = (currentProgram.weeks.current / currentProgram.weeks.total) * 100
@@ -599,69 +657,281 @@ export default function ProgramsPage() {
                       {/* Exercises in series */}
                       <div className="space-y-2">
                         {group.exercises.map(({ exercise, seriesPrefix }) => {
+                          const swapKey = `${selectedDay}-${exercise.name}`
+                          const displayName = swappedExercises[swapKey] ?? exercise.name
+                          const isSwapped = displayName !== exercise.name
+                          const alternatives = exerciseAlternatives[exercise.name] ?? []
+                          const showSwapMenu = swapMenuOpen === exercise.name
                           const dbMatch = matchedExercises.get(exercise.name) ?? null
                           const showEnd = imagePreview[exercise.name] ?? false
+                          const isOpen = expandedWorkoutExercise === exercise.name
+                          const logKey = `${selectedDay}-${exercise.name}`
+                          const currentLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, () => ({ weight: '', reps: '' }))
+                          const pr = exercisePRs[exercise.name] ?? null
+                          // Check if any entered set beats the PR
+                          const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.weight && l.reps ? Number(l.weight) : 0)))
+                          const isNewPR = pr ? bestEnteredWeight > pr.weight : bestEnteredWeight > 0
 
                           return (
-                            <button
-                              key={exercise.name}
-                              onClick={() => {
-                                if (dbMatch) {
-                                  setSelectedExercise(exercise.name)
-                                  setView('exercise')
-                                }
-                              }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#222] border border-white/[0.10] hover:bg-[#1E1E1E] hover:border-white/[0.10] transition-colors duration-200 text-left"
-                            >
-                              {/* Thumbnail with play overlay */}
-                              <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
-                                {dbMatch?.images[0] ? (
-                                  <>
-                                    <img
-                                      src={dbMatch.images[showEnd && dbMatch.images[1] ? 1 : 0]}
-                                      alt=""
-                                      className="w-full h-full object-cover transition-opacity duration-[1200ms]"
-                                      loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 bg-black/20" />
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                      <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
-                                        <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M8 5v14l11-7z" />
-                                        </svg>
+                            <div key={exercise.name} className="rounded-xl bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
+                              {/* Exercise row */}
+                              <div className="flex items-center gap-3 p-3">
+                                {/* Thumbnail — tap for exercise detail */}
+                                <button
+                                  onClick={() => {
+                                    if (dbMatch) {
+                                      setSelectedExercise(exercise.name)
+                                      setView('exercise')
+                                    }
+                                  }}
+                                  className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0"
+                                >
+                                  {dbMatch?.images[0] ? (
+                                    <>
+                                      <img
+                                        src={dbMatch.images[showEnd && dbMatch.images[1] ? 1 : 0]}
+                                        alt=""
+                                        className="w-full h-full object-cover transition-opacity duration-[1200ms]"
+                                        loading="lazy"
+                                      />
+                                      <div className="absolute inset-0 bg-black/20" />
+                                      <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                                          <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z" />
+                                          </svg>
+                                        </div>
                                       </div>
+                                    </>
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <span className="text-white/20 text-xs font-display font-bold">{seriesPrefix}</span>
                                     </div>
-                                  </>
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <span className="text-white/20 text-xs font-display font-bold">{seriesPrefix}</span>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Info */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                  {group.isSuperset && (
-                                    <span className="text-[#22C55E] text-[10px] font-display font-bold">{seriesPrefix}</span>
                                   )}
-                                  <p className="font-body font-semibold text-white text-sm truncate">{exercise.name}</p>
-                                </div>
-                                <p className="text-white/35 text-xs font-body mt-0.5">
-                                  Reps: {exercise.reps} &middot; {exercise.sets} sets
-                                </p>
+                                </button>
+
+                                {/* Info — tap to expand log */}
+                                <button
+                                  onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
+                                  className="flex-1 min-w-0 text-left"
+                                >
+                                  <div className="flex items-center gap-1.5">
+                                    {group.isSuperset && (
+                                      <span className="text-[#22C55E] text-[10px] font-display font-bold">{seriesPrefix}</span>
+                                    )}
+                                    <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
+                                    {isSwapped && (
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#3B82F6]/15 text-[#3B82F6] shrink-0">
+                                        Swapped
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <p className="text-white/35 text-xs font-body">
+                                      Reps: {exercise.reps} &middot; {exercise.sets} sets
+                                    </p>
+                                    {pr && (
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B] flex items-center gap-0.5">
+                                        <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
+                                        </svg>
+                                        PR: {pr.weight} lbs
+                                      </span>
+                                    )}
+                                  </div>
+                                </button>
+
+                                {/* Right side — expand toggle */}
+                                <button
+                                  onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
+                                  className="text-right shrink-0 flex flex-col items-end"
+                                >
+                                  <p className="text-[#F08B1E] text-xs font-display font-bold">
+                                    {exercise.sets}X / Rest
+                                  </p>
+                                  <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                  </svg>
+                                </button>
                               </div>
 
-                              {/* Rest / Set info */}
-                              <div className="text-right shrink-0">
-                                <p className="text-[#F08B1E] text-xs font-display font-bold">
-                                  {exercise.sets}X / Rest
-                                </p>
-                                <svg className="w-4 h-4 text-white/20 ml-auto mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                                </svg>
-                              </div>
-                            </button>
+                              {/* Expandable set logger */}
+                              <AnimatePresence>
+                                {isOpen && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="px-3 pb-3 pt-1 border-t border-white/[0.06]">
+                                      {/* PR banner */}
+                                      {pr && (
+                                        <div className={`flex items-center justify-between rounded-lg px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-[#F59E0B]/15 border border-[#F59E0B]/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
+                                          <div className="flex items-center gap-2">
+                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-[#F59E0B]' : 'text-white/30'}`} viewBox="0 0 24 24" fill="currentColor">
+                                              <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
+                                            </svg>
+                                            {isNewPR ? (
+                                              <span className="text-[#F59E0B] text-[11px] font-display font-bold uppercase tracking-wide">
+                                                New PR!
+                                              </span>
+                                            ) : (
+                                              <span className="text-white/40 text-[11px] font-display font-bold uppercase tracking-wide">
+                                                Current PR
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div className="text-right">
+                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-[#F59E0B]' : 'text-white/60'}`}>
+                                              {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
+                                            </span>
+                                            <span className="text-white/20 text-[10px] font-body ml-2">{pr.date}</span>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* Column headers */}
+                                      <div className="grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-2 mt-2">
+                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Reps</span>
+                                        <span />
+                                      </div>
+
+                                      {/* Set rows */}
+                                      {currentLogs.map((log, si) => {
+                                        const filled = log.weight !== '' && log.reps !== ''
+                                        const setWeight = Number(log.weight) || 0
+                                        const setBeatsPR = filled && pr ? setWeight > pr.weight : filled && setWeight > 0
+                                        return (
+                                          <div key={si} className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1.5 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-[#F59E0B]/[0.06]' : ''}`}>
+                                            <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-[#F59E0B]' : 'text-white/30'}`}>{si + 1}</span>
+                                            <input
+                                              type="number"
+                                              inputMode="numeric"
+                                              placeholder="—"
+                                              value={log.weight}
+                                              onChange={(e) => {
+                                                const updated = [...currentLogs]
+                                                updated[si] = { ...updated[si], weight: e.target.value }
+                                                setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
+                                              }}
+                                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            />
+                                            <input
+                                              type="number"
+                                              inputMode="numeric"
+                                              placeholder="—"
+                                              value={log.reps}
+                                              onChange={(e) => {
+                                                const updated = [...currentLogs]
+                                                updated[si] = { ...updated[si], reps: e.target.value }
+                                                setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
+                                              }}
+                                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            />
+                                            <div className="flex items-center justify-center">
+                                              {setBeatsPR ? (
+                                                <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
+                                                  <svg className="w-3.5 h-3.5 text-[#F59E0B]" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
+                                                  </svg>
+                                                </div>
+                                              ) : filled ? (
+                                                <div className="w-6 h-6 rounded-full bg-[#22C55E]/20 flex items-center justify-center">
+                                                  <svg className="w-3.5 h-3.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                  </svg>
+                                                </div>
+                                              ) : (
+                                                <div className="w-6 h-6 rounded-full bg-white/[0.04] border border-white/[0.08]" />
+                                              )}
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
+
+                                      {/* Target reminder */}
+                                      <p className="text-white/20 text-[10px] font-body mt-2 text-center">
+                                        Target: {exercise.reps} reps &middot; Rest: {exercise.rest}
+                                      </p>
+
+                                      {/* Swap exercise button */}
+                                      {alternatives.length > 0 && (
+                                        <div className="mt-3 relative">
+                                          <button
+                                            onClick={() => setSwapMenuOpen(showSwapMenu ? null : exercise.name)}
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
+                                          >
+                                            <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                                            </svg>
+                                            <span className="text-white/40 text-[10px] font-display font-bold uppercase tracking-wide">
+                                              {isSwapped ? 'Change Substitute' : 'Swap Exercise'}
+                                            </span>
+                                          </button>
+
+                                          {/* Swap dropdown */}
+                                          <AnimatePresence>
+                                            {showSwapMenu && (
+                                              <motion.div
+                                                initial={{ opacity: 0, y: -4 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -4 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute bottom-full left-0 right-0 mb-1 bg-[#1A1A1A] border border-white/[0.10] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
+                                              >
+                                                <div className="px-3 py-2 border-b border-white/[0.06]">
+                                                  <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-[0.15em]">
+                                                    Equipment not available? Pick a substitute:
+                                                  </p>
+                                                </div>
+                                                {alternatives.map((alt) => (
+                                                  <button
+                                                    key={alt}
+                                                    onClick={() => {
+                                                      setSwappedExercises((prev) => ({ ...prev, [swapKey]: alt }))
+                                                      setSwapMenuOpen(null)
+                                                    }}
+                                                    className={`w-full px-3 py-2.5 text-left hover:bg-white/[0.04] transition-colors duration-150 flex items-center justify-between ${
+                                                      displayName === alt ? 'bg-white/[0.04]' : ''
+                                                    }`}
+                                                  >
+                                                    <span className="text-white/70 text-sm font-body">{alt}</span>
+                                                    {displayName === alt && (
+                                                      <svg className="w-4 h-4 text-[#3B82F6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                      </svg>
+                                                    )}
+                                                  </button>
+                                                ))}
+                                                {isSwapped && (
+                                                  <button
+                                                    onClick={() => {
+                                                      setSwappedExercises((prev) => {
+                                                        const next = { ...prev }
+                                                        delete next[swapKey]
+                                                        return next
+                                                      })
+                                                      setSwapMenuOpen(null)
+                                                    }}
+                                                    className="w-full px-3 py-2.5 text-left border-t border-white/[0.06] hover:bg-white/[0.04] transition-colors duration-150"
+                                                  >
+                                                    <span className="text-[#F08B1E] text-sm font-body font-semibold">Reset to Original</span>
+                                                  </button>
+                                                )}
+                                              </motion.div>
+                                            )}
+                                          </AnimatePresence>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
                           )
                         })}
                       </div>

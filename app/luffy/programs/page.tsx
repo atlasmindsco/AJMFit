@@ -12,72 +12,249 @@ const fadeIn = {
   }),
 }
 
-const programs = [
+type Level = 'Beginner' | 'Intermediate' | 'Advanced'
+
+interface ProgramLevel {
+  level: Level
+  duration: string
+  phases: number
+  daysPerWeek: number
+  split: string
+  clients: string[]
+}
+
+interface Program {
+  name: string
+  description: string
+  type: string
+  icon: 'muscle' | 'strength' | 'shred' | 'back' | 'legs' | 'chest' | 'shoulders'
+  levels: ProgramLevel[]
+}
+
+const programs: Program[] = [
   {
-    name: 'Lean Muscle Builder',
-    description: 'Progressive hypertrophy-focused program for building lean muscle mass',
-    duration: '12 weeks',
-    phases: 3,
-    clients: ['Marcus Johnson', 'Tanya Bell'],
-    status: 'active',
+    name: 'Muscle Builder',
+    description: 'Bro split hypertrophy program — 2 body parts per day, gym & dumbbell focused',
     type: 'Hypertrophy',
-    split: 'Upper/Lower + Legs & Core',
-    daysPerWeek: 5,
+    icon: 'muscle',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '8 weeks',
+        phases: 2,
+        daysPerWeek: 5,
+        split: 'Bro Split — Chest/Tri, Back/Bi, Shoulders/Abs, Legs, Arms',
+        clients: ['David Reeves'],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 5,
+        split: 'Bro Split — Chest/Tri, Back/Bi, Shoulders/Traps, Legs/Abs, Arms',
+        clients: ['Marcus Johnson', 'Tanya Bell'],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 6,
+        split: 'Bro Split — Chest/Front Delt, Back/Rear Delt, Shoulders/Traps, Quads/Calves, Hams/Glutes, Arms/Abs',
+        clients: ['Chris Okafor'],
+      },
+    ],
   },
   {
-    name: 'Fat Loss Kickstart',
-    description: 'High-intensity fat loss program combining strength and metabolic conditioning',
-    duration: '8 weeks',
-    phases: 2,
-    clients: ['Sarah Kim', 'Chris Okafor', 'Mia Chen'],
-    status: 'active',
-    type: 'Fat Loss',
-    split: 'Full Body / Push-Pull',
-    daysPerWeek: 4,
-  },
-  {
-    name: 'Strength Foundations',
-    description: 'Beginner-friendly strength program focused on compound lifts and form mastery',
-    duration: '6 weeks',
-    phases: 2,
-    clients: ['David Reeves', 'Andre Williams'],
-    status: 'active',
+    name: 'Strength Builder',
+    description: 'Compound-focused strength program to build raw power and functional strength',
     type: 'Strength',
-    split: 'Full Body 3x/wk',
-    daysPerWeek: 3,
+    icon: 'strength',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '6 weeks',
+        phases: 2,
+        daysPerWeek: 3,
+        split: 'Full Body 3x/wk',
+        clients: ['Andre Williams'],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 4,
+        split: 'Upper / Lower + Heavy Day',
+        clients: ['Sarah Kim', 'Jasmine Torres'],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 5,
+        split: 'Conjugate / Westside',
+        clients: [],
+      },
+    ],
   },
   {
-    name: 'Athletic Performance',
-    description: 'Sport-specific training for power, agility, and athletic conditioning',
-    duration: '10 weeks',
-    phases: 3,
-    clients: ['Jasmine Torres'],
-    status: 'active',
-    type: 'Performance',
-    split: 'Sport-Specific Periodization',
-    daysPerWeek: 5,
+    name: 'Shred Program',
+    description: 'High-intensity fat loss program combining strength training and metabolic conditioning',
+    type: 'Fat Loss',
+    icon: 'shred',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '6 weeks',
+        phases: 2,
+        daysPerWeek: 3,
+        split: 'Full Body + Cardio Finishers',
+        clients: ['Mia Chen'],
+      },
+      {
+        level: 'Intermediate',
+        duration: '8 weeks',
+        phases: 3,
+        daysPerWeek: 4,
+        split: 'Push-Pull + HIIT Days',
+        clients: ['Sarah Kim', 'Chris Okafor'],
+      },
+      {
+        level: 'Advanced',
+        duration: '10 weeks',
+        phases: 4,
+        daysPerWeek: 5,
+        split: 'PPL + 2x Conditioning',
+        clients: [],
+      },
+    ],
   },
   {
-    name: 'Post-Rehab Return',
-    description: 'Gentle return-to-training program for clients recovering from injury',
-    duration: '6 weeks',
-    phases: 2,
-    clients: [],
-    status: 'template',
-    type: 'Rehab',
-    split: 'Full Body / Mobility',
-    daysPerWeek: 3,
+    name: 'Back Focus',
+    description: 'PPL program with extra back volume — build width, thickness, and a stronger posterior chain',
+    type: 'Hypertrophy',
+    icon: 'back',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '8 weeks',
+        phases: 2,
+        daysPerWeek: 4,
+        split: 'Pull (Back Heavy) / Push / Legs / Pull (Back Width)',
+        clients: [],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 5,
+        split: 'Pull (Thickness) / Push / Legs / Pull (Width) / Upper',
+        clients: [],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 6,
+        split: 'Pull (Thickness) / Push / Legs / Pull (Width) / Push / Legs (Deadlift)',
+        clients: [],
+      },
+    ],
   },
   {
-    name: 'Competition Prep',
-    description: 'Peaking and tapering program for physique or strength competitions',
-    duration: '16 weeks',
-    phases: 4,
-    clients: [],
-    status: 'template',
-    type: 'Competition',
-    split: 'PPL + Posing Practice',
-    daysPerWeek: 6,
+    name: 'Leg Focus',
+    description: 'PPL program with extra leg volume — quads, hamstrings, glutes, and calves priority',
+    type: 'Hypertrophy',
+    icon: 'legs',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '8 weeks',
+        phases: 2,
+        daysPerWeek: 4,
+        split: 'Legs (Quad) / Push / Pull / Legs (Ham & Glutes)',
+        clients: [],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 5,
+        split: 'Legs (Quad) / Push / Pull / Legs (Ham & Glutes) / Upper',
+        clients: [],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 6,
+        split: 'Legs (Quad) / Push / Pull / Legs (Ham & Glutes) / Push / Pull',
+        clients: [],
+      },
+    ],
+  },
+  {
+    name: 'Chest & Arms Focus',
+    description: 'PPL program with extra chest and arm volume — build a bigger pressing foundation',
+    type: 'Hypertrophy',
+    icon: 'chest',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '8 weeks',
+        phases: 2,
+        daysPerWeek: 4,
+        split: 'Push (Chest Heavy) / Pull / Legs / Arms',
+        clients: [],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 5,
+        split: 'Push (Chest Heavy) / Pull / Legs / Push (Incline) / Arms',
+        clients: [],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 6,
+        split: 'Push (Chest Heavy) / Pull / Legs / Push (Incline) / Arms / Pull',
+        clients: [],
+      },
+    ],
+  },
+  {
+    name: 'Shoulder Focus',
+    description: 'PPL program with extra delt volume — build capped shoulders and a wider frame',
+    type: 'Hypertrophy',
+    icon: 'shoulders',
+    levels: [
+      {
+        level: 'Beginner',
+        duration: '8 weeks',
+        phases: 2,
+        daysPerWeek: 4,
+        split: 'Push (Shoulder Heavy) / Pull / Legs / Shoulders & Arms',
+        clients: [],
+      },
+      {
+        level: 'Intermediate',
+        duration: '10 weeks',
+        phases: 3,
+        daysPerWeek: 5,
+        split: 'Push (Shoulder Heavy) / Pull / Legs / Shoulders / Arms',
+        clients: [],
+      },
+      {
+        level: 'Advanced',
+        duration: '12 weeks',
+        phases: 4,
+        daysPerWeek: 6,
+        split: 'Push (Shoulder Heavy) / Pull / Legs / Shoulders / Push / Arms',
+        clients: [],
+      },
+    ],
   },
 ]
 
@@ -109,11 +286,26 @@ function getTypeColor(type: string) {
     Hypertrophy: 'bg-[#F08B1E]/15 text-[#F08B1E]',
     'Fat Loss': 'bg-emerald-500/15 text-emerald-400',
     Strength: 'bg-[#2E6AB0]/15 text-[#2E6AB0]',
-    Performance: 'bg-purple-500/15 text-purple-400',
-    Rehab: 'bg-amber-500/15 text-amber-400',
-    Competition: 'bg-red-500/15 text-red-400',
   }
   return map[type] || 'bg-white/[0.06] text-white/50'
+}
+
+function getLevelColor(level: Level) {
+  const map: Record<Level, string> = {
+    Beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+    Intermediate: 'bg-[#F08B1E]/15 text-[#F08B1E] border-[#F08B1E]/20',
+    Advanced: 'bg-red-500/15 text-red-400 border-red-500/20',
+  }
+  return map[level]
+}
+
+function getLevelDot(level: Level) {
+  const map: Record<Level, string> = {
+    Beginner: 'bg-emerald-400',
+    Intermediate: 'bg-[#F08B1E]',
+    Advanced: 'bg-red-400',
+  }
+  return map[level]
 }
 
 type Tab = 'programs' | 'library'
@@ -121,6 +313,7 @@ type Tab = 'programs' | 'library'
 export default function ProgramsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('programs')
   const [expandedProgram, setExpandedProgram] = useState<number | null>(null)
+  const [expandedLevel, setExpandedLevel] = useState<string | null>(null)
 
   // Exercise library state
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
@@ -172,8 +365,7 @@ export default function ProgramsPage() {
     return list.sort((a, b) => a.name.localeCompare(b.name))
   }, [exerciseDB, libMuscle, libEquipment, libSearch])
 
-  const activePrograms = programs.filter(p => p.status === 'active')
-  const templates = programs.filter(p => p.status === 'template')
+  const totalClients = programs.reduce((sum, p) => sum + p.levels.reduce((s, l) => s + l.clients.length, 0), 0)
 
   return (
     <div className="p-6 lg:p-10 max-w-[1400px] mx-auto">
@@ -188,7 +380,7 @@ export default function ProgramsPage() {
             Programs
           </motion.h1>
           <p className="text-white/40 font-body text-sm mt-1">
-            {activePrograms.length} active &middot; {templates.length} templates
+            {programs.length} programs &middot; {totalClients} active clients
           </p>
         </div>
         <div className="flex gap-2">
@@ -212,119 +404,165 @@ export default function ProgramsPage() {
       </div>
 
       {activeTab === 'programs' ? (
-        <div className="space-y-8">
-          {/* Active Programs */}
-          <div>
-            <h2 className="text-white/30 text-[11px] font-display uppercase tracking-[0.2em] mb-4">Active Programs</h2>
-            <div className="space-y-3">
-              {activePrograms.map((prog, i) => (
-                <motion.div
-                  key={prog.name}
-                  custom={i}
-                  variants={fadeIn}
-                  initial="hidden"
-                  animate="visible"
-                  className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden"
-                >
-                  <button
-                    onClick={() => setExpandedProgram(expandedProgram === i ? null : i)}
-                    className="w-full p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors duration-200"
-                  >
-                    <div className="flex items-center gap-4 text-left">
-                      <div className="w-12 h-12 rounded-xl bg-[#F08B1E]/10 flex items-center justify-center shrink-0">
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15a2.25 2.25 0 0 1 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-white font-body font-semibold text-sm">{prog.name}</p>
-                          <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${getTypeColor(prog.type)}`}>
-                            {prog.type}
-                          </span>
-                        </div>
-                        <p className="text-white/30 text-xs font-body mt-0.5">{prog.description}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="hidden sm:block text-right">
-                        <p className="text-white/60 text-sm font-display font-bold">{prog.clients.length}</p>
-                        <p className="text-white/20 text-[10px] font-body">clients</p>
-                      </div>
-                      <svg className={`w-4 h-4 text-white/20 transition-transform duration-200 ${expandedProgram === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </div>
-                  </button>
+        <div className="space-y-6">
+          {programs.map((prog, i) => {
+            const totalProgramClients = prog.levels.reduce((s, l) => s + l.clients.length, 0)
+            const isExpanded = expandedProgram === i
 
-                  {expandedProgram === i && (
-                    <div className="px-5 pb-5 pt-0 border-t border-white/[0.04]">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 mb-4">
-                        <div>
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Duration</p>
-                          <p className="text-white/70 text-sm font-body mt-1">{prog.duration}</p>
-                        </div>
-                        <div>
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Phases</p>
-                          <p className="text-white/70 text-sm font-body mt-1">{prog.phases} phases</p>
-                        </div>
-                        <div>
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Split</p>
-                          <p className="text-white/70 text-sm font-body mt-1">{prog.split}</p>
-                        </div>
-                        <div>
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Training Days</p>
-                          <p className="text-white/70 text-sm font-body mt-1">{prog.daysPerWeek}x / week</p>
-                        </div>
-                      </div>
-                      {prog.clients.length > 0 && (
-                        <div>
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mb-2">Assigned Clients</p>
-                          <div className="flex flex-wrap gap-2">
-                            {prog.clients.map((c) => (
-                              <span key={c} className="bg-white/[0.04] text-white/50 text-xs font-body px-3 py-1.5 rounded-lg">
-                                {c}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+            return (
+              <motion.div
+                key={prog.name}
+                custom={i}
+                variants={fadeIn}
+                initial="hidden"
+                animate="visible"
+                className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden"
+              >
+                {/* Program Header */}
+                <button
+                  onClick={() => setExpandedProgram(isExpanded ? null : i)}
+                  className="w-full p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-4 text-left">
+                    <div className="w-12 h-12 rounded-xl bg-[#F08B1E]/10 flex items-center justify-center shrink-0">
+                      {prog.icon === 'muscle' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                        </svg>
+                      )}
+                      {prog.icon === 'strength' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                      {prog.icon === 'shred' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18z" />
+                        </svg>
+                      )}
+                      {/* Back icon — rows/lats */}
+                      {prog.icon === 'back' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m-7.5 3V6.75A2.25 2.25 0 0 1 6.75 4.5h10.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25H6.75a2.25 2.25 0 0 1-2.25-2.25Z" />
+                        </svg>
+                      )}
+                      {/* Legs icon */}
+                      {prog.icon === 'legs' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125V17.25m5.25 0h-5.25m5.25 0a3 3 0 0 0 .966-5.839 4.5 4.5 0 0 0-7.716-3.093M8.25 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125V17.25m5.25 0H3m5.25 0a3 3 0 0 0-.966-5.839 4.5 4.5 0 0 0-3.284-3.093" />
+                        </svg>
+                      )}
+                      {/* Chest icon */}
+                      {prog.icon === 'chest' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                      )}
+                      {/* Shoulders icon */}
+                      {prog.icon === 'shoulders' && (
+                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
+                        </svg>
                       )}
                     </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-body font-semibold text-sm">{prog.name}</p>
+                        <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${getTypeColor(prog.type)}`}>
+                          {prog.type}
+                        </span>
+                      </div>
+                      <p className="text-white/30 text-xs font-body mt-0.5">{prog.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="hidden sm:flex items-center gap-3">
+                      {prog.levels.map((l) => (
+                        <span key={l.level} className={`text-[9px] font-display font-bold px-2 py-0.5 rounded ${getLevelColor(l.level)}`}>
+                          {l.level}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="hidden sm:block text-right">
+                      <p className="text-white/60 text-sm font-display font-bold">{totalProgramClients}</p>
+                      <p className="text-white/20 text-[10px] font-body">clients</p>
+                    </div>
+                    <svg className={`w-4 h-4 text-white/20 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </div>
+                </button>
 
-          {/* Templates */}
-          <div>
-            <h2 className="text-white/30 text-[11px] font-display uppercase tracking-[0.2em] mb-4">Templates</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {templates.map((prog, i) => (
-                <motion.div
-                  key={prog.name}
-                  custom={i + activePrograms.length}
-                  variants={fadeIn}
-                  initial="hidden"
-                  animate="visible"
-                  className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className="text-white font-body font-semibold text-sm">{prog.name}</p>
-                    <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${getTypeColor(prog.type)}`}>
-                      {prog.type}
-                    </span>
+                {/* Expanded Level Cards */}
+                {isExpanded && (
+                  <div className="px-5 pb-5 pt-0 border-t border-white/[0.04]">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                      {prog.levels.map((lvl) => {
+                        const levelKey = `${prog.name}-${lvl.level}`
+                        const isLevelExpanded = expandedLevel === levelKey
+
+                        return (
+                          <div
+                            key={lvl.level}
+                            className={`bg-white/[0.03] border rounded-xl overflow-hidden transition-colors duration-200 ${
+                              isLevelExpanded ? 'border-white/[0.12]' : 'border-white/[0.06]'
+                            }`}
+                          >
+                            <button
+                              onClick={() => setExpandedLevel(isLevelExpanded ? null : levelKey)}
+                              className="w-full p-4 text-left hover:bg-white/[0.02] transition-colors duration-200"
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${getLevelDot(lvl.level)}`} />
+                                  <span className="text-white font-display font-bold text-sm">{lvl.level}</span>
+                                </div>
+                                <span className={`text-[9px] font-display font-bold px-2 py-0.5 rounded ${getLevelColor(lvl.level)}`}>
+                                  {lvl.clients.length} client{lvl.clients.length !== 1 ? 's' : ''}
+                                </span>
+                              </div>
+                              <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Duration</span>
+                                  <span className="text-white/60 text-xs font-body">{lvl.duration}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Phases</span>
+                                  <span className="text-white/60 text-xs font-body">{lvl.phases}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Days/Week</span>
+                                  <span className="text-white/60 text-xs font-body">{lvl.daysPerWeek}x</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Split</span>
+                                  <span className="text-white/60 text-xs font-body text-right">{lvl.split}</span>
+                                </div>
+                              </div>
+                            </button>
+
+                            {isLevelExpanded && lvl.clients.length > 0 && (
+                              <div className="px-4 pb-4 border-t border-white/[0.04]">
+                                <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mt-3 mb-2">Assigned Clients</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {lvl.clients.map((c) => (
+                                    <span key={c} className="bg-white/[0.04] text-white/50 text-[11px] font-body px-2.5 py-1 rounded-lg">
+                                      {c}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
-                  <p className="text-white/30 text-xs font-body mb-3">{prog.description}</p>
-                  <div className="flex items-center gap-4 text-xs text-white/25 font-body">
-                    <span>{prog.duration}</span>
-                    <span>{prog.phases} phases</span>
-                    <span>{prog.daysPerWeek}x/wk</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+                )}
+              </motion.div>
+            )
+          })}
         </div>
       ) : (
         /* Exercise Library — Full Database */
