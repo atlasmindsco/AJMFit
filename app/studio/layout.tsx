@@ -24,9 +24,9 @@ export default function ClientPortalLayout({
   const [chatOpen, setChatOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#EEF1F6]">
+    <div className="min-h-screen bg-[#0A0A0A]">
       {/* Top Navbar */}
-      <nav className="bg-[#1B2D50] sticky top-0 z-50">
+      <nav className="bg-[#111111] border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left: Logo + Nav */}
@@ -54,8 +54,8 @@ export default function ClientPortalLayout({
                       href={tab.href}
                       className={`px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-[#2E6AB0] text-white'
-                          : 'text-white/50 hover:text-white/80 hover:bg-white/[0.06]'
+                          ? 'bg-white/[0.10] text-white'
+                          : 'text-white/40 hover:text-white/70 hover:bg-white/[0.06]'
                       }`}
                     >
                       {tab.label}
@@ -111,8 +111,8 @@ export default function ClientPortalLayout({
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-4 py-2.5 rounded-lg text-sm font-body font-medium mb-1 ${
                     isActive
-                      ? 'bg-[#2E6AB0] text-white'
-                      : 'text-white/50 hover:text-white/80'
+                      ? 'bg-white/[0.10] text-white'
+                      : 'text-white/40 hover:text-white/70'
                   }`}
                 >
                   {tab.label}
@@ -130,7 +130,7 @@ export default function ClientPortalLayout({
 
       {/* Floating Chaedyn Chat Widget */}
       {chatOpen && (
-        <div className="fixed bottom-20 right-6 z-50 w-[380px] h-[520px] shadow-[0_20px_60px_rgba(27,45,80,0.2)] rounded-xl overflow-hidden">
+        <div className="fixed bottom-20 right-6 z-50 w-[380px] h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-xl overflow-hidden">
           <ChaedynChat portal="client" />
         </div>
       )}
@@ -149,9 +149,9 @@ export default function ClientPortalLayout({
           <Image
             src="/chaedyn-avatar.png"
             alt="Chat with Chaedyn"
-            width={112}
-            height={112}
-            className="w-[200%] h-[200%] object-cover object-[82%_15%]"
+            width={80}
+            height={80}
+            className="w-full h-full object-cover"
           />
         )}
       </button>

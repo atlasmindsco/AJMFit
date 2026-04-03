@@ -2,16 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
-
-/* ── Animation ── */
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
+import MuscleMap from '@/components/exercises/MuscleMap'
 
 /* ── Types ── */
 interface ExerciseDB {
@@ -31,13 +22,32 @@ interface ProgramExercise {
   sets: number
   reps: string
   rest: string
+  series: string
+}
+
+type ProgramView = 'preview' | 'workout' | 'exercise'
+
+/* ── Muscle name mapping: ExerciseDB → MuscleMap keys ── */
+const MUSCLE_MAP: Record<string, string> = {
+  chest: 'pectorals',
+  quadriceps: 'quads',
+  'lower back': 'spine',
+  'middle back': 'upper back',
+  shoulders: 'delts',
+  neck: 'levator scapulae',
+  abdominals: 'abs',
+}
+
+function toMuscleMapKey(dbMuscle: string): string {
+  return MUSCLE_MAP[dbMuscle.toLowerCase()] || dbMuscle.toLowerCase()
 }
 
 /* ── Current Program ── */
 const currentProgram = {
-  name: 'Lean Muscle Builder',
+  name: 'Muscle Builder',
+  level: 'Intermediate',
   phase: 'Phase 2 — Hypertrophy',
-  weeks: { current: 5, total: 12 },
+  weeks: { current: 5, total: 10 },
   startDate: 'Feb 3, 2026',
   coach: 'Anthony M.',
 }
@@ -46,87 +56,106 @@ const currentProgram = {
 const weeklyPlan = [
   {
     day: 'Monday',
-    name: 'Upper Body Push',
+    name: 'Chest',
     muscles: 'Chest, Shoulders, Triceps',
+    primaryMuscle: 'chest',
+    duration: '~55 min',
+    completed: true,
     exercises: [
-      { name: 'Barbell Bench Press', sets: 4, reps: '8-10', rest: '90s' },
-      { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: '75s' },
-      { name: 'Overhead Press', sets: 3, reps: '8-10', rest: '90s' },
-      { name: 'Lateral Raises', sets: 3, reps: '12-15', rest: '60s' },
-      { name: 'Tricep Pushdowns', sets: 3, reps: '12-15', rest: '60s' },
+      { name: 'Barbell Bench Press', sets: 4, reps: '8-10', rest: '90s', series: 'A' },
+      { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: '75s', series: 'B' },
+      { name: 'Overhead Press', sets: 3, reps: '8-10', rest: '90s', series: 'C' },
+      { name: 'Lateral Raises', sets: 3, reps: '12-15', rest: '60s', series: 'D1' },
+      { name: 'Tricep Pushdowns', sets: 3, reps: '12-15', rest: '60s', series: 'D2' },
     ],
   },
   {
     day: 'Tuesday',
-    name: 'Lower Body',
+    name: 'Legs',
     muscles: 'Quads, Hamstrings, Glutes, Calves',
+    primaryMuscle: 'quadriceps',
+    duration: '~60 min',
+    completed: true,
     exercises: [
-      { name: 'Barbell Squat', sets: 4, reps: '6-8', rest: '120s' },
-      { name: 'Romanian Deadlift', sets: 3, reps: '8-10', rest: '90s' },
-      { name: 'Leg Press', sets: 3, reps: '10-12', rest: '90s' },
-      { name: 'Walking Lunges', sets: 3, reps: '12 each', rest: '75s' },
-      { name: 'Calf Raises', sets: 4, reps: '15-20', rest: '45s' },
+      { name: 'Barbell Squat', sets: 4, reps: '6-8', rest: '120s', series: 'A' },
+      { name: 'Romanian Deadlift', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
+      { name: 'Leg Press', sets: 3, reps: '10-12', rest: '90s', series: 'C' },
+      { name: 'Walking Lunges', sets: 3, reps: '12 each', rest: '75s', series: 'D' },
+      { name: 'Calf Raises', sets: 4, reps: '15-20', rest: '45s', series: 'E' },
     ],
   },
   {
     day: 'Wednesday',
     name: 'Active Recovery',
     muscles: 'Mobility & Cardio',
+    primaryMuscle: '',
+    duration: '~40 min',
+    completed: true,
     exercises: [
-      { name: 'Foam Rolling', sets: 1, reps: '10 min', rest: '--' },
-      { name: 'Dynamic Stretching', sets: 1, reps: '10 min', rest: '--' },
-      { name: 'Light Cardio (Walk/Bike)', sets: 1, reps: '20-30 min', rest: '--' },
+      { name: 'Foam Rolling', sets: 1, reps: '10 min', rest: '--', series: 'A' },
+      { name: 'Dynamic Stretching', sets: 1, reps: '10 min', rest: '--', series: 'B' },
+      { name: 'Light Cardio (Walk/Bike)', sets: 1, reps: '20-30 min', rest: '--', series: 'C' },
     ],
   },
   {
     day: 'Thursday',
-    name: 'Upper Body Pull',
+    name: 'Back',
     muscles: 'Back, Biceps, Rear Delts',
+    primaryMuscle: 'lats',
+    duration: '~55 min',
+    completed: false,
     exercises: [
-      { name: 'Pull-Ups (Weighted)', sets: 4, reps: '6-8', rest: '90s' },
-      { name: 'Barbell Row', sets: 4, reps: '8-10', rest: '90s' },
-      { name: 'Seated Cable Row', sets: 3, reps: '10-12', rest: '75s' },
-      { name: 'Face Pulls', sets: 3, reps: '15-20', rest: '60s' },
-      { name: 'Barbell Curls', sets: 3, reps: '10-12', rest: '60s' },
+      { name: 'Pull-Ups (Weighted)', sets: 4, reps: '6-8', rest: '90s', series: 'A' },
+      { name: 'Barbell Row', sets: 4, reps: '8-10', rest: '90s', series: 'B' },
+      { name: 'Seated Cable Row', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
+      { name: 'Face Pulls', sets: 3, reps: '15-20', rest: '60s', series: 'D1' },
+      { name: 'Barbell Curls', sets: 3, reps: '10-12', rest: '60s', series: 'D2' },
     ],
   },
   {
     day: 'Friday',
-    name: 'Legs & Core',
+    name: 'Shoulders',
     muscles: 'Glutes, Hamstrings, Abs',
+    primaryMuscle: 'delts',
+    duration: '~50 min',
+    completed: false,
     exercises: [
-      { name: 'Hip Thrusts', sets: 4, reps: '8-10', rest: '90s' },
-      { name: 'Front Squat', sets: 3, reps: '8-10', rest: '90s' },
-      { name: 'Leg Curl', sets: 3, reps: '10-12', rest: '75s' },
-      { name: 'Cable Woodchops', sets: 3, reps: '12 each', rest: '60s' },
-      { name: 'Plank Hold', sets: 3, reps: '45-60s', rest: '45s' },
+      { name: 'Hip Thrusts', sets: 4, reps: '8-10', rest: '90s', series: 'A' },
+      { name: 'Front Squat', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
+      { name: 'Leg Curl', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
+      { name: 'Cable Woodchops', sets: 3, reps: '12 each', rest: '60s', series: 'D1' },
+      { name: 'Plank Hold', sets: 3, reps: '45-60s', rest: '45s', series: 'D2' },
     ],
   },
   {
     day: 'Saturday',
     name: 'Rest Day',
     muscles: 'Recovery',
+    primaryMuscle: '',
+    duration: '',
+    completed: false,
     exercises: [],
   },
   {
     day: 'Sunday',
     name: 'Rest Day',
     muscles: 'Recovery',
+    primaryMuscle: '',
+    duration: '',
+    completed: false,
     exercises: [],
   },
 ]
 
 /* ── Exercise Log History ── */
 const recentLogs = [
-  { date: 'Mar 26', workout: 'Upper Body Push', topSet: 'Bench Press — 185 lbs x 8', prs: 1 },
-  { date: 'Mar 25', workout: 'Lower Body', topSet: 'Squat — 225 lbs x 6', prs: 0 },
+  { date: 'Mar 26', workout: 'Chest', topSet: 'Bench Press — 185 lbs x 8', prs: 1 },
+  { date: 'Mar 25', workout: 'Legs', topSet: 'Squat — 225 lbs x 6', prs: 0 },
   { date: 'Mar 24', workout: 'Active Recovery', topSet: '30 min walk + stretch', prs: 0 },
-  { date: 'Mar 22', workout: 'Upper Body Pull', topSet: 'Pull-Ups — BW+25 x 8', prs: 1 },
+  { date: 'Mar 22', workout: 'Back', topSet: 'Pull-Ups — BW+25 x 8', prs: 1 },
 ]
 
 /* ── Fuzzy name matching ── */
-
-// Common aliases: program name → database name
 const EXERCISE_ALIASES: Record<string, string> = {
   'lateral raises': 'side lateral raise',
   'lateral raise': 'side lateral raise',
@@ -149,40 +178,25 @@ const EXERCISE_ALIASES: Record<string, string> = {
 }
 
 function normalizeExName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
+  return name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
 }
 
 function findExerciseMatch(programName: string, db: ExerciseDB[]): ExerciseDB | null {
   const norm = normalizeExName(programName)
-
-  // 1. Exact match
   const exact = db.find((ex) => normalizeExName(ex.name) === norm)
   if (exact) return exact
-
-  // 2. Alias lookup
   const alias = EXERCISE_ALIASES[norm]
   if (alias) {
     const aliasNorm = normalizeExName(alias)
     const aliasMatch = db.find((ex) => normalizeExName(ex.name) === aliasNorm)
     if (aliasMatch) return aliasMatch
-    // Try partial alias match
     const partialAlias = db.find((ex) => normalizeExName(ex.name).includes(aliasNorm))
     if (partialAlias) return partialAlias
   }
-
-  // 3. DB name contains program name (e.g. "Bench Press" matches "Barbell Bench Press - Medium Grip")
   const containsMatch = db.find((ex) => normalizeExName(ex.name).includes(norm))
   if (containsMatch) return containsMatch
-
-  // 4. Program name contains DB name
   const reverseMatch = db.find((ex) => norm.includes(normalizeExName(ex.name)))
   if (reverseMatch) return reverseMatch
-
-  // 5. Scored word overlap — at least 1 significant word must match
   const words = norm.split(' ').filter((w) => w.length > 2)
   let bestMatch: ExerciseDB | null = null
   let bestScore = 0
@@ -197,120 +211,67 @@ function findExerciseMatch(programName: string, db: ExerciseDB[]): ExerciseDB | 
   return bestMatch
 }
 
-/* ── Exercise Detail Panel ── */
-function ExerciseDetail({ exercise, dbMatch }: { exercise: ProgramExercise; dbMatch: ExerciseDB | null }) {
-  const [showEnd, setShowEnd] = useState(false)
+/* ── Group exercises by series ── */
+interface SeriesGroup {
+  label: string
+  isSuperset: boolean
+  exercises: { exercise: ProgramExercise; seriesPrefix: string }[]
+}
 
-  // Auto-cycle between start and end images
-  useEffect(() => {
-    if (!dbMatch?.images[1]) return
-    const interval = setInterval(() => setShowEnd((p) => !p), 2500)
-    return () => clearInterval(interval)
-  }, [dbMatch])
+function groupBySeries(exercises: ProgramExercise[]): SeriesGroup[] {
+  const groups: SeriesGroup[] = []
+  const seen = new Set<string>()
 
-  if (!dbMatch) {
-    return (
-      <div className="px-4 py-3 bg-[#F4F6F9] border-t border-[#1B2D50]/[0.04]">
-        <p className="text-[#64748B] text-xs font-body">No exercise details available.</p>
-      </div>
-    )
+  for (const ex of exercises) {
+    const baseLetter = ex.series.replace(/[0-9]/g, '')
+    if (seen.has(baseLetter)) continue
+    seen.add(baseLetter)
+
+    const members = exercises.filter((e) => e.series.replace(/[0-9]/g, '') === baseLetter)
+    const isSuperset = members.length > 1
+
+    groups.push({
+      label: isSuperset
+        ? members.map((m) => m.series).join('/') + ' SERIES'
+        : `${baseLetter} SERIES`,
+      isSuperset,
+      exercises: members.map((m) => ({ exercise: m, seriesPrefix: m.series })),
+    })
   }
 
-  return (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
-      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      className="overflow-hidden"
-    >
-      <div className="px-4 py-4 bg-[#F4F6F9] border-t border-[#1B2D50]/[0.04]">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Images — auto-cycles between start/end every 1.8s */}
-          {dbMatch.images.length > 0 && (
-            <div
-              className="relative w-full sm:w-48 h-40 rounded-lg overflow-hidden bg-white border border-[#1B2D50]/[0.06] shrink-0"
-            >
-              <img
-                src={dbMatch.images[0]}
-                alt={`${dbMatch.name} — start`}
-                className="absolute inset-0 w-full h-full object-contain p-1 transition-opacity duration-[1500ms]"
-                style={{ opacity: showEnd && dbMatch.images[1] ? 0 : 1 }}
-              />
-              {dbMatch.images[1] && (
-                <img
-                  src={dbMatch.images[1]}
-                  alt={`${dbMatch.name} — end`}
-                  className="absolute inset-0 w-full h-full object-contain p-1 transition-opacity duration-[1500ms]"
-                  style={{ opacity: showEnd ? 1 : 0 }}
-                />
-              )}
-              <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-[#1B2D50]/60 rounded text-[8px] font-display font-semibold text-white/80 uppercase tracking-wide">
-                {showEnd && dbMatch.images[1] ? 'End' : 'Start'}
-              </div>
-            </div>
-          )}
+  return groups
+}
 
-          {/* Info */}
-          <div className="flex-1 min-w-0 space-y-2.5">
-            <div className="flex flex-wrap gap-1.5">
-              <span className="px-1.5 py-0.5 bg-[#F08B1E]/10 text-[#F08B1E] font-display font-semibold text-[9px] uppercase tracking-wide rounded">
-                {dbMatch.level}
-              </span>
-              <span className="px-1.5 py-0.5 bg-[#2E6AB0]/10 text-[#2E6AB0] font-display font-semibold text-[9px] uppercase tracking-wide rounded">
-                {dbMatch.category}
-              </span>
-              <span className="px-1.5 py-0.5 bg-[#1B2D50]/[0.05] text-[#1B2D50]/50 font-display font-semibold text-[9px] uppercase tracking-wide rounded">
-                {dbMatch.equipment}
-              </span>
-            </div>
+/* ── Animation variants ── */
+const slideIn = {
+  initial: { opacity: 0, x: 40 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, x: -40, transition: { duration: 0.2 } },
+}
 
-            <div className="flex gap-4">
-              <div>
-                <p className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#1B2D50]/30">Primary</p>
-                <p className="text-xs font-body text-[#F08B1E] font-semibold capitalize">{dbMatch.primaryMuscles.join(', ')}</p>
-              </div>
-              {dbMatch.secondaryMuscles.length > 0 && (
-                <div>
-                  <p className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#1B2D50]/30">Secondary</p>
-                  <p className="text-xs font-body text-[#1B2D50]/50 capitalize">{dbMatch.secondaryMuscles.join(', ')}</p>
-                </div>
-              )}
-            </div>
+const slideBack = {
+  initial: { opacity: 0, x: -40 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, x: 40, transition: { duration: 0.2 } },
+}
 
-            {dbMatch.instructions.length > 0 && (
-              <div>
-                <p className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#1B2D50]/30 mb-1">How to perform</p>
-                <ol className="space-y-1">
-                  {dbMatch.instructions.slice(0, 3).map((step, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="shrink-0 w-4 h-4 rounded-full bg-[#F08B1E]/10 text-[#F08B1E] flex items-center justify-center text-[8px] font-display font-bold mt-0.5">
-                        {i + 1}
-                      </span>
-                      <p className="text-[11px] font-body text-[#1B2D50]/60 leading-relaxed">{step}</p>
-                    </li>
-                  ))}
-                  {dbMatch.instructions.length > 3 && (
-                    <li className="text-[10px] font-body text-[#1B2D50]/30 pl-6">
-                      +{dbMatch.instructions.length - 3} more steps
-                    </li>
-                  )}
-                </ol>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
+const fadeIn = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] },
+  }),
 }
 
 export default function ProgramsPage() {
-  const [selectedDay, setSelectedDay] = useState(0)
-  const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
+  const [view, setView] = useState<ProgramView>('preview')
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
+  const [imagePreview, setImagePreview] = useState<Record<string, boolean>>({})
 
-  const selected = weeklyPlan[selectedDay]
+  const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
   const progressPct = (currentProgram.weeks.current / currentProgram.weeks.total) * 100
 
   // Load exercise database
@@ -320,278 +281,558 @@ export default function ProgramsPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
-      .then((data: ExerciseDB[]) => {
-        console.log('[ExerciseDB] Loaded', data.length, 'exercises')
-        setExerciseDB(data)
-      })
+      .then((data: ExerciseDB[]) => setExerciseDB(data))
       .catch((err) => console.error('[ExerciseDB] Failed to load:', err))
   }, [])
 
   // Pre-match exercises for the selected day
   const matchedExercises = useMemo(() => {
     const matches = new Map<string, ExerciseDB | null>()
-    for (const ex of selected.exercises) {
-      matches.set(ex.name, findExerciseMatch(ex.name, exerciseDB))
+    if (selected) {
+      for (const ex of selected.exercises) {
+        matches.set(ex.name, findExerciseMatch(ex.name, exerciseDB))
+      }
     }
     return matches
   }, [selected, exerciseDB])
 
+  // Get first matched image for day card thumbnails
+  const getDayThumbnail = (dayIndex: number) => {
+    const day = weeklyPlan[dayIndex]
+    if (day.exercises.length === 0) return null
+    for (const ex of day.exercises) {
+      const match = findExerciseMatch(ex.name, exerciseDB)
+      if (match?.images[0]) return match.images[0]
+    }
+    return null
+  }
+
+  // Auto-cycle image for a given exercise name
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setImagePreview((prev) => {
+        const next = { ...prev }
+        for (const key of Object.keys(next)) {
+          next[key] = !next[key]
+        }
+        return next
+      })
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [])
+
+  const selectedExerciseData = selected?.exercises.find((e) => e.name === selectedExercise) ?? null
+  const selectedExerciseDB = selectedExercise ? matchedExercises.get(selectedExercise) ?? null : null
+
   return (
-    <div>
-      {/* Program Overview Card */}
-      <motion.div
-        custom={0}
-        variants={fadeIn}
-        initial="hidden"
-        animate="visible"
-        className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-6 mb-6"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-          <div>
-            <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">
-              {currentProgram.name}
-            </h1>
-            <p className="text-[#64748B] text-sm font-body mt-1">
-              {currentProgram.phase} &middot; Coach: {currentProgram.coach}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[#1B2D50] font-display font-bold text-sm">
-              Week {currentProgram.weeks.current} / {currentProgram.weeks.total}
-            </p>
-            <p className="text-[#64748B] text-xs font-body">Started {currentProgram.startDate}</p>
-          </div>
-        </div>
-        <div className="w-full h-3 bg-[#E5E7EB] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#2E6AB0] rounded-full transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-        <p className="text-[#64748B] text-xs font-body mt-2">{Math.round(progressPct)}% complete</p>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT: Weekly Split */}
-        <div className="lg:col-span-8 space-y-4">
-          <motion.div
-            custom={1}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Weekly Split</h2>
-            </div>
-
-            {/* Day tabs */}
-            <div className="flex overflow-x-auto border-b border-[#1B2D50]/[0.06]">
-              {weeklyPlan.map((day, i) => (
-                <button
-                  key={day.day}
-                  onClick={() => {
-                    setSelectedDay(i)
-                    setExpandedExercise(null)
-                  }}
-                  className={`px-4 py-3 text-xs font-display font-bold uppercase tracking-wide whitespace-nowrap transition-all duration-200 border-b-2 ${
-                    i === selectedDay
-                      ? 'text-[#2E6AB0] border-[#2E6AB0]'
-                      : 'text-[#64748B] border-transparent hover:text-[#1B2D50]'
-                  }`}
-                >
-                  {day.day.slice(0, 3)}
-                </button>
-              ))}
-            </div>
-
-            {/* Selected day content */}
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-display font-bold text-[#1B2D50]">{selected.name}</h3>
-                  <p className="text-[#64748B] text-xs font-body">{selected.muscles}</p>
-                </div>
-                {selected.exercises.length > 0 && (
-                  <span className="bg-[#2E6AB0]/10 text-[#2E6AB0] text-xs font-display font-bold px-3 py-1 rounded-lg">
-                    {selected.exercises.length} exercises
-                  </span>
-                )}
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* MAIN CONTENT */}
+      <div className="lg:col-span-8">
+        {/* Program Header */}
+        <div className="bg-[#141414] rounded-xl border border-white/[0.06] p-6 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-display font-extrabold text-xl text-white tracking-tight">
+                  {currentProgram.name}
+                </h1>
+                <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded bg-[#22C55E]/15 text-[#22C55E]">
+                  {currentProgram.level}
+                </span>
               </div>
+              <p className="text-white/40 text-sm font-body mt-1">
+                {currentProgram.phase} &middot; Coach: {currentProgram.coach}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-white font-display font-bold text-sm">
+                Week {currentProgram.weeks.current} / {currentProgram.weeks.total}
+              </p>
+              <p className="text-white/30 text-xs font-body">Started {currentProgram.startDate}</p>
+            </div>
+          </div>
+          <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#3B82F6] rounded-full transition-[width] duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <p className="text-white/30 text-xs font-body mt-2">{Math.round(progressPct)}% complete</p>
+        </div>
 
-              {selected.exercises.length > 0 ? (
-                <div className="space-y-2">
-                  {selected.exercises.map((ex, i) => {
-                    const isExpanded = expandedExercise === ex.name
-                    const dbMatch = matchedExercises.get(ex.name) ?? null
-                    const hasMatch = dbMatch !== null
+        {/* View Content */}
+        <AnimatePresence mode="wait">
+          {/* ════════ VIEW 1: PROGRAM PREVIEW ════════ */}
+          {view === 'preview' && (
+            <motion.div key="preview" {...slideBack}>
+              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+                {/* Overview / Program toggle */}
+                <div className="flex items-center border-b border-white/[0.06]">
+                  <button className="flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide text-white/30">
+                    Overview
+                  </button>
+                  <button className="flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide text-white bg-white/[0.04] border-b-2 border-[#3B82F6]">
+                    Program
+                  </button>
+                </div>
 
-                    return (
-                      <div
-                        key={i}
-                        className={`rounded-lg border transition-all duration-200 group ${
-                          isExpanded
-                            ? 'border-[#2E6AB0]/20 shadow-[0_2px_12px_rgba(27,45,80,0.06)]'
-                            : hasMatch
-                              ? 'border-[#1B2D50]/[0.04] hover:border-[#2E6AB0]/15'
-                              : 'border-[#1B2D50]/[0.04]'
-                        }`}
-                      >
-                        <button
-                          onClick={() => hasMatch && setExpandedExercise(isExpanded ? null : ex.name)}
-                          className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-150 ${
-                            isExpanded
-                              ? 'bg-[#EEF1F6]'
-                              : hasMatch
-                                ? 'bg-[#FAFBFD] hover:bg-[#F0F3F8] cursor-pointer'
-                                : 'bg-[#FAFBFD]'
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-display font-bold text-white text-sm">Program Preview</h2>
+                  </div>
+
+                  <div className="space-y-2">
+                    {weeklyPlan.map((day, i) => {
+                      const isRest = day.exercises.length === 0
+                      const thumb = getDayThumbnail(i)
+
+                      return (
+                        <motion.button
+                          key={day.day}
+                          custom={i}
+                          variants={fadeIn}
+                          initial="hidden"
+                          animate="visible"
+                          onClick={() => {
+                            if (!isRest) {
+                              setSelectedDay(i)
+                              setView('workout')
+                            }
+                          }}
+                          className={`w-full flex items-center gap-4 p-3 rounded-xl transition-colors duration-200 text-left ${
+                            isRest
+                              ? 'bg-[#1C1C1C] border border-white/[0.04]'
+                              : 'bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#1E1E1E] hover:border-white/[0.10]'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            {/* Thumbnail from DB if matched */}
-                            {hasMatch && dbMatch!.images[0] ? (
-                              <div className="w-10 h-10 rounded-lg bg-gray-100 border border-[#1B2D50]/[0.06] overflow-hidden shrink-0">
-                                <img
-                                  src={dbMatch!.images[0]}
-                                  alt={ex.name}
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-lg bg-[#2E6AB0]/10 flex items-center justify-center shrink-0">
-                                <span className="text-[#2E6AB0] text-xs font-display font-bold">{i + 1}</span>
-                              </div>
-                            )}
-                            <div className="text-left">
-                              <div className="flex items-center gap-1.5">
-                                <p className={`font-body font-semibold text-sm ${hasMatch ? 'text-[#1B2D50] group-hover:text-[#2E6AB0]' : 'text-[#1B2D50]'}`}>{ex.name}</p>
-                                {hasMatch && (
-                                  <svg
-                                    className={`w-3.5 h-3.5 text-[#2E6AB0]/40 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                          {/* Thumbnail or rest icon */}
+                          {isRest ? (
+                            <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
+                              <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
+                              {thumb ? (
+                                <>
+                                  <img src={thumb} alt="" className="w-full h-full object-cover" loading="lazy" />
+                                  <div className="absolute inset-0 bg-black/30" />
+                                </>
+                              ) : (
+                                <div className="w-full h-full bg-white/[0.04]" />
+                              )}
+                              {/* Play button overlay */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                                  <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5v14l11-7z" />
                                   </svg>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white'}`}>
+                              {day.name}
+                            </p>
+                            <p className="text-white/30 text-xs font-body">
+                              Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
+                            </p>
+                          </div>
+
+                          {/* Status */}
+                          {day.completed ? (
+                            <div className="w-7 h-7 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
+                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                              </svg>
+                            </div>
+                          ) : !isRest ? (
+                            <svg className="w-5 h-5 text-white/20 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                            </svg>
+                          ) : null}
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ════════ VIEW 2: WORKOUT OVERVIEW ════════ */}
+          {view === 'workout' && selected && (
+            <motion.div key="workout" {...slideIn}>
+              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+                {/* Header */}
+                <div className="px-5 py-4 border-b border-white/[0.06]">
+                  <button
+                    onClick={() => { setView('preview'); setSelectedDay(null) }}
+                    className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    <span className="text-xs font-display font-semibold uppercase tracking-wide">Back to Program</span>
+                  </button>
+                  <h2 className="font-display font-bold text-lg text-white">Workout Overview</h2>
+                  <p className="text-white/40 text-xs font-body mt-0.5">{selected.muscles}</p>
+                </div>
+
+                {/* Series-grouped exercises */}
+                <div className="p-4 space-y-4">
+                  {groupBySeries(selected.exercises).map((group) => (
+                    <div key={group.label}>
+                      {/* Series header */}
+                      <div className="flex items-center justify-between mb-2.5">
+                        <p className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">
+                          {group.label}
+                        </p>
+                        {group.isSuperset && (
+                          <span className="text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide">
+                            Superset
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Exercises in series */}
+                      <div className="space-y-2">
+                        {group.exercises.map(({ exercise, seriesPrefix }) => {
+                          const dbMatch = matchedExercises.get(exercise.name) ?? null
+                          const showEnd = imagePreview[exercise.name] ?? false
+
+                          return (
+                            <button
+                              key={exercise.name}
+                              onClick={() => {
+                                if (dbMatch) {
+                                  setSelectedExercise(exercise.name)
+                                  setView('exercise')
+                                }
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#1E1E1E] hover:border-white/[0.10] transition-colors duration-200 text-left"
+                            >
+                              {/* Thumbnail with play overlay */}
+                              <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
+                                {dbMatch?.images[0] ? (
+                                  <>
+                                    <img
+                                      src={dbMatch.images[showEnd && dbMatch.images[1] ? 1 : 0]}
+                                      alt=""
+                                      className="w-full h-full object-cover transition-opacity duration-[1200ms]"
+                                      loading="lazy"
+                                    />
+                                    <div className="absolute inset-0 bg-black/20" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                                        <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M8 5v14l11-7z" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <span className="text-white/20 text-xs font-display font-bold">{seriesPrefix}</span>
+                                  </div>
                                 )}
                               </div>
-                              <p className="text-[#64748B] text-xs font-body">
-                                {ex.sets} sets &times; {ex.reps}
-                              </p>
-                            </div>
-                          </div>
-                          <span className="text-[#64748B] text-xs font-body">Rest: {ex.rest}</span>
-                        </button>
 
-                        <AnimatePresence>
-                          {isExpanded && <ExerciseDetail exercise={ex} dbMatch={dbMatch} />}
-                        </AnimatePresence>
+                              {/* Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  {group.isSuperset && (
+                                    <span className="text-[#22C55E] text-[10px] font-display font-bold">{seriesPrefix}</span>
+                                  )}
+                                  <p className="font-body font-semibold text-white text-sm truncate">{exercise.name}</p>
+                                </div>
+                                <p className="text-white/35 text-xs font-body mt-0.5">
+                                  Reps: {exercise.reps} &middot; {exercise.sets} sets
+                                </p>
+                              </div>
+
+                              {/* Rest / Set info */}
+                              <div className="text-right shrink-0">
+                                <p className="text-[#F08B1E] text-xs font-display font-bold">
+                                  {exercise.sets}X / Rest
+                                </p>
+                                <svg className="w-4 h-4 text-white/20 ml-auto mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                              </div>
+                            </button>
+                          )
+                        })}
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <div className="text-center py-10">
-                  <span className="text-4xl mb-3 block">😴</span>
-                  <p className="text-[#64748B] text-sm font-body">Rest day — recover and recharge</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </div>
 
-        {/* RIGHT: Log History + Coach Notes */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* Recent Workout Logs */}
-          <motion.div
-            custom={2}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Recent Logs</h2>
-            </div>
-            <div className="p-5 space-y-3">
-              {recentLogs.map((log) => (
-                <div key={log.date} className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#FAFBFD] border border-[#1B2D50]/[0.06] flex items-center justify-center shrink-0">
-                    <span className="text-[#64748B] text-[10px] font-display font-bold">{log.date}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-body font-semibold text-[#1B2D50] text-sm">{log.workout}</p>
-                    <p className="text-[#64748B] text-xs font-body truncate">{log.topSet}</p>
-                    {log.prs > 0 && (
-                      <span className="inline-block mt-1 text-[10px] font-display font-bold text-[#F08B1E] bg-[#F08B1E]/10 px-2 py-0.5 rounded">
-                        {log.prs} PR
-                      </span>
-                    )}
-                  </div>
+                {/* Start Workout button */}
+                <div className="p-4 pt-0">
+                  <button className="w-full py-4 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200">
+                    Start Workout
+                  </button>
                 </div>
-              ))}
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
+          )}
 
-          {/* Coach Notes */}
-          <motion.div
-            custom={3}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Coach Notes</h2>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="p-3 rounded-lg bg-[#2E6AB0]/[0.04] border border-[#2E6AB0]/10">
-                <p className="text-[#1B2D50] text-sm font-body leading-relaxed">
-                  &ldquo;Great progress on bench — you&apos;re ready to push to 190 next week. Keep rest times strict on accessories.&rdquo;
-                </p>
-                <p className="text-[#64748B] text-xs font-body mt-2">— Anthony, Mar 26</p>
-              </div>
-              <div className="p-3 rounded-lg bg-[#F08B1E]/[0.04] border border-[#F08B1E]/10">
-                <p className="text-[#1B2D50] text-sm font-body leading-relaxed">
-                  &ldquo;Focus on mind-muscle connection during pull-ups. Slow the eccentric to 3 seconds.&rdquo;
-                </p>
-                <p className="text-[#64748B] text-xs font-body mt-2">— Anthony, Mar 22</p>
-              </div>
-            </div>
-          </motion.div>
+          {/* ════════ VIEW 3: EXERCISE DETAIL ════════ */}
+          {view === 'exercise' && selectedExerciseData && (
+            <motion.div key="exercise" {...slideIn}>
+              <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
+                {/* Header */}
+                <div className="px-5 py-4 border-b border-white/[0.06]">
+                  <button
+                    onClick={() => { setView('workout'); setSelectedExercise(null) }}
+                    className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    <span className="text-xs font-display font-semibold uppercase tracking-wide">Back to Workout</span>
+                  </button>
+                  <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
+                    {selectedExerciseData.name}
+                  </h2>
 
-          {/* Program History */}
-          <motion.div
-            custom={4}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Past Programs</h2>
-            </div>
-            <div className="p-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-body font-semibold text-[#1B2D50] text-sm">Fat Loss Kickstart</p>
-                  <p className="text-[#64748B] text-xs font-body">8 weeks &middot; Completed</p>
+                  {/* Muscle tags */}
+                  {selectedExerciseDB && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {selectedExerciseDB.primaryMuscles.map((m) => (
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#22C55E]/15 text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                          {m}
+                        </span>
+                      ))}
+                      {selectedExerciseDB.secondaryMuscles.map((m) => (
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <span className="text-emerald-500 text-xs font-display font-bold">100%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-body font-semibold text-[#1B2D50] text-sm">Strength Foundations</p>
-                  <p className="text-[#64748B] text-xs font-body">6 weeks &middot; Completed</p>
+
+                <div className="p-5 space-y-6">
+                  {/* Exercise image */}
+                  {selectedExerciseDB?.images[0] && (
+                    <ExerciseImageCycler images={selectedExerciseDB.images} name={selectedExerciseDB.name} />
+                  )}
+
+                  {/* Setup section */}
+                  {selectedExerciseDB && (
+                    <div>
+                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
+                      <div className="grid grid-cols-3 gap-3">
+                        <SetupCard icon="equipment" label="Equipment" value={selectedExerciseDB.equipment} />
+                        <SetupCard icon="level" label="Level" value={selectedExerciseDB.level} />
+                        <SetupCard icon="category" label="Type" value={selectedExerciseDB.category} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Target muscles with MuscleMap */}
+                  {selectedExerciseDB && (
+                    <div>
+                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
+                      <div className="flex flex-col sm:flex-row gap-4 items-start">
+                        <div className="w-full sm:w-48 shrink-0">
+                          <MuscleMap
+                            target={toMuscleMapKey(selectedExerciseDB.primaryMuscles[0] || '')}
+                            secondaryMuscles={selectedExerciseDB.secondaryMuscles.map(toMuscleMapKey)}
+                            size="sm"
+                            theme="dark"
+                          />
+                        </div>
+                        <div className="flex-1 space-y-3">
+                          {selectedExerciseDB.primaryMuscles.map((m) => (
+                            <div key={m} className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-[#22C55E]/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-[#22C55E]" />
+                              </div>
+                              <div>
+                                <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
+                                <p className="text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
+                              </div>
+                            </div>
+                          ))}
+                          {selectedExerciseDB.secondaryMuscles.map((m) => (
+                            <div key={m} className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-[#EAB308]/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-[#EAB308]/60" />
+                              </div>
+                              <div>
+                                <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
+                                <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Instructions */}
+                  {selectedExerciseDB && selectedExerciseDB.instructions.length > 0 && (
+                    <div>
+                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
+                      <ol className="space-y-3">
+                        {selectedExerciseDB.instructions.map((step, i) => (
+                          <li key={i} className="flex gap-3">
+                            <span className="shrink-0 w-6 h-6 rounded-full bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                              {i + 1}
+                            </span>
+                            <p className="text-white/60 text-sm font-body leading-relaxed">{step}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
                 </div>
-                <span className="text-emerald-500 text-xs font-display font-bold">100%</span>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* SIDEBAR */}
+      <div className="lg:col-span-4 space-y-4">
+        {/* Recent Workout Logs */}
+        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
+          <div className="px-5 py-4 border-b border-white/[0.06]">
+            <h2 className="font-display font-bold text-sm text-white">Recent Logs</h2>
+          </div>
+          <div className="p-5 space-y-3">
+            {recentLogs.map((log) => (
+              <div key={log.date} className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+                  <span className="text-white/40 text-[10px] font-display font-bold">{log.date}</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-body font-semibold text-white text-sm">{log.workout}</p>
+                  <p className="text-white/40 text-xs font-body truncate">{log.topSet}</p>
+                  {log.prs > 0 && (
+                    <span className="inline-block mt-1 text-[10px] font-display font-bold text-[#F08B1E] bg-[#F08B1E]/10 px-2 py-0.5 rounded">
+                      {log.prs} PR
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Coach Notes */}
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
+          <div className="px-5 py-4 border-b border-white/[0.06]">
+            <h2 className="font-display font-bold text-sm text-white">Coach Notes</h2>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-white/70 text-sm font-body leading-relaxed">
+                &ldquo;Great progress on bench — you&apos;re ready to push to 190 next week. Keep rest times strict on accessories.&rdquo;
+              </p>
+              <p className="text-white/30 text-xs font-body mt-2">— Anthony, Mar 26</p>
             </div>
-          </motion.div>
-        </div>
+            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-white/70 text-sm font-body leading-relaxed">
+                &ldquo;Focus on mind-muscle connection during pull-ups. Slow the eccentric to 3 seconds.&rdquo;
+              </p>
+              <p className="text-white/30 text-xs font-body mt-2">— Anthony, Mar 22</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Past Programs */}
+        <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#141414] rounded-xl border border-white/[0.06]">
+          <div className="px-5 py-4 border-b border-white/[0.06]">
+            <h2 className="font-display font-bold text-sm text-white">Past Programs</h2>
+          </div>
+          <div className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-body font-semibold text-white text-sm">Fat Loss Kickstart</p>
+                <p className="text-white/40 text-xs font-body">8 weeks &middot; Completed</p>
+              </div>
+              <span className="text-emerald-400 text-xs font-display font-bold">100%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-body font-semibold text-white text-sm">Strength Foundations</p>
+                <p className="text-white/40 text-xs font-body">6 weeks &middot; Completed</p>
+              </div>
+              <span className="text-emerald-400 text-xs font-display font-bold">100%</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Sub-components ── */
+
+function ExerciseImageCycler({ images, name }: { images: string[]; name: string }) {
+  const [showEnd, setShowEnd] = useState(false)
+
+  useEffect(() => {
+    if (!images[1]) return
+    const interval = setInterval(() => setShowEnd((p) => !p), 2500)
+    return () => clearInterval(interval)
+  }, [images])
+
+  return (
+    <div className="relative w-full h-56 rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/[0.06]">
+      <img
+        src={images[0]}
+        alt={`${name} — start`}
+        className="absolute inset-0 w-full h-full object-contain p-2 transition-opacity duration-[1500ms]"
+        style={{ opacity: showEnd && images[1] ? 0 : 1 }}
+      />
+      {images[1] && (
+        <img
+          src={images[1]}
+          alt={`${name} — end`}
+          className="absolute inset-0 w-full h-full object-contain p-2 transition-opacity duration-[1500ms]"
+          style={{ opacity: showEnd ? 1 : 0 }}
+        />
+      )}
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-md text-[9px] font-display font-semibold text-white/70 uppercase tracking-wide backdrop-blur-sm">
+        {showEnd && images[1] ? 'End' : 'Start'}
+      </div>
+    </div>
+  )
+}
+
+function SetupCard({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+      <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center">
+        {icon === 'equipment' && (
+          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+          </svg>
+        )}
+        {icon === 'level' && (
+          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+          </svg>
+        )}
+        {icon === 'category' && (
+          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+          </svg>
+        )}
+      </div>
+      <div className="text-center">
+        <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-wide">{label}</p>
+        <p className="text-white text-xs font-body font-semibold capitalize mt-0.5">{value}</p>
       </div>
     </div>
   )
