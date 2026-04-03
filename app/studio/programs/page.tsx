@@ -266,6 +266,7 @@ const fadeIn = {
 
 export default function ProgramsPage() {
   const [view, setView] = useState<ProgramView>('preview')
+  const [previewTab, setPreviewTab] = useState<'overview' | 'program'>('program')
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
@@ -368,98 +369,196 @@ export default function ProgramsPage() {
               <div className="bg-[#141414] rounded-xl border border-white/[0.06] overflow-hidden">
                 {/* Overview / Program toggle */}
                 <div className="flex items-center border-b border-white/[0.06]">
-                  <button className="flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide text-white/30">
+                  <button
+                    onClick={() => setPreviewTab('overview')}
+                    className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
+                      previewTab === 'overview'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#3B82F6]'
+                        : 'text-white/30 hover:text-white/50'
+                    }`}
+                  >
                     Overview
                   </button>
-                  <button className="flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide text-white bg-white/[0.04] border-b-2 border-[#3B82F6]">
+                  <button
+                    onClick={() => setPreviewTab('program')}
+                    className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
+                      previewTab === 'program'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#3B82F6]'
+                        : 'text-white/30 hover:text-white/50'
+                    }`}
+                  >
                     Program
                   </button>
                 </div>
 
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-display font-bold text-white text-sm">Program Preview</h2>
+                {/* ── Overview tab content ── */}
+                {previewTab === 'overview' && (
+                  <div className="p-5 space-y-5">
+                    {/* Quick stats */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                        <p className="text-white font-display font-extrabold text-2xl tracking-tight">
+                          {weeklyPlan.filter((d) => d.exercises.length > 0).length}
+                        </p>
+                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
+                      </div>
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                        <p className="text-white font-display font-extrabold text-2xl tracking-tight">
+                          {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
+                        </p>
+                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
+                      </div>
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                        <p className="text-[#22C55E] font-display font-extrabold text-2xl tracking-tight">
+                          {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
+                        </p>
+                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Completed</p>
+                      </div>
+                    </div>
+
+                    {/* Program details */}
+                    <div className="space-y-3">
+                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
+                      {[
+                        { label: 'Program', value: currentProgram.name },
+                        { label: 'Phase', value: currentProgram.phase },
+                        { label: 'Level', value: currentProgram.level },
+                        { label: 'Coach', value: currentProgram.coach },
+                        { label: 'Started', value: currentProgram.startDate },
+                        { label: 'Duration', value: `${currentProgram.weeks.total} weeks` },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
+                          <span className="text-white/40 text-sm font-body">{item.label}</span>
+                          <span className="text-white font-body font-semibold text-sm">{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Weekly split summary */}
+                    <div className="space-y-2">
+                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
+                      {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => (
+                        <div key={day.day} className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/[0.02]">
+                          <div className="flex items-center gap-3">
+                            <span className="text-white/30 text-xs font-body w-12">{day.day.slice(0, 3)}</span>
+                            <span className="text-white font-body font-semibold text-sm">{day.name}</span>
+                          </div>
+                          <span className="text-white/30 text-xs font-body">{day.muscles}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* CTA to view program */}
+                    <button
+                      onClick={() => setPreviewTab('program')}
+                      className="w-full py-3.5 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200"
+                    >
+                      View Program
+                    </button>
                   </div>
+                )}
 
-                  <div className="space-y-2">
-                    {weeklyPlan.map((day, i) => {
-                      const isRest = day.exercises.length === 0
-                      const thumb = getDayThumbnail(i)
+                {/* ── Program tab content ── */}
+                {previewTab === 'program' && (
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="font-display font-bold text-white text-sm">Program Preview</h2>
+                    </div>
 
-                      return (
-                        <motion.button
-                          key={day.day}
-                          custom={i}
-                          variants={fadeIn}
-                          initial="hidden"
-                          animate="visible"
-                          onClick={() => {
-                            if (!isRest) {
-                              setSelectedDay(i)
-                              setView('workout')
-                            }
-                          }}
-                          className={`w-full flex items-center gap-4 p-3 rounded-xl transition-colors duration-200 text-left ${
-                            isRest
-                              ? 'bg-[#1C1C1C] border border-white/[0.04]'
-                              : 'bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#1E1E1E] hover:border-white/[0.10]'
-                          }`}
-                        >
-                          {/* Thumbnail or rest icon */}
-                          {isRest ? (
-                            <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
-                              <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-                              </svg>
-                            </div>
-                          ) : (
-                            <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
-                              {thumb ? (
-                                <>
-                                  <img src={thumb} alt="" className="w-full h-full object-cover" loading="lazy" />
-                                  <div className="absolute inset-0 bg-black/30" />
-                                </>
-                              ) : (
-                                <div className="w-full h-full bg-white/[0.04]" />
-                              )}
-                              {/* Play button overlay */}
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
-                                  <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
+                    <div className="space-y-2">
+                      {weeklyPlan.map((day, i) => {
+                        const isRest = day.exercises.length === 0
+                        const thumb = getDayThumbnail(i)
+
+                        return (
+                          <motion.button
+                            key={day.day}
+                            custom={i}
+                            variants={fadeIn}
+                            initial="hidden"
+                            animate="visible"
+                            onClick={() => {
+                              if (!isRest) {
+                                setSelectedDay(i)
+                                setView('workout')
+                              }
+                            }}
+                            className={`w-full flex items-center gap-4 p-3 rounded-xl text-left group ${
+                              isRest
+                                ? 'bg-[#1C1C1C] border border-white/[0.04] cursor-default'
+                                : 'bg-[#1A1A1A] border border-white/[0.06] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
+                            }`}
+                          >
+                            {/* Thumbnail or rest icon */}
+                            {isRest ? (
+                              <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
+                                <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
+                                {thumb ? (
+                                  <>
+                                    <img src={thumb} alt="" className="w-full h-full object-cover" loading="lazy" />
+                                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-200" />
+                                  </>
+                                ) : (
+                                  <div className="w-full h-full bg-white/[0.04]" />
+                                )}
+                                {/* Play button overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="w-6 h-6 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                                    <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </div>
                                 </div>
                               </div>
+                            )}
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#3B82F6]'} transition-colors duration-200`}>
+                                {day.name}
+                              </p>
+                              <p className="text-white/30 text-xs font-body">
+                                Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
+                              </p>
                             </div>
-                          )}
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white'}`}>
-                              {day.name}
-                            </p>
-                            <p className="text-white/30 text-xs font-body">
-                              Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
-                            </p>
-                          </div>
-
-                          {/* Status */}
-                          {day.completed ? (
-                            <div className="w-7 h-7 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
-                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                            {/* Status */}
+                            {day.completed ? (
+                              <div className="w-7 h-7 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                              </div>
+                            ) : !isRest ? (
+                              <svg className="w-5 h-5 text-white/20 group-hover:text-white/40 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                               </svg>
-                            </div>
-                          ) : !isRest ? (
-                            <svg className="w-5 h-5 text-white/20 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                            </svg>
-                          ) : null}
-                        </motion.button>
+                            ) : null}
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+
+                    {/* Today's workout CTA */}
+                    {(() => {
+                      const todayIndex = weeklyPlan.findIndex((d) => !d.completed && d.exercises.length > 0)
+                      if (todayIndex === -1) return null
+                      return (
+                        <button
+                          onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
+                          className="w-full mt-4 py-3.5 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200"
+                        >
+                          Continue — {weeklyPlan[todayIndex].name}
+                        </button>
                       )
-                    })}
+                    })()}
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           )}
