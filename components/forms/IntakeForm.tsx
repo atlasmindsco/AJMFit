@@ -17,9 +17,6 @@ const step1Schema = z.object({
 
 const step2Schema = z.object({
   goals: z.string().min(10, 'Tell us a bit more about your goals'),
-  fitnessLevel: z.enum(['beginner', 'intermediate', 'advanced'], {
-    required_error: 'Select your fitness level',
-  }),
   equipment: z.array(z.string()).min(1, 'Select at least one'),
   healthLimitations: z.string().optional(),
 })
@@ -43,11 +40,6 @@ const schemas = [step1Schema, step2Schema, step3Schema] as const
 const equipmentOptions = [
   { value: 'gym', label: 'Gym' },
   { value: 'dumbbells', label: 'Dumbbells' },
-  { value: 'calisthenics', label: 'Calisthenics' },
-  { value: 'resistance-bands', label: 'Resistance Bands' },
-  { value: 'kettlebells', label: 'Kettlebells' },
-  { value: 'landmine', label: 'Landmine' },
-  { value: 'full-home-gym', label: 'Full Home Gym' },
 ]
 
 const tierOptions = [
@@ -92,11 +84,6 @@ const tierOptions = [
   },
 ]
 
-const fitnessLevels = [
-  { value: 'beginner', label: 'Beginner' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'advanced', label: 'Advanced' },
-]
 
 // ---- Styles ----
 
@@ -252,19 +239,6 @@ export default function IntakeForm() {
                   className={inputBase + ' resize-none'}
                 />
                 {errors.goals && <p className={errorBase}>{errors.goals.message}</p>}
-              </div>
-
-              <div>
-                <label className={labelBase}>Current Fitness Level</label>
-                <select {...register('fitnessLevel')} className={inputBase + ' appearance-none'}>
-                  <option value="">Select level...</option>
-                  {fitnessLevels.map((lvl) => (
-                    <option key={lvl.value} value={lvl.value}>
-                      {lvl.label}
-                    </option>
-                  ))}
-                </select>
-                {errors.fitnessLevel && <p className={errorBase}>{errors.fitnessLevel.message}</p>}
               </div>
 
               <div>
