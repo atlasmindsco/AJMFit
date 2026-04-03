@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
 
 /* ── Types ── */
@@ -329,6 +329,46 @@ export default function ProgramsPage() {
   const [setLogs, setSetLogs] = useState<Record<string, { weight: string; reps: string }[]>>({})
   const [swapMenuOpen, setSwapMenuOpen] = useState<string | null>(null)
   const [swappedExercises, setSwappedExercises] = useState<Record<string, string>>({})
+
+  // Rest timer
+  const [restTimers, setRestTimers] = useState<Record<string, number>>({}) // per-exercise custom rest in seconds
+  const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number } | null>(null)
+  const [editingRest, setEditingRest] = useState<string | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const parseRestSeconds = (rest: string): number => {
+    const match = rest.match(/(\d+)/)
+    if (!match) return 60
+    const val = parseInt(match[1])
+    if (rest.includes('min')) return val * 60
+    return val
+  }
+
+  const startRestTimer = useCallback((exerciseKey: string, seconds: number) => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds })
+    timerRef.current = setInterval(() => {
+      setActiveTimer((prev) => {
+        if (!prev || prev.remaining <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          timerRef.current = null
+          return null
+        }
+        return { ...prev, remaining: prev.remaining - 1 }
+      })
+    }, 1000)
+  }, [])
+
+  const stopRestTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = null
+    setActiveTimer(null)
+  }, [])
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [])
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
   const progressPct = (currentProgram.weeks.current / currentProgram.weeks.total) * 100
@@ -810,8 +850,57 @@ export default function ProgramsPage() {
                                         </div>
                                       )}
 
+                                      {/* Rest time adjuster */}
+                                      {(() => {
+                                        const restKey = `${selectedDay}-${exercise.name}`
+                                        const defaultSec = parseRestSeconds(exercise.rest)
+                                        const customSec = restTimers[restKey] ?? defaultSec
+                                        const isEditingThis = editingRest === exercise.name
+
+                                        return (
+                                          <div className="flex items-center justify-between rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2 mt-2 mb-3">
+                                            <div className="flex items-center gap-2">
+                                              <svg className="w-3.5 h-3.5 text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                              </svg>
+                                              <span className="text-white/40 text-[10px] font-display font-bold uppercase tracking-wide">Rest Timer</span>
+                                            </div>
+                                            {isEditingThis ? (
+                                              <div className="flex items-center gap-1.5">
+                                                {[30, 45, 60, 90, 120, 180].map((sec) => (
+                                                  <button
+                                                    key={sec}
+                                                    onClick={() => {
+                                                      setRestTimers((prev) => ({ ...prev, [restKey]: sec }))
+                                                      setEditingRest(null)
+                                                    }}
+                                                    className={`px-2 py-1 rounded text-[10px] font-display font-bold transition-colors duration-150 ${
+                                                      customSec === sec
+                                                        ? 'bg-[#3B82F6] text-white'
+                                                        : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                    }`}
+                                                  >
+                                                    {sec < 60 ? `${sec}s` : `${sec / 60}m`}
+                                                  </button>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <button
+                                                onClick={() => setEditingRest(exercise.name)}
+                                                className="flex items-center gap-1.5 text-white/50 hover:text-white/80 transition-colors duration-200"
+                                              >
+                                                <span className="text-sm font-display font-bold">{customSec}s</span>
+                                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                                                </svg>
+                                              </button>
+                                            )}
+                                          </div>
+                                        )
+                                      })()}
+
                                       {/* Column headers */}
-                                      <div className="grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-2 mt-2">
+                                      <div className="grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-2">
                                         <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Set</span>
                                         <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
                                         <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Reps</span>
@@ -823,57 +912,120 @@ export default function ProgramsPage() {
                                         const filled = log.weight !== '' && log.reps !== ''
                                         const setWeight = Number(log.weight) || 0
                                         const setBeatsPR = filled && pr ? setWeight > pr.weight : filled && setWeight > 0
+                                        const setTimerKey = `${logKey}-set${si}`
+                                        const isLastSet = si === currentLogs.length - 1
+                                        const timerActive = activeTimer?.key === setTimerKey
+
+                                        const handleLogChange = (field: 'weight' | 'reps', value: string) => {
+                                          const updated = [...currentLogs]
+                                          updated[si] = { ...updated[si], [field]: value }
+                                          setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
+
+                                          // Auto-start rest timer when set is completed
+                                          const newLog = { ...updated[si] }
+                                          if (newLog.weight !== '' && newLog.reps !== '') {
+                                            const restKey = `${selectedDay}-${exercise.name}`
+                                            const defaultSec = parseRestSeconds(exercise.rest)
+                                            const customSec = restTimers[restKey] ?? defaultSec
+                                            startRestTimer(setTimerKey, customSec)
+                                          }
+                                        }
+
                                         return (
-                                          <div key={si} className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1.5 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-[#F59E0B]/[0.06]' : ''}`}>
-                                            <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-[#F59E0B]' : 'text-white/30'}`}>{si + 1}</span>
-                                            <input
-                                              type="number"
-                                              inputMode="numeric"
-                                              placeholder="—"
-                                              value={log.weight}
-                                              onChange={(e) => {
-                                                const updated = [...currentLogs]
-                                                updated[si] = { ...updated[si], weight: e.target.value }
-                                                setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
-                                              }}
-                                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                            />
-                                            <input
-                                              type="number"
-                                              inputMode="numeric"
-                                              placeholder="—"
-                                              value={log.reps}
-                                              onChange={(e) => {
-                                                const updated = [...currentLogs]
-                                                updated[si] = { ...updated[si], reps: e.target.value }
-                                                setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
-                                              }}
-                                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                            />
-                                            <div className="flex items-center justify-center">
-                                              {setBeatsPR ? (
-                                                <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
-                                                  <svg className="w-3.5 h-3.5 text-[#F59E0B]" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
-                                                  </svg>
-                                                </div>
-                                              ) : filled ? (
-                                                <div className="w-6 h-6 rounded-full bg-[#22C55E]/20 flex items-center justify-center">
-                                                  <svg className="w-3.5 h-3.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                  </svg>
-                                                </div>
-                                              ) : (
-                                                <div className="w-6 h-6 rounded-full bg-white/[0.04] border border-white/[0.08]" />
-                                              )}
+                                          <div key={si}>
+                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-[#F59E0B]/[0.06]' : ''}`}>
+                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-[#F59E0B]' : 'text-white/30'}`}>{si + 1}</span>
+                                              <input
+                                                type="number"
+                                                inputMode="numeric"
+                                                placeholder="—"
+                                                value={log.weight}
+                                                onChange={(e) => handleLogChange('weight', e.target.value)}
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                              />
+                                              <input
+                                                type="number"
+                                                inputMode="numeric"
+                                                placeholder="—"
+                                                value={log.reps}
+                                                onChange={(e) => handleLogChange('reps', e.target.value)}
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                              />
+                                              <div className="flex items-center justify-center">
+                                                {setBeatsPR ? (
+                                                  <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-[#F59E0B]" viewBox="0 0 24 24" fill="currentColor">
+                                                      <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
+                                                    </svg>
+                                                  </div>
+                                                ) : filled ? (
+                                                  <div className="w-6 h-6 rounded-full bg-[#22C55E]/20 flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                    </svg>
+                                                  </div>
+                                                ) : (
+                                                  <div className="w-6 h-6 rounded-full bg-white/[0.04] border border-white/[0.08]" />
+                                                )}
+                                              </div>
                                             </div>
+
+                                            {/* Rest timer between sets */}
+                                            {filled && !isLastSet && (
+                                              <div className="ml-8 mr-10 my-1.5">
+                                                {timerActive && activeTimer ? (
+                                                  <div className="flex items-center gap-2 rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 px-3 py-2">
+                                                    {/* Progress ring */}
+                                                    <div className="relative w-8 h-8 shrink-0">
+                                                      <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
+                                                        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                                                        <circle
+                                                          cx="18" cy="18" r="15" fill="none"
+                                                          stroke="#3B82F6"
+                                                          strokeWidth="3"
+                                                          strokeLinecap="round"
+                                                          strokeDasharray={`${(activeTimer.remaining / activeTimer.total) * 94.25} 94.25`}
+                                                          className="transition-[stroke-dasharray] duration-1000 ease-linear"
+                                                        />
+                                                      </svg>
+                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#3B82F6]">
+                                                        {activeTimer.remaining}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                      <p className="text-[#3B82F6] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
+                                                      <p className="text-white/25 text-[9px] font-body">
+                                                        {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
+                                                      </p>
+                                                    </div>
+                                                    <button
+                                                      onClick={stopRestTimer}
+                                                      className="px-2.5 py-1 rounded-md bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
+                                                    >
+                                                      Skip
+                                                    </button>
+                                                  </div>
+                                                ) : (
+                                                  <div className="flex items-center gap-2 px-3 py-1">
+                                                    <div className="flex-1 h-px bg-white/[0.06]" />
+                                                    <span className="text-white/15 text-[9px] font-display font-bold uppercase tracking-wide flex items-center gap-1">
+                                                      <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                      </svg>
+                                                      Rest complete
+                                                    </span>
+                                                    <div className="flex-1 h-px bg-white/[0.06]" />
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
                                           </div>
                                         )
                                       })}
 
                                       {/* Target reminder */}
                                       <p className="text-white/20 text-[10px] font-body mt-2 text-center">
-                                        Target: {exercise.reps} reps &middot; Rest: {exercise.rest}
+                                        Target: {exercise.reps} reps
                                       </p>
 
                                       {/* Swap exercise button */}
