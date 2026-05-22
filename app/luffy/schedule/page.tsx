@@ -72,8 +72,8 @@ function getTypeIcon(type: string) {
 }
 
 function getTypeColor(type: string) {
-  if (type === 'Live Training') return 'bg-[#F08B1E]/15 text-[#F08B1E]'
-  if (type === 'Video Check-in') return 'bg-[#2E6AB0]/15 text-[#2E6AB0]'
+  if (type === 'Live Training') return 'bg-[#F76B16]/15 text-[#F76B16]'
+  if (type === 'Video Check-in') return 'bg-[#1668E0]/15 text-[#1668E0]'
   if (type === 'Form Review') return 'bg-purple-500/15 text-purple-400'
   return 'bg-emerald-500/15 text-emerald-400'
 }
@@ -104,9 +104,9 @@ export default function SchedulePage() {
       {/* Week Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Total Sessions', value: totalSessions, color: 'text-[#F08B1E]' },
+          { label: 'Total Sessions', value: totalSessions, color: 'text-[#F76B16]' },
           { label: 'Live Training', value: liveCount, color: 'text-emerald-400' },
-          { label: 'Check-ins', value: checkinCount, color: 'text-[#2E6AB0]' },
+          { label: 'Check-ins', value: checkinCount, color: 'text-[#1668E0]' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -136,7 +136,7 @@ export default function SchedulePage() {
                     onClick={() => setSelectedDay(day)}
                     className={`flex-1 py-4 text-center border-b-2 transition-all duration-200 ${
                       selectedDay === day
-                        ? 'border-[#F08B1E] text-[#F08B1E]'
+                        ? 'border-[#F76B16] text-[#F76B16]'
                         : 'border-transparent text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -168,8 +168,8 @@ export default function SchedulePage() {
                         <p className="text-white/30 text-xs font-body">{session.type} &middot; {session.duration}</p>
                       </div>
                       <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${
-                        session.tier === 'Full' ? 'bg-[#F08B1E]/15 text-[#F08B1E]' :
-                        session.tier === 'Accelerator' ? 'bg-[#2E6AB0]/15 text-[#2E6AB0]' :
+                        session.tier === 'Full' ? 'bg-[#F76B16]/15 text-[#F76B16]' :
+                        session.tier === 'Accelerator' ? 'bg-[#1668E0]/15 text-[#1668E0]' :
                         session.tier === 'All' ? 'bg-emerald-500/15 text-emerald-400' :
                         'bg-white/[0.06] text-white/40'
                       }`}>
@@ -202,11 +202,11 @@ export default function SchedulePage() {
                 return (
                   <div key={day} className="flex items-center gap-3">
                     <span className={`text-xs font-display font-bold w-8 ${
-                      day === selectedDay ? 'text-[#F08B1E]' : 'text-white/30'
+                      day === selectedDay ? 'text-[#F76B16]' : 'text-white/30'
                     }`}>{day}</span>
                     <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${count > 0 ? 'bg-[#F08B1E]' : ''}`}
+                        className={`h-full rounded-full ${count > 0 ? 'bg-[#F76B16]' : ''}`}
                         style={{ width: `${(count / maxCount) * 100}%` }}
                       />
                     </div>
@@ -224,8 +224,8 @@ export default function SchedulePage() {
             </div>
             <div className="p-5 space-y-3">
               {[
-                { type: 'Live Training', count: liveCount, color: '#F08B1E' },
-                { type: 'Video Check-in', count: checkinCount, color: '#2E6AB0' },
+                { type: 'Live Training', count: liveCount, color: '#F76B16' },
+                { type: 'Video Check-in', count: checkinCount, color: '#1668E0' },
                 { type: 'Form Review', count: Object.values(weekSchedule).flat().filter(s => s.type === 'Form Review').length, color: '#A855F7' },
                 { type: 'Group Call', count: Object.values(weekSchedule).flat().filter(s => s.type === 'Group Call').length, color: '#10B981' },
               ].map((t) => (
@@ -243,7 +243,7 @@ export default function SchedulePage() {
           {/* Hours This Week */}
           <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 text-center">
             <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mb-2">Total Hours This Week</p>
-            <p className="font-display font-extrabold text-4xl text-[#F08B1E]">14.5</p>
+            <p className="font-display font-extrabold text-4xl text-[#F76B16]">14.5</p>
             <p className="text-white/30 text-xs font-body mt-1">across {totalSessions} sessions</p>
           </motion.div>
         </div>

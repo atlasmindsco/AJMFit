@@ -100,7 +100,7 @@ export default function CustomCursor() {
         {/* Left weight plate (inner) */}
         <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
         {/* Bar */}
-        <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+        <rect x="10" y="14" width="12" height="4" rx="1" fill="#F76B16" />
         {/* Right weight plate (inner) */}
         <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
         {/* Right weight plate (outer) */}

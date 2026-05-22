@@ -3,6 +3,18 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
+import { getCurrentUserId } from '@/lib/current-user'
+import {
+  startWorkout as dbStartWorkout,
+  endWorkout as dbEndWorkout,
+  saveSet as dbSaveSet,
+  upsertPR as dbUpsertPR,
+  fetchPRs as dbFetchPRs,
+  saveSwap as dbSaveSwap,
+  removeSwap as dbRemoveSwap,
+  fetchSwaps as dbFetchSwaps,
+  fetchInProgressWorkout as dbFetchInProgressWorkout,
+} from '@/lib/workout'
 
 /* ── Types ── */
 interface ExerciseDB {
@@ -23,6 +35,38 @@ interface ProgramExercise {
   reps: string
   rest: string
   series: string
+}
+
+type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
+
+const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string; ring: string; bg: string; border: string; text: string; hint: string }> = {
+  dropset: {
+    label: 'Drop Set',
+    color: '#EF4444',
+    ring: 'ring-red-500/30',
+    bg: 'bg-red-500/[0.06]',
+    border: 'border-red-500/15',
+    text: 'text-red-400',
+    hint: 'After your last working set, immediately reduce weight and rep to failure.',
+  },
+  restpause: {
+    label: 'Rest-Pause',
+    color: '#A855F7',
+    ring: 'ring-purple-500/30',
+    bg: 'bg-purple-500/[0.06]',
+    border: 'border-purple-500/15',
+    text: 'text-purple-400',
+    hint: 'After your last working set, rest 10-15s, then rep to failure. Keep the weight.',
+  },
+  partial: {
+    label: 'Partials',
+    color: '#F59E0B',
+    ring: 'ring-amber-500/30',
+    bg: 'bg-amber-500/[0.06]',
+    border: 'border-amber-500/15',
+    text: 'text-amber-400',
+    hint: 'After your last working set, drop the ROM to half reps. Pump until you physically cannot move.',
+  },
 }
 
 type ProgramView = 'preview' | 'workout' | 'exercise'
@@ -62,7 +106,7 @@ const weeklyPlan = [
     duration: '~55 min',
     completed: true,
     exercises: [
-      { name: 'Barbell Bench Press', sets: 4, reps: '8-10', rest: '90s', series: 'A' },
+      { name: 'Barbell Bench Press', sets: 3, reps: '8-10', rest: '90s', series: 'A' },
       { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: '75s', series: 'B' },
       { name: 'Overhead Press', sets: 3, reps: '8-10', rest: '90s', series: 'C' },
       { name: 'Lateral Raises', sets: 3, reps: '12-15', rest: '60s', series: 'D1' },
@@ -77,11 +121,11 @@ const weeklyPlan = [
     duration: '~60 min',
     completed: true,
     exercises: [
-      { name: 'Barbell Squat', sets: 4, reps: '6-8', rest: '120s', series: 'A' },
+      { name: 'Barbell Squat', sets: 3, reps: '6-8', rest: '120s', series: 'A' },
       { name: 'Romanian Deadlift', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
       { name: 'Leg Press', sets: 3, reps: '10-12', rest: '90s', series: 'C' },
       { name: 'Walking Lunges', sets: 3, reps: '12 each', rest: '75s', series: 'D' },
-      { name: 'Calf Raises', sets: 4, reps: '15-20', rest: '45s', series: 'E' },
+      { name: 'Calf Raises', sets: 3, reps: '15-20', rest: '45s', series: 'E' },
     ],
   },
   {
@@ -105,8 +149,8 @@ const weeklyPlan = [
     duration: '~55 min',
     completed: false,
     exercises: [
-      { name: 'Pull-Ups (Weighted)', sets: 4, reps: '6-8', rest: '90s', series: 'A' },
-      { name: 'Barbell Row', sets: 4, reps: '8-10', rest: '90s', series: 'B' },
+      { name: 'Pull-Ups (Weighted)', sets: 3, reps: '6-8', rest: '90s', series: 'A' },
+      { name: 'Barbell Row', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
       { name: 'Seated Cable Row', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
       { name: 'Face Pulls', sets: 3, reps: '15-20', rest: '60s', series: 'D1' },
       { name: 'Barbell Curls', sets: 3, reps: '10-12', rest: '60s', series: 'D2' },
@@ -120,7 +164,7 @@ const weeklyPlan = [
     duration: '~50 min',
     completed: false,
     exercises: [
-      { name: 'Hip Thrusts', sets: 4, reps: '8-10', rest: '90s', series: 'A' },
+      { name: 'Hip Thrusts', sets: 3, reps: '8-10', rest: '90s', series: 'A' },
       { name: 'Front Squat', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
       { name: 'Leg Curl', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
       { name: 'Cable Woodchops', sets: 3, reps: '12 each', rest: '60s', series: 'D1' },
@@ -334,7 +378,17 @@ export default function ProgramsPage() {
   const [restTimers, setRestTimers] = useState<Record<string, number>>({}) // per-exercise custom rest in seconds
   const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number } | null>(null)
   const [editingRest, setEditingRest] = useState<string | null>(null)
+  const [workoutStartTime, setWorkoutStartTime] = useState<Record<number, number>>({}) // day index → unix ms
+  const [workoutElapsed, setWorkoutElapsed] = useState(0) // seconds — ticks for active workout
+  const [intensityOn, setIntensityOn] = useState<Record<string, boolean>>({}) // exercise key → toggle
+  const [intensityChoice, setIntensityChoice] = useState<Record<string, IntensityTechnique>>({}) // exercise key → selected technique
+  const [intensityLogs, setIntensityLogs] = useState<Record<string, { weight: string; done: boolean }[]>>({}) // exercise key → 2 intensity set logs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Persistence
+  const [userId, setUserId] = useState<string | null>(null)
+  const [workoutIds, setWorkoutIds] = useState<Record<number, string>>({}) // day index → DB workout id
+  const [dbPRs, setDbPRs] = useState<Record<string, PRRecord>>({}) // overrides hardcoded demo PRs when present
 
   const parseRestSeconds = (rest: string): number => {
     const match = rest.match(/(\d+)/)
@@ -384,6 +438,98 @@ export default function ProgramsPage() {
       .catch((err) => console.error('[ExerciseDB] Failed to load:', err))
   }, [])
 
+  // Hydrate from Supabase: user id, PRs, swaps
+  useEffect(() => {
+    const id = getCurrentUserId()
+    if (!id) return
+    setUserId(id)
+
+    dbFetchPRs(id)
+      .then((rows) => {
+        const map: Record<string, PRRecord> = {}
+        for (const row of rows) {
+          map[row.exercise_name] = {
+            weight: Number(row.weight),
+            reps: row.reps,
+            date: new Date(row.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            previous: row.previous_weight ? Number(row.previous_weight) : undefined,
+          }
+        }
+        setDbPRs(map)
+      })
+      .catch((err) => console.error('[PRs] Failed to load:', err))
+
+    dbFetchSwaps(id)
+      .then((rows) => {
+        // Swaps are scoped per day in UI (key = `${dayIndex}-${exerciseName}`), but stored
+        // globally per user. Apply the same swap to every day where that exercise appears.
+        const map: Record<string, string> = {}
+        weeklyPlan.forEach((day, dayIdx) => {
+          for (const ex of day.exercises) {
+            const match = rows.find((r) => r.original_exercise_name === ex.name)
+            if (match) map[`${dayIdx}-${ex.name}`] = match.swapped_exercise_name
+          }
+        })
+        setSwappedExercises(map)
+      })
+      .catch((err) => console.error('[Swaps] Failed to load:', err))
+
+    // Rehydrate an in-progress workout if one exists
+    dbFetchInProgressWorkout(id)
+      .then((data) => {
+        if (!data) return
+        const { workout, sets } = data
+        const dayIdx = weeklyPlan.findIndex((d) => d.name === workout.day_name)
+        if (dayIdx === -1) return
+
+        setWorkoutIds((prev) => ({ ...prev, [dayIdx]: workout.id }))
+        setWorkoutStartTime((prev) => ({ ...prev, [dayIdx]: new Date(workout.started_at).getTime() }))
+
+        // Group sets by exercise
+        const workingByExercise: Record<string, { weight: string; reps: string }[]> = {}
+        const intensityByExercise: Record<string, { weight: string; done: boolean }[]> = {}
+        const techniqueByExercise: Record<string, IntensityTechnique> = {}
+
+        for (const set of sets) {
+          const key = `${dayIdx}-${set.exercise_name}`
+          if (set.is_intensity_set) {
+            if (!intensityByExercise[key]) intensityByExercise[key] = [{ weight: '', done: false }, { weight: '', done: false }]
+            const idx = set.set_number - 1
+            if (idx >= 0 && idx < intensityByExercise[key].length) {
+              intensityByExercise[key][idx] = {
+                weight: set.weight !== null ? String(set.weight) : '',
+                done: set.completed,
+              }
+            }
+            if (set.intensity_technique) techniqueByExercise[key] = set.intensity_technique
+          } else {
+            if (!workingByExercise[key]) workingByExercise[key] = []
+            // Grow array as needed
+            while (workingByExercise[key].length < set.set_number) {
+              workingByExercise[key].push({ weight: '', reps: '' })
+            }
+            workingByExercise[key][set.set_number - 1] = {
+              weight: set.weight !== null ? String(set.weight) : '',
+              reps: set.reps !== null ? String(set.reps) : '',
+            }
+          }
+        }
+
+        setSetLogs(workingByExercise)
+        setIntensityLogs(intensityByExercise)
+        setIntensityChoice(techniqueByExercise)
+        // Turn intensity on for every exercise that has intensity sets
+        const onMap: Record<string, boolean> = {}
+        for (const key of Object.keys(intensityByExercise)) onMap[key] = true
+        setIntensityOn(onMap)
+
+        // Jump to the in-progress workout view
+        setSelectedDay(dayIdx)
+        setView('workout')
+      })
+      .catch((err) => console.error('[In-progress workout] Failed to load:', err))
+  }, [])
+
   // Pre-match exercises for the selected day
   const matchedExercises = useMemo(() => {
     const matches = new Map<string, ExerciseDB | null>()
@@ -420,6 +566,16 @@ export default function ProgramsPage() {
     return () => clearInterval(interval)
   }, [])
 
+  // Tick elapsed time while a workout is active
+  const activeWorkoutStartedAt = selectedDay !== null ? workoutStartTime[selectedDay] ?? null : null
+  useEffect(() => {
+    if (!activeWorkoutStartedAt) return
+    const tick = () => setWorkoutElapsed(Math.floor((Date.now() - activeWorkoutStartedAt) / 1000))
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [activeWorkoutStartedAt])
+
   const selectedExerciseData = selected?.exercises.find((e) => e.name === selectedExercise) ?? null
   const selectedExerciseDB = selectedExercise ? matchedExercises.get(selectedExercise) ?? null : null
 
@@ -452,7 +608,7 @@ export default function ProgramsPage() {
           </div>
           <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#3B82F6] rounded-full transition-[width] duration-500"
+              className="h-full bg-[#1668E0] rounded-full transition-[width] duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -471,7 +627,7 @@ export default function ProgramsPage() {
                     onClick={() => setPreviewTab('overview')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'overview'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#3B82F6]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1668E0]'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -481,7 +637,7 @@ export default function ProgramsPage() {
                     onClick={() => setPreviewTab('program')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'program'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#3B82F6]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1668E0]'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -544,7 +700,7 @@ export default function ProgramsPage() {
                             className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
                           >
                             <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
-                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#3B82F6] transition-colors duration-200">{day.name}</span>
+                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#1668E0] transition-colors duration-200">{day.name}</span>
                             <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
                             {day.completed ? (
                               <div className="w-5 h-5 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
@@ -565,7 +721,7 @@ export default function ProgramsPage() {
                     {/* CTA to view program */}
                     <button
                       onClick={() => setPreviewTab('program')}
-                      className="w-full py-3.5 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-3.5 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
                     >
                       View Program
                     </button>
@@ -633,7 +789,7 @@ export default function ProgramsPage() {
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#3B82F6]'} transition-colors duration-200`}>
+                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#1668E0]'} transition-colors duration-200`}>
                                 {day.name}
                               </p>
                               <p className="text-white/30 text-xs font-body">
@@ -665,7 +821,7 @@ export default function ProgramsPage() {
                       return (
                         <button
                           onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                          className="w-full mt-4 py-3.5 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200"
+                          className="w-full mt-4 py-3.5 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
                         >
                           Continue — {weeklyPlan[todayIndex].name}
                         </button>
@@ -724,8 +880,17 @@ export default function ProgramsPage() {
                           const showEnd = imagePreview[exercise.name] ?? false
                           const isOpen = expandedWorkoutExercise === exercise.name
                           const logKey = `${selectedDay}-${exercise.name}`
-                          const currentLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, () => ({ weight: '', reps: '' }))
-                          const pr = exercisePRs[exercise.name] ?? null
+                          const intensityEnabled = intensityOn[logKey] ?? false
+                          const selectedTechnique = intensityChoice[logKey] ?? null
+                          const workingSetCount = intensityEnabled ? Math.max(1, exercise.sets - 1) : exercise.sets
+                          const fullLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, () => ({ weight: '', reps: '' }))
+                          // Ensure backing array always holds `exercise.sets` rows so data isn't lost when toggling intensity on/off.
+                          const backingLogs = fullLogs.length < exercise.sets
+                            ? [...fullLogs, ...Array.from({ length: exercise.sets - fullLogs.length }, () => ({ weight: '', reps: '' }))]
+                            : fullLogs
+                          const currentLogs = backingLogs.slice(0, workingSetCount)
+                          const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
+                          const pr = dbPRs[exercise.name] ?? exercisePRs[exercise.name] ?? null
                           // Check if any entered set beats the PR
                           const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.weight && l.reps ? Number(l.weight) : 0)))
                           const isNewPR = pr ? bestEnteredWeight > pr.weight : bestEnteredWeight > 0
@@ -779,14 +944,22 @@ export default function ProgramsPage() {
                                     )}
                                     <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
                                     {isSwapped && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#3B82F6]/15 text-[#3B82F6] shrink-0">
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#1668E0]/15 text-[#1668E0] shrink-0">
                                         Swapped
+                                      </span>
+                                    )}
+                                    {intensityEnabled && selectedTechnique && (
+                                      <span
+                                        className={`text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-white/5 shrink-0`}
+                                        style={{ color: TECHNIQUE_META[selectedTechnique].color, backgroundColor: `${TECHNIQUE_META[selectedTechnique].color}22` }}
+                                      >
+                                        {TECHNIQUE_META[selectedTechnique].label}
                                       </span>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 mt-0.5">
                                     <p className="text-white/35 text-xs font-body">
-                                      Reps: {exercise.reps} &middot; {exercise.sets} sets
+                                      Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
                                     </p>
                                     {pr && (
                                       <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B] flex items-center gap-0.5">
@@ -804,8 +977,8 @@ export default function ProgramsPage() {
                                   onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                   className="text-right shrink-0 flex flex-col items-end"
                                 >
-                                  <p className="text-[#F08B1E] text-xs font-display font-bold">
-                                    {exercise.sets}X / Rest
+                                  <p className="text-[#F76B16] text-xs font-display font-bold">
+                                    {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
                                   </p>
                                   <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -876,7 +1049,7 @@ export default function ProgramsPage() {
                                                     }}
                                                     className={`px-2 py-1 rounded text-[10px] font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
-                                                        ? 'bg-[#3B82F6] text-white'
+                                                        ? 'bg-[#1668E0] text-white'
                                                         : 'bg-white/[0.04] text-white/40 hover:text-white/70'
                                                     }`}
                                                   >
@@ -917,17 +1090,56 @@ export default function ProgramsPage() {
                                         const timerActive = activeTimer?.key === setTimerKey
 
                                         const handleLogChange = (field: 'weight' | 'reps', value: string) => {
-                                          const updated = [...currentLogs]
+                                          const updated = [...backingLogs]
                                           updated[si] = { ...updated[si], [field]: value }
                                           setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
 
                                           // Auto-start rest timer when set is completed
                                           const newLog = { ...updated[si] }
-                                          if (newLog.weight !== '' && newLog.reps !== '') {
+                                          const isComplete = newLog.weight !== '' && newLog.reps !== ''
+                                          if (isComplete) {
                                             const restKey = `${selectedDay}-${exercise.name}`
                                             const defaultSec = parseRestSeconds(exercise.rest)
                                             const customSec = restTimers[restKey] ?? defaultSec
                                             startRestTimer(setTimerKey, customSec)
+                                          }
+
+                                          // Persist to DB if a workout is active
+                                          const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                          if (userId && wid) {
+                                            const w = Number(newLog.weight) || null
+                                            const r = Number(newLog.reps) || null
+                                            dbSaveSet({
+                                              workoutId: wid,
+                                              userId,
+                                              exerciseName: displayName,
+                                              originalExerciseName: isSwapped ? exercise.name : null,
+                                              setNumber: si + 1,
+                                              weight: w,
+                                              reps: r,
+                                              isIntensitySet: false,
+                                              completed: isComplete,
+                                            }).catch((err) => console.error('[Set save] Failed:', err))
+
+                                            // Upsert PR if weight + reps present and beats current
+                                            if (isComplete && w && r) {
+                                              const currentPR = pr?.weight ?? 0
+                                              if (w > currentPR) {
+                                                dbUpsertPR({ userId, exerciseName: displayName, weight: w, reps: r, workoutId: wid })
+                                                  .then(() => {
+                                                    setDbPRs((prev) => ({
+                                                      ...prev,
+                                                      [displayName]: {
+                                                        weight: w,
+                                                        reps: r,
+                                                        previous: currentPR || undefined,
+                                                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                                                      },
+                                                    }))
+                                                  })
+                                                  .catch((err) => console.error('[PR upsert] Failed:', err))
+                                              }
+                                            }
                                           }
                                         }
 
@@ -941,7 +1153,7 @@ export default function ProgramsPage() {
                                                 placeholder="—"
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1668E0]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <input
                                                 type="number"
@@ -949,7 +1161,7 @@ export default function ProgramsPage() {
                                                 placeholder="—"
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#3B82F6]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1668E0]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -974,26 +1186,26 @@ export default function ProgramsPage() {
                                             {filled && !isLastSet && (
                                               <div className="ml-8 mr-10 my-1.5">
                                                 {timerActive && activeTimer ? (
-                                                  <div className="flex items-center gap-2 rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 px-3 py-2">
+                                                  <div className="flex items-center gap-2 rounded-lg bg-[#1668E0]/10 border border-[#1668E0]/20 px-3 py-2">
                                                     {/* Progress ring */}
                                                     <div className="relative w-8 h-8 shrink-0">
                                                       <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
                                                         <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
                                                         <circle
                                                           cx="18" cy="18" r="15" fill="none"
-                                                          stroke="#3B82F6"
+                                                          stroke="#1668E0"
                                                           strokeWidth="3"
                                                           strokeLinecap="round"
                                                           strokeDasharray={`${(activeTimer.remaining / activeTimer.total) * 94.25} 94.25`}
                                                           className="transition-[stroke-dasharray] duration-1000 ease-linear"
                                                         />
                                                       </svg>
-                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#3B82F6]">
+                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#1668E0]">
                                                         {activeTimer.remaining}
                                                       </span>
                                                     </div>
                                                     <div className="flex-1">
-                                                      <p className="text-[#3B82F6] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
+                                                      <p className="text-[#1668E0] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
                                                       <p className="text-white/25 text-[9px] font-body">
                                                         {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
                                                       </p>
@@ -1022,6 +1234,148 @@ export default function ProgramsPage() {
                                           </div>
                                         )
                                       })}
+
+                                      {/* Intensity Technique toggle */}
+                                      <div className="mt-3 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            <span className="text-white/60 text-[11px] font-display font-bold uppercase tracking-wide">Intensity Technique</span>
+                                          </div>
+                                          <button
+                                            onClick={() => {
+                                              setIntensityOn((prev) => ({ ...prev, [logKey]: !intensityEnabled }))
+                                              if (!intensityEnabled && !selectedTechnique) {
+                                                setIntensityChoice((prev) => ({ ...prev, [logKey]: 'dropset' }))
+                                              }
+                                            }}
+                                            role="switch"
+                                            aria-checked={intensityEnabled}
+                                            aria-label="Toggle intensity technique"
+                                            className={`relative inline-flex shrink-0 h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+                                              intensityEnabled ? 'bg-[#F76B16]' : 'bg-white/15'
+                                            }`}
+                                          >
+                                            <span
+                                              aria-hidden="true"
+                                              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                intensityEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                                              }`}
+                                            />
+                                          </button>
+                                        </div>
+
+                                        {/* Technique picker — visible when on */}
+                                        {intensityEnabled && (
+                                          <div className="grid grid-cols-3 gap-1.5 mt-3">
+                                            {(['dropset', 'restpause', 'partial'] as IntensityTechnique[]).map((key) => {
+                                              const meta = TECHNIQUE_META[key]
+                                              const isSelected = selectedTechnique === key
+                                              return (
+                                                <button
+                                                  key={key}
+                                                  onClick={() => setIntensityChoice((prev) => ({ ...prev, [logKey]: key }))}
+                                                  className={`py-2 px-2 rounded-lg text-[10px] font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
+                                                    isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/[0.05]'
+                                                  }`}
+                                                  style={
+                                                    isSelected
+                                                      ? { backgroundColor: `${meta.color}22`, borderColor: `${meta.color}55`, color: meta.color }
+                                                      : undefined
+                                                  }
+                                                >
+                                                  {meta.label}
+                                                </button>
+                                              )
+                                            })}
+                                          </div>
+                                        )}
+
+                                        {/* Intensity set logger */}
+                                        {intensityEnabled && selectedTechnique && (
+                                          <div className="mt-3 pt-3 border-t border-white/[0.05]">
+                                            <p className="text-white/30 text-[10px] font-body leading-relaxed mb-3">
+                                              {TECHNIQUE_META[selectedTechnique].hint}
+                                            </p>
+                                            <div className="grid grid-cols-[32px_1fr_40px] gap-2 mb-1.5">
+                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Fail</span>
+                                            </div>
+                                            {currentIntensityLogs.map((iLog, idx) => {
+                                              const meta = TECHNIQUE_META[selectedTechnique]
+                                              const handleIntensityChange = (field: 'weight' | 'done', value: string | boolean) => {
+                                                const updated = [...currentIntensityLogs]
+                                                updated[idx] = { ...updated[idx], [field]: value }
+                                                setIntensityLogs((prev) => ({ ...prev, [logKey]: updated }))
+
+                                                // Persist to DB
+                                                const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                                if (userId && wid) {
+                                                  const row = updated[idx]
+                                                  dbSaveSet({
+                                                    workoutId: wid,
+                                                    userId,
+                                                    exerciseName: displayName,
+                                                    originalExerciseName: isSwapped ? exercise.name : null,
+                                                    setNumber: idx + 1,
+                                                    weight: Number(row.weight) || null,
+                                                    reps: null, // intensity sets are to failure — no rep count
+                                                    isIntensitySet: true,
+                                                    intensityTechnique: selectedTechnique,
+                                                    completed: row.done,
+                                                  }).catch((err) => console.error('[Intensity set] Failed:', err))
+                                                }
+                                              }
+                                              return (
+                                                <div
+                                                  key={idx}
+                                                  className={`grid grid-cols-[32px_1fr_40px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5`}
+                                                  style={iLog.done ? { backgroundColor: `${meta.color}15` } : undefined}
+                                                >
+                                                  <span
+                                                    className="text-xs font-display font-bold text-center"
+                                                    style={{ color: iLog.done ? meta.color : 'rgba(255,255,255,0.3)' }}
+                                                  >
+                                                    {idx + 1}
+                                                  </span>
+                                                  <input
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    placeholder="—"
+                                                    value={iLog.weight}
+                                                    onChange={(e) => handleIntensityChange('weight', e.target.value)}
+                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    style={{ borderColor: iLog.done ? `${meta.color}55` : undefined }}
+                                                  />
+                                                  <div className="flex items-center justify-center">
+                                                    <button
+                                                      onClick={() => handleIntensityChange('done', !iLog.done)}
+                                                      className="w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-150"
+                                                      style={{
+                                                        borderColor: iLog.done ? meta.color : 'rgba(255,255,255,0.1)',
+                                                        backgroundColor: iLog.done ? `${meta.color}33` : 'rgba(255,255,255,0.04)',
+                                                      }}
+                                                      aria-label={iLog.done ? 'Mark incomplete' : 'Mark complete'}
+                                                    >
+                                                      {iLog.done && (
+                                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={meta.color} strokeWidth={3}>
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                        </svg>
+                                                      )}
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              )
+                                            })}
+                                            <p className="text-white/20 text-[10px] font-body mt-2 text-center">
+                                              To failure — check when complete
+                                            </p>
+                                          </div>
+                                        )}
+                                      </div>
 
                                       {/* Target reminder */}
                                       <p className="text-white/20 text-[10px] font-body mt-2 text-center">
@@ -1064,6 +1418,9 @@ export default function ProgramsPage() {
                                                     onClick={() => {
                                                       setSwappedExercises((prev) => ({ ...prev, [swapKey]: alt }))
                                                       setSwapMenuOpen(null)
+                                                      if (userId) {
+                                                        dbSaveSwap(userId, exercise.name, alt).catch((err) => console.error('[Swap save] Failed:', err))
+                                                      }
                                                     }}
                                                     className={`w-full px-3 py-2.5 text-left hover:bg-white/[0.04] transition-colors duration-150 flex items-center justify-between ${
                                                       displayName === alt ? 'bg-white/[0.04]' : ''
@@ -1071,7 +1428,7 @@ export default function ProgramsPage() {
                                                   >
                                                     <span className="text-white/70 text-sm font-body">{alt}</span>
                                                     {displayName === alt && (
-                                                      <svg className="w-4 h-4 text-[#3B82F6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                      <svg className="w-4 h-4 text-[#1668E0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                       </svg>
                                                     )}
@@ -1086,10 +1443,13 @@ export default function ProgramsPage() {
                                                         return next
                                                       })
                                                       setSwapMenuOpen(null)
+                                                      if (userId) {
+                                                        dbRemoveSwap(userId, exercise.name).catch((err) => console.error('[Swap remove] Failed:', err))
+                                                      }
                                                     }}
                                                     className="w-full px-3 py-2.5 text-left border-t border-white/[0.06] hover:bg-white/[0.04] transition-colors duration-150"
                                                   >
-                                                    <span className="text-[#F08B1E] text-sm font-body font-semibold">Reset to Original</span>
+                                                    <span className="text-[#F76B16] text-sm font-body font-semibold">Reset to Original</span>
                                                   </button>
                                                 )}
                                               </motion.div>
@@ -1109,11 +1469,84 @@ export default function ProgramsPage() {
                   ))}
                 </div>
 
-                {/* Start Workout button */}
+                {/* Start / End Workout button */}
                 <div className="p-4 pt-0">
-                  <button className="w-full py-4 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200">
-                    Start Workout
-                  </button>
+                  {selectedDay !== null && workoutStartTime[selectedDay] ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20 px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+                          </span>
+                          <span className="text-[#22C55E] text-[11px] font-display font-bold uppercase tracking-wide">Workout Active</span>
+                        </div>
+                        <span className="text-[#22C55E] text-sm font-display font-bold tabular-nums">
+                          {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
+                          {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
+                          {(workoutElapsed % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (selectedDay === null) return
+                          const elapsed = workoutElapsed
+                          const workoutId = workoutIds[selectedDay]
+                          setWorkoutStartTime((prev) => {
+                            const next = { ...prev }
+                            delete next[selectedDay]
+                            return next
+                          })
+                          setWorkoutIds((prev) => {
+                            const next = { ...prev }
+                            delete next[selectedDay]
+                            return next
+                          })
+                          setWorkoutElapsed(0)
+                          stopRestTimer()
+
+                          if (workoutId) {
+                            try {
+                              await dbEndWorkout(workoutId, elapsed)
+                            } catch (err) {
+                              console.error('[Workout] Failed to end:', err)
+                            }
+                          }
+                        }}
+                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
+                      >
+                        End Workout
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        if (selectedDay === null || !selected) return
+                        setWorkoutStartTime((prev) => ({ ...prev, [selectedDay]: Date.now() }))
+                        setWorkoutElapsed(0)
+                        const firstExercise = selected.exercises[0]
+                        if (firstExercise) setExpandedWorkoutExercise(firstExercise.name)
+
+                        // Persist workout if user is identified
+                        if (userId) {
+                          try {
+                            const wid = await dbStartWorkout({
+                              userId,
+                              dayName: selected.name,
+                              programName: currentProgram.name,
+                              programPhase: currentProgram.phase,
+                            })
+                            setWorkoutIds((prev) => ({ ...prev, [selectedDay]: wid }))
+                          } catch (err) {
+                            console.error('[Workout] Failed to create:', err)
+                          }
+                        }
+                      }}
+                      className="w-full py-4 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
+                    >
+                      Start Workout
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -1254,7 +1687,7 @@ export default function ProgramsPage() {
                   <p className="font-body font-semibold text-white text-sm">{log.workout}</p>
                   <p className="text-white/40 text-xs font-body truncate">{log.topSet}</p>
                   {log.prs > 0 && (
-                    <span className="inline-block mt-1 text-[10px] font-display font-bold text-[#F08B1E] bg-[#F08B1E]/10 px-2 py-0.5 rounded">
+                    <span className="inline-block mt-1 text-[10px] font-display font-bold text-[#F76B16] bg-[#F76B16]/10 px-2 py-0.5 rounded">
                       {log.prs} PR
                     </span>
                   )}

@@ -80,8 +80,8 @@ const fadeIn = {
 }
 
 function getTierColor(tier: string) {
-  if (tier.includes('Full')) return 'text-[#F08B1E]'
-  if (tier.includes('Accelerator')) return 'text-[#2E6AB0]'
+  if (tier.includes('Full')) return 'text-[#F76B16]'
+  if (tier.includes('Accelerator')) return 'text-[#1668E0]'
   return 'text-white/50'
 }
 
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
             animate="visible"
             className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-[#F08B1E]">
+            <div className="w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-[#F76B16]">
               {stat.icon}
             </div>
             <div>
@@ -228,8 +228,8 @@ export default function AdminDashboard() {
                   key={`${session.client}-${session.time}`}
                   className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/[0.02] transition-colors duration-150"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#F08B1E]/10 flex items-center justify-center shrink-0">
-                    <svg className="w-4 h-4 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <div className="w-10 h-10 rounded-lg bg-[#F76B16]/10 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
                     </svg>
                   </div>
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
                   key={action.text}
                   className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/[0.02] transition-colors duration-150"
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${action.urgent ? 'bg-[#F08B1E]' : 'bg-white/20'}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${action.urgent ? 'bg-[#F76B16]' : 'bg-white/20'}`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-white/70 text-sm font-body leading-snug">{action.text}</p>
                     <span className="text-[10px] font-display uppercase tracking-[0.15em] text-white/20 mt-1 inline-block">

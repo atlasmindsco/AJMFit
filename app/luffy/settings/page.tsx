@@ -45,7 +45,7 @@ export default function SettingsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 py-2.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
               activeTab === tab.key
-                ? 'bg-[#F08B1E] text-white'
+                ? 'bg-[#F76B16] text-white'
                 : 'text-white/30 hover:text-white/60'
             }`}
           >
@@ -60,7 +60,7 @@ export default function SettingsPage() {
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Coach Profile</h2>
             <div className="flex items-center gap-5 mb-6">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#2E6AB0] to-[#1B2D50] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1668E0] to-[#1B2D50] flex items-center justify-center">
                 <span className="text-white text-xl font-display font-bold">AJ</span>
               </div>
               <div>
@@ -74,7 +74,7 @@ export default function SettingsPage() {
                 <input
                   type="text"
                   defaultValue="Anthony M."
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30"
                 />
               </div>
               <div>
@@ -82,7 +82,7 @@ export default function SettingsPage() {
                 <input
                   type="email"
                   defaultValue="anthony@ajmfit.com"
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30"
                 />
               </div>
               <div>
@@ -90,12 +90,12 @@ export default function SettingsPage() {
                 <input
                   type="tel"
                   defaultValue="(555) 123-4567"
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30"
                 />
               </div>
               <div>
                 <label className="text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2">Timezone</label>
-                <select className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30">
+                <select className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30">
                   <option>Eastern Time (ET)</option>
                   <option>Central Time (CT)</option>
                   <option>Mountain Time (MT)</option>
@@ -108,11 +108,11 @@ export default function SettingsPage() {
               <textarea
                 rows={3}
                 defaultValue="Certified personal trainer specializing in body transformation, strength training, and nutrition coaching."
-                className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30 resize-none"
+                className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30 resize-none"
               />
             </div>
             <div className="mt-6 flex justify-end">
-              <button className="px-6 py-2.5 bg-[#F08B1E] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#e07810] active:scale-[0.98] transition-all duration-200">
+              <button className="px-6 py-2.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200">
                 Save Changes
               </button>
             </div>
@@ -128,15 +128,15 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2">Business Name</label>
-                <input type="text" defaultValue="AJM Fit" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30" />
+                <input type="text" defaultValue="AJM Fit" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30" />
               </div>
               <div>
                 <label className="text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2">Website</label>
-                <input type="url" defaultValue="https://ajmfit.com" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30" />
+                <input type="url" defaultValue="https://ajmfit.com" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30" />
               </div>
               <div>
                 <label className="text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2">Instagram</label>
-                <input type="text" defaultValue="@ajmfit" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F08B1E]/30" />
+                <input type="text" defaultValue="@ajmfit" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/70 font-body focus:outline-none focus:border-[#F76B16]/30" />
               </div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                     <p className="text-white font-body font-semibold text-sm">{tier.name}</p>
                     <p className="text-white/25 text-xs font-body">{tier.features}</p>
                   </div>
-                  <span className="text-[#F08B1E] font-display font-bold text-lg">{tier.price}</span>
+                  <span className="text-[#F76B16] font-display font-bold text-lg">{tier.price}</span>
                 </div>
               ))}
             </div>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                   <p className="text-white/25 text-xs font-body">{notif.description}</p>
                 </div>
                 <div className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-200 ${
-                  notif.enabled ? 'bg-[#F08B1E]' : 'bg-white/[0.08]'
+                  notif.enabled ? 'bg-[#F76B16]' : 'bg-white/[0.08]'
                 }`}>
                   <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
                     notif.enabled ? 'left-[22px]' : 'left-0.5'
@@ -201,7 +201,7 @@ export default function SettingsPage() {
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Revenue Overview</h2>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center">
-                <p className="font-display font-extrabold text-2xl text-[#F08B1E]">$5,364</p>
+                <p className="font-display font-extrabold text-2xl text-[#F76B16]">$5,364</p>
                 <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mt-1">This Month</p>
               </div>
               <div className="text-center">

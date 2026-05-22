@@ -160,7 +160,7 @@ export default function CommunityPage() {
               <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">
                 Community
               </h1>
-              <button className="px-4 py-2 bg-[#2E6AB0] text-white text-xs font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#2558a0] active:scale-[0.98] transition-all duration-200">
+              <button className="px-4 py-2 bg-[#1668E0] text-white text-xs font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F52C9] active:scale-[0.98] transition-all duration-200">
                 New Post
               </button>
             </div>
@@ -171,7 +171,7 @@ export default function CommunityPage() {
                   onClick={() => setActiveCategory(cat.name)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 ${
                     activeCategory === cat.name
-                      ? 'bg-[#2E6AB0] text-white'
+                      ? 'bg-[#1668E0] text-white'
                       : 'bg-[#FAFBFD] text-[#64748B] hover:text-[#1B2D50] border border-[#1B2D50]/[0.06]'
                   }`}
                 >
@@ -190,30 +190,30 @@ export default function CommunityPage() {
                 variants={fadeIn}
                 initial="hidden"
                 animate="visible"
-                className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-5 hover:border-[#2E6AB0]/20 transition-colors duration-200 cursor-pointer"
+                className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-5 hover:border-[#1668E0]/20 transition-colors duration-200 cursor-pointer"
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                     post.isCoach
-                      ? 'bg-gradient-to-br from-[#F08B1E] to-[#e07810]'
-                      : 'bg-[#2E6AB0]/10'
+                      ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
+                      : 'bg-[#1668E0]/10'
                   }`}>
                     <span className={`text-xs font-display font-bold ${
-                      post.isCoach ? 'text-white' : 'text-[#2E6AB0]'
+                      post.isCoach ? 'text-white' : 'text-[#1668E0]'
                     }`}>{post.avatar}</span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       {post.pinned && (
-                        <span className="text-[#F08B1E] text-[10px] font-display font-bold bg-[#F08B1E]/10 px-2 py-0.5 rounded">
+                        <span className="text-[#F76B16] text-[10px] font-display font-bold bg-[#F76B16]/10 px-2 py-0.5 rounded">
                           PINNED
                         </span>
                       )}
-                      <span className="text-[#2E6AB0] text-[10px] font-display font-bold bg-[#2E6AB0]/10 px-2 py-0.5 rounded">
+                      <span className="text-[#1668E0] text-[10px] font-display font-bold bg-[#1668E0]/10 px-2 py-0.5 rounded">
                         {post.category}
                       </span>
                       {post.isCoach && (
-                        <span className="text-[#F08B1E] text-[10px] font-display font-bold">
+                        <span className="text-[#F76B16] text-[10px] font-display font-bold">
                           COACH
                         </span>
                       )}
@@ -263,14 +263,14 @@ export default function CommunityPage() {
             <div className="p-5 space-y-4">
               {spotlights.map((member) => (
                 <div key={member.name} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F08B1E] to-[#e07810] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
                     <span className="text-white text-[10px] font-display font-bold">{member.avatar}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-body font-semibold text-[#1B2D50] text-sm">{member.name}</p>
                     <p className="text-[#64748B] text-xs font-body truncate">{member.achievement}</p>
                   </div>
-                  <span className="bg-[#F08B1E]/10 text-[#F08B1E] text-[10px] font-display font-bold px-2 py-1 rounded shrink-0">
+                  <span className="bg-[#F76B16]/10 text-[#F76B16] text-[10px] font-display font-bold px-2 py-1 rounded shrink-0">
                     {member.stat}
                   </span>
                 </div>
@@ -293,7 +293,7 @@ export default function CommunityPage() {
               {leaderboard.map((member, i) => (
                 <div key={member.name} className="flex items-center gap-3">
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-display font-bold ${
-                    i === 0 ? 'bg-[#F08B1E] text-white' :
+                    i === 0 ? 'bg-[#F76B16] text-white' :
                     i === 1 ? 'bg-[#94A3B8] text-white' :
                     i === 2 ? 'bg-[#B87333] text-white' :
                     'bg-[#FAFBFD] text-[#64748B] border border-[#1B2D50]/[0.06]'
@@ -326,8 +326,8 @@ export default function CommunityPage() {
                 <div key={event.name} className="flex items-start gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-display font-bold ${
                     event.type === 'Live' ? 'bg-red-500/10 text-red-500' :
-                    event.type === 'Zoom' ? 'bg-[#2E6AB0]/10 text-[#2E6AB0]' :
-                    'bg-[#F08B1E]/10 text-[#F08B1E]'
+                    event.type === 'Zoom' ? 'bg-[#1668E0]/10 text-[#1668E0]' :
+                    'bg-[#F76B16]/10 text-[#F76B16]'
                   }`}>
                     {event.type === 'Live' ? (
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

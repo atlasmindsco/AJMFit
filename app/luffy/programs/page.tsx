@@ -21,6 +21,8 @@ interface ProgramLevel {
   daysPerWeek: number
   split: string
   clients: string[]
+  /** Intensity techniques available at this level */
+  intensityTechniques?: string[]
 }
 
 interface Program {
@@ -61,6 +63,7 @@ const programs: Program[] = [
         daysPerWeek: 6,
         split: 'Bro Split — Chest/Front Delt, Back/Rear Delt, Shoulders/Traps, Quads/Calves, Hams/Glutes, Arms/Abs',
         clients: ['Chris Okafor'],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -93,6 +96,7 @@ const programs: Program[] = [
         daysPerWeek: 5,
         split: 'Conjugate / Westside',
         clients: [],
+        intensityTechniques: ['Rest-Pause Sets'],
       },
     ],
   },
@@ -125,6 +129,7 @@ const programs: Program[] = [
         daysPerWeek: 5,
         split: 'PPL + 2x Conditioning',
         clients: [],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -157,6 +162,7 @@ const programs: Program[] = [
         daysPerWeek: 6,
         split: 'Pull (Thickness) / Push / Legs / Pull (Width) / Push / Legs (Deadlift)',
         clients: [],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -189,6 +195,7 @@ const programs: Program[] = [
         daysPerWeek: 6,
         split: 'Legs (Quad) / Push / Pull / Legs (Ham & Glutes) / Push / Pull',
         clients: [],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -221,6 +228,7 @@ const programs: Program[] = [
         daysPerWeek: 6,
         split: 'Push (Chest Heavy) / Pull / Legs / Push (Incline) / Arms / Pull',
         clients: [],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -253,6 +261,7 @@ const programs: Program[] = [
         daysPerWeek: 6,
         split: 'Push (Shoulder Heavy) / Pull / Legs / Shoulders / Push / Arms',
         clients: [],
+        intensityTechniques: ['Drop Sets', 'Rest-Pause Sets'],
       },
     ],
   },
@@ -283,9 +292,9 @@ const EQUIPMENT_FILTERS = [
 
 function getTypeColor(type: string) {
   const map: Record<string, string> = {
-    Hypertrophy: 'bg-[#F08B1E]/15 text-[#F08B1E]',
+    Hypertrophy: 'bg-[#F76B16]/15 text-[#F76B16]',
     'Fat Loss': 'bg-emerald-500/15 text-emerald-400',
-    Strength: 'bg-[#2E6AB0]/15 text-[#2E6AB0]',
+    Strength: 'bg-[#1668E0]/15 text-[#1668E0]',
   }
   return map[type] || 'bg-white/[0.06] text-white/50'
 }
@@ -293,7 +302,7 @@ function getTypeColor(type: string) {
 function getLevelColor(level: Level) {
   const map: Record<Level, string> = {
     Beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-    Intermediate: 'bg-[#F08B1E]/15 text-[#F08B1E] border-[#F08B1E]/20',
+    Intermediate: 'bg-[#F76B16]/15 text-[#F76B16] border-[#F76B16]/20',
     Advanced: 'bg-red-500/15 text-red-400 border-red-500/20',
   }
   return map[level]
@@ -302,7 +311,7 @@ function getLevelColor(level: Level) {
 function getLevelDot(level: Level) {
   const map: Record<Level, string> = {
     Beginner: 'bg-emerald-400',
-    Intermediate: 'bg-[#F08B1E]',
+    Intermediate: 'bg-[#F76B16]',
     Advanced: 'bg-red-400',
   }
   return map[level]
@@ -387,7 +396,7 @@ export default function ProgramsPage() {
           <button
             onClick={() => setActiveTab('programs')}
             className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
-              activeTab === 'programs' ? 'bg-[#F08B1E] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+              activeTab === 'programs' ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
             }`}
           >
             Programs
@@ -395,7 +404,7 @@ export default function ProgramsPage() {
           <button
             onClick={() => setActiveTab('library')}
             className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
-              activeTab === 'library' ? 'bg-[#F08B1E] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+              activeTab === 'library' ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
             }`}
           >
             Exercise Library
@@ -424,44 +433,44 @@ export default function ProgramsPage() {
                   className="w-full p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors duration-200"
                 >
                   <div className="flex items-center gap-4 text-left">
-                    <div className="w-12 h-12 rounded-xl bg-[#F08B1E]/10 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#F76B16]/10 flex items-center justify-center shrink-0">
                       {prog.icon === 'muscle' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                         </svg>
                       )}
                       {prog.icon === 'strength' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       )}
                       {prog.icon === 'shred' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18z" />
                         </svg>
                       )}
                       {/* Back icon — rows/lats */}
                       {prog.icon === 'back' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m-7.5 3V6.75A2.25 2.25 0 0 1 6.75 4.5h10.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25H6.75a2.25 2.25 0 0 1-2.25-2.25Z" />
                         </svg>
                       )}
                       {/* Legs icon */}
                       {prog.icon === 'legs' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125V17.25m5.25 0h-5.25m5.25 0a3 3 0 0 0 .966-5.839 4.5 4.5 0 0 0-7.716-3.093M8.25 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125V17.25m5.25 0H3m5.25 0a3 3 0 0 0-.966-5.839 4.5 4.5 0 0 0-3.284-3.093" />
                         </svg>
                       )}
                       {/* Chest icon */}
                       {prog.icon === 'chest' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                         </svg>
                       )}
                       {/* Shoulders icon */}
                       {prog.icon === 'shoulders' && (
-                        <svg className="w-5 h-5 text-[#F08B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
                         </svg>
                       )}
@@ -539,6 +548,18 @@ export default function ProgramsPage() {
                                   <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Split</span>
                                   <span className="text-white/60 text-xs font-body text-right">{lvl.split}</span>
                                 </div>
+                                {lvl.intensityTechniques && lvl.intensityTechniques.length > 0 && (
+                                  <div className="flex items-center justify-between mt-1">
+                                    <span className="text-white/25 text-[10px] font-display uppercase tracking-wide">Techniques</span>
+                                    <div className="flex flex-wrap gap-1 justify-end">
+                                      {lvl.intensityTechniques.map((t) => (
+                                        <span key={t} className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 border border-red-500/20">
+                                          {t}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </button>
 
@@ -579,7 +600,7 @@ export default function ProgramsPage() {
                 placeholder="Search 873 exercises..."
                 value={libSearch}
                 onChange={(e) => setLibSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg font-body text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#F08B1E]/40 transition-colors duration-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg font-body text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#F76B16]/40 transition-colors duration-200"
               />
             </div>
 
@@ -593,7 +614,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibMuscle(m)}
                     className={`px-2.5 py-1 rounded-md text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libMuscle === m
-                        ? 'bg-[#F08B1E] text-white'
+                        ? 'bg-[#F76B16] text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -613,7 +634,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibEquipment(e)}
                     className={`px-2.5 py-1 rounded-md text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
-                        ? 'bg-[#2E6AB0] text-white'
+                        ? 'bg-[#1668E0] text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -629,7 +650,7 @@ export default function ProgramsPage() {
           {/* Loading */}
           {libLoading && (
             <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 border-2 border-white/10 border-t-[#F08B1E] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-white/10 border-t-[#F76B16] rounded-full animate-spin" />
             </div>
           )}
 
@@ -657,14 +678,14 @@ export default function ProgramsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-body font-semibold text-sm truncate group-hover:text-[#F08B1E] transition-colors duration-150">
+                    <p className="text-white font-body font-semibold text-sm truncate group-hover:text-[#F76B16] transition-colors duration-150">
                       {ex.name}
                     </p>
                     <p className="text-white/30 text-[11px] font-body capitalize truncate">
                       {ex.primaryMuscles.join(', ')}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#F08B1E]/70 bg-[#F08B1E]/10 px-1.5 py-0.5 rounded">
+                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#F76B16]/70 bg-[#F76B16]/10 px-1.5 py-0.5 rounded">
                         {ex.level}
                       </span>
                       <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-white/25 bg-white/[0.04] px-1.5 py-0.5 rounded capitalize">
@@ -754,10 +775,10 @@ export default function ProgramsPage() {
                   <div className="px-6 pb-6 space-y-5">
                     {/* Badges */}
                     <div className="flex flex-wrap gap-1.5">
-                      <span className="px-2 py-1 bg-[#F08B1E]/15 text-[#F08B1E] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
+                      <span className="px-2 py-1 bg-[#F76B16]/15 text-[#F76B16] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-[#2E6AB0]/15 text-[#2E6AB0] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
+                      <span className="px-2 py-1 bg-[#1668E0]/15 text-[#1668E0] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.category}
                       </span>
                       <span className="px-2 py-1 bg-white/[0.06] text-white/40 font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
@@ -769,7 +790,7 @@ export default function ProgramsPage() {
                     <div className="flex items-start gap-5">
                       <div className="flex-1">
                         <p className="text-[10px] font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Primary</p>
-                        <p className="font-display font-bold text-sm text-[#F08B1E] capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
+                        <p className="font-display font-bold text-sm text-[#F76B16] capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
                       </div>
                       {selectedExercise.secondaryMuscles.length > 0 && (
                         <div className="flex-1">
@@ -786,7 +807,7 @@ export default function ProgramsPage() {
                         <ol className="space-y-2.5">
                           {selectedExercise.instructions.map((step, i) => (
                             <li key={i} className="flex gap-3">
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-[#F08B1E]/15 text-[#F08B1E] flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                              <span className="shrink-0 w-5 h-5 rounded-full bg-[#F76B16]/15 text-[#F76B16] flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
                                 {i + 1}
                               </span>
                               <p className="font-body text-[13px] text-white/60 leading-relaxed">{step}</p>

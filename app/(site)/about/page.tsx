@@ -68,7 +68,7 @@ export default function AboutPage() {
                   <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                     <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
-                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F76B16" />
                     <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
                     <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                   </svg>
@@ -82,7 +82,7 @@ export default function AboutPage() {
                   <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                     <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
-                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F76B16" />
                     <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
                     <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                   </svg>
@@ -96,7 +96,7 @@ export default function AboutPage() {
                   <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="3" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                     <rect x="7" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
-                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F08B1E" />
+                    <rect x="10" y="14" width="12" height="4" rx="1" fill="#F76B16" />
                     <rect x="22" y="10" width="3" height="12" rx="1" fill="#1B2D50" />
                     <rect x="25" y="8" width="4" height="16" rx="1.5" fill="#1B2D50" />
                   </svg>

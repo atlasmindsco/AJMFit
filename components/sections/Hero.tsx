@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
@@ -16,6 +16,26 @@ const fadeUp = {
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isMuted, setIsMuted] = useState(true)
+
+  // Sync video to real-time clock so every visitor sees the same frame
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const syncToRealTime = () => {
+      if (video.duration && video.duration > 0) {
+        const now = Date.now() / 1000 // current time in seconds
+        video.currentTime = now % video.duration
+      }
+    }
+
+    // Sync once metadata is loaded (we know the duration)
+    if (video.readyState >= 1) {
+      syncToRealTime()
+    } else {
+      video.addEventListener('loadedmetadata', syncToRealTime, { once: true })
+    }
+  }, [])
 
   const toggleMute = () => {
     if (videoRef.current) {

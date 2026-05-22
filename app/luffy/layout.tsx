@@ -101,7 +101,7 @@ export default function AdminLayout({
               <span className="font-display font-bold text-white text-sm uppercase tracking-[0.15em]">
                 AJMFit
               </span>
-              <span className="block text-[10px] font-display uppercase tracking-[0.3em] text-[#F08B1E]">
+              <span className="block text-[10px] font-display uppercase tracking-[0.3em] text-[#F76B16]">
                 Admin
               </span>
             </div>
@@ -119,11 +119,11 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-body font-medium transition-all duration-200 group ${
                   isActive
-                    ? 'bg-[#F08B1E]/10 text-[#F08B1E]'
+                    ? 'bg-[#F76B16]/10 text-[#F76B16]'
                     : 'text-white/40 hover:text-white/80 hover:bg-white/[0.04]'
                 }`}
               >
-                <span className={`${isActive ? 'text-[#F08B1E]' : 'text-white/30 group-hover:text-white/60'} transition-colors duration-200`}>
+                <span className={`${isActive ? 'text-[#F76B16]' : 'text-white/30 group-hover:text-white/60'} transition-colors duration-200`}>
                   {item.icon}
                 </span>
                 {item.label}
@@ -170,11 +170,11 @@ export default function AdminLayout({
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
               </svg>
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#F08B1E] rounded-full" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#F76B16] rounded-full" />
             </button>
 
             {/* Admin avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2E6AB0] to-[#1B2D50] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1668E0] to-[#1B2D50] flex items-center justify-center">
               <span className="text-white text-xs font-display font-bold">AJ</span>
             </div>
           </div>

@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/Button'
+import { supabase } from '@/lib/supabase'
+import { setCurrentUserId } from '@/lib/current-user'
 
 // ---- Schema ----
 
@@ -97,6 +99,8 @@ const errorBase = 'text-red-600 text-xs font-body mt-1'
 export default function IntakeForm() {
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [hoveredTier, setHoveredTier] = useState<string | null>(null)
 
   const {
@@ -126,10 +130,54 @@ export default function IntakeForm() {
 
   const handleBack = () => setStep((s) => s - 1)
 
-  const onSubmit = (data: FormData) => {
-    // [PLACEHOLDER] — wire up to API route or external service
-    console.log('Intake form submitted:', data)
-    setSubmitted(true)
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      // 1. Upsert user by email so re-applications don't crash on unique constraint.
+      const userPayload = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        status: 'pending',
+      }
+      const { data: user, error: userErr } = await supabase
+        .from('users')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .upsert(userPayload as any, { onConflict: 'email' })
+        .select('id')
+        .single()
+
+      if (userErr || !user) throw userErr ?? new Error('Failed to create user')
+      const userId = (user as { id: string }).id
+
+      // 2. Insert the application snapshot
+      const appPayload = {
+        user_id: userId,
+        goals: data.goals,
+        equipment: data.equipment,
+        health_limitations: data.healthLimitations || null,
+        availability: data.availability,
+        tier: data.tier,
+        billing_cycle: data.billingCycle,
+        referral: data.referral || null,
+        status: 'pending',
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: appErr } = await supabase.from('applications').insert(appPayload as any)
+
+      if (appErr) throw appErr
+
+      // 3. Store user id client-side so they can access the studio immediately.
+      // TODO(auth): swap for Supabase Auth session once wired.
+      setCurrentUserId(userId)
+      setSubmitted(true)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setSubmitError(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const toggleEquipment = (value: string) => {
@@ -428,10 +476,17 @@ export default function IntakeForm() {
           )}
         </AnimatePresence>
 
+        {/* Submission error */}
+        {submitError && (
+          <div className="mt-6 rounded-sm bg-red-50 border border-red-200 px-4 py-3">
+            <p className="text-red-700 text-sm font-body">{submitError}</p>
+          </div>
+        )}
+
         {/* Navigation buttons */}
         <div className="mt-10 flex gap-4">
           {step > 0 && (
-            <Button type="button" variant="secondary" onClick={handleBack}>
+            <Button type="button" variant="secondary" onClick={handleBack} disabled={submitting}>
               Back
             </Button>
           )}
@@ -441,8 +496,8 @@ export default function IntakeForm() {
                 Continue
               </Button>
             ) : (
-              <Button type="submit" variant="primary" fullWidth>
-                Submit Application
+              <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+                {submitting ? 'Submitting...' : 'Submit Application'}
               </Button>
             )}
           </div>

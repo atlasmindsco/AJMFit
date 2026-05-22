@@ -13,8 +13,8 @@ const stats = [
         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
       </svg>
     ),
-    iconBg: 'bg-[#3B82F6]/10',
-    iconColor: 'text-[#3B82F6]',
+    iconBg: 'bg-[#1668E0]/10',
+    iconColor: 'text-[#1668E0]',
   },
   {
     label: 'Calories Burned',
@@ -25,8 +25,8 @@ const stats = [
         <path d="M12 23c-4.97 0-9-3.58-9-8 0-5.5 9-13 9-13s9 7.5 9 13c0 4.42-4.03 8-9 8zm0-18.58C9.12 7.38 5 12.13 5 15c0 3.31 3.13 6 7 6s7-2.69 7-6c0-2.87-4.12-7.62-7-10.58z" />
       </svg>
     ),
-    iconBg: 'bg-[#F08B1E]/10',
-    iconColor: 'text-[#F08B1E]',
+    iconBg: 'bg-[#F76B16]/10',
+    iconColor: 'text-[#F76B16]',
   },
   {
     label: 'Weight Progress',
@@ -38,8 +38,8 @@ const stats = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     ),
-    iconBg: 'bg-[#3B82F6]/10',
-    iconColor: 'text-[#3B82F6]',
+    iconBg: 'bg-[#1668E0]/10',
+    iconColor: 'text-[#1668E0]',
   },
   {
     label: 'Steps Today',
@@ -50,8 +50,8 @@ const stats = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
       </svg>
     ),
-    iconBg: 'bg-[#F08B1E]/10',
-    iconColor: 'text-[#F08B1E]',
+    iconBg: 'bg-[#F76B16]/10',
+    iconColor: 'text-[#F76B16]',
   },
 ]
 
@@ -89,8 +89,8 @@ const dailyHabits = [
 
 /* ── Macros ── */
 const macros = [
-  { name: 'Protein', current: 150, goal: 180, color: '#3B82F6' },
-  { name: 'Carbs', current: 220, goal: 250, color: '#F08B1E' },
+  { name: 'Protein', current: 150, goal: 180, color: '#1668E0' },
+  { name: 'Carbs', current: 220, goal: 250, color: '#F76B16' },
   { name: 'Fats', current: 60, goal: 70, color: '#64748B' },
 ]
 
@@ -216,8 +216,8 @@ export default function ClientDashboard() {
             </div>
             <div className="p-5">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-full bg-[#3B82F6]/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-[#3B82F6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="w-8 h-8 rounded-full bg-[#1668E0]/10 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-[#1668E0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </div>
@@ -235,7 +235,7 @@ export default function ClientDashboard() {
                 ))}
               </div>
 
-              <button className="w-full py-3 bg-[#3B82F6] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#2563EB] active:scale-[0.98] transition-transform duration-200">
+              <button className="w-full py-3 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200">
                 Start Workout
               </button>
             </div>
@@ -315,13 +315,13 @@ export default function ClientDashboard() {
                   })}
 
                   {/* Line */}
-                  <path d={pathD} fill="none" stroke="#F08B1E" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={pathD} fill="none" stroke="#F76B16" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
 
                   {/* Points + labels */}
                   {points.map((p) => (
                     <g key={p.month}>
-                      <circle cx={p.x} cy={p.y} r={4} fill="#F08B1E" />
-                      <circle cx={p.x} cy={p.y} r={6} fill="none" stroke="#F08B1E" strokeWidth={1} opacity={0.3} />
+                      <circle cx={p.x} cy={p.y} r={4} fill="#F76B16" />
+                      <circle cx={p.x} cy={p.y} r={6} fill="none" stroke="#F76B16" strokeWidth={1} opacity={0.3} />
                       <text x={p.x} y={p.y - 12} textAnchor="middle" fill="white" fontWeight="700" fontSize={12}>
                         {p.value}
                       </text>
@@ -398,11 +398,11 @@ export default function ClientDashboard() {
               {/* Calorie bar */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="bg-[#3B82F6] text-white text-[10px] font-display font-bold px-2 py-0.5 rounded">MIN</span>
+                  <span className="bg-[#1668E0] text-white text-[10px] font-display font-bold px-2 py-0.5 rounded">MIN</span>
                   <span className="text-white text-sm font-body font-semibold">1,750 / 2,000 kcal</span>
                 </div>
                 <div className="w-full h-3 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: '87.5%' }} />
+                  <div className="h-full bg-[#1668E0] rounded-full" style={{ width: '87.5%' }} />
                 </div>
               </div>
 
@@ -450,7 +450,7 @@ export default function ClientDashboard() {
                   <div key={post.title} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{post.icon}</span>
-                      <span className="text-[#3B82F6] text-sm font-body font-medium">{post.title}</span>
+                      <span className="text-[#1668E0] text-sm font-body font-medium">{post.title}</span>
                     </div>
                     <span className="text-white/40 text-xs font-body">{post.time}</span>
                   </div>
@@ -471,7 +471,7 @@ export default function ClientDashboard() {
               <h2 className="font-display font-bold text-sm text-white">Member Spotlight</h2>
             </div>
             <div className="p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F08B1E] to-[#e07810] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
                 <span className="text-white text-sm font-display font-bold">SW</span>
               </div>
               <div>

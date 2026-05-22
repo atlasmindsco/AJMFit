@@ -74,7 +74,7 @@ export default function ClientPortalLayout({
               </button>
 
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F08B1E] to-[#e07810] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center">
                   <span className="text-white text-[10px] font-display font-bold">AJ</span>
                 </div>
                 <span className="text-white/70 text-sm font-body hidden sm:block">
@@ -138,7 +138,7 @@ export default function ClientPortalLayout({
       {/* Chaedyn FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#3B7DD8] flex items-center justify-center shadow-[0_4px_20px_rgba(59,125,216,0.4)] hover:shadow-[0_6px_30px_rgba(59,125,216,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1668E0] flex items-center justify-center shadow-[0_4px_20px_rgba(22,104,224,0.4)] hover:shadow-[0_6px_30px_rgba(22,104,224,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
         aria-label={chatOpen ? 'Close Chaedyn' : 'Chat with Chaedyn'}
       >
         {chatOpen ? (
