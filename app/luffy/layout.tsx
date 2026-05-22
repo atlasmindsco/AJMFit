@@ -174,7 +174,7 @@ export default function AdminLayout({
             </button>
 
             {/* Admin avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1668E0] to-[#1B2D50] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A7BFF] to-[#1B2D50] flex items-center justify-center">
               <span className="text-white text-xs font-display font-bold">AJ</span>
             </div>
           </div>

@@ -12,7 +12,7 @@ const config: Config = {
           white: '#FFFFFF',
           offwhite: '#F4F6F9',
           navy: '#1B2D50',
-          blue: '#1668E0',
+          blue: '#1A7BFF',
           orange: '#F76B16',
           slate: '#64748B',
         },

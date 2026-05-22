@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import ChaedynChat from '@/components/chat/ChaedynChat'
+import ResumeSession from '@/components/studio/ResumeSession'
+import { getCurrentUserId, clearCurrentUserId } from '@/lib/current-user'
 
 const navTabs = [
   { label: 'Dashboard', href: '/studio' },
@@ -22,6 +24,33 @@ export default function ClientPortalLayout({
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  const [authState, setAuthState] = useState<'checking' | 'in' | 'out'>('checking')
+
+  useEffect(() => {
+    setAuthState(getCurrentUserId() ? 'in' : 'out')
+  }, [])
+
+  // Avoid flashing the portal before we know auth status
+  if (authState === 'checking') {
+    return (
+      <div className="min-h-screen bg-[#111] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Gate the whole client studio behind sign-in
+  if (authState === 'out') {
+    return (
+      <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center px-4">
+        <div className="flex items-center gap-2.5 mb-8">
+          <Image src="/AJMfit.png" alt="AJMFit" width={40} height={40} className="w-10 h-10 object-contain" />
+          <span className="font-display font-bold text-white text-lg uppercase tracking-[0.15em]">AJM Fit</span>
+        </div>
+        <ResumeSession title="Sign in to your studio" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#111]">
@@ -73,17 +102,24 @@ export default function ClientPortalLayout({
                 </svg>
               </button>
 
-              <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => {
+                  clearCurrentUserId()
+                  window.location.reload()
+                }}
+                className="flex items-center gap-2.5 group"
+                title="Sign out"
+              >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center">
                   <span className="text-white text-[10px] font-display font-bold">AJ</span>
                 </div>
-                <span className="text-white/70 text-sm font-body hidden sm:block">
-                  Hi, Alex
+                <span className="text-white/70 text-sm font-body hidden sm:block group-hover:text-white transition-colors duration-200">
+                  Sign out
                 </span>
-                <svg className="w-4 h-4 text-white/40 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <svg className="w-4 h-4 text-white/40 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                 </svg>
-              </div>
+              </button>
 
               {/* Mobile hamburger */}
               <button
@@ -138,8 +174,8 @@ export default function ClientPortalLayout({
       {/* Chaedyn FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1668E0] flex items-center justify-center shadow-[0_4px_20px_rgba(22,104,224,0.4)] hover:shadow-[0_6px_30px_rgba(22,104,224,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
-        aria-label={chatOpen ? 'Close Chaedyn' : 'Chat with Chaedyn'}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1A7BFF] flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
+        aria-label={chatOpen ? 'Close Chea' : 'Chat with Chea'}
       >
         {chatOpen ? (
           <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -147,11 +183,11 @@ export default function ClientPortalLayout({
           </svg>
         ) : (
           <Image
-            src="/chaedyn-avatar.png"
-            alt="Chat with Chaedyn"
-            width={80}
-            height={80}
-            className="w-full h-full object-cover"
+            src="/chea-avatar.jpg"
+            alt="Chat with Chea"
+            width={300}
+            height={300}
+            className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
           />
         )}
       </button>

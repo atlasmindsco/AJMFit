@@ -55,20 +55,20 @@ export default function ResumeSession({ title = 'Sign in to continue' }: { title
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@email.com"
             required
-            className="w-full px-4 py-3 bg-[#FAFBFD] border border-[#1B2D50]/10 rounded-md text-[#1B2D50] text-sm font-body focus:outline-none focus:border-[#1668E0]/50 transition-colors duration-200"
+            className="w-full px-4 py-3 bg-[#FAFBFD] border border-[#1B2D50]/10 rounded-md text-[#1B2D50] text-sm font-body focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200"
           />
           {error && <p className="text-red-600 text-xs font-body">{error}</p>}
           <button
             type="submit"
             disabled={loading || !email.trim()}
-            className="w-full py-3 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-md hover:bg-[#0F52C9] disabled:opacity-50 transition-colors duration-200"
+            className="w-full py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-md hover:bg-[#0F5FE0] disabled:opacity-50 transition-colors duration-200"
           >
             {loading ? 'Looking up...' : 'Continue'}
           </button>
         </form>
         <p className="text-[#64748B] text-xs font-body mt-6 text-center">
           Don&rsquo;t have an account?{' '}
-          <a href="/apply" className="text-[#1668E0] underline">
+          <a href="/apply" className="text-[#1A7BFF] underline">
             Apply for coaching
           </a>
         </p>

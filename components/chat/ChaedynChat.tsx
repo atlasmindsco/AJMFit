@@ -24,7 +24,7 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
       role: 'assistant',
       content: portal === 'admin'
         ? "What's up Coach! Need help with ISSA references, program design, or a client question?"
-        : "Hey! I'm Chaedyn — your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
+        : "Hey! I'm Chea — your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
       timestamp: new Date(),
     },
   ])
@@ -127,18 +127,18 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
       <div className={`px-4 py-3 border-b flex items-center gap-3 shrink-0 ${
         isDark ? 'border-white/[0.06]' : 'border-[#1B2D50]/[0.06]'
       }`}>
-        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-[#1668E0]">
+        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-[#1A7BFF]">
           <Image
-            src="/chaedyn-avatar.png"
-            alt="Chaedyn"
-            width={80}
-            height={80}
-            className="w-[200%] h-[200%] object-cover object-[82%_15%]"
+            src="/chea-avatar.jpg"
+            alt="Chea"
+            width={300}
+            height={300}
+            className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
           />
         </div>
         <div className="flex-1">
           <h2 className={`font-display font-bold text-sm ${isDark ? 'text-white' : 'text-[#1B2D50]'}`}>
-            Chaedyn
+            Chea
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -164,13 +164,13 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
               >
                 {/* Avatar */}
                 {!isUser && (
-                  <div className={`w-7 h-7 rounded-full overflow-hidden shrink-0 bg-[#1668E0] ${showAvatar ? 'visible' : 'invisible'}`}>
+                  <div className={`relative w-7 h-7 rounded-full overflow-hidden shrink-0 bg-[#1A7BFF] ${showAvatar ? 'visible' : 'invisible'}`}>
                     <Image
-                      src="/chaedyn-avatar.png"
+                      src="/chea-avatar.jpg"
                       alt=""
-                      width={56}
-                      height={56}
-                      className="w-[200%] h-[200%] object-cover object-[82%_15%]"
+                      width={200}
+                      height={200}
+                      className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
                     />
                   </div>
                 )}
@@ -179,7 +179,7 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
                 <div className="max-w-[75%]">
                   <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed whitespace-pre-wrap ${
                     isUser
-                      ? 'bg-[#1668E0] text-white rounded-2xl rounded-br-md'
+                      ? 'bg-[#1A7BFF] text-white rounded-2xl rounded-br-md'
                       : isDark
                         ? 'bg-white/[0.08] text-white/85 rounded-2xl rounded-bl-md'
                         : 'bg-white text-[#1B2D50] rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
@@ -216,7 +216,7 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Message Chaedyn..."
+            placeholder="Message Chea..."
             disabled={isStreaming}
             className={`flex-1 rounded-full px-4 py-2 text-sm font-body focus:outline-none transition-colors duration-200 ${
               isDark
@@ -227,7 +227,7 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isStreaming}
-            className="w-9 h-9 rounded-full bg-[#1668E0] flex items-center justify-center hover:bg-[#0F52C9] active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
+            className="w-9 h-9 rounded-full bg-[#1A7BFF] flex items-center justify-center hover:bg-[#0F5FE0] active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
           >
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />

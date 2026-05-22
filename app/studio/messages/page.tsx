@@ -121,7 +121,7 @@ export default function ClientMessagesPage() {
                 <div className="max-w-[75%]">
                   <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed ${
                     isClient
-                      ? 'bg-[#1668E0] text-white rounded-2xl rounded-br-md'
+                      ? 'bg-[#1A7BFF] text-white rounded-2xl rounded-br-md'
                       : 'bg-white text-[#1B2D50] rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                   }`}>
                     {msg.text}
@@ -151,7 +151,7 @@ export default function ClientMessagesPage() {
             <button
               onClick={sendMessage}
               disabled={!input.trim()}
-              className="w-9 h-9 rounded-full bg-[#1668E0] flex items-center justify-center hover:bg-[#0F52C9] active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
+              className="w-9 h-9 rounded-full bg-[#1A7BFF] flex items-center justify-center hover:bg-[#0F5FE0] active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
             >
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />

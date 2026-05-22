@@ -186,8 +186,8 @@ function BodyOutline({ view, dark }: { view: 'front' | 'back'; dark: boolean }) 
           <stop offset="100%" stopColor="#D8590C" />
         </linearGradient>
         <linearGradient id="secondaryGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1668E0" />
-          <stop offset="100%" stopColor="#0F52C9" />
+          <stop offset="0%" stopColor="#1A7BFF" />
+          <stop offset="100%" stopColor="#0F5FE0" />
         </linearGradient>
         {/* Dark primary (green like Stndrd) */}
         <linearGradient id="primaryGradDark" x1="0" y1="0" x2="0" y2="1">
@@ -270,7 +270,7 @@ export default function MuscleMap({
       return { fill: 'url(#primaryGrad)', opacity: isHovered ? 0.85 : 0.7, stroke: '#D8590C', strokeWidth: 0.8 }
     }
     if (isSecondary) {
-      return { fill: 'url(#secondaryGrad)', opacity: isHovered ? 0.5 : 0.35, stroke: '#1668E0', strokeWidth: 0.5 }
+      return { fill: 'url(#secondaryGrad)', opacity: isHovered ? 0.5 : 0.35, stroke: '#1A7BFF', strokeWidth: 0.5 }
     }
     if (interactive && isHovered) {
       return { fill: '#1B2D50', opacity: 0.15, stroke: '#1B2D50', strokeWidth: 0.8 }
@@ -356,7 +356,7 @@ export default function MuscleMap({
           )}
           {secondaryMuscles.length > 0 && (
             <div className="flex items-center gap-1.5">
-              <span className={`w-2.5 h-2.5 rounded-sm opacity-50 ${dark ? 'bg-gradient-to-b from-[#EAB308] to-[#CA8A04]' : 'bg-gradient-to-b from-[#1668E0] to-[#0F52C9]'}`} />
+              <span className={`w-2.5 h-2.5 rounded-sm opacity-50 ${dark ? 'bg-gradient-to-b from-[#EAB308] to-[#CA8A04]' : 'bg-gradient-to-b from-[#1A7BFF] to-[#0F5FE0]'}`} />
               <span className={dark ? 'text-white/60' : 'text-brand-navy/60'}>Secondary</span>
             </div>
           )}

@@ -608,7 +608,7 @@ export default function ProgramsPage() {
           </div>
           <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#1668E0] rounded-full transition-[width] duration-500"
+              className="h-full bg-[#1A7BFF] rounded-full transition-[width] duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -627,7 +627,7 @@ export default function ProgramsPage() {
                     onClick={() => setPreviewTab('overview')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'overview'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1668E0]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1A7BFF]'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -637,7 +637,7 @@ export default function ProgramsPage() {
                     onClick={() => setPreviewTab('program')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'program'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1668E0]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1A7BFF]'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -700,7 +700,7 @@ export default function ProgramsPage() {
                             className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
                           >
                             <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
-                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#1668E0] transition-colors duration-200">{day.name}</span>
+                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#1A7BFF] transition-colors duration-200">{day.name}</span>
                             <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
                             {day.completed ? (
                               <div className="w-5 h-5 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
@@ -721,7 +721,7 @@ export default function ProgramsPage() {
                     {/* CTA to view program */}
                     <button
                       onClick={() => setPreviewTab('program')}
-                      className="w-full py-3.5 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-3.5 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
                     >
                       View Program
                     </button>
@@ -789,7 +789,7 @@ export default function ProgramsPage() {
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#1668E0]'} transition-colors duration-200`}>
+                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#1A7BFF]'} transition-colors duration-200`}>
                                 {day.name}
                               </p>
                               <p className="text-white/30 text-xs font-body">
@@ -821,7 +821,7 @@ export default function ProgramsPage() {
                       return (
                         <button
                           onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                          className="w-full mt-4 py-3.5 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
+                          className="w-full mt-4 py-3.5 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
                         >
                           Continue — {weeklyPlan[todayIndex].name}
                         </button>
@@ -944,7 +944,7 @@ export default function ProgramsPage() {
                                     )}
                                     <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
                                     {isSwapped && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#1668E0]/15 text-[#1668E0] shrink-0">
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#1A7BFF]/15 text-[#1A7BFF] shrink-0">
                                         Swapped
                                       </span>
                                     )}
@@ -1049,7 +1049,7 @@ export default function ProgramsPage() {
                                                     }}
                                                     className={`px-2 py-1 rounded text-[10px] font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
-                                                        ? 'bg-[#1668E0] text-white'
+                                                        ? 'bg-[#1A7BFF] text-white'
                                                         : 'bg-white/[0.04] text-white/40 hover:text-white/70'
                                                     }`}
                                                   >
@@ -1153,7 +1153,7 @@ export default function ProgramsPage() {
                                                 placeholder="—"
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1668E0]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <input
                                                 type="number"
@@ -1161,7 +1161,7 @@ export default function ProgramsPage() {
                                                 placeholder="—"
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1668E0]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -1186,26 +1186,26 @@ export default function ProgramsPage() {
                                             {filled && !isLastSet && (
                                               <div className="ml-8 mr-10 my-1.5">
                                                 {timerActive && activeTimer ? (
-                                                  <div className="flex items-center gap-2 rounded-lg bg-[#1668E0]/10 border border-[#1668E0]/20 px-3 py-2">
+                                                  <div className="flex items-center gap-2 rounded-lg bg-[#1A7BFF]/10 border border-[#1A7BFF]/20 px-3 py-2">
                                                     {/* Progress ring */}
                                                     <div className="relative w-8 h-8 shrink-0">
                                                       <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
                                                         <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
                                                         <circle
                                                           cx="18" cy="18" r="15" fill="none"
-                                                          stroke="#1668E0"
+                                                          stroke="#1A7BFF"
                                                           strokeWidth="3"
                                                           strokeLinecap="round"
                                                           strokeDasharray={`${(activeTimer.remaining / activeTimer.total) * 94.25} 94.25`}
                                                           className="transition-[stroke-dasharray] duration-1000 ease-linear"
                                                         />
                                                       </svg>
-                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#1668E0]">
+                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#1A7BFF]">
                                                         {activeTimer.remaining}
                                                       </span>
                                                     </div>
                                                     <div className="flex-1">
-                                                      <p className="text-[#1668E0] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
+                                                      <p className="text-[#1A7BFF] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
                                                       <p className="text-white/25 text-[9px] font-body">
                                                         {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
                                                       </p>
@@ -1428,7 +1428,7 @@ export default function ProgramsPage() {
                                                   >
                                                     <span className="text-white/70 text-sm font-body">{alt}</span>
                                                     {displayName === alt && (
-                                                      <svg className="w-4 h-4 text-[#1668E0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                      <svg className="w-4 h-4 text-[#1A7BFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                       </svg>
                                                     )}
@@ -1542,7 +1542,7 @@ export default function ProgramsPage() {
                           }
                         }
                       }}
-                      className="w-full py-4 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
                     >
                       Start Workout
                     </button>

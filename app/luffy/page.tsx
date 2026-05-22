@@ -81,7 +81,7 @@ const fadeIn = {
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'text-[#F76B16]'
-  if (tier.includes('Accelerator')) return 'text-[#1668E0]'
+  if (tier.includes('Accelerator')) return 'text-[#1A7BFF]'
   return 'text-white/50'
 }
 

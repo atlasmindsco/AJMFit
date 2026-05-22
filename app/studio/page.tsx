@@ -13,8 +13,8 @@ const stats = [
         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
       </svg>
     ),
-    iconBg: 'bg-[#1668E0]/10',
-    iconColor: 'text-[#1668E0]',
+    iconBg: 'bg-[#1A7BFF]/10',
+    iconColor: 'text-[#1A7BFF]',
   },
   {
     label: 'Calories Burned',
@@ -38,8 +38,8 @@ const stats = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     ),
-    iconBg: 'bg-[#1668E0]/10',
-    iconColor: 'text-[#1668E0]',
+    iconBg: 'bg-[#1A7BFF]/10',
+    iconColor: 'text-[#1A7BFF]',
   },
   {
     label: 'Steps Today',
@@ -89,7 +89,7 @@ const dailyHabits = [
 
 /* ── Macros ── */
 const macros = [
-  { name: 'Protein', current: 150, goal: 180, color: '#1668E0' },
+  { name: 'Protein', current: 150, goal: 180, color: '#1A7BFF' },
   { name: 'Carbs', current: 220, goal: 250, color: '#F76B16' },
   { name: 'Fats', current: 60, goal: 70, color: '#64748B' },
 ]
@@ -216,8 +216,8 @@ export default function ClientDashboard() {
             </div>
             <div className="p-5">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-full bg-[#1668E0]/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-[#1668E0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="w-8 h-8 rounded-full bg-[#1A7BFF]/10 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-[#1A7BFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </div>
@@ -235,7 +235,7 @@ export default function ClientDashboard() {
                 ))}
               </div>
 
-              <button className="w-full py-3 bg-[#1668E0] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F52C9] active:scale-[0.98] transition-transform duration-200">
+              <button className="w-full py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200">
                 Start Workout
               </button>
             </div>
@@ -398,11 +398,11 @@ export default function ClientDashboard() {
               {/* Calorie bar */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="bg-[#1668E0] text-white text-[10px] font-display font-bold px-2 py-0.5 rounded">MIN</span>
+                  <span className="bg-[#1A7BFF] text-white text-[10px] font-display font-bold px-2 py-0.5 rounded">MIN</span>
                   <span className="text-white text-sm font-body font-semibold">1,750 / 2,000 kcal</span>
                 </div>
                 <div className="w-full h-3 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#1668E0] rounded-full" style={{ width: '87.5%' }} />
+                  <div className="h-full bg-[#1A7BFF] rounded-full" style={{ width: '87.5%' }} />
                 </div>
               </div>
 
@@ -450,7 +450,7 @@ export default function ClientDashboard() {
                   <div key={post.title} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{post.icon}</span>
-                      <span className="text-[#1668E0] text-sm font-body font-medium">{post.title}</span>
+                      <span className="text-[#1A7BFF] text-sm font-body font-medium">{post.title}</span>
                     </div>
                     <span className="text-white/40 text-xs font-body">{post.time}</span>
                   </div>

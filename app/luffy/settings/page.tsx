@@ -60,7 +60,7 @@ export default function SettingsPage() {
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Coach Profile</h2>
             <div className="flex items-center gap-5 mb-6">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1668E0] to-[#1B2D50] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1A7BFF] to-[#1B2D50] flex items-center justify-center">
                 <span className="text-white text-xl font-display font-bold">AJ</span>
               </div>
               <div>

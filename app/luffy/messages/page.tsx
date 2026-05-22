@@ -149,7 +149,7 @@ export default function MessagesPage() {
           <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center">
             <span className="text-white text-[6px] font-display font-bold">CH</span>
           </div>
-          Chaedyn AI
+          Chea AI
         </button>
       </div>
 
@@ -189,7 +189,7 @@ export default function MessagesPage() {
                       convo.tier.includes('Full')
                         ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
                         : convo.tier.includes('Accelerator')
-                        ? 'bg-[#1668E0]'
+                        ? 'bg-[#1A7BFF]'
                         : 'bg-white/[0.08]'
                     }`}>
                       <span className="text-white text-[10px] font-display font-bold">{convo.initials}</span>
@@ -223,7 +223,7 @@ export default function MessagesPage() {
                 active.tier.includes('Full')
                   ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
                   : active.tier.includes('Accelerator')
-                  ? 'bg-[#1668E0]'
+                  ? 'bg-[#1A7BFF]'
                   : 'bg-white/[0.08]'
               }`}>
                 <span className="text-white text-[10px] font-display font-bold">{active.initials}</span>
@@ -245,7 +245,7 @@ export default function MessagesPage() {
                 >
                   <div className={`max-w-[75%] px-4 py-3 rounded-2xl ${
                     msg.from === 'coach'
-                      ? 'bg-[#1668E0] text-white rounded-br-md'
+                      ? 'bg-[#1A7BFF] text-white rounded-br-md'
                       : 'bg-white/[0.06] text-white/80 rounded-bl-md'
                   }`}>
                     <p className="text-sm font-body leading-relaxed">{msg.text}</p>

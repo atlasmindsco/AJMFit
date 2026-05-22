@@ -73,7 +73,7 @@ function getTypeIcon(type: string) {
 
 function getTypeColor(type: string) {
   if (type === 'Live Training') return 'bg-[#F76B16]/15 text-[#F76B16]'
-  if (type === 'Video Check-in') return 'bg-[#1668E0]/15 text-[#1668E0]'
+  if (type === 'Video Check-in') return 'bg-[#1A7BFF]/15 text-[#1A7BFF]'
   if (type === 'Form Review') return 'bg-purple-500/15 text-purple-400'
   return 'bg-emerald-500/15 text-emerald-400'
 }
@@ -106,7 +106,7 @@ export default function SchedulePage() {
         {[
           { label: 'Total Sessions', value: totalSessions, color: 'text-[#F76B16]' },
           { label: 'Live Training', value: liveCount, color: 'text-emerald-400' },
-          { label: 'Check-ins', value: checkinCount, color: 'text-[#1668E0]' },
+          { label: 'Check-ins', value: checkinCount, color: 'text-[#1A7BFF]' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -169,7 +169,7 @@ export default function SchedulePage() {
                       </div>
                       <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${
                         session.tier === 'Full' ? 'bg-[#F76B16]/15 text-[#F76B16]' :
-                        session.tier === 'Accelerator' ? 'bg-[#1668E0]/15 text-[#1668E0]' :
+                        session.tier === 'Accelerator' ? 'bg-[#1A7BFF]/15 text-[#1A7BFF]' :
                         session.tier === 'All' ? 'bg-emerald-500/15 text-emerald-400' :
                         'bg-white/[0.06] text-white/40'
                       }`}>
@@ -225,7 +225,7 @@ export default function SchedulePage() {
             <div className="p-5 space-y-3">
               {[
                 { type: 'Live Training', count: liveCount, color: '#F76B16' },
-                { type: 'Video Check-in', count: checkinCount, color: '#1668E0' },
+                { type: 'Video Check-in', count: checkinCount, color: '#1A7BFF' },
                 { type: 'Form Review', count: Object.values(weekSchedule).flat().filter(s => s.type === 'Form Review').length, color: '#A855F7' },
                 { type: 'Group Call', count: Object.values(weekSchedule).flat().filter(s => s.type === 'Group Call').length, color: '#10B981' },
               ].map((t) => (

@@ -294,7 +294,7 @@ function getTypeColor(type: string) {
   const map: Record<string, string> = {
     Hypertrophy: 'bg-[#F76B16]/15 text-[#F76B16]',
     'Fat Loss': 'bg-emerald-500/15 text-emerald-400',
-    Strength: 'bg-[#1668E0]/15 text-[#1668E0]',
+    Strength: 'bg-[#1A7BFF]/15 text-[#1A7BFF]',
   }
   return map[type] || 'bg-white/[0.06] text-white/50'
 }
@@ -634,7 +634,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibEquipment(e)}
                     className={`px-2.5 py-1 rounded-md text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
-                        ? 'bg-[#1668E0] text-white'
+                        ? 'bg-[#1A7BFF] text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -778,7 +778,7 @@ export default function ProgramsPage() {
                       <span className="px-2 py-1 bg-[#F76B16]/15 text-[#F76B16] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-[#1668E0]/15 text-[#1668E0] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
+                      <span className="px-2 py-1 bg-[#1A7BFF]/15 text-[#1A7BFF] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.category}
                       </span>
                       <span className="px-2 py-1 bg-white/[0.06] text-white/40 font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">

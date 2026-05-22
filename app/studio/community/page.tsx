@@ -160,7 +160,7 @@ export default function CommunityPage() {
               <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">
                 Community
               </h1>
-              <button className="px-4 py-2 bg-[#1668E0] text-white text-xs font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F52C9] active:scale-[0.98] transition-all duration-200">
+              <button className="px-4 py-2 bg-[#1A7BFF] text-white text-xs font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200">
                 New Post
               </button>
             </div>
@@ -171,7 +171,7 @@ export default function CommunityPage() {
                   onClick={() => setActiveCategory(cat.name)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 ${
                     activeCategory === cat.name
-                      ? 'bg-[#1668E0] text-white'
+                      ? 'bg-[#1A7BFF] text-white'
                       : 'bg-[#FAFBFD] text-[#64748B] hover:text-[#1B2D50] border border-[#1B2D50]/[0.06]'
                   }`}
                 >
@@ -190,16 +190,16 @@ export default function CommunityPage() {
                 variants={fadeIn}
                 initial="hidden"
                 animate="visible"
-                className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-5 hover:border-[#1668E0]/20 transition-colors duration-200 cursor-pointer"
+                className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-5 hover:border-[#1A7BFF]/20 transition-colors duration-200 cursor-pointer"
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                     post.isCoach
                       ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
-                      : 'bg-[#1668E0]/10'
+                      : 'bg-[#1A7BFF]/10'
                   }`}>
                     <span className={`text-xs font-display font-bold ${
-                      post.isCoach ? 'text-white' : 'text-[#1668E0]'
+                      post.isCoach ? 'text-white' : 'text-[#1A7BFF]'
                     }`}>{post.avatar}</span>
                   </div>
                   <div className="min-w-0 flex-1">
@@ -209,7 +209,7 @@ export default function CommunityPage() {
                           PINNED
                         </span>
                       )}
-                      <span className="text-[#1668E0] text-[10px] font-display font-bold bg-[#1668E0]/10 px-2 py-0.5 rounded">
+                      <span className="text-[#1A7BFF] text-[10px] font-display font-bold bg-[#1A7BFF]/10 px-2 py-0.5 rounded">
                         {post.category}
                       </span>
                       {post.isCoach && (
@@ -326,7 +326,7 @@ export default function CommunityPage() {
                 <div key={event.name} className="flex items-start gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-display font-bold ${
                     event.type === 'Live' ? 'bg-red-500/10 text-red-500' :
-                    event.type === 'Zoom' ? 'bg-[#1668E0]/10 text-[#1668E0]' :
+                    event.type === 'Zoom' ? 'bg-[#1A7BFF]/10 text-[#1A7BFF]' :
                     'bg-[#F76B16]/10 text-[#F76B16]'
                   }`}>
                     {event.type === 'Live' ? (

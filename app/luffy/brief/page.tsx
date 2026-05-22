@@ -18,7 +18,7 @@ const competitors = [
 ]
 
 const ajmTiers = [
-  { name: 'The Blueprint', price: 297, weekly: 74, color: '#1668E0', features: ['Custom 3-4 day/week program', 'New plan every 30 days (3 phases)', 'Scaled to your equipment', 'M-F messaging access', 'Supplement recommendations'] },
+  { name: 'The Blueprint', price: 297, weekly: 74, color: '#1A7BFF', features: ['Custom 3-4 day/week program', 'New plan every 30 days (3 phases)', 'Scaled to your equipment', 'M-F messaging access', 'Supplement recommendations'] },
   { name: 'The Accelerator', price: 497, weekly: 124, color: '#F76B16', popular: true, features: ['Everything in The Blueprint', 'Weekly 30-45 min video check-in', 'Form feedback via video review', 'Progress tracking & adjustments', 'Priority response M-F'] },
   { name: 'The Full Experience', price: 697, weekly: 174, color: '#1B2D50', features: ['Everything in The Accelerator', '2x live 45-min virtual sessions/week', 'Real-time coaching & intensity', 'Live form correction every session'] },
 ]
@@ -38,7 +38,7 @@ const platformFeatures = [
   { feature: 'Community forum', ajm: true, future: false, caliber: false, trainwell: false },
   { feature: 'Leaderboard & points', ajm: true, future: false, caliber: false, trainwell: false },
   { feature: 'Community events & Q&As', ajm: true, future: false, caliber: false, trainwell: false },
-  { feature: 'AI assistant (Chaedyn)', ajm: true, future: false, caliber: false, trainwell: false },
+  { feature: 'AI assistant (Chea)', ajm: true, future: false, caliber: false, trainwell: false },
   { feature: 'Coach admin dashboard', ajm: true, future: true, caliber: true, trainwell: true },
 ]
 
@@ -50,7 +50,7 @@ const commitmentDiscounts = [
 
 const marketTiers = [
   { model: 'DIY / App-Only', range: '$30 – $100', avg: 65, color: '#94A3B8' },
-  { model: 'Group / Hybrid', range: '$100 – $300', avg: 200, color: '#1668E0' },
+  { model: 'Group / Hybrid', range: '$100 – $300', avg: 200, color: '#1A7BFF' },
   { model: 'Standard 1:1', range: '$200 – $500', avg: 350, color: '#F76B16' },
   { model: 'Premium 1:1', range: '$350 – $800+', avg: 575, color: '#1B2D50' },
 ]
@@ -406,7 +406,7 @@ export default function BriefPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-2xl p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-2xl mb-3">AI</div>
-                  <h3 className="font-display font-bold text-xl text-brand-navy">Chaedyn AI Assistant</h3>
+                  <h3 className="font-display font-bold text-xl text-brand-navy">Chea AI Assistant</h3>
                   <p className="text-sm text-brand-slate mt-2 leading-relaxed">
                     Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo — AJM FIT includes it in every tier.
                   </p>

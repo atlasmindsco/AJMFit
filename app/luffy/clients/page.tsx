@@ -23,7 +23,7 @@ const fadeIn = {
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-[#F76B16]/15 text-[#F76B16]'
-  if (tier.includes('Accelerator')) return 'bg-[#1668E0]/15 text-[#1668E0]'
+  if (tier.includes('Accelerator')) return 'bg-[#1A7BFF]/15 text-[#1A7BFF]'
   return 'bg-white/[0.06] text-white/50'
 }
 
@@ -310,7 +310,7 @@ export default function ClientsPage() {
                   {
                     tier: 'The Accelerator',
                     count: clients.filter((c) => c.application?.tier === 'accelerator' && c.status === 'active').length,
-                    color: '#1668E0',
+                    color: '#1A7BFF',
                     price: '$497/mo',
                   },
                   {
