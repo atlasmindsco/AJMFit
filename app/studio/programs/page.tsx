@@ -1613,8 +1613,8 @@ export default function ProgramsPage() {
                       <div className="flex flex-col sm:flex-row gap-4 items-start">
                         <div className="w-full sm:w-48 shrink-0">
                           <MuscleMap
-                            target={toMuscleMapKey(selectedExerciseDB.primaryMuscles[0] || '')}
-                            secondaryMuscles={selectedExerciseDB.secondaryMuscles.map(toMuscleMapKey)}
+                            target={selectedExerciseDB.primaryMuscles[0] || ''}
+                            secondaryMuscles={selectedExerciseDB.secondaryMuscles}
                             size="sm"
                             theme="dark"
                           />
