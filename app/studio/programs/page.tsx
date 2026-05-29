@@ -1575,12 +1575,12 @@ export default function ProgramsPage() {
                   {selectedExerciseDB && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {selectedExerciseDB.primaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#22C55E]/15 text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#F76B16]/15 text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#1A7BFF]/15 text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -1622,23 +1622,23 @@ export default function ProgramsPage() {
                         <div className="flex-1 space-y-3">
                           {selectedExerciseDB.primaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-[#22C55E]/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-[#22C55E]" />
+                              <div className="w-10 h-10 rounded-lg bg-[#F76B16]/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-[#F76B16]" />
                               </div>
                               <div>
                                 <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
+                                <p className="text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
                               </div>
                             </div>
                           ))}
                           {selectedExerciseDB.secondaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-[#EAB308]/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-[#EAB308]/60" />
+                              <div className="w-10 h-10 rounded-lg bg-[#1A7BFF]/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-[#1A7BFF]" />
                               </div>
                               <div>
                                 <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
+                                <p className="text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
                           ))}
