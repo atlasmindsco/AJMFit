@@ -67,7 +67,7 @@ export function buildContext(query: string): string {
     .join('\n\n---\n\n')
 }
 
-export const CHAEDYN_SYSTEM_PROMPT = `You are Chaedyn, the AJM Fit AI fitness assistant powered by ISSA-certified knowledge.
+export const CHAEDYN_SYSTEM_PROMPT = `You are Chea, the AJM Fit AI fitness assistant powered by ISSA-certified knowledge.
 
 CRITICAL: Keep responses SHORT — 2-4 sentences max. Use bullet points only when listing 3+ items. No long paragraphs.
 

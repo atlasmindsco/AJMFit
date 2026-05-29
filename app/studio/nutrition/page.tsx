@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { getCurrentUserId } from '@/lib/current-user'
 import ResumeSession from '@/components/studio/ResumeSession'
+import MacroRing from '@/components/ui/MacroRing'
+import { fadeIn } from '@/lib/animations'
 
 const BarcodeScanner = dynamic(() => import('@/components/studio/BarcodeScanner'), { ssr: false })
 import {
@@ -23,39 +25,6 @@ import {
   type FoodLogRow,
   type DailyCalories,
 } from '@/lib/nutrition'
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
-
-function MacroRing({ current, goal, color, size = 80 }: { current: number; goal: number; color: string; size?: number }) {
-  const radius = (size - 8) / 2
-  const circumference = 2 * Math.PI * radius
-  const pct = goal > 0 ? Math.min(current / goal, 1) : 0
-  const offset = circumference * (1 - pct)
-  return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#E5E7EB" strokeWidth={6} />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={6}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        className="transition-all duration-700"
-      />
-    </svg>
-  )
-}
 
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100 // default daily goal
@@ -373,7 +342,7 @@ export default function NutritionPage() {
             ].map((macro) => (
               <div key={macro.label} className="flex flex-col items-center">
                 <div className="relative">
-                  <MacroRing current={macro.current} goal={macro.goal} color={macro.color} />
+                  <MacroRing current={macro.current} goal={macro.goal} color={macro.color} size={80} bgStroke="#E5E7EB" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="font-display font-bold text-[#1B2D50] text-sm">
                       {Math.round(macro.current)}{macro.unit}

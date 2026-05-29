@@ -11,15 +11,7 @@ import {
   type ClientRow,
   type UserStatus,
 } from '@/lib/admin'
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
+import { fadeInAdmin as fadeIn } from '@/lib/animations'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-[#F76B16]/15 text-[#F76B16]'

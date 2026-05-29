@@ -2,15 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
+import { fadeInAdmin as fadeIn } from '@/lib/animations'
 
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 

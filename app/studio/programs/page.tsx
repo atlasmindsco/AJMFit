@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
+import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import {
   startWorkout as dbStartWorkout,
@@ -70,21 +71,6 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
 }
 
 type ProgramView = 'preview' | 'workout' | 'exercise'
-
-/* ── Muscle name mapping: ExerciseDB → MuscleMap keys ── */
-const MUSCLE_MAP: Record<string, string> = {
-  chest: 'pectorals',
-  quadriceps: 'quads',
-  'lower back': 'spine',
-  'middle back': 'upper back',
-  shoulders: 'delts',
-  neck: 'levator scapulae',
-  abdominals: 'abs',
-}
-
-function toMuscleMapKey(dbMuscle: string): string {
-  return MUSCLE_MAP[dbMuscle.toLowerCase()] || dbMuscle.toLowerCase()
-}
 
 /* ── Current Program ── */
 const currentProgram = {
@@ -353,14 +339,6 @@ const slideBack = {
   exit: { opacity: 0, x: 40, transition: { duration: 0.2 } },
 }
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
 
 export default function ProgramsPage() {
   const [view, setView] = useState<ProgramView>('preview')

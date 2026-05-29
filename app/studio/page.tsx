@@ -1,6 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import MacroRing from '@/components/ui/MacroRing'
+import { fadeIn } from '@/lib/animations'
 
 /* ── Stat cards ── */
 const stats = [
@@ -101,48 +103,6 @@ const forumPosts = [
 ]
 
 const spotlight = { name: 'Sarah W.', achievement: 'Lost 25 lbs!' }
-
-/* ── Helpers ── */
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
-
-function MacroRing({ current, goal, color, size = 72 }: { current: number; goal: number; color: string; size?: number }) {
-  const radius = (size - 8) / 2
-  const circumference = 2 * Math.PI * radius
-  const pct = Math.min(current / goal, 1)
-  const offset = circumference * (1 - pct)
-
-  return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="rgba(255,255,255,0.06)"
-        strokeWidth={6}
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={6}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        className="transition-[stroke-dashoffset] duration-700"
-      />
-    </svg>
-  )
-}
 
 export default function ClientDashboard() {
   /* Progress chart scaling */

@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { fadeInAdmin as fadeIn } from '@/lib/animations'
 
 const stats = [
   {
@@ -70,14 +71,6 @@ const pendingActions = [
   { text: 'New application: Jordan West', type: 'Application', urgent: false },
 ]
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'text-[#F76B16]'
