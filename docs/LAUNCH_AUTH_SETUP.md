@@ -2,9 +2,15 @@
 
 Code for real Supabase Auth is merged. To make it live, complete these in order.
 
-## 1. Run the database migration (required)
+## 1. Run the database migration (required + URGENT)
 The migration adds `users.auth_id`, the auto-link trigger, helper functions, and
 **Row Level Security** on every client-data table.
+
+> **Security note:** a prior stopgap migration (`005_enable_rls_anon_policies.sql`)
+> left **permissive `anon USING (true)` policies on every table** — meaning the public
+> anon key can currently read/write *all* client data. `0001_auth_foundation.sql` drops
+> those and replaces them with owner/trainer policies. Until it runs, that exposure is
+> live, so run it before onboarding real clients.
 
 - File: [`supabase/migrations/0001_auth_foundation.sql`](../supabase/migrations/0001_auth_foundation.sql)
 - Project: `xsmxenpynyusmiihtuex`

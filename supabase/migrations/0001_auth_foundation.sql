@@ -69,12 +69,34 @@ create trigger on_auth_user_created
 --    happen before an auth identity exists (the public application) go through
 --    a server route using the service-role key, which bypasses RLS — so anon
 --    needs no policies here.
+--
+--    NOTE: prior migration 005_enable_rls_anon_policies.sql created permissive
+--    `TO anon USING (true)` policies on every table (a pre-auth stopgap). Those
+--    policies would OR with the ones below and defeat all of this, so we first
+--    DROP EVERY existing policy on each table, then enable RLS and add the
+--    correct owner/trainer policies.
 -- ----------------------------------------------------------------------------
 
+-- Drop all existing policies + (re-)enable RLS on every client-data table.
+do $$
+declare t text; p text;
+begin
+  foreach t in array array[
+    'users','applications','meals','food_logs','daily_logs',
+    'workouts','workout_sets','exercise_prs','exercise_swaps'
+  ]
+  loop
+    for p in
+      select policyname from pg_policies
+      where schemaname = 'public' and tablename = t
+    loop
+      execute format('drop policy if exists %I on public.%I;', p, t);
+    end loop;
+    execute format('alter table public.%I enable row level security;', t);
+  end loop;
+end $$;
+
 -- users (owner row keyed by auth_id directly)
-alter table public.users enable row level security;
-drop policy if exists users_select on public.users;
-drop policy if exists users_update on public.users;
 create policy users_select on public.users
   for select using (auth_id = auth.uid() or public.is_trainer());
 create policy users_update on public.users
@@ -82,9 +104,6 @@ create policy users_update on public.users
            with check (auth_id = auth.uid() or public.is_trainer());
 
 -- applications (read by owner/trainer; status edits by trainer; inserts via server)
-alter table public.applications enable row level security;
-drop policy if exists applications_select on public.applications;
-drop policy if exists applications_update on public.applications;
 create policy applications_select on public.applications
   for select using (public.current_user_id() = user_id or public.is_trainer());
 create policy applications_update on public.applications
@@ -99,8 +118,6 @@ begin
     'workout_sets','exercise_prs','exercise_swaps'
   ]
   loop
-    execute format('alter table public.%I enable row level security;', t);
-    execute format('drop policy if exists %I on public.%I;', t || '_owner_all', t);
     execute format($p$
       create policy %I on public.%I
         for all
