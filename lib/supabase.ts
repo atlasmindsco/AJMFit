@@ -1,7 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/supabase'
+import { createClient } from '@/lib/supabase/client'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+/**
+ * Backward-compatible singleton browser client.
+ *
+ * Now backed by @supabase/ssr's cookie-based client, so existing browser data
+ * libraries (lib/workout.ts, lib/nutrition.ts, lib/admin.ts) automatically send
+ * the logged-in user's session and are subject to RLS. New code should prefer
+ * importing the appropriate factory from `@/lib/supabase/{client,server}`.
+ */
+export const supabase = createClient()

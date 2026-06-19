@@ -6,8 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/Button'
-import { supabase } from '@/lib/supabase'
-import { setCurrentUserId } from '@/lib/current-user'
 
 // ---- Schema ----
 
@@ -48,14 +46,15 @@ const tierOptions = [
   {
     value: 'blueprint',
     label: 'The Blueprint',
-    monthlyPrice: 297,
-    tagline: 'Your foundation. Built right.',
+    monthlyPrice: 19.97,
+    tagline: 'Self-guided. Full app access.',
     features: [
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Scaled to your equipment',
+      'Full studio app — workouts, nutrition, programs library',
+      'Photo food recognition + macro tracking',
+      'Workout logging + PR tracking',
+      'Chea AI assistant',
+      'Community access',
       'M-F messaging access',
-      'Supplement recommendations',
     ],
   },
   {
@@ -66,9 +65,10 @@ const tierOptions = [
     featured: true,
     features: [
       'Everything in The Blueprint',
+      'Custom 3-4 day/week workout plan',
+      'New plan every 30 days (3 phases)',
       'Weekly 30-45 min video check-in',
       'Form feedback via video review',
-      'Progress tracking & adjustments',
       'Priority response M-F',
     ],
   },
@@ -134,43 +134,20 @@ export default function IntakeForm() {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      // 1. Upsert user by email so re-applications don't crash on unique constraint.
-      const userPayload = {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        status: 'pending',
+      // Submit to the server route, which writes with the service-role key.
+      // No studio access is granted here — the client is invited by email once
+      // Anthony approves the application.
+      const res = await fetch('/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null
+        throw new Error(body?.error ?? 'Something went wrong. Please try again.')
       }
-      const { data: user, error: userErr } = await supabase
-        .from('users')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .upsert(userPayload as any, { onConflict: 'email' })
-        .select('id')
-        .single()
 
-      if (userErr || !user) throw userErr ?? new Error('Failed to create user')
-      const userId = (user as { id: string }).id
-
-      // 2. Insert the application snapshot
-      const appPayload = {
-        user_id: userId,
-        goals: data.goals,
-        equipment: data.equipment,
-        health_limitations: data.healthLimitations || null,
-        availability: data.availability,
-        tier: data.tier,
-        billing_cycle: data.billingCycle,
-        referral: data.referral || null,
-        status: 'pending',
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: appErr } = await supabase.from('applications').insert(appPayload as any)
-
-      if (appErr) throw appErr
-
-      // 3. Store user id client-side so they can access the studio immediately.
-      // TODO(auth): swap for Supabase Auth session once wired.
-      setCurrentUserId(userId)
       setSubmitted(true)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'

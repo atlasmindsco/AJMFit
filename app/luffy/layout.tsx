@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { signOut } from '@/lib/current-user'
 
 const navItems = [
   {
@@ -69,7 +70,14 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/members')
+    router.refresh()
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0F1923]">
@@ -177,6 +185,17 @@ export default function AdminLayout({
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A7BFF] to-[#1B2D50] flex items-center justify-center">
               <span className="text-white text-xs font-display font-bold">AJ</span>
             </div>
+
+            {/* Sign out */}
+            <button
+              onClick={handleSignOut}
+              title="Sign out"
+              className="text-white/40 hover:text-white/80 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+              </svg>
+            </button>
           </div>
         </header>
 

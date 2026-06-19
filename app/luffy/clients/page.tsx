@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import {
   fetchClients,
   acceptApplication,
+  inviteClient,
   declineApplication,
   tierLabel,
   relativeTime,
@@ -69,9 +70,12 @@ export default function ClientsPage() {
     setProcessing(client.id)
     try {
       await acceptApplication(client.application.id, client.id)
+      // Email the client their set-password invite so they can reach the studio.
+      await inviteClient(client.id)
       loadClients()
     } catch (err) {
       console.error('[Accept] Failed:', err)
+      alert(err instanceof Error ? err.message : 'Could not accept application.')
     } finally {
       setProcessing(null)
     }

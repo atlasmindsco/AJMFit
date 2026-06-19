@@ -1,24 +1,29 @@
 /**
- * Temporary user identity helper.
+ * Current-user helper, backed by Supabase Auth.
  *
- * TODO(auth): Replace with Supabase Auth once wired. The studio pages call
- * `getCurrentUserId()` to scope data; once `auth.uid()` is available, swap
- * this implementation and update RLS policies accordingly.
+ * Studio pages call `getCurrentUserId()` to scope their data to the signed-in
+ * client. It resolves the public.users.id linked to the current auth session
+ * (users.auth_id = auth.uid()). RLS enforces the same boundary at the database.
  */
+import { createClient } from '@/lib/supabase/client'
 
-const STORAGE_KEY = 'ajmfit.user_id'
+export async function getCurrentUserId(): Promise<string | null> {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
 
-export function setCurrentUserId(id: string) {
-  if (typeof window === 'undefined') return
-  window.localStorage.setItem(STORAGE_KEY, id)
+  const { data } = await supabase
+    .from('users')
+    .select('id')
+    .eq('auth_id', user.id)
+    .maybeSingle<{ id: string }>()
+
+  return data?.id ?? null
 }
 
-export function getCurrentUserId(): string | null {
-  if (typeof window === 'undefined') return null
-  return window.localStorage.getItem(STORAGE_KEY)
-}
-
-export function clearCurrentUserId() {
-  if (typeof window === 'undefined') return
-  window.localStorage.removeItem(STORAGE_KEY)
+export async function signOut(): Promise<void> {
+  const supabase = createClient()
+  await supabase.auth.signOut()
 }

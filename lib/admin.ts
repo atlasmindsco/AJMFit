@@ -109,6 +109,22 @@ export async function acceptApplication(applicationId: string, userId: string) {
   if (userErr) throw userErr
 }
 
+/**
+ * Sends the approved client their "set your password" invite email (via the
+ * trainer-only server route). Safe to call after acceptApplication().
+ */
+export async function inviteClient(userId: string): Promise<void> {
+  const res = await fetch('/api/admin/invite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId }),
+  })
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null
+    throw new Error(body?.error ?? 'Failed to send invite')
+  }
+}
+
 export async function declineApplication(applicationId: string, userId: string) {
   const now = new Date().toISOString()
   const { error: appErr } = await db

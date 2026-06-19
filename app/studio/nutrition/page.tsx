@@ -61,13 +61,13 @@ export default function NutritionPage() {
   const macroFieldsTouchedRef = useRef(false)
 
   useEffect(() => {
-    const id = getCurrentUserId()
-    setUserId(id)
-    if (!id) {
-      setLoading(false)
-      return
-    }
     ;(async () => {
+      const id = await getCurrentUserId()
+      setUserId(id)
+      if (!id) {
+        setLoading(false)
+        return
+      }
       try {
         const [t, m, l, dl, w] = await Promise.all([
           fetchTargets(id),

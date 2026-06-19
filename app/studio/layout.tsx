@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import ChaedynChat from '@/components/chat/ChaedynChat'
 import ResumeSession from '@/components/studio/ResumeSession'
-import { getCurrentUserId, clearCurrentUserId } from '@/lib/current-user'
+import { getCurrentUserId, signOut } from '@/lib/current-user'
 
 const navTabs = [
   { label: 'Dashboard', href: '/studio' },
@@ -22,13 +22,22 @@ export default function ClientPortalLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  // Access is enforced server-side in middleware; this is a graceful fallback
+  // only for a client render path that somehow loads without a session.
   const [authState, setAuthState] = useState<'checking' | 'in' | 'out'>('checking')
 
   useEffect(() => {
-    setAuthState(getCurrentUserId() ? 'in' : 'out')
+    getCurrentUserId().then((id) => setAuthState(id ? 'in' : 'out'))
   }, [])
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/members')
+    router.refresh()
+  }
 
   // Avoid flashing the portal before we know auth status
   if (authState === 'checking') {
@@ -39,7 +48,7 @@ export default function ClientPortalLayout({
     )
   }
 
-  // Gate the whole client studio behind sign-in
+  // Fallback prompt (middleware should have redirected already)
   if (authState === 'out') {
     return (
       <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center px-4">
@@ -103,10 +112,7 @@ export default function ClientPortalLayout({
               </button>
 
               <button
-                onClick={() => {
-                  clearCurrentUserId()
-                  window.location.reload()
-                }}
+                onClick={handleSignOut}
                 className="flex items-center gap-2.5 group"
                 title="Sign out"
               >

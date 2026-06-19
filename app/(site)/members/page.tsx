@@ -5,33 +5,59 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function MembersLogin() {
   const router = useRouter()
-  const [username, setUsername] = useState('')
+  const supabase = createClient()
+
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showForgot, setShowForgot] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
   const [forgotSent, setForgotSent] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    if (!username || !password) {
-      setError('Please enter your username and password.')
+    if (!email || !password) {
+      setError('Please enter your email and password.')
       return
     }
 
-    // TODO: Replace with real authentication
-    router.push('/studio')
+    setLoading(true)
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    })
+    setLoading(false)
+
+    if (signInError) {
+      setError('Incorrect email or password.')
+      return
+    }
+
+    // Route by role, honouring an optional ?next= destination.
+    const role = (data.user?.app_metadata as { role?: string } | undefined)?.role
+    const params = new URLSearchParams(window.location.search)
+    const next = params.get('next')
+    const dest = role === 'trainer' ? '/luffy' : next || '/studio'
+    router.push(dest)
+    router.refresh()
   }
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!forgotEmail) return
-    // TODO: Replace with real password reset logic
+    setLoading(true)
+    await supabase.auth.resetPasswordForEmail(forgotEmail.trim().toLowerCase(), {
+      redirectTo: `${window.location.origin}/auth/callback?next=/members/reset`,
+    })
+    setLoading(false)
+    // Always show success (don't reveal whether an account exists).
     setForgotSent(true)
   }
 
@@ -69,19 +95,19 @@ export default function MembersLogin() {
               <form onSubmit={handleLogin} className="mt-8 space-y-5">
                 <div>
                   <label
-                    htmlFor="username"
+                    htmlFor="email"
                     className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2"
                   >
-                    Username
+                    Email
                   </label>
                   <input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors duration-200"
-                    placeholder="Enter your username"
-                    autoComplete="username"
+                    placeholder="your@email.com"
+                    autoComplete="email"
                   />
                 </div>
 
@@ -109,15 +135,19 @@ export default function MembersLogin() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200 disabled:opacity-60"
                 >
-                  Log In
+                  {loading ? 'Signing in…' : 'Log In'}
                 </button>
               </form>
 
               <div className="mt-6 text-center">
                 <button
-                  onClick={() => setShowForgot(true)}
+                  onClick={() => {
+                    setShowForgot(true)
+                    setError('')
+                  }}
                   className="font-body text-sm text-brand-blue hover:text-brand-blue/80 focus-visible:outline-none focus-visible:underline transition-colors duration-200"
                 >
                   Forgot Password?
@@ -155,9 +185,10 @@ export default function MembersLogin() {
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+                    disabled={loading}
+                    className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200 disabled:opacity-60"
                   >
-                    Send Reset Link
+                    {loading ? 'Sending…' : 'Send Reset Link'}
                   </button>
                 </form>
               ) : (
@@ -179,6 +210,7 @@ export default function MembersLogin() {
                     setShowForgot(false)
                     setForgotSent(false)
                     setForgotEmail('')
+                    setError('')
                   }}
                   className="font-body text-sm text-brand-blue hover:text-brand-blue/80 focus-visible:outline-none focus-visible:underline transition-colors duration-200"
                 >

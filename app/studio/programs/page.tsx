@@ -418,8 +418,9 @@ export default function ProgramsPage() {
 
   // Hydrate from Supabase: user id, PRs, swaps
   useEffect(() => {
-    const id = getCurrentUserId()
-    if (!id) return
+    let active = true
+    void getCurrentUserId().then((id) => {
+    if (!active || !id) return
     setUserId(id)
 
     dbFetchPRs(id)
@@ -506,6 +507,10 @@ export default function ProgramsPage() {
         setView('workout')
       })
       .catch((err) => console.error('[In-progress workout] Failed to load:', err))
+    })
+    return () => {
+      active = false
+    }
   }, [])
 
   // Pre-match exercises for the selected day
