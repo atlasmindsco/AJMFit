@@ -34,22 +34,46 @@ export default function ClientPortalLayout({
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) {
+    let cancelled = false
+    // When returning from Stripe checkout, the webhook may land a moment after
+    // the redirect — poll briefly so we don't flash the paywall at a paid member.
+    const justSubscribed =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).has('subscribed')
+
+    ;(async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (cancelled) return
+      if (!user) {
         setGate('out')
         return
       }
-      const { data: u } = await supabase
-        .from('users')
-        .select('status')
-        .eq('auth_id', data.user.id)
-        .maybeSingle<{ status: string }>()
-      if (!u) {
-        setGate('out')
-        return
+      const attempts = justSubscribed ? 6 : 1
+      for (let i = 0; i < attempts; i++) {
+        const { data: u } = await supabase
+          .from('users')
+          .select('status')
+          .eq('auth_id', user.id)
+          .maybeSingle<{ status: string }>()
+        if (cancelled) return
+        if (!u) {
+          setGate('out')
+          return
+        }
+        if (u.status === 'active') {
+          setGate('in')
+          return
+        }
+        if (i < attempts - 1) await new Promise((r) => setTimeout(r, 1500))
       }
-      setGate(u.status === 'active' ? 'in' : 'paywall')
-    })
+      if (!cancelled) setGate('paywall')
+    })()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleSignOut = async () => {
