@@ -5,7 +5,7 @@ Source: ISSA CPT, Ch.9 — Acute variables: training volume & density. Send: Thu
 
 ---
 
-You can't manage what you don't measure. The ISSA cert gives you the number that matters most: **training volume**.
+You can't manage what you don't measure. Here's the number that matters most: **training volume**.
 
 Volume is the total work you do, and the formula is simple:
 

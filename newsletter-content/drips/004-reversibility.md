@@ -5,7 +5,7 @@ Source: ISSA CPT, Ch.9 — Principle of Reversibility & detraining. Send: Thursd
 
 ---
 
-The ISSA **principle of reversibility** is the one nobody wants to hear: you lose the effects of training after you stop. The cert calls the slide **detraining**, and it sets in after about **two weeks** off.
+The **principle of reversibility** is the one nobody wants to hear: you lose the effects of training after you stop. The slide is called **detraining**, and it sets in after about **two weeks** off.
 
 This is why the person who trains at 70% every single week quietly buries the one who goes 100% for ten days and then vanishes. Adaptation is a tenant, not an owner. Stop paying rent and it moves out.
 

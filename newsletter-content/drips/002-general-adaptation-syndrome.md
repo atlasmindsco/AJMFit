@@ -7,7 +7,7 @@ Source: ISSA CPT, Ch.9 — GAS & supercompensation. Send: Thursday.
 
 Last week: progressive overload. This week: why it takes patience.
 
-The ISSA cert teaches the **General Adaptation Syndrome (GAS)** — how your body responds to training stress in three stages:
+There's a model I lean on called the **General Adaptation Syndrome (GAS)** — how your body responds to training stress in three stages:
 
 - **Alarm** (first 2–3 weeks): fatigue, weakness, soreness. The early strength you gain here is mostly your nervous system learning the movement — not muscle yet.
 - **Resistance** (around 4–6 weeks): the real changes arrive — muscle size and strength.

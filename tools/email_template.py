@@ -29,7 +29,7 @@ _FONT_DISPLAY = "'Barlow Condensed', 'Arial Narrow', Arial, sans-serif"
 
 
 def render(content_html: str, *, preheader: str,
-           kicker: str = "The ISSA cert, one Thursday at a time") -> str:
+           kicker: str = "Train smarter, one Thursday at a time") -> str:
     """Wrap inner body HTML in the full branded email shell."""
     return f"""\
 <!DOCTYPE html>

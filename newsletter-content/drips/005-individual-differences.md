@@ -5,7 +5,7 @@ Source: ISSA CPT, Ch.9 — Principle of Individual Differences; Diminishing Retu
 
 ---
 
-Two ISSA principles, one lesson: stop copying.
+Two principles, one lesson: stop copying.
 
 **Individual differences** — there's no single way to train every person, because every person is unique. Age, history, recovery, schedule, injuries, starting point. The program that transformed your friend was built for *their* variables, not yours. Borrow the principles; don't xerox the plan.
 
