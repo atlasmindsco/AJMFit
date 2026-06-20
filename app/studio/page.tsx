@@ -1,8 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import MacroRing from '@/components/ui/MacroRing'
 import { fadeIn } from '@/lib/animations'
+import { createClient } from '@/lib/supabase/client'
 
 /* ── Stat cards ── */
 const stats = [
@@ -105,6 +107,20 @@ const forumPosts = [
 const spotlight = { name: 'Sarah W.', achievement: 'Lost 25 lbs!' }
 
 export default function ClientDashboard() {
+  const [firstName, setFirstName] = useState('')
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return
+      const { data: u } = await supabase
+        .from('users')
+        .select('name')
+        .eq('auth_id', data.user.id)
+        .maybeSingle<{ name: string | null }>()
+      if (u?.name) setFirstName(u.name.trim().split(/\s+/)[0])
+    })
+  }, [])
+
   /* Progress chart scaling */
   const chartW = 380
   const chartH = 180
@@ -121,6 +137,14 @@ export default function ClientDashboard() {
 
   return (
     <div>
+      {/* Greeting */}
+      <div className="mb-6">
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+          Welcome back{firstName ? `, ${firstName}` : ''}
+        </h1>
+        <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
+      </div>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         {stats.map((stat, i) => (

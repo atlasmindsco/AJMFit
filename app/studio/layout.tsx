@@ -27,6 +27,7 @@ export default function ClientPortalLayout({
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  const [clientName, setClientName] = useState('')
   // Auth is enforced in middleware; here we additionally gate on subscription
   // status: only an active (incl. trialing) member sees the studio. Others are
   // shown the paywall. 'out' is a graceful fallback if no session/record loads.
@@ -54,14 +55,15 @@ export default function ClientPortalLayout({
       for (let i = 0; i < attempts; i++) {
         const { data: u } = await supabase
           .from('users')
-          .select('status')
+          .select('status,name')
           .eq('auth_id', user.id)
-          .maybeSingle<{ status: string }>()
+          .maybeSingle<{ status: string; name: string | null }>()
         if (cancelled) return
         if (!u) {
           setGate('out')
           return
         }
+        if (u.name) setClientName(u.name)
         if (u.status === 'active') {
           setGate('in')
           return
@@ -81,6 +83,11 @@ export default function ClientPortalLayout({
     router.push('/members')
     router.refresh()
   }
+
+  const initials = clientName
+    ? clientName.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+    : ''
+  const firstName = clientName ? clientName.trim().split(/\s+/)[0] : ''
 
   // Avoid flashing the portal before we know status
   if (gate === 'checking') {
@@ -159,18 +166,27 @@ export default function ClientPortalLayout({
                 </svg>
               </button>
 
+              {/* Client identity */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
+                  <span className="text-white text-[10px] font-display font-bold">
+                    {initials || '·'}
+                  </span>
+                </div>
+                {firstName && (
+                  <span className="text-white/80 text-sm font-body hidden sm:block max-w-[140px] truncate">
+                    {firstName}
+                  </span>
+                )}
+              </div>
+
+              {/* Sign out */}
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2.5 group"
                 title="Sign out"
+                className="text-white/40 hover:text-white/80 transition-colors duration-200"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center">
-                  <span className="text-white text-[10px] font-display font-bold">AJ</span>
-                </div>
-                <span className="text-white/70 text-sm font-body hidden sm:block group-hover:text-white transition-colors duration-200">
-                  Sign out
-                </span>
-                <svg className="w-4 h-4 text-white/40 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                 </svg>
               </button>
