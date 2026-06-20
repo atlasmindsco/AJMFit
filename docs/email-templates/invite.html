@@ -1,0 +1,48 @@
+<!--
+  AJM FIT — Supabase "Invite user" email template.
+  Paste into: Supabase Dashboard → Authentication → Email Templates → "Invite user".
+  Subject: You're in — set up your AJM Fit account
+  Supabase variable used: {{ .ConfirmationURL }}
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f1420;padding:32px 0;font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:12px;overflow:hidden;">
+        <!-- Header -->
+        <tr>
+          <td style="background:#1B2D50;padding:24px 32px;" align="center">
+            <img src="https://ajmfit.com/AJMfit.png" width="44" height="44" alt="AJM Fit" style="display:block;margin:0 auto 8px;" />
+            <div style="color:#ffffff;font-size:14px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;">AJM FIT</div>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:36px 32px 16px;">
+            <p style="margin:0 0 6px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">Application approved</p>
+            <h1 style="margin:0 0 14px;color:#1B2D50;font-size:24px;font-weight:800;">You're in.</h1>
+            <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
+              Welcome to AJM Fit coaching. Set your password to access your training studio — your custom plan,
+              nutrition tracking, and direct line to Coach Anthony are waiting.
+            </p>
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#F76B16;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 28px;border-radius:8px;">
+              Set your password &amp; get started
+            </a>
+            <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;line-height:1.6;">
+              If the button doesn't work, copy this link into your browser:<br />
+              <a href="{{ .ConfirmationURL }}" style="color:#1A7BFF;word-break:break-all;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="padding:24px 32px 32px;border-top:1px solid #eef1f5;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6;">
+              You're receiving this because your AJM Fit application was approved. If this wasn't you, ignore this email.<br />
+              AJM Fit · Personal Training &amp; Coaching
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
