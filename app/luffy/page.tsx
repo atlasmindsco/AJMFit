@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchClients, tierLabel, relativeTime, type ClientRow } from '@/lib/admin'
+import { fetchFeedback, type Feedback } from '@/lib/feedback'
 
 interface Stats {
   activeClients: number
@@ -22,19 +23,22 @@ function getTierColor(tier: string) {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [clients, setClients] = useState<ClientRow[]>([])
+  const [feedback, setFeedback] = useState<Feedback[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const [s, c] = await Promise.all([
+        const [s, c, f] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
+          fetchFeedback().catch(() => []),
         ])
         if (!active) return
         setStats(s)
         setClients(c)
+        setFeedback(f)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -158,6 +162,28 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Beta feedback */}
+      <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+        <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
+          <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Beta Feedback</h2>
+          {feedback.length > 0 && <span className="text-xs text-white/30 font-body">{feedback.length}</span>}
+        </div>
+        <div className="p-4 space-y-2">
+          {feedback.length === 0 ? (
+            <p className="px-2 py-3 text-white/40 text-sm font-body">No feedback yet.</p>
+          ) : (
+            feedback.slice(0, 12).map((f) => (
+              <div key={f.id} className="p-3 rounded-lg bg-white/[0.02]">
+                <p className="text-white/80 text-sm font-body">{f.message}</p>
+                <p className="text-white/30 text-[11px] font-body mt-1">
+                  {f.name || 'Member'}{f.page ? ` · ${f.page}` : ''} · {new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </motion.div>
     </div>
   )
 }

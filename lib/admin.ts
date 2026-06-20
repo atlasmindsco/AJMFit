@@ -13,6 +13,7 @@ export interface ClientRow {
   email: string
   phone: string | null
   status: UserStatus
+  is_beta: boolean
   created_at: string
   application: {
     id: string
@@ -35,7 +36,7 @@ export interface ClientRow {
 export async function fetchClients(): Promise<ClientRow[]> {
   const { data: users, error } = await db
     .from('users')
-    .select('id, name, email, phone, status, created_at')
+    .select('id, name, email, phone, status, is_beta, created_at')
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -82,16 +83,22 @@ export async function fetchClients(): Promise<ClientRow[]> {
     if (!latestWorkout.has(w.user_id)) latestWorkout.set(w.user_id, w.started_at)
   }
 
-  return (users ?? []).map((u: { id: string; name: string; email: string; phone: string | null; status: UserStatus; created_at: string }) => ({
+  return (users ?? []).map((u: { id: string; name: string; email: string; phone: string | null; status: UserStatus; is_beta: boolean; created_at: string }) => ({
     id: u.id,
     name: u.name,
     email: u.email,
     phone: u.phone,
     status: u.status,
+    is_beta: u.is_beta ?? false,
     created_at: u.created_at,
     application: latestApp.get(u.id) ?? null,
     last_workout_at: latestWorkout.get(u.id) ?? null,
   }))
+}
+
+export async function setUserBeta(userId: string, isBeta: boolean) {
+  const { error } = await db.from('users').update({ is_beta: isBeta }).eq('id', userId)
+  if (error) throw error
 }
 
 export async function acceptApplication(applicationId: string, userId: string) {

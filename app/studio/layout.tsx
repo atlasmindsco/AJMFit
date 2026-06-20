@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import ChaedynChat from '@/components/chat/ChaedynChat'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MembershipPaywall from '@/components/studio/MembershipPaywall'
+import FeedbackButton from '@/components/studio/FeedbackButton'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
@@ -55,16 +56,17 @@ export default function ClientPortalLayout({
       for (let i = 0; i < attempts; i++) {
         const { data: u } = await supabase
           .from('users')
-          .select('status,name')
+          .select('status,name,is_beta')
           .eq('auth_id', user.id)
-          .maybeSingle<{ status: string; name: string | null }>()
+          .maybeSingle<{ status: string; name: string | null; is_beta: boolean }>()
         if (cancelled) return
         if (!u) {
           setGate('out')
           return
         }
         if (u.name) setClientName(u.name)
-        if (u.status === 'active') {
+        // Active members and beta testers get full access; beta bypasses payment.
+        if (u.status === 'active' || u.is_beta) {
           setGate('in')
           return
         }
@@ -233,6 +235,8 @@ export default function ClientPortalLayout({
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
+
+      <FeedbackButton />
 
       {/* Floating Chaedyn Chat Widget */}
       {chatOpen && (

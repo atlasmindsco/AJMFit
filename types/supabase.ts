@@ -6,6 +6,7 @@ export interface Database {
           id: string
           auth_id: string | null
           stripe_customer_id: string | null
+          is_beta: boolean
           name: string
           email: string
           phone: string | null
@@ -36,6 +37,7 @@ export interface Database {
           id?: string
           auth_id?: string | null
           stripe_customer_id?: string | null
+          is_beta?: boolean
           name?: string
           email?: string
           phone?: string | null

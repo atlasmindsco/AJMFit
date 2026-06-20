@@ -7,6 +7,7 @@ import {
   acceptApplication,
   inviteClient,
   declineApplication,
+  setUserBeta,
   tierLabel,
   relativeTime,
   type ClientRow,
@@ -206,6 +207,22 @@ export default function ClientsPage() {
                         </div>
                       ) : (
                         <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setProcessing(client.id)
+                              setUserBeta(client.id, !client.is_beta).then(loadClients).finally(() => setProcessing(null))
+                            }}
+                            disabled={processing === client.id}
+                            title="Beta testers get free studio access (no payment)"
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
+                              client.is_beta
+                                ? 'bg-[#F76B16]/15 border border-[#F76B16]/25 text-[#F76B16]'
+                                : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
+                            }`}
+                          >
+                            Beta {client.is_beta ? 'On' : 'Off'}
+                          </button>
                           <div className="hidden md:block text-right">
                             <p className="text-white/30 text-[10px] font-display uppercase tracking-wide">Last Workout</p>
                             <p className="text-white/60 text-xs font-body mt-1">{relativeTime(client.last_workout_at)}</p>
