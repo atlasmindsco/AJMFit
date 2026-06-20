@@ -1,379 +1,175 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
-import { fadeIn } from '@/lib/animations'
+import { useEffect, useState, useCallback } from 'react'
+import { getCurrentUserId } from '@/lib/current-user'
+import { createClient } from '@/lib/supabase/client'
+import {
+  fetchPosts, createPost, fetchComments, addComment, fetchEvents, fetchLeaderboard,
+  POST_CATEGORIES, timeAgo,
+  type Post, type Comment, type CommunityEvent, type LeaderRow,
+} from '@/lib/community'
 
-/* ── Forum Categories ── */
-const categories = [
-  { name: 'All', count: 24 },
-  { name: 'Training', count: 8 },
-  { name: 'Nutrition', count: 6 },
-  { name: 'Motivation', count: 5 },
-  { name: 'Form Checks', count: 3 },
-  { name: 'Wins', count: 2 },
-]
-
-/* ── Forum Posts ── */
-const forumPosts = [
-  {
-    id: 1,
-    title: 'Tips for Meal Prepping on a Budget',
-    author: 'Sarah W.',
-    avatar: 'SW',
-    category: 'Nutrition',
-    time: '15 min ago',
-    replies: 12,
-    likes: 8,
-    pinned: true,
-    preview: 'I\'ve been batch cooking on Sundays and it\'s been a game changer. Here\'s what I do...',
-  },
-  {
-    id: 2,
-    title: 'Motivation Monday — Share Your Wins!',
-    author: 'Anthony M.',
-    avatar: 'AM',
-    category: 'Motivation',
-    time: '1 hour ago',
-    replies: 18,
-    likes: 24,
-    pinned: true,
-    preview: 'Drop your wins from last week below. No win is too small. Let\'s celebrate the grind.',
-    isCoach: true,
-  },
-  {
-    id: 3,
-    title: 'Form Check: Barbell Squat',
-    author: 'Marcus J.',
-    avatar: 'MJ',
-    category: 'Form Checks',
-    time: '3 hours ago',
-    replies: 5,
-    likes: 3,
-    pinned: false,
-    preview: 'Can someone check my squat form? I feel like I\'m leaning too far forward at the bottom.',
-  },
-  {
-    id: 4,
-    title: 'Best Pre-Workout Snacks?',
-    author: 'David R.',
-    avatar: 'DR',
-    category: 'Nutrition',
-    time: '5 hours ago',
-    replies: 9,
-    likes: 6,
-    pinned: false,
-    preview: 'What do y\'all eat before training? I need something quick that won\'t sit heavy.',
-  },
-  {
-    id: 5,
-    title: 'Hit my first 225 bench!',
-    author: 'Tanya B.',
-    avatar: 'TB',
-    category: 'Wins',
-    time: '8 hours ago',
-    replies: 14,
-    likes: 31,
-    pinned: false,
-    preview: 'Been working toward this for months. Finally got 225 for a clean single. Coach Anthony\'s programming is legit.',
-  },
-  {
-    id: 6,
-    title: 'How to Stay Consistent When Motivation Drops',
-    author: 'Chris O.',
-    avatar: 'CO',
-    category: 'Motivation',
-    time: '1 day ago',
-    replies: 7,
-    likes: 11,
-    pinned: false,
-    preview: 'I\'ve been struggling to stay on track lately. Anyone else go through phases like this?',
-  },
-  {
-    id: 7,
-    title: 'Programming Update: Phase 2 Starts Next Week',
-    author: 'Anthony M.',
-    avatar: 'AM',
-    category: 'Training',
-    time: '2 days ago',
-    replies: 6,
-    likes: 15,
-    pinned: false,
-    preview: 'For those on the Muscle Builder program, Phase 2 (Hypertrophy) kicks off Monday. Here\'s what to expect...',
-    isCoach: true,
-  },
-]
-
-/* ── Member Spotlights ── */
-const spotlights = [
-  { name: 'Sarah W.', avatar: 'SW', achievement: 'Lost 25 lbs in 3 months', stat: '-25 lbs' },
-  { name: 'Marcus J.', avatar: 'MJ', achievement: 'Bench PR: 225 lbs', stat: '225 lb PR' },
-  { name: 'Tanya B.', avatar: 'TB', achievement: 'Perfect attendance — 12 weeks', stat: '12 weeks' },
-]
-
-/* ── Leaderboard ── */
-const leaderboard = [
-  { name: 'Tanya B.', points: 1240, streak: 15 },
-  { name: 'Sarah W.', points: 1180, streak: 12 },
-  { name: 'Marcus J.', points: 1050, streak: 10 },
-  { name: 'David R.', points: 890, streak: 7 },
-  { name: 'Chris O.', points: 720, streak: 4 },
-]
-
-/* ── Upcoming Events ── */
-const events = [
-  { name: 'Live Q&A with Coach Anthony', date: 'Sat, Mar 29', time: '10:00 AM EST', type: 'Live' },
-  { name: 'Group Accountability Check-in', date: 'Mon, Mar 31', time: '7:00 PM EST', type: 'Zoom' },
-  { name: 'Monthly Challenge: 10K Steps/Day', date: 'Apr 1 - Apr 30', time: 'All Month', type: 'Challenge' },
-]
+function initials(name: string) {
+  return name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?'
+}
 
 export default function CommunityPage() {
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [posts, setPosts] = useState<Post[]>([])
+  const [events, setEvents] = useState<CommunityEvent[]>([])
+  const [leaders, setLeaders] = useState<LeaderRow[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredPosts = activeCategory === 'All'
-    ? forumPosts
-    : forumPosts.filter(p => p.category === activeCategory)
+  const [showNew, setShowNew] = useState(false)
+  const [draft, setDraft] = useState({ category: POST_CATEGORIES[0], title: '', body: '' })
+  const [posting, setPosting] = useState(false)
+
+  const [openPost, setOpenPost] = useState<string | null>(null)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [commentText, setCommentText] = useState('')
+
+  const loadPosts = useCallback(async () => setPosts(await fetchPosts()), [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        const { data: u } = await supabase.from('users').select('id, name').eq('auth_id', data.user.id).maybeSingle<{ id: string; name: string }>()
+        if (u) { setUserId(u.id); setName(u.name) }
+      }
+    })
+    Promise.all([loadPosts(), fetchEvents().then(setEvents), fetchLeaderboard().then(setLeaders)]).finally(() => setLoading(false))
+  }, [loadPosts])
+
+  const submitPost = async () => {
+    if (!userId || !draft.title.trim()) return
+    setPosting(true)
+    try {
+      await createPost(userId, name || 'Member', { category: draft.category, title: draft.title.trim(), body: draft.body.trim() })
+      setDraft({ category: POST_CATEGORIES[0], title: '', body: '' })
+      setShowNew(false)
+      await loadPosts()
+    } catch (e) { console.error(e) } finally { setPosting(false) }
+  }
+
+  const toggleComments = async (postId: string) => {
+    if (openPost === postId) { setOpenPost(null); return }
+    setOpenPost(postId)
+    setComments(await fetchComments(postId))
+  }
+
+  const submitComment = async (postId: string) => {
+    if (!userId || !commentText.trim()) return
+    await addComment(postId, userId, name || 'Member', commentText.trim())
+    setCommentText('')
+    setComments(await fetchComments(postId))
+    await loadPosts()
+  }
 
   return (
     <div>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT: Forum Posts */}
-        <div className="lg:col-span-8 space-y-4">
-          {/* Category Filter */}
-          <motion.div
-            custom={0}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06] px-5 py-4"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">
-                Community
-              </h1>
-              <button className="px-4 py-2 bg-[#1A7BFF] text-white text-xs font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200">
-                New Post
-              </button>
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {categories.map((cat) => (
-                <button
-                  key={cat.name}
-                  onClick={() => setActiveCategory(cat.name)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 ${
-                    activeCategory === cat.name
-                      ? 'bg-[#1A7BFF] text-white'
-                      : 'bg-[#FAFBFD] text-[#64748B] hover:text-[#1B2D50] border border-[#1B2D50]/[0.06]'
-                  }`}
-                >
-                  {cat.name} ({cat.count})
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Posts */}
-          <div className="space-y-3">
-            {filteredPosts.map((post, i) => (
-              <motion.div
-                key={post.id}
-                custom={i + 1}
-                variants={fadeIn}
-                initial="hidden"
-                animate="visible"
-                className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-5 hover:border-[#1A7BFF]/20 transition-colors duration-200 cursor-pointer"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                    post.isCoach
-                      ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
-                      : 'bg-[#1A7BFF]/10'
-                  }`}>
-                    <span className={`text-xs font-display font-bold ${
-                      post.isCoach ? 'text-white' : 'text-[#1A7BFF]'
-                    }`}>{post.avatar}</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      {post.pinned && (
-                        <span className="text-[#F76B16] text-[10px] font-display font-bold bg-[#F76B16]/10 px-2 py-0.5 rounded">
-                          PINNED
-                        </span>
-                      )}
-                      <span className="text-[#1A7BFF] text-[10px] font-display font-bold bg-[#1A7BFF]/10 px-2 py-0.5 rounded">
-                        {post.category}
-                      </span>
-                      {post.isCoach && (
-                        <span className="text-[#F76B16] text-[10px] font-display font-bold">
-                          COACH
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-body font-semibold text-[#1B2D50] text-sm mb-1">
-                      {post.title}
-                    </h3>
-                    <p className="text-[#64748B] text-xs font-body line-clamp-2 mb-2">
-                      {post.preview}
-                    </p>
-                    <div className="flex items-center gap-4 text-[10px] font-body text-[#64748B]">
-                      <span>{post.author}</span>
-                      <span>{post.time}</span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-                        </svg>
-                        {post.replies}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                        </svg>
-                        {post.likes}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">Community</h1>
+          <p className="text-white/40 text-sm font-body mt-1">Share wins, ask questions, stay accountable.</p>
         </div>
+        <button onClick={() => setShowNew((v) => !v)} className="px-5 py-2.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200">
+          {showNew ? 'Close' : 'New Post'}
+        </button>
+      </div>
 
-        {/* RIGHT: Spotlights, Leaderboard, Events */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* Member Spotlight */}
-          <motion.div
-            custom={1}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Member Spotlight</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Feed */}
+        <div className="lg:col-span-2 space-y-4">
+          {showNew && (
+            <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-5">
+              <div className="flex gap-2 mb-3 flex-wrap">
+                {POST_CATEGORIES.map((c) => (
+                  <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-md text-[11px] font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40'}`}>{c}</button>
+                ))}
+              </div>
+              <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white font-body mb-2 focus:outline-none focus:border-[#F76B16]/40" />
+              <textarea value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} rows={3} placeholder="Share something…" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white font-body resize-none focus:outline-none focus:border-[#F76B16]/40" />
+              <div className="flex justify-end mt-3">
+                <button onClick={submitPost} disabled={posting || !draft.title.trim()} className="px-5 py-2 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg disabled:opacity-40">{posting ? 'Posting…' : 'Post'}</button>
+              </div>
             </div>
-            <div className="p-5 space-y-4">
-              {spotlights.map((member) => (
-                <div key={member.name} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
-                    <span className="text-white text-[10px] font-display font-bold">{member.avatar}</span>
+          )}
+
+          {loading ? (
+            <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" /></div>
+          ) : posts.length === 0 ? (
+            <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-8 text-center">
+              <p className="text-white font-display font-bold text-sm">No posts yet</p>
+              <p className="text-white/40 text-sm font-body mt-1">Be the first to share a win or ask a question.</p>
+            </div>
+          ) : (
+            posts.map((p, i) => (
+              <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
+                    <span className="text-white text-[10px] font-display font-bold">{initials(p.author_name ?? 'Member')}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-body font-semibold text-[#1B2D50] text-sm">{member.name}</p>
-                    <p className="text-[#64748B] text-xs font-body truncate">{member.achievement}</p>
+                    <p className="text-white text-sm font-body font-semibold">{p.author_name ?? 'Member'}</p>
+                    <p className="text-white/30 text-[11px] font-body">{p.category} · {timeAgo(p.created_at)}</p>
                   </div>
-                  <span className="bg-[#F76B16]/10 text-[#F76B16] text-[10px] font-display font-bold px-2 py-1 rounded shrink-0">
-                    {member.stat}
-                  </span>
+                  {p.pinned && <span className="text-[#F76B16] text-[10px] font-display font-bold uppercase">Pinned</span>}
                 </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Leaderboard */}
-          <motion.div
-            custom={2}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Leaderboard</h2>
-            </div>
-            <div className="p-5 space-y-3">
-              {leaderboard.map((member, i) => (
-                <div key={member.name} className="flex items-center gap-3">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-display font-bold ${
-                    i === 0 ? 'bg-[#F76B16] text-white' :
-                    i === 1 ? 'bg-[#94A3B8] text-white' :
-                    i === 2 ? 'bg-[#B87333] text-white' :
-                    'bg-[#FAFBFD] text-[#64748B] border border-[#1B2D50]/[0.06]'
-                  }`}>
-                    {i + 1}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-body font-semibold text-[#1B2D50] text-sm">{member.name}</p>
-                    <p className="text-[#64748B] text-[10px] font-body">{member.streak} day streak</p>
-                  </div>
-                  <span className="font-display font-bold text-[#1B2D50] text-sm">{member.points.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Upcoming Events */}
-          <motion.div
-            custom={3}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Upcoming Events</h2>
-            </div>
-            <div className="p-5 space-y-4">
-              {events.map((event) => (
-                <div key={event.name} className="flex items-start gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-display font-bold ${
-                    event.type === 'Live' ? 'bg-red-500/10 text-red-500' :
-                    event.type === 'Zoom' ? 'bg-[#1A7BFF]/10 text-[#1A7BFF]' :
-                    'bg-[#F76B16]/10 text-[#F76B16]'
-                  }`}>
-                    {event.type === 'Live' ? (
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="4" />
-                      </svg>
-                    ) : event.type === 'Zoom' ? (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.996.462-1.688 1.422-1.897 2.53l-.016.085a.737.737 0 0 0 .543.838 3.72 3.72 0 0 0 2.073.047.738.738 0 0 0 .519-.67 2.098 2.098 0 0 1 .417-1.078" />
-                      </svg>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-body font-semibold text-[#1B2D50] text-sm">{event.name}</p>
-                    <p className="text-[#64748B] text-xs font-body">{event.date} &middot; {event.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            custom={4}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-white rounded-xl border border-[#1B2D50]/[0.06]"
-          >
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Quick Links</h2>
-            </div>
-            <div className="p-5 space-y-2">
-              {[
-                { label: 'Community Guidelines', icon: '📋' },
-                { label: 'Submit a Form Check', icon: '📹' },
-                { label: 'Recipe Database', icon: '🍽️' },
-                { label: 'Progress Photo Gallery', icon: '📸' },
-              ].map((link) => (
-                <button
-                  key={link.label}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-[#1B2D50] hover:bg-[#FAFBFD] transition-colors duration-200 text-left"
-                >
-                  <span>{link.icon}</span>
-                  <span className="font-medium">{link.label}</span>
-                  <svg className="w-3.5 h-3.5 text-[#64748B] ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                  </svg>
+                <h3 className="text-white font-display font-bold text-sm">{p.title}</h3>
+                {p.body && <p className="text-white/60 text-sm font-body mt-1 leading-relaxed whitespace-pre-wrap">{p.body}</p>}
+                <button onClick={() => toggleComments(p.id)} className="mt-3 text-white/40 text-xs font-body hover:text-white/70">
+                  {p.commentCount ? `${p.commentCount} comment${p.commentCount === 1 ? '' : 's'}` : 'Comment'} {openPost === p.id ? '▲' : '▼'}
                 </button>
-              ))}
+                {openPost === p.id && (
+                  <div className="mt-3 pt-3 border-t border-white/[0.06] space-y-3">
+                    {comments.map((c) => (
+                      <div key={c.id} className="flex gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-display font-bold">{initials(c.author_name ?? 'M')}</span></div>
+                        <div className="flex-1"><p className="text-white/80 text-xs font-body"><span className="font-semibold text-white">{c.author_name ?? 'Member'}</span> · {timeAgo(c.created_at)}</p><p className="text-white/60 text-sm font-body">{c.body}</p></div>
+                      </div>
+                    ))}
+                    <div className="flex gap-2">
+                      <input value={commentText} onChange={(e) => setCommentText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitComment(p.id) }} placeholder="Write a comment…" className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white font-body focus:outline-none focus:border-[#F76B16]/40" />
+                      <button onClick={() => submitComment(p.id)} disabled={!commentText.trim()} className="px-3 py-2 bg-[#1A7BFF] text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">Send</button>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            ))
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-4">
+          <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Upcoming Events</h2></div>
+            <div className="p-4 space-y-3">
+              {events.length === 0 ? <p className="text-white/40 text-sm font-body">No events scheduled.</p>
+                : events.map((e) => (
+                  <div key={e.id}>
+                    <p className="text-white text-sm font-body font-semibold">{e.title}</p>
+                    <p className="text-white/40 text-xs font-body">{e.type ? `${e.type} · ` : ''}{new Date(e.starts_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
+                  </div>
+                ))}
             </div>
-          </motion.div>
+          </div>
+
+          <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Leaderboard</h2><p className="text-white/30 text-[10px] font-body">Workouts this month</p></div>
+            <div className="p-4 space-y-2">
+              {leaders.length === 0 ? <p className="text-white/40 text-sm font-body">No workouts logged yet this month.</p>
+                : leaders.map((l, i) => (
+                  <div key={l.name + i} className="flex items-center gap-3">
+                    <span className={`w-5 text-center text-xs font-display font-bold ${i === 0 ? 'text-[#F76B16]' : 'text-white/30'}`}>{i + 1}</span>
+                    <span className="flex-1 text-white/80 text-sm font-body truncate">{l.name}</span>
+                    <span className="text-white/50 text-xs font-body">{l.workouts}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
