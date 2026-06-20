@@ -5,6 +5,7 @@ export interface Database {
         Row: {
           id: string
           auth_id: string | null
+          stripe_customer_id: string | null
           name: string
           email: string
           phone: string | null
@@ -19,6 +20,7 @@ export interface Database {
         Insert: {
           id?: string
           auth_id?: string | null
+          stripe_customer_id?: string | null
           name: string
           email: string
           phone?: string | null
@@ -33,6 +35,7 @@ export interface Database {
         Update: {
           id?: string
           auth_id?: string | null
+          stripe_customer_id?: string | null
           name?: string
           email?: string
           phone?: string | null

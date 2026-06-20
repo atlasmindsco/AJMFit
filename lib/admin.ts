@@ -102,9 +102,11 @@ export async function acceptApplication(applicationId: string, userId: string) {
     .eq('id', applicationId)
   if (appErr) throw appErr
 
+  // Keep the user 'pending' until they start their subscription — the Stripe
+  // webhook flips them to 'active' on payment/trial start.
   const { error: userErr } = await db
     .from('users')
-    .update({ status: 'active' })
+    .update({ status: 'pending' })
     .eq('id', userId)
   if (userErr) throw userErr
 }

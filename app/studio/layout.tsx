@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import ChaedynChat from '@/components/chat/ChaedynChat'
 import ResumeSession from '@/components/studio/ResumeSession'
+import MembershipBanner from '@/components/studio/MembershipBanner'
 import { getCurrentUserId, signOut } from '@/lib/current-user'
 
 const navTabs = [
@@ -167,6 +168,7 @@ export default function ClientPortalLayout({
 
       {/* Page content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <MembershipBanner />
         {children}
       </main>
 
