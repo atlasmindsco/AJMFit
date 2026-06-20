@@ -6,8 +6,9 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import ChaedynChat from '@/components/chat/ChaedynChat'
 import ResumeSession from '@/components/studio/ResumeSession'
-import MembershipBanner from '@/components/studio/MembershipBanner'
-import { getCurrentUserId, signOut } from '@/lib/current-user'
+import MembershipPaywall from '@/components/studio/MembershipPaywall'
+import { signOut } from '@/lib/current-user'
+import { createClient } from '@/lib/supabase/client'
 
 const navTabs = [
   { label: 'Dashboard', href: '/studio' },
@@ -26,12 +27,29 @@ export default function ClientPortalLayout({
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
-  // Access is enforced server-side in middleware; this is a graceful fallback
-  // only for a client render path that somehow loads without a session.
-  const [authState, setAuthState] = useState<'checking' | 'in' | 'out'>('checking')
+  // Auth is enforced in middleware; here we additionally gate on subscription
+  // status: only an active (incl. trialing) member sees the studio. Others are
+  // shown the paywall. 'out' is a graceful fallback if no session/record loads.
+  const [gate, setGate] = useState<'checking' | 'out' | 'paywall' | 'in'>('checking')
 
   useEffect(() => {
-    getCurrentUserId().then((id) => setAuthState(id ? 'in' : 'out'))
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) {
+        setGate('out')
+        return
+      }
+      const { data: u } = await supabase
+        .from('users')
+        .select('status')
+        .eq('auth_id', data.user.id)
+        .maybeSingle<{ status: string }>()
+      if (!u) {
+        setGate('out')
+        return
+      }
+      setGate(u.status === 'active' ? 'in' : 'paywall')
+    })
   }, [])
 
   const handleSignOut = async () => {
@@ -40,8 +58,8 @@ export default function ClientPortalLayout({
     router.refresh()
   }
 
-  // Avoid flashing the portal before we know auth status
-  if (authState === 'checking') {
+  // Avoid flashing the portal before we know status
+  if (gate === 'checking') {
     return (
       <div className="min-h-screen bg-[#111] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
@@ -49,8 +67,13 @@ export default function ClientPortalLayout({
     )
   }
 
+  // Approved but not yet subscribed → paywall.
+  if (gate === 'paywall') {
+    return <MembershipPaywall />
+  }
+
   // Fallback prompt (middleware should have redirected already)
-  if (authState === 'out') {
+  if (gate === 'out') {
     return (
       <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center px-4">
         <div className="flex items-center gap-2.5 mb-8">
@@ -168,7 +191,6 @@ export default function ClientPortalLayout({
 
       {/* Page content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <MembershipBanner />
         {children}
       </main>
 
