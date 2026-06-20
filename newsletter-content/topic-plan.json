@@ -1,0 +1,4621 @@
+{
+  "topics": [
+    {
+      "term": "Personal trainer",
+      "slug": "personal-trainer",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 4,
+      "excerpt": "A person who instructs and prescribes exercise.",
+      "status": "idea"
+    },
+    {
+      "term": "Physical therapist",
+      "slug": "physical-therapist",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 4,
+      "excerpt": "A licensed health-care professional who helps patients reduce pain, improve mobility, and enhance movement patterns.",
+      "status": "idea"
+    },
+    {
+      "term": "Rotator cuff",
+      "slug": "rotator-cuff",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 4,
+      "excerpt": "A group of tendons and four muscles that attach the upper arm to the shoulder blade.",
+      "status": "drafted"
+    },
+    {
+      "term": "Risk factor",
+      "slug": "risk-factor",
+      "theme": "Assessment & Safety",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "Any physical, psychological, or environmental factor that can increase a person’s likelihood of developing an injury or disease.",
+      "status": "drafted"
+    },
+    {
+      "term": "Posture",
+      "slug": "posture",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "The position of a person’s body while standing, sitting, or moving.",
+      "status": "drafted"
+    },
+    {
+      "term": "Forward head posture",
+      "slug": "forward-head-posture",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "An anterior positioning of the cervical spine.",
+      "status": "drafted"
+    },
+    {
+      "term": "Vital capacity",
+      "slug": "vital-capacity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "The maximum amount of air that can be exhaled after a maximum inhalation.",
+      "status": "drafted"
+    },
+    {
+      "term": "Thoracic kyphosis",
+      "slug": "thoracic-kyphosis",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "An abnormal forward curvature of the thoracic spine.",
+      "status": "drafted"
+    },
+    {
+      "term": "Mortality rate",
+      "slug": "mortality-rate",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "The number of deaths within a specific population of people.",
+      "status": "drafted"
+    },
+    {
+      "term": "Intervertebral disc",
+      "slug": "intervertebral-disc",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "The shock-absorbing, gel-filled structure between each vertebra.",
+      "status": "drafted"
+    },
+    {
+      "term": "High-intensity exercise",
+      "slug": "high-intensity-exercise",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 5,
+      "excerpt": "A form of exercise that requires a large percentage of a person’s physical power.",
+      "status": "drafted"
+    },
+    {
+      "term": "Powerlifting",
+      "slug": "powerlifting",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "A strength sport that requires a person to lift the largest load possible for one repetition in the squat, deadlift, and bench press.",
+      "status": "drafted"
+    },
+    {
+      "term": "Movement",
+      "slug": "movement",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "A physical motion occurring at one or more joints that is influenced by mobility, stability, posture, and motor control.",
+      "status": "drafted"
+    },
+    {
+      "term": "Olympic lifts",
+      "slug": "olympic-lifts",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "The snatch and the clean and jerk.",
+      "status": "drafted"
+    },
+    {
+      "term": "Strength",
+      "slug": "strength",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "The maximal force that a muscle or muscle group can generate.",
+      "status": "drafted"
+    },
+    {
+      "term": "Mobility",
+      "slug": "mobility",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "The ability to move freely through a normal range of motion using minimal effort.",
+      "status": "drafted"
+    },
+    {
+      "term": "Motor control",
+      "slug": "motor-control",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "The process of activating and coordinating muscles during movement.",
+      "status": "drafted"
+    },
+    {
+      "term": "Physiatrist",
+      "slug": "physiatrist",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "A physician who specializes in restoring normal function to the bones, muscle, and nervous system.",
+      "status": "drafted"
+    },
+    {
+      "term": "Chiropractor",
+      "slug": "chiropractor",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "A licensed clinician trained to restore interactions between the spine and nervous system.",
+      "status": "idea"
+    },
+    {
+      "term": "Medical doctor",
+      "slug": "medical-doctor",
+      "theme": "Assessment & Safety",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 6,
+      "excerpt": "A physician who specializes in treating disease and injury with medicine.",
+      "status": "drafted"
+    },
+    {
+      "term": "Movement dysfunction",
+      "slug": "movement-dysfunction",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 9,
+      "excerpt": "The faulty execution of an exercise or multiple-joint movement due to a lack of mobility, stability, posture, and/or motor control.",
+      "status": "drafted"
+    },
+    {
+      "term": "Muscle imbalance",
+      "slug": "muscle-imbalance",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 9,
+      "excerpt": "When one muscle is stronger and/or stiffer than is the muscle that opposes its actions.",
+      "status": "drafted"
+    },
+    {
+      "term": "Durable body",
+      "slug": "durable-body",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 12,
+      "excerpt": "A body that is able to withstand wear or damage.",
+      "status": "drafted"
+    },
+    {
+      "term": "Soft tissue mobilization",
+      "slug": "soft-tissue-mobilization",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 14,
+      "excerpt": "The act of removing restrictions from muscles and connective tissues.",
+      "status": "drafted"
+    },
+    {
+      "term": "Athletic trainer",
+      "slug": "athletic-trainer",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 14,
+      "excerpt": "A health- care professional trained to help prevent and treat physical injuries.",
+      "status": "drafted"
+    },
+    {
+      "term": "Motor program",
+      "slug": "motor-program",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 14,
+      "excerpt": "A relatively automatic movement pattern produced by the nervous system.",
+      "status": "drafted"
+    },
+    {
+      "term": "Synapse",
+      "slug": "synapse",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 16,
+      "excerpt": "The area of communication between two neurons or between a neuron and muscle.",
+      "status": "drafted"
+    },
+    {
+      "term": "Nervous system",
+      "slug": "nervous-system",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 16,
+      "excerpt": "The brain, spinal cord, and associated nerves.",
+      "status": "idea"
+    },
+    {
+      "term": "Empirical evidence",
+      "slug": "empirical-evidence",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 16,
+      "excerpt": "The knowledge a person acquires through observation and experience.",
+      "status": "idea"
+    },
+    {
+      "term": "Functional movement",
+      "slug": "functional-movement",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 16,
+      "excerpt": "A movement that is useful for its intended purpose.",
+      "status": "idea"
+    },
+    {
+      "term": "Quality of life",
+      "slug": "quality-of-life",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 16,
+      "excerpt": "The general well-being of an individual.",
+      "status": "idea"
+    },
+    {
+      "term": "Structure/support",
+      "slug": "structure-support",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 19,
+      "excerpt": "The skeleton provides the structure and support we need for movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Protection",
+      "slug": "protection",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 19,
+      "excerpt": "Our essential organs such as the brain, spinal cord, heart and lungs are protected by the skeleton.",
+      "status": "idea"
+    },
+    {
+      "term": "Calcium storehouse",
+      "slug": "calcium-storehouse",
+      "theme": "Nutrition & Fuel",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 19,
+      "excerpt": "Calcium and other minerals are stored within bone.",
+      "status": "drafted"
+    },
+    {
+      "term": "Organ system",
+      "slug": "organ-system",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 20,
+      "excerpt": "A group of organs and tissues working together to perform specific functions.",
+      "status": "idea"
+    },
+    {
+      "term": "Axial skeleton",
+      "slug": "axial-skeleton",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 20,
+      "excerpt": "The bones of the skull, vertebral column, sternum, ribcage and sacrum.",
+      "status": "idea"
+    },
+    {
+      "term": "Appendicular skeleton",
+      "slug": "appendicular-skeleton",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 20,
+      "excerpt": "The bones of the upper and lower extremities.",
+      "status": "idea"
+    },
+    {
+      "term": "Ossification",
+      "slug": "ossification",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 22,
+      "excerpt": "The hardening process of bones during development.",
+      "status": "idea"
+    },
+    {
+      "term": "Epiphyseal plate",
+      "slug": "epiphyseal-plate",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 23,
+      "excerpt": "The location of bone growth near the end of immature bones.",
+      "status": "idea"
+    },
+    {
+      "term": "Epiphyseal line",
+      "slug": "epiphyseal-line",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 23,
+      "excerpt": "A line of cartilage near the end of mature long bones.",
+      "status": "idea"
+    },
+    {
+      "term": "Stress fracture",
+      "slug": "stress-fracture",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 25,
+      "excerpt": "A thin bone crack due to an accumulation of microdamage.",
+      "status": "drafted"
+    },
+    {
+      "term": "Remodeling",
+      "slug": "remodeling",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 25,
+      "excerpt": "When a bone changes shape either by increasing or decreasing its diameter.",
+      "status": "idea"
+    },
+    {
+      "term": "Law",
+      "slug": "law",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 25,
+      "excerpt": "A theory developed by German surgeon, Julis Wolff, which states that bone will adapt to the loads placed upon it.",
+      "status": "drafted"
+    },
+    {
+      "term": "Osteocytes",
+      "slug": "osteocytes",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 25,
+      "excerpt": "Mature bone cells that maintain a bone’s matrix.",
+      "status": "idea"
+    },
+    {
+      "term": "Periosteum",
+      "slug": "periosteum",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "The outer covering of bone where osteoblasts are located.",
+      "status": "idea"
+    },
+    {
+      "term": "Endosteum",
+      "slug": "endosteum",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "Connective tissue that covers the inside of bone and medullary cavity.",
+      "status": "idea"
+    },
+    {
+      "term": "Medullary cavity",
+      "slug": "medullary-cavity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "Central cavity of the bone shaft where marrow is stored.",
+      "status": "idea"
+    },
+    {
+      "term": "Compact bone",
+      "slug": "compact-bone",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "Hard outer layer of dense bone tissue.",
+      "status": "idea"
+    },
+    {
+      "term": "Spongy bone",
+      "slug": "spongy-bone",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "Porous, light inner layer of bone tissue.",
+      "status": "idea"
+    },
+    {
+      "term": "Osteoporosis",
+      "slug": "osteoporosis",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "Bone disease characterized by a loss in bone mass and density.",
+      "status": "drafted"
+    },
+    {
+      "term": "Bony protrusion",
+      "slug": "bony-protrusion",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 27,
+      "excerpt": "An eminence on the surface of bones that increase strength and contact area for muscle attachments.",
+      "status": "idea"
+    },
+    {
+      "term": "Osteoarthritis",
+      "slug": "osteoarthritis",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 29,
+      "excerpt": "Bone-on-bone contact that results in joint pain and stiffness due to a loss of articular cartilage.",
+      "status": "idea"
+    },
+    {
+      "term": "Hyaline cartilage",
+      "slug": "hyaline-cartilage",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 30,
+      "excerpt": "This deform- able but elastic type of cartilage is the most widespread form in the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Fibrocartilage",
+      "slug": "fibrocartilage",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 30,
+      "excerpt": "This tough tissue is located in the interverte- bral discs and at the insertions of tendons and ligaments.",
+      "status": "idea"
+    },
+    {
+      "term": "Elastic cartilage",
+      "slug": "elastic-cartilage",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 30,
+      "excerpt": "As the name implies, this is the most pliable form of cartilage.",
+      "status": "idea"
+    },
+    {
+      "term": "Extrinsic ligament",
+      "slug": "extrinsic-ligament",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 33,
+      "excerpt": "This type of ligament is located on the outside of the joint.",
+      "status": "idea"
+    },
+    {
+      "term": "Intrinsic ligament",
+      "slug": "intrinsic-ligament",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 33,
+      "excerpt": "This ligament is located inside the joint.",
+      "status": "idea"
+    },
+    {
+      "term": "Capsular ligament",
+      "slug": "capsular-ligament",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 33,
+      "excerpt": "This type of ligament is continuous with the joint capsule.",
+      "status": "idea"
+    },
+    {
+      "term": "Elastin",
+      "slug": "elastin",
+      "theme": "Nutrition & Fuel",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 33,
+      "excerpt": "An elastic protein found in connective tissue that gives the tissue extensibility.",
+      "status": "drafted"
+    },
+    {
+      "term": "Varus",
+      "slug": "varus",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 33,
+      "excerpt": "An abnormal joint movement away from the midline of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Joint capsule",
+      "slug": "joint-capsule",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "A thin, strong layer of connective tissue that contains synovial fluid in freely moving joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Valgus",
+      "slug": "valgus",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "An abnormal joint movement toward the midline of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Synovial membrane",
+      "slug": "synovial-membrane",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "A thin layer of connective tissue beneath the joint capsule that makes a lubricating fluid.",
+      "status": "idea"
+    },
+    {
+      "term": "Creep",
+      "slug": "creep",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "A temporary deformation of connective tissue.",
+      "status": "drafted"
+    },
+    {
+      "term": "Laxity",
+      "slug": "laxity",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "A permanent deformation of connective tissue caused by excessive stretching.",
+      "status": "idea"
+    },
+    {
+      "term": "Tear",
+      "slug": "tear",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 34,
+      "excerpt": "A partial or complete separation of a tissue due to a stretch beyond its structural capacity.",
+      "status": "idea"
+    },
+    {
+      "term": "Cardiac muscle",
+      "slug": "cardiac-muscle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 41,
+      "excerpt": "A type of muscle tissue found only in the heart, responsible for pumping blood throughout the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Smooth muscle",
+      "slug": "smooth-muscle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 42,
+      "excerpt": "A type of muscle tissue that moves internal organs, such as the bowels, and vessels, such as the artery walls.",
+      "status": "idea"
+    },
+    {
+      "term": "Skeletal muscle",
+      "slug": "skeletal-muscle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 42,
+      "excerpt": "The contractile tissue that produces force in the human body.",
+      "status": "idea"
+    },
+    {
+      "term": "Origin",
+      "slug": "origin",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 42,
+      "excerpt": "The attachment of a muscle closest to the head when viewed from the anatomical position.",
+      "status": "idea"
+    },
+    {
+      "term": "Insertion",
+      "slug": "insertion",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 42,
+      "excerpt": "The attachment of a muscle closest to the feet when viewed from the anatomical position.",
+      "status": "idea"
+    },
+    {
+      "term": "Tendon",
+      "slug": "tendon",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "A strong connective tissue made primarily of collagen that connects muscle to bone.",
+      "status": "idea"
+    },
+    {
+      "term": "Type I collagen",
+      "slug": "type-i-collagen",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "A structural protein contained within a tendon.",
+      "status": "idea"
+    },
+    {
+      "term": "Fascicle",
+      "slug": "fascicle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "A bundle of muscle fibers contained within a skeletal muscle.",
+      "status": "idea"
+    },
+    {
+      "term": "Myofibril",
+      "slug": "myofibril",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "A rod-like unit of a muscle cell made up of sarcomeres.",
+      "status": "idea"
+    },
+    {
+      "term": "Sarcomere",
+      "slug": "sarcomere",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "The functional unit of a skeletal muscle fiber.",
+      "status": "idea"
+    },
+    {
+      "term": "Myosin",
+      "slug": "myosin",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "The thick myofilament contained within a sarcomere.",
+      "status": "idea"
+    },
+    {
+      "term": "Actin",
+      "slug": "actin",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 43,
+      "excerpt": "The thin myofilament contained within a sarcomere.",
+      "status": "idea"
+    },
+    {
+      "term": "Concentric action",
+      "slug": "concentric-action",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "An action that occurs when an activated muscle shortens.",
+      "status": "idea"
+    },
+    {
+      "term": "Eccentric action",
+      "slug": "eccentric-action",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "An action that occurs when an activated muscle lengthens.",
+      "status": "idea"
+    },
+    {
+      "term": "Isometric action",
+      "slug": "isometric-action",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "An action that occurs when an activated muscle remains in a static position.",
+      "status": "idea"
+    },
+    {
+      "term": "Pulling force",
+      "slug": "pulling-force",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "A force a muscle produces to shorten.",
+      "status": "idea"
+    },
+    {
+      "term": "Resistance force",
+      "slug": "resistance-force",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "An external force that opposes the force a muscle produces to shorten.",
+      "status": "idea"
+    },
+    {
+      "term": "Plantar fasciitis",
+      "slug": "plantar-fasciitis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 44,
+      "excerpt": "A common cause of heel pain due to an irritation of the connective tissue on the bottom of the foot.",
+      "status": "idea"
+    },
+    {
+      "term": "Agonist",
+      "slug": "agonist",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 46,
+      "excerpt": "The muscle or muscle group most directly involved in producing a movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Antagonist",
+      "slug": "antagonist",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 46,
+      "excerpt": "One or more muscles that have the opposite action of a specific agonist.",
+      "status": "idea"
+    },
+    {
+      "term": "Synergists",
+      "slug": "synergists",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 46,
+      "excerpt": "Muscles that work together during movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Force-couple",
+      "slug": "force-couple",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 48,
+      "excerpt": "When two or more muscles concurrently produce force in different linear directions to produce one movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Plantar aponeurosis",
+      "slug": "plantar-aponeurosis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 52,
+      "excerpt": "A strong layer of connective tissue on the bottom of the foot.",
+      "status": "idea"
+    },
+    {
+      "term": "Learns and forms memories",
+      "slug": "learns-and-forms-memories",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 66,
+      "excerpt": "Learning and memory are the primary elements of cognition.",
+      "status": "idea"
+    },
+    {
+      "term": "Experiences emotions",
+      "slug": "experiences-emotions",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 66,
+      "excerpt": "These include feelings of fear, pleasure, attach- ment, and drive.",
+      "status": "idea"
+    },
+    {
+      "term": "Controls arousal",
+      "slug": "controls-arousal",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 67,
+      "excerpt": "Consciousness and sleep regulation are parts of this function.",
+      "status": "drafted"
+    },
+    {
+      "term": "Neuron",
+      "slug": "neuron",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 68,
+      "excerpt": "The nervous system cell that produces action potentials to communicate with other neurons, muscles, or glands.",
+      "status": "idea"
+    },
+    {
+      "term": "Glia",
+      "slug": "glia",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "The nervous system cell that protects and supports neurons but does not produce action potentials.",
+      "status": "idea"
+    },
+    {
+      "term": "Action potential",
+      "slug": "action-potential",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "The electrical signal produced by a neuron or muscle spindle.",
+      "status": "idea"
+    },
+    {
+      "term": "Motor neuron",
+      "slug": "motor-neuron",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "A nervous system cell that transmits information away from the spinal cord to muscles or glands.",
+      "status": "idea"
+    },
+    {
+      "term": "Sensory neuron",
+      "slug": "sensory-neuron",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "A nervous system cell that transmits information regarding movement, sight, touch, sound, and smell to the brain and spinal cord.",
+      "status": "idea"
+    },
+    {
+      "term": "Interneuron",
+      "slug": "interneuron",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "A nervous system cell that creates circuits between motor or sensory neurons, and within the brain and spinal cord.",
+      "status": "idea"
+    },
+    {
+      "term": "Dendrites",
+      "slug": "dendrites",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "The portion of a neuron that receives information from other neurons.",
+      "status": "idea"
+    },
+    {
+      "term": "Cell body",
+      "slug": "cell-body",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "The region of a neuron that contains the DNA and cytoplasm.",
+      "status": "idea"
+    },
+    {
+      "term": "Axon",
+      "slug": "axon",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "The projection of a neuron that transmits an action potential away from the neuron.",
+      "status": "idea"
+    },
+    {
+      "term": "Muscle spindle",
+      "slug": "muscle-spindle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 69,
+      "excerpt": "A sensory receptor contained in the muscle belly that detects changes in muscle length and helps regulate contraction.",
+      "status": "idea"
+    },
+    {
+      "term": "Acetylcholine",
+      "slug": "acetylcholine",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 71,
+      "excerpt": "The chemical a motor neuron releases to cause muscle contractions.",
+      "status": "idea"
+    },
+    {
+      "term": "Neuromuscular junction",
+      "slug": "neuromuscular-junction",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 72,
+      "excerpt": "The area between a motor neuron and muscle fiber where acetylcholine is released.",
+      "status": "idea"
+    },
+    {
+      "term": "Myelin",
+      "slug": "myelin",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 72,
+      "excerpt": "A fatty sheath around the axon of a nerve that provides electrical insulation, protection, nourishment, and faster signal transmission.",
+      "status": "idea"
+    },
+    {
+      "term": "Multiple Sclerosis",
+      "slug": "multiple-sclerosis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 73,
+      "excerpt": "A disease that damages the myelin that surrounds an axon.",
+      "status": "idea"
+    },
+    {
+      "term": "Somatic nervous system",
+      "slug": "somatic-nervous-system",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 73,
+      "excerpt": "The division of the peripheral nervous system that controls voluntary movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Autonomic nervous system",
+      "slug": "autonomic-nervous-system",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 73,
+      "excerpt": "The division of the peripheral nervous system that controls subconscious actions such as breathing, heart rate, and digestive processes.",
+      "status": "idea"
+    },
+    {
+      "term": "Homeostasis",
+      "slug": "homeostasis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 75,
+      "excerpt": "The process of keeping physiological systems stable.",
+      "status": "idea"
+    },
+    {
+      "term": "Corpus callosum",
+      "slug": "corpus-callosum",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 75,
+      "excerpt": "Neural fibers that connect the right and left cerebral hemispheres.",
+      "status": "idea"
+    },
+    {
+      "term": "White matter",
+      "slug": "white-matter",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 75,
+      "excerpt": "The portion of the brain and spinal cord that contain myelinated axons.",
+      "status": "idea"
+    },
+    {
+      "term": "Gray matter",
+      "slug": "gray-matter",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 75,
+      "excerpt": "The portion of the brain and spinal cord that contain axons with little or no myelin and cell bodies.",
+      "status": "idea"
+    },
+    {
+      "term": "Meninges",
+      "slug": "meninges",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 76,
+      "excerpt": "The membranes that cover the brain and spinal cord to provide protection and nourishment.",
+      "status": "idea"
+    },
+    {
+      "term": "Ventricles",
+      "slug": "ventricles",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 76,
+      "excerpt": "Cavities in the brain that contain cerebrospinal fluid.",
+      "status": "idea"
+    },
+    {
+      "term": "Cauda equina",
+      "slug": "cauda-equina",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 77,
+      "excerpt": "A bundle of spinal nerves that begin around the second lumbar vertebrae where the spinal cord ends.",
+      "status": "idea"
+    },
+    {
+      "term": "Cervical enlargement",
+      "slug": "cervical-enlargement",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 77,
+      "excerpt": "The larger diameter area of the spinal cord that contains the nerves that travel to the upper limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Lumbar enlargement",
+      "slug": "lumbar-enlargement",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 77,
+      "excerpt": "The larger diameter area of the spinal cord that contains the nerves that travel to the lower limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Mixed nerve",
+      "slug": "mixed-nerve",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 79,
+      "excerpt": "A bundle of axons that carries sensory, motor, and autonomic information.",
+      "status": "idea"
+    },
+    {
+      "term": "Cranial nerves",
+      "slug": "cranial-nerves",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 79,
+      "excerpt": "Twelve pairs of nerves that emerge from the brain or brainstem to relay pure sensory, pure motor, or sensory and motor information to the head.",
+      "status": "idea"
+    },
+    {
+      "term": "Spinal nerves",
+      "slug": "spinal-nerves",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 79,
+      "excerpt": "Thirty-one pairs of nerves that emerge from the spinal cord to relay motor sensory and autonomic information from the neck to the feet, except for the C1 spinal nerve that transmits pure motor information.",
+      "status": "idea"
+    },
+    {
+      "term": "Cervical nerves",
+      "slug": "cervical-nerves",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 79,
+      "excerpt": "Eight pairs of spinal nerves that exit the cervical region of the vertebral column above each corresponding vertebrae except for the C8 spinal nerve that exits below the C7 vertebrae.",
+      "status": "idea"
+    },
+    {
+      "term": "Thoracic nerves",
+      "slug": "thoracic-nerves",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 79,
+      "excerpt": "Twelve pairs of spinal nerves that exit the thoracic region of the vertebral column below each corresponding vertebrae.",
+      "status": "idea"
+    },
+    {
+      "term": "Lumbar nerves",
+      "slug": "lumbar-nerves",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 80,
+      "excerpt": "Five pairs of spinal nerves that exit the lumbar region of the vertebral column below each corresponding vertebrae.",
+      "status": "idea"
+    },
+    {
+      "term": "Sacral nerves",
+      "slug": "sacral-nerves",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 80,
+      "excerpt": "Five pairs of spinal nerves that exit the sacrum at the lower end of the vertebral column.",
+      "status": "idea"
+    },
+    {
+      "term": "Coccygeal nerves",
+      "slug": "coccygeal-nerves",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 80,
+      "excerpt": "One pair of spinal nerves that exits below the sacrum.",
+      "status": "idea"
+    },
+    {
+      "term": "Lower motor neuron",
+      "slug": "lower-motor-neuron",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 83,
+      "excerpt": "A peripheral nervous system cell whose cell body is in the brainstem or spinal cord that innervates muscles or glands.",
+      "status": "idea"
+    },
+    {
+      "term": "Motor unit",
+      "slug": "motor-unit",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 83,
+      "excerpt": "A lower motor neuron and all the muscle fibers it innervates.",
+      "status": "idea"
+    },
+    {
+      "term": "Motor neuron pool",
+      "slug": "motor-neuron-pool",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 83,
+      "excerpt": "A vertical column of cell bodies within the spinal cord that innervate a single muscle.",
+      "status": "idea"
+    },
+    {
+      "term": "Upper motor neuron",
+      "slug": "upper-motor-neuron",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 84,
+      "excerpt": "A central nervous system cell that synapses with lower motor neurons.",
+      "status": "idea"
+    },
+    {
+      "term": "Cerebral cortex",
+      "slug": "cerebral-cortex",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 84,
+      "excerpt": "The outermost layer of the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Motor cortex",
+      "slug": "motor-cortex",
+      "theme": "Nutrition & Fuel",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 84,
+      "excerpt": "The region of the brain consisting of the premotor cortex, primary motor cortex, and supplementary motor area that primarily controls movement.",
+      "status": "drafted"
+    },
+    {
+      "term": "Neural tract",
+      "slug": "neural-tract",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 85,
+      "excerpt": "A bundle of axons within the CNS that carries motor or sensory information.",
+      "status": "idea"
+    },
+    {
+      "term": "Descending tract",
+      "slug": "descending-tract",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 85,
+      "excerpt": "A bundle of upper motor neuron axons that travel through the spinal cord to activate lower motor neurons.",
+      "status": "idea"
+    },
+    {
+      "term": "Ascending tract",
+      "slug": "ascending-tract",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 85,
+      "excerpt": "A bundle of axons that carry sensory information through the spinal cord to the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "MUSCLES SENSORY FEEDBACK Imagine this",
+      "slug": "muscles-sensory-feedback-imagine-this",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 88,
+      "excerpt": "You’re standing blindfolded with your body relaxed, and someone lifts one of your arms up and out to the side.",
+      "status": "idea"
+    },
+    {
+      "term": "Pyramidal tract",
+      "slug": "pyramidal-tract",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 88,
+      "excerpt": "A pathway from the motor cortex that helps regulate voluntary movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Extrapyramidal tract",
+      "slug": "extrapyramidal-tract",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 88,
+      "excerpt": "A pathway from the brainstem that helps regulate involuntary movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Proprioceptors",
+      "slug": "proprioceptors",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 88,
+      "excerpt": "Sensory receptors in the muscles and joints that transmit information to the CNS.",
+      "status": "idea"
+    },
+    {
+      "term": "Stretch Reflex",
+      "slug": "stretch-reflex",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 91,
+      "excerpt": "A neural circuit that allows activation of a muscle to occur with simultaneous relaxation of its antagonist.",
+      "status": "idea"
+    },
+    {
+      "term": "Basal ganglia",
+      "slug": "basal-ganglia",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 93,
+      "excerpt": "Structures within the cerebrum that communicate with the motor cortex to help initiate movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Neuroplasticity",
+      "slug": "neuroplasticity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 95,
+      "excerpt": "The brain’s ability to form new connections.",
+      "status": "idea"
+    },
+    {
+      "term": "Anatomical position",
+      "slug": "anatomical-position",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 101,
+      "excerpt": "The position from where all locations of the body and movements are referenced.",
+      "status": "idea"
+    },
+    {
+      "term": "Ventral/anterior",
+      "slug": "ventral-anterior",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 102,
+      "excerpt": "These terms describe the front of the body from the neck to the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Dorsal/posterior",
+      "slug": "dorsal-posterior",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 102,
+      "excerpt": "This pairing describes the back of the body from the neck to the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Superior/inferior",
+      "slug": "superior-inferior",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 102,
+      "excerpt": "These terms can reference any position of the body from head to toe.",
+      "status": "idea"
+    },
+    {
+      "term": "Cranial/caudal",
+      "slug": "cranial-caudal",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 102,
+      "excerpt": "This pairing describes positions from the top of the head down to the pelvis, without regard for the limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Medial/lateral",
+      "slug": "medial-lateral",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "From an anterior view of the anatomical position, the midline refers to an imaginary vertical line that intersects the eyes, pelvis, and feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Proximal/distal",
+      "slug": "proximal-distal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "These terms are typically used in reference to the limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Ventral",
+      "slug": "ventral",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "The anterior portion of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Dorsal",
+      "slug": "dorsal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "The posterior portion of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Cranial",
+      "slug": "cranial",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "Toward the top of the head.",
+      "status": "idea"
+    },
+    {
+      "term": "Caudal",
+      "slug": "caudal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "Toward the feet. Medial: Toward the midline of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Lateral",
+      "slug": "lateral",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "Away from the midline of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Proximal",
+      "slug": "proximal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "Moving closer to where a limb attaches to the trunk.",
+      "status": "idea"
+    },
+    {
+      "term": "Distal",
+      "slug": "distal",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 103,
+      "excerpt": "Moving away from where a limb attaches to the trunk.",
+      "status": "idea"
+    },
+    {
+      "term": "Sagittal plane",
+      "slug": "sagittal-plane",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "An imaginary plane that divides the body into right and left segments.",
+      "status": "idea"
+    },
+    {
+      "term": "Frontal plane",
+      "slug": "frontal-plane",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "An imaginary plane that divides the body into anterior and posterior segments.",
+      "status": "idea"
+    },
+    {
+      "term": "Transverse plane",
+      "slug": "transverse-plane",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "An imaginary plane that divides the body into superior and inferior segments.",
+      "status": "idea"
+    },
+    {
+      "term": "Coronal plane",
+      "slug": "coronal-plane",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "An imaginary plane that divides the body into anterior and posterior segments.",
+      "status": "idea"
+    },
+    {
+      "term": "Axial plane",
+      "slug": "axial-plane",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "An imaginary plane that divides the body into superior and inferior segments.",
+      "status": "idea"
+    },
+    {
+      "term": "Multiplanar motion",
+      "slug": "multiplanar-motion",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 104,
+      "excerpt": "Movement that occurs in more than one plane.",
+      "status": "idea"
+    },
+    {
+      "term": "Direction of resistance",
+      "slug": "direction-of-resistance",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 105,
+      "excerpt": "A vector that represents the direction and magnitude of load produced by a free weight, a cable, or a band.",
+      "status": "drafted"
+    },
+    {
+      "term": "Direction of rotation",
+      "slug": "direction-of-rotation",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 105,
+      "excerpt": "The curved direction of movement around an axis.",
+      "status": "idea"
+    },
+    {
+      "term": "Shoulder girdle",
+      "slug": "shoulder-girdle",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 108,
+      "excerpt": "Where the clavicle and scapula connect the humerus to the axial skeleton.",
+      "status": "idea"
+    },
+    {
+      "term": "Subtalar joint",
+      "slug": "subtalar-joint",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 117,
+      "excerpt": "Where the talus and calcaneus meet in the foot.",
+      "status": "idea"
+    },
+    {
+      "term": "Triplanar motion",
+      "slug": "triplanar-motion",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 117,
+      "excerpt": "Movement that occurs in the three anatomical planes.",
+      "status": "idea"
+    },
+    {
+      "term": "If Center of mass",
+      "slug": "if-center-of-mass",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 122,
+      "excerpt": "The point of relatively equal distribution of mass within the human body.",
+      "status": "idea"
+    },
+    {
+      "term": "Base of support",
+      "slug": "base-of-support",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 122,
+      "excerpt": "The area of contact beneath a person.",
+      "status": "idea"
+    },
+    {
+      "term": "Sense of balance",
+      "slug": "sense-of-balance",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 124,
+      "excerpt": "The feeling of being stable due to input from the visual, vestibular and somatosensory systems.",
+      "status": "idea"
+    },
+    {
+      "term": "Visual system",
+      "slug": "visual-system",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 125,
+      "excerpt": "The structures and neurons that connect the eyes to the cortex of the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Vestibular system",
+      "slug": "vestibular-system",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 126,
+      "excerpt": "The structures and neurons that connect the semicircular canals in the inner ear to the brainstem.",
+      "status": "idea"
+    },
+    {
+      "term": "Somatosensory system",
+      "slug": "somatosensory-system",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 126,
+      "excerpt": "The structures and neurons that connect receptors within skin, muscle and joints to the cerebellum.",
+      "status": "idea"
+    },
+    {
+      "term": "Motor learning",
+      "slug": "motor-learning",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 128,
+      "excerpt": "A process that develops or changes the way the nervous system performs a movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Closed-loop motor control",
+      "slug": "closed-loop-motor-control",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 128,
+      "excerpt": "The motor learning process that uses sensory feedback to develop a motor program.",
+      "status": "drafted"
+    },
+    {
+      "term": "Open-loop motor control",
+      "slug": "open-loop-motor-control",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 128,
+      "excerpt": "The execution of a motor program that doesn’t involve sensory feedback.",
+      "status": "idea"
+    },
+    {
+      "term": "Synaptic plasticity",
+      "slug": "synaptic-plasticity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 132,
+      "excerpt": "The ability of synapses to strengthen or weaken based on the activity they receive.",
+      "status": "idea"
+    },
+    {
+      "term": "Knee valgus",
+      "slug": "knee-valgus",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 137,
+      "excerpt": "An inward buckling of the knees due to weakness in the hips and/or feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Long-term potentiation",
+      "slug": "long-term-potentiation",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 139,
+      "excerpt": "A long-lasting increase in synaptic strength between two neurons.",
+      "status": "idea"
+    },
+    {
+      "term": "Reactive approach",
+      "slug": "reactive-approach",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 143,
+      "excerpt": "An action or actions taken to solve a problem after a person realizes the problem exists.",
+      "status": "idea"
+    },
+    {
+      "term": "Proactive approach",
+      "slug": "proactive-approach",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 144,
+      "excerpt": "An action or actions taken to solve a potential problem.",
+      "status": "idea"
+    },
+    {
+      "term": "Reason to ask",
+      "slug": "reason-to-ask",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 145,
+      "excerpt": "This can be the sign of orthopedic impairments such as damaged carti- lage, torn ligaments, or bone problems.",
+      "status": "idea"
+    },
+    {
+      "term": "Six Important Questions",
+      "slug": "six-important-questions",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 145,
+      "excerpt": "Identifying Red Flags Does the pain feel like it’s inside the joint?",
+      "status": "idea"
+    },
+    {
+      "term": "Red flags",
+      "slug": "red-flags",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 146,
+      "excerpt": "Symptoms associated with conditions that might require the care of a medical professional.",
+      "status": "idea"
+    },
+    {
+      "term": "Performance goal",
+      "slug": "performance-goal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 154,
+      "excerpt": "A measurable, specific, and realistic outcome you establish with a client.",
+      "status": "idea"
+    },
+    {
+      "term": "Pain intensity measurement scale",
+      "slug": "pain-intensity-measurement-scale",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 157,
+      "excerpt": "An outcome measure scale that has been shown to effectively determine a person’s level of discomfort.",
+      "status": "idea"
+    },
+    {
+      "term": "Chronic pain",
+      "slug": "chronic-pain",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 157,
+      "excerpt": "Any pain lasting longer than 12 weeks.",
+      "status": "idea"
+    },
+    {
+      "term": "Acute pain",
+      "slug": "acute-pain",
+      "theme": "Assessment & Safety",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 160,
+      "excerpt": "Normal, short- term pain or the initial pain that indicates a more serious injury.",
+      "status": "drafted"
+    },
+    {
+      "term": "Quantifiable data",
+      "slug": "quantifiable-data",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 162,
+      "excerpt": "Information that can be measured or counted.",
+      "status": "idea"
+    },
+    {
+      "term": "Lower Extremity Functional Scale",
+      "slug": "lower-extremity-functional-scale",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 165,
+      "excerpt": "An evidence-based outcome measure that quantifies a person’s functional ability for movements that involve the lower limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Upper Extremity Functional Index",
+      "slug": "upper-extremity-functional-index",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 165,
+      "excerpt": "An evidence-based outcome measure that quantifies a person’s functional ability for movements that involve the upper limbs.",
+      "status": "idea"
+    },
+    {
+      "term": "Reliable",
+      "slug": "reliable",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 165,
+      "excerpt": "When a significant result has been shown to be repeatable in different populations.",
+      "status": "idea"
+    },
+    {
+      "term": "Meaningful change",
+      "slug": "meaningful-change",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 166,
+      "excerpt": "A change that is detectable to the client.",
+      "status": "idea"
+    },
+    {
+      "term": "Delay becoming more active if",
+      "slug": "delay-becoming-more-active-if",
+      "theme": "Programming & Variables",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 172,
+      "excerpt": "You have a temporary illness such as a cold or fever; it is best to wait until you feel better.",
+      "status": "idea"
+    },
+    {
+      "term": "PARTICIPANT DECLARATION below",
+      "slug": "participant-declaration-below",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 180,
+      "excerpt": "If you answered YES to one or more of the follow-up questions about your medical condition: You should seek further information before becoming more physically active or engaging in a fi tness appraisal.",
+      "status": "idea"
+    },
+    {
+      "term": "Meaningful experience",
+      "slug": "meaningful-experience",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "An experience that caters to a person’s psychological needs without negatively affecting the exercise parameters.",
+      "status": "idea"
+    },
+    {
+      "term": "Motivation",
+      "slug": "motivation",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The general desire to do something.",
+      "status": "idea"
+    },
+    {
+      "term": "Feedback",
+      "slug": "feedback",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The verbal information given to a client regarding exercise performance.",
+      "status": "idea"
+    },
+    {
+      "term": "Capacity",
+      "slug": "capacity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The ability to do something successfully.",
+      "status": "idea"
+    },
+    {
+      "term": "Just Right Challenge",
+      "slug": "just-right-challenge",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The correct combination of motivation, feedback, and capacity during a corrective exercise session.",
+      "status": "idea"
+    },
+    {
+      "term": "Autonomy",
+      "slug": "autonomy",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The need to feel control and independence.",
+      "status": "idea"
+    },
+    {
+      "term": "Belonging",
+      "slug": "belonging",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 191,
+      "excerpt": "The need to feel connected to others and part of society.",
+      "status": "idea"
+    },
+    {
+      "term": "Internal cues",
+      "slug": "internal-cues",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 194,
+      "excerpt": "Cues that target the inside of the body and require an internal focus.",
+      "status": "idea"
+    },
+    {
+      "term": "External cues",
+      "slug": "external-cues",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 194,
+      "excerpt": "Cues that target something outside the body and require an external focus.",
+      "status": "idea"
+    },
+    {
+      "term": "Complex movement",
+      "slug": "complex-movement",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 194,
+      "excerpt": "A movement that involves motion at two or more joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Knowledge of results",
+      "slug": "knowledge-of-results",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 197,
+      "excerpt": "A form of verbal feedback where information is given at the end of the task.",
+      "status": "idea"
+    },
+    {
+      "term": "Isolation exercise",
+      "slug": "isolation-exercise",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 200,
+      "excerpt": "An exercise that involves motion at one joint.",
+      "status": "idea"
+    },
+    {
+      "term": "Cardiovascular endurance",
+      "slug": "cardiovascular-endurance",
+      "theme": "Cardio & Energy",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 201,
+      "excerpt": "The ability of the heart, lungs, and blood vessels to deliver oxygen to the tissues in the body.",
+      "status": "drafted"
+    },
+    {
+      "term": "Movement analysis",
+      "slug": "movement-analysis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 211,
+      "excerpt": "A process of analyzing how a client moves.",
+      "status": "idea"
+    },
+    {
+      "term": "Concentric phase",
+      "slug": "concentric-phase",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 213,
+      "excerpt": "The portion of a movement when the muscles are shortening to overcome the direction of resistance.",
+      "status": "idea"
+    },
+    {
+      "term": "Eccentric phase",
+      "slug": "eccentric-phase",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 213,
+      "excerpt": "The portion of a movement when the muscles lengthen to yield the direction of resistance.",
+      "status": "idea"
+    },
+    {
+      "term": "Critical events",
+      "slug": "critical-events",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 215,
+      "excerpt": "The necessary steps for performing a movement with ideal technique.",
+      "status": "idea"
+    },
+    {
+      "term": "Documentation",
+      "slug": "documentation",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 215,
+      "excerpt": "The process of writing down what you see and do in a training session.",
+      "status": "idea"
+    },
+    {
+      "term": "Hypothesis",
+      "slug": "hypothesis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 215,
+      "excerpt": "A proposed explanation made based on limited evidence.",
+      "status": "idea"
+    },
+    {
+      "term": "Single-Joint Movement Analysis Client",
+      "slug": "single-joint-movement-analysis-client",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 232,
+      "excerpt": "Date: Exercise: Critical event #1: Was critical event #1 met?",
+      "status": "idea"
+    },
+    {
+      "term": "Functional exercise",
+      "slug": "functional-exercise",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 236,
+      "excerpt": "An exercise that closely mimics the actions necessary for a person’s life or sport.",
+      "status": "idea"
+    },
+    {
+      "term": "Objectives",
+      "slug": "objectives",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 239,
+      "excerpt": "The goals of a movement. However, no one of those requirements is any different from any other movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Kinematics",
+      "slug": "kinematics",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 244,
+      "excerpt": "An area of mechanics that describes the motions of a body.",
+      "status": "idea"
+    },
+    {
+      "term": "Arthrokinematics",
+      "slug": "arthrokinematics",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 247,
+      "excerpt": "The motions that occur at the articulating surfaces between bones.",
+      "status": "idea"
+    },
+    {
+      "term": "Static stabilizer",
+      "slug": "static-stabilizer",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 249,
+      "excerpt": "A muscle that performs an isometric contraction to stabilize a joint during movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Dynamic stabilizer",
+      "slug": "dynamic-stabilizer",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 249,
+      "excerpt": "A muscle that performs a concentric and/ or eccentric action to stabilize a joint during movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Open scissors syndrome",
+      "slug": "open-scissors-syndrome",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 253,
+      "excerpt": "The combination of ribcage elevation and anterior pelvic tilt that alters movement mechanics and reduces intra- abdominal pressure.",
+      "status": "idea"
+    },
+    {
+      "term": "ST region downward rotators",
+      "slug": "st-region-downward-rotators",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 260,
+      "excerpt": "Rhomboid major/mi- nor, levator scapulae, pectoralis minor, latissimus dorsi, pectoralis major (sternal portion) and serratus anterior (superior portion).",
+      "status": "idea"
+    },
+    {
+      "term": "GH joint adductors",
+      "slug": "gh-joint-adductors",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 260,
+      "excerpt": "Latissimus dorsi, teres major, pecto- ralis major (sternal portion), and coracobrachialis.",
+      "status": "idea"
+    },
+    {
+      "term": "Degrees of freedom",
+      "slug": "degrees-of-freedom",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 263,
+      "excerpt": "The number of independent movements allowed at a joint.",
+      "status": "idea"
+    },
+    {
+      "term": "Lumbopelvic control",
+      "slug": "lumbopelvic-control",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 266,
+      "excerpt": "The ability of the nervous system to stabilize the lumbar and pelvic regions during movement.",
+      "status": "idea"
+    },
+    {
+      "term": "Reason",
+      "slug": "reason",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 269,
+      "excerpt": "These cues can improve range of motion at the shoulder and elbow joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Shoulder Press Movement Analysis Client",
+      "slug": "shoulder-press-movement-analysis-client",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 273,
+      "excerpt": "Date: Exercise: one-arm shoulder press movement analysis Critical event #1: maintenance of posture Was critical event #1 met?",
+      "status": "idea"
+    },
+    {
+      "term": "Corrective Excercise Specialist Certification Course",
+      "slug": "corrective-excercise-specialist-certification-co",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 274,
+      "excerpt": "Client and Joint Analysis Form ONE-ARM SHOULDER PRESS MOVEMENT ANALYSIS Client: Date: Exercise: Critical event #1: maintenance of posture Was critical event #1 met?",
+      "status": "idea"
+    },
+    {
+      "term": "Upper Body Movement Analysis Client",
+      "slug": "upper-body-movement-analysis-client",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 275,
+      "excerpt": "Date: Exercise: Critical event #1: maintenance of posture Was critical event #1 met?",
+      "status": "idea"
+    },
+    {
+      "term": "Acetabular depth",
+      "slug": "acetabular-depth",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 279,
+      "excerpt": "The perpendicular distance between the roof of the acetabulum and a straight line that runs between the lateral edge of the acetabulum and pubic symphysis.",
+      "status": "idea"
+    },
+    {
+      "term": "Hip dysplasia",
+      "slug": "hip-dysplasia",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 279,
+      "excerpt": "An abnormal shape or position of the hip socket.",
+      "status": "idea"
+    },
+    {
+      "term": "Annulus fibrosus",
+      "slug": "annulus-fibrosus",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 284,
+      "excerpt": "The outer fibrous layer of an intervertebral disc.",
+      "status": "idea"
+    },
+    {
+      "term": "Nucleus pulposus",
+      "slug": "nucleus-pulposus",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 284,
+      "excerpt": "The inner jelly-like fluid of an intervertebral disc.",
+      "status": "idea"
+    },
+    {
+      "term": "Knee strategy",
+      "slug": "knee-strategy",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 290,
+      "excerpt": "A compensation seen when the knees push forward at the beginning of a squat, which usually indicates weakness of the hip extensors.",
+      "status": "idea"
+    },
+    {
+      "term": "Hip strategy",
+      "slug": "hip-strategy",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 290,
+      "excerpt": "A reliance on the hip extensors to initiate a squat, which reduces the demands at the knee joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Fallen arch",
+      "slug": "fallen-arch",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 292,
+      "excerpt": "Chronic, excessive pronation of the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Lumbopelvic region",
+      "slug": "lumbopelvic-region",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 301,
+      "excerpt": "As a person descends into the lower portion of the squat, the lumbar spine will often flex, and the pelvis will posteriorly rotate.",
+      "status": "idea"
+    },
+    {
+      "term": "Hip",
+      "slug": "hip",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 302,
+      "excerpt": "The muscles that externally rotate the hip are frequently underactive during the squat.",
+      "status": "idea"
+    },
+    {
+      "term": "Feet",
+      "slug": "feet",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 302,
+      "excerpt": "The feet will often pronate due to poor motor control of the supinators, which function to maintain a proper arch (i.e., foot posture).",
+      "status": "idea"
+    },
+    {
+      "term": "Goblet Squat Movement Analysis Client",
+      "slug": "goblet-squat-movement-analysis-client",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 309,
+      "excerpt": "Date: Exercise: goblet squat Critical event #1: maintenance of posture Was critical event #1 met?",
+      "status": "idea"
+    },
+    {
+      "term": "Diaphragmatic breathing",
+      "slug": "diaphragmatic-breathing",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 312,
+      "excerpt": "The type of breathing that is primarily driven by contraction and relaxation of the diaphragm.",
+      "status": "idea"
+    },
+    {
+      "term": "Thoracic cavity",
+      "slug": "thoracic-cavity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 312,
+      "excerpt": "The space enclosed by the ribs, vertebral column, and sternum where the heart and lungs are contained.",
+      "status": "idea"
+    },
+    {
+      "term": "Abdominal cavity",
+      "slug": "abdominal-cavity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 312,
+      "excerpt": "The space between the diaphragm and pelvis that contains the abdominal organs.",
+      "status": "idea"
+    },
+    {
+      "term": "Lumbosacral junction",
+      "slug": "lumbosacral-junction",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 320,
+      "excerpt": "This is the meeting point between the fifth lumbar vertebrae and sacrum 2.",
+      "status": "idea"
+    },
+    {
+      "term": "Sacroiliac joints",
+      "slug": "sacroiliac-joints",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 320,
+      "excerpt": "There are two of these joints, where the sacrum meets the ilium on the right and left side.",
+      "status": "idea"
+    },
+    {
+      "term": "Pubic symphysis",
+      "slug": "pubic-symphysis",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 320,
+      "excerpt": "This is the meeting point be- tween the two pubic bones.",
+      "status": "idea"
+    },
+    {
+      "term": "IT band syndrome",
+      "slug": "it-band-syndrome",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 325,
+      "excerpt": "Excessive stiffness and/or inflammation of the iliotibial band due to overuse.",
+      "status": "idea"
+    },
+    {
+      "term": "Protective tension",
+      "slug": "protective-tension",
+      "theme": "Recovery & Adaptation",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 333,
+      "excerpt": "Stiffness within soft tissue that restricts mobility.",
+      "status": "drafted"
+    },
+    {
+      "term": "Deep neck flexors",
+      "slug": "deep-neck-flexors",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 341,
+      "excerpt": "Muscles in the anterior neck that flex the cervical spine.",
+      "status": "idea"
+    },
+    {
+      "term": "Pelvic floor",
+      "slug": "pelvic-floor",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 347,
+      "excerpt": "The muscular base of the abdomen that attaches to the pelvis.",
+      "status": "idea"
+    },
+    {
+      "term": "Neural tension",
+      "slug": "neural-tension",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 363,
+      "excerpt": "The inability of a nerve to move freely, which often causes pain.",
+      "status": "idea"
+    },
+    {
+      "term": "Upper crossed syndrome",
+      "slug": "upper-crossed-syndrome",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 389,
+      "excerpt": "A series of upper body compensations, described by Prof.",
+      "status": "idea"
+    },
+    {
+      "term": "Suboccipitals",
+      "slug": "suboccipitals",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 391,
+      "excerpt": "Four pairs of muscles located between the lower posterior skull and upper vertebrae that extend and rotate the cervical spine.",
+      "status": "idea"
+    },
+    {
+      "term": "Lower crossed syndrome",
+      "slug": "lower-crossed-syndrome",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 419,
+      "excerpt": "A series of lower body compensations, described by Prof.",
+      "status": "idea"
+    },
+    {
+      "term": "Locked long",
+      "slug": "locked-long",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 432,
+      "excerpt": "A term popularized by Robert McAtee to describe a muscle that has stiffness from being overstretched due to eccentric activity.",
+      "status": "idea"
+    },
+    {
+      "term": "Locked short",
+      "slug": "locked-short",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 432,
+      "excerpt": "A term popularized by Robert McAtee to describe a muscle that has stiffness due to being held in a shortened position for an extended period.",
+      "status": "idea"
+    },
+    {
+      "term": "In",
+      "slug": "in",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 458,
+      "excerpt": "Neumann DA. Kinesiology of the musculoskeletal system: foundations for rehabilitation.",
+      "status": "idea"
+    },
+    {
+      "term": "Canada",
+      "slug": "canada",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 462,
+      "excerpt": "Backfitpro, Inc; 2015. UNIT 10 Cook CE.",
+      "status": "idea"
+    },
+    {
+      "term": "GLOSSARY A Abdominal cavity",
+      "slug": "glossary-a-abdominal-cavity",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 472,
+      "excerpt": "The space between the diaphragm and pelvis that contains the abdominal organs.",
+      "status": "idea"
+    },
+    {
+      "term": "Alpha-gamma co-activation",
+      "slug": "alpha-gamma-co-activation",
+      "theme": "Anatomy & Movement",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 472,
+      "excerpt": "A process that allows a muscle spindle to contract at the same rate as the muscle where it resides.",
+      "status": "idea"
+    },
+    {
+      "term": "Center of mass",
+      "slug": "center-of-mass",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 473,
+      "excerpt": "The point of relatively equal distribution of mass within the human body.",
+      "status": "idea"
+    },
+    {
+      "term": "Medial",
+      "slug": "medial",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 477,
+      "excerpt": "Toward the midline of the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Medical pain",
+      "slug": "medical-pain",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 478,
+      "excerpt": "The type of discomfort that could be caused by a medical condition, which requires the intervention from a medical professional.",
+      "status": "idea"
+    },
+    {
+      "term": "Minimum detectable change",
+      "slug": "minimum-detectable-change",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 478,
+      "excerpt": "The smallest detectable change that can be considered above a measurement error.",
+      "status": "idea"
+    },
+    {
+      "term": "Outcome goal",
+      "slug": "outcome-goal",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 480,
+      "excerpt": "The ultimate goal of the client, which isn’t under the trainer’s control.",
+      "status": "idea"
+    },
+    {
+      "term": "Outcome measure",
+      "slug": "outcome-measure",
+      "theme": "Training Foundations",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 480,
+      "excerpt": "The result of a test used to determine a person’s baseline function.",
+      "status": "idea"
+    },
+    {
+      "term": "Movement pain",
+      "slug": "movement-pain",
+      "theme": "Mobility & Correctives",
+      "source": "Corrective Exercise Full Textbook",
+      "chunk_index": 481,
+      "excerpt": "The type of discomfort that’s not a medical problem and often caused by a lack of strength, mobility, and/or motor control.",
+      "status": "idea"
+    },
+    {
+      "term": "Vegetables and fruits",
+      "slug": "vegetables-and-fruits",
+      "theme": "Nutrition & Fuel",
+      "source": "DGA26-30",
+      "chunk_index": 9,
+      "excerpt": "Full-fat yogurt and cheese - Whole grains - Legumes and nut- or seed-containing foods prepared in a safe, infant-appropriate form + Avoid added sugars during infancy and early childhood.",
+      "status": "drafted"
+    },
+    {
+      "term": "Hippocrates wrote",
+      "slug": "hippocrates-wrote",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 6,
+      "excerpt": "Eating alone will not keep a man well; he must also take exercise.",
+      "status": "idea"
+    },
+    {
+      "term": "These adaptations BIOMECHANICS",
+      "slug": "these-adaptations-biomechanics",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 9,
+      "excerpt": "The study of the mechanical laws governing movement of living organisms.",
+      "status": "idea"
+    },
+    {
+      "term": "Allergies",
+      "slug": "allergies",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Exercise is one of the body’s most efficient ways to control nasal congestion (and the accompanying discomfort of restricted nasal blood flow).",
+      "status": "idea"
+    },
+    {
+      "term": "Angina",
+      "slug": "angina",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Regular aerobic exercise dilates blood vessels, increasing blood flow and thereby improving the body’s ability to extract oxygen from the bloodstream.",
+      "status": "idea"
+    },
+    {
+      "term": "Anxiety",
+      "slug": "anxiety",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Exercise triggers the release of mood-altering chemicals in the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Back pain",
+      "slug": "back-pain",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Exercise helps to strengthen the abdominal muscles, the lower back extensor muscles, and the hamstring muscles (muscles in the upper back of the leg).",
+      "status": "idea"
+    },
+    {
+      "term": "Bursitis and tendinitis",
+      "slug": "bursitis-and-tendinitis",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Exercise can strengthen the tendons , enabling them to handle greater loads without being injured.",
+      "status": "idea"
+    },
+    {
+      "term": "Cancer",
+      "slug": "cancer",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 16,
+      "excerpt": "Exercise may be an effective intervention for improving the quality of life for those with or recovering from cancer.",
+      "status": "idea"
+    },
+    {
+      "term": "Carpal tunnel syndrome",
+      "slug": "carpal-tunnel-syndrome",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise helps build up the muscles in the wrists and forearms, thereby reducing the stress on arms, elbows, and hands.",
+      "status": "idea"
+    },
+    {
+      "term": "Depression",
+      "slug": "depression",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise helps speed metabolism and deliver more oxygen to the brain; the improved level of circulation in the brain tends to enhance mood.",
+      "status": "idea"
+    },
+    {
+      "term": "Diabetes",
+      "slug": "diabetes",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise helps lower blood sugar levels, strengthen the skeletal muscles and heart, improve circulation, and reduce stress.",
+      "status": "idea"
+    },
+    {
+      "term": "Fatigue",
+      "slug": "fatigue",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise can help alleviate the fatigue-causing effects of stress, poor circulation and blood oxygenation, bad posture, and poor breathing habits.",
+      "status": "idea"
+    },
+    {
+      "term": "Glaucoma",
+      "slug": "glaucoma",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise helps relieve intraocular hypertension (the pressure buildup on the eyeball that heralds the onset of glaucoma).",
+      "status": "idea"
+    },
+    {
+      "term": "Headaches",
+      "slug": "headaches",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 17,
+      "excerpt": "Exercise helps force the brain to secrete more of the body’s opiate-like, pain-dampening chemicals (e.g., endorphins and enkephalins).",
+      "status": "idea"
+    },
+    {
+      "term": "Knee problems",
+      "slug": "knee-problems",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 18,
+      "excerpt": "Exercise helps strengthen the structures attendant to the knee (muscles, tendons, and ligaments ), thereby facilitating the ability of the knee to withstand stress.",
+      "status": "idea"
+    },
+    {
+      "term": "Lung disease",
+      "slug": "lung-disease",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 18,
+      "excerpt": "Exercise helps strengthen the muscles associated with breathing and helps boost the oxygen level in the blood.",
+      "status": "idea"
+    },
+    {
+      "term": "Memory problems",
+      "slug": "memory-problems",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 18,
+      "excerpt": "Exercise helps to improve cognitive ability by increasing the blood and oxygen flow to the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Menstrual problems",
+      "slug": "menstrual-problems",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 19,
+      "excerpt": "Exercise helps to control the hormonal imbalances often associated with premenstrual syndrome (PMS) by increasing the release of beta- endorphins.",
+      "status": "idea"
+    },
+    {
+      "term": "Scenario",
+      "slug": "scenario",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 43,
+      "excerpt": "Autonomy-support in action Instructions: The trainer should read the scenario that pertains to implementing autonomy within a personal training session.",
+      "status": "idea"
+    },
+    {
+      "term": "Possible solutions",
+      "slug": "possible-solutions",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 43,
+      "excerpt": "There is no one-size-fits-all solution to this scenario.",
+      "status": "idea"
+    },
+    {
+      "term": "Specific",
+      "slug": "specific",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 66,
+      "excerpt": "The goal is well-defined and clear as to what the client intends to do.",
+      "status": "idea"
+    },
+    {
+      "term": "Measurable",
+      "slug": "measurable",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 66,
+      "excerpt": "The goal provides three specific criteria to follow.",
+      "status": "idea"
+    },
+    {
+      "term": "Achievable",
+      "slug": "achievable",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 67,
+      "excerpt": "The achievability will depend upon the individual client, particularly the client’s time constraints, physical abilities (i.e., fitness level), and mental abilities (i.e., self-efficacy).",
+      "status": "idea"
+    },
+    {
+      "term": "Relevant",
+      "slug": "relevant",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 67,
+      "excerpt": "The goal demonstrates relevance because it addresses an important health behavior (e.g., exercise) for weight management.",
+      "status": "idea"
+    },
+    {
+      "term": "Time-bound",
+      "slug": "time-bound",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 67,
+      "excerpt": "The goal has a clearly defined time frame: within one week’s time (e.g., seven days), the client plans to walk three times.",
+      "status": "idea"
+    },
+    {
+      "term": "SMART Goals SMART PRINCIPLE",
+      "slug": "smart-goals-smart-principle",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 67,
+      "excerpt": "Acronym to enable goals to be more objective; S— specific, M—measurable, A—achievable, R—relevant, T—time-bound.",
+      "status": "idea"
+    },
+    {
+      "term": "The Neuromuscular Connection SENSORY NEURONS",
+      "slug": "the-neuromuscular-connection-sensory-neurons",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 84,
+      "excerpt": "Nerve cells involved in communicating tactile, auditory, or visual information.",
+      "status": "idea"
+    },
+    {
+      "term": "Human Brain MEDULLA OBLONGATA",
+      "slug": "human-brain-medulla-oblongata",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 87,
+      "excerpt": "The base of the brain stem, responsible for involuntary functions like swallowing, sneezing, and heart function.",
+      "status": "idea"
+    },
+    {
+      "term": "Spine CRANIAL NERVES",
+      "slug": "spine-cranial-nerves",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 91,
+      "excerpt": "The 12 sensory and motor nerves extending directly from the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Nordic skiers Wrestlers MITOCHONDRIA",
+      "slug": "nordic-skiers-wrestlers-mitochondria",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 107,
+      "excerpt": "An organelle with a double membrane and many folds inside responsible for generating the chemical energy needed for biochemical reactions.",
+      "status": "idea"
+    },
+    {
+      "term": "OVEMENT S YSTEMS Fusiform",
+      "slug": "ovement-s-ystems-fusiform",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 109,
+      "excerpt": "Fascicles nearly parallel to longitudinal axis of muscle; terminate in flat tendons; muscle tapers toward tendons where diameter is less than at belly.",
+      "status": "idea"
+    },
+    {
+      "term": "Biceps brachii Parallel",
+      "slug": "biceps-brachii-parallel",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 110,
+      "excerpt": "Fascicles parallel to longitudinal axis of muscle; terminate at either end in flat tendons.",
+      "status": "idea"
+    },
+    {
+      "term": "Sutures or synarthrodial joints",
+      "slug": "sutures-or-synarthrodial-joints",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 119,
+      "excerpt": "This type of joint is found in the skull.",
+      "status": "idea"
+    },
+    {
+      "term": "Skull MYOSITIS OSSIFICANS",
+      "slug": "skull-myositis-ossificans",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 119,
+      "excerpt": "A condition when bone tissue forms within a muscle or other soft tissue as a result of trauma or injury.",
+      "status": "idea"
+    },
+    {
+      "term": "Cartilaginous Joints",
+      "slug": "cartilaginous-joints",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 120,
+      "excerpt": "Intervertebral Discs (Blue) The most common and movable joints in the human body are synovial joints , also known as diarthrodial joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Ball-and-socket joint",
+      "slug": "ball-and-socket-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 121,
+      "excerpt": "Also known as an enarthrodial joint, this joint allows a wide range of movement in many directions.",
+      "status": "idea"
+    },
+    {
+      "term": "Saddle joint",
+      "slug": "saddle-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 121,
+      "excerpt": "The sellar or saddle joints are like ball-and-socket joints but cannot rotate.",
+      "status": "idea"
+    },
+    {
+      "term": "Hinge joint",
+      "slug": "hinge-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 121,
+      "excerpt": "The hinge joints include the elbows, ankles, and knee joints.",
+      "status": "idea"
+    },
+    {
+      "term": "Gliding joint",
+      "slug": "gliding-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 122,
+      "excerpt": "The arthrodial or gliding joints of the body include the tarsals and metatarsal of the foot.",
+      "status": "idea"
+    },
+    {
+      "term": "Pivot joint",
+      "slug": "pivot-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 122,
+      "excerpt": "Trochoidal or pivot joints rotate around a long axis (line that runs parallel to the joint).",
+      "status": "idea"
+    },
+    {
+      "term": "Condyloid joint",
+      "slug": "condyloid-joint",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 122,
+      "excerpt": "Also known as an ellipsoid joint, these joints move in two directions—one direction primarily with a small range in another direction.",
+      "status": "idea"
+    },
+    {
+      "term": "Cartilage PERICHONDRIUM",
+      "slug": "cartilage-perichondrium",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 128,
+      "excerpt": "The connective tissue enveloping cartilage everywhere except at a joint.",
+      "status": "idea"
+    },
+    {
+      "term": "The Blood Vessels ARTERIOLES",
+      "slug": "the-blood-vessels-arterioles",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 133,
+      "excerpt": "The smaller branches of the arteries leading to the capillaries.",
+      "status": "idea"
+    },
+    {
+      "term": "View of the Heart ATRIUM",
+      "slug": "view-of-the-heart-atrium",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 134,
+      "excerpt": "One of the two upper cavities of the heart passing blood to the ventricles.",
+      "status": "idea"
+    },
+    {
+      "term": "Nose and nasal cavities",
+      "slug": "nose-and-nasal-cavities",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "The nose is made of bone and cartilage.",
+      "status": "idea"
+    },
+    {
+      "term": "Pharynx",
+      "slug": "pharynx",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "The pharynx is commonly called the throat and is a passageway for both air and food.",
+      "status": "idea"
+    },
+    {
+      "term": "Larynx",
+      "slug": "larynx",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "This passageway is between the pharynx and trachea.",
+      "status": "idea"
+    },
+    {
+      "term": "Trachea",
+      "slug": "trachea",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "This is the main passageway of air into the lungs.",
+      "status": "idea"
+    },
+    {
+      "term": "Bronchi",
+      "slug": "bronchi",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "This is the passageway of air into the functional tissues of the lungs.",
+      "status": "idea"
+    },
+    {
+      "term": "Lungs",
+      "slug": "lungs",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 146,
+      "excerpt": "The right lung has three lobes, while the left lung has two lobes.",
+      "status": "idea"
+    },
+    {
+      "term": "When a hormone HORMONES",
+      "slug": "when-a-hormone-hormones",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 151,
+      "excerpt": "Chemical messengers stored, created, and released by endocrine glands.",
+      "status": "idea"
+    },
+    {
+      "term": "Hypothalamus",
+      "slug": "hypothalamus",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 155,
+      "excerpt": "The main role of this gland is to maintain homeostasis.",
+      "status": "idea"
+    },
+    {
+      "term": "Pineal gland",
+      "slug": "pineal-gland",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 155,
+      "excerpt": "The only hormone this gland is known to secrete is melatonin.",
+      "status": "idea"
+    },
+    {
+      "term": "Pituitary gland",
+      "slug": "pituitary-gland",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "Pituitary hormones control other parts of the endocrine system, including the thyroid gland, adrenal glands, ovaries, and testes.",
+      "status": "idea"
+    },
+    {
+      "term": "Thyroid",
+      "slug": "thyroid",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The main function of the thyroid is to regulate metabolism.",
+      "status": "idea"
+    },
+    {
+      "term": "Parathyroid",
+      "slug": "parathyroid",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "There are four parathyroid glands that help regulate calcium levels in the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Thymus",
+      "slug": "thymus",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The thymus is only active until puberty.",
+      "status": "idea"
+    },
+    {
+      "term": "Adrenal",
+      "slug": "adrenal",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The adrenal glands are attached to the kidneys and are made up of the adrenal cortex and adrenal medulla.",
+      "status": "idea"
+    },
+    {
+      "term": "Pancreas",
+      "slug": "pancreas",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The main role of the pancreas is to maintain blood glucose balance.",
+      "status": "idea"
+    },
+    {
+      "term": "Ovaries",
+      "slug": "ovaries",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The ovaries secrete hormones essential for female reproductive development and fertility.",
+      "status": "idea"
+    },
+    {
+      "term": "Testes",
+      "slug": "testes",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 156,
+      "excerpt": "The testes are responsible for maintaining male reproductive health.",
+      "status": "idea"
+    },
+    {
+      "term": "Pancreas PERISTALSIS",
+      "slug": "pancreas-peristalsis",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 164,
+      "excerpt": "The muscular contractions of the smooth muscle of the digestive tract, which moves food through the digestive tract.",
+      "status": "idea"
+    },
+    {
+      "term": "Pancreas SALIVARY AMYLASE",
+      "slug": "pancreas-salivary-amylase",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 170,
+      "excerpt": "An enzyme found in saliva that converts starches and glycogen to more simple sugars.",
+      "status": "idea"
+    },
+    {
+      "term": "The skin has three layers",
+      "slug": "the-skin-has-three-layers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 171,
+      "excerpt": "The epidermis is the outermost layer of the skin that makes the skin taut and creates a waterproof barrier.",
+      "status": "idea"
+    },
+    {
+      "term": "Human Skin INTEGUMENTARY SYSTEM",
+      "slug": "human-skin-integumentary-system",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 171,
+      "excerpt": "Organ system protecting the body; composed of skin, hair, and nails.",
+      "status": "idea"
+    },
+    {
+      "term": "Anatomical Position BIOMECHANICS",
+      "slug": "anatomical-position-biomechanics",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 173,
+      "excerpt": "The study of the mechanical laws governing movement of living organisms.",
+      "status": "idea"
+    },
+    {
+      "term": "Anatomical Planes FRONTAL PLANE",
+      "slug": "anatomical-planes-frontal-plane",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 177,
+      "excerpt": "An imaginary line that divides the body into anterior and posterior halves.",
+      "status": "idea"
+    },
+    {
+      "term": "Consider the equation",
+      "slug": "consider-the-equation",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 187,
+      "excerpt": "F x velocity = P Where F is force and P is power.",
+      "status": "idea"
+    },
+    {
+      "term": "Principles of Biomechanics",
+      "slug": "principles-of-biomechanics",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 196,
+      "excerpt": "Overview CATEGORY PRINCIPLE(S) DESCRIPTION EXAMPLE Stability Stability The ability to maintain control (i.e., resist change) of a joint or position.",
+      "status": "idea"
+    },
+    {
+      "term": "Upper Body INSERTION",
+      "slug": "upper-body-insertion",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 205,
+      "excerpt": "The distal muscular attachment point to a bone.",
+      "status": "idea"
+    },
+    {
+      "term": "Cell Components GOLGI APPARATUS",
+      "slug": "cell-components-golgi-apparatus",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 227,
+      "excerpt": "An organelle of folded membranes responsible for packaging and transporting membrane-bound proteins.",
+      "status": "drafted"
+    },
+    {
+      "term": "Cal STEADY-STATE EXERCISE",
+      "slug": "cal-steady-state-exercise",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 244,
+      "excerpt": "Exercise that maintains a steady level of exertion from start to finish.",
+      "status": "idea"
+    },
+    {
+      "term": "Portability and Accountability SUBJECTIVE ASSESSMENTS",
+      "slug": "portability-and-accountability-subjective-assess",
+      "theme": "Assessment & Safety",
+      "source": "High Res_CPT",
+      "chunk_index": 258,
+      "excerpt": "Fitness assessments that require observation or a subjective, opinion-based measure.",
+      "status": "drafted"
+    },
+    {
+      "term": "Remember Objective and Subjective Objective",
+      "slug": "remember-objective-and-subjective-objective",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 269,
+      "excerpt": "Root word object . You are objective whenever you are discussing an object or something concrete that you can touch.",
+      "status": "idea"
+    },
+    {
+      "term": "Males",
+      "slug": "males",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 273,
+      "excerpt": "The tape is placed around the waist at the belly button.",
+      "status": "idea"
+    },
+    {
+      "term": "Females",
+      "slug": "females",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 273,
+      "excerpt": "The client places their forefinger and middle finger on top of the belly button.",
+      "status": "idea"
+    },
+    {
+      "term": "Upper Arm",
+      "slug": "upper-arm",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 275,
+      "excerpt": "Relaxed The client should stand with their arms at their sides and shoulders relaxed.",
+      "status": "idea"
+    },
+    {
+      "term": "LIENT A SSESSMENTS Waist Males",
+      "slug": "lient-a-ssessments-waist-males",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 276,
+      "excerpt": "The tape is placed around the abdomen at the belly button and drawn flat against the skin without pressing into the skin.",
+      "status": "idea"
+    },
+    {
+      "term": "Triceps measurement",
+      "slug": "triceps-measurement",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 279,
+      "excerpt": "With the arm relaxed and to the side, a vertical skinfold measurement is taken halfway between the shoulder and the elbow.",
+      "status": "idea"
+    },
+    {
+      "term": "Subscapular measurement",
+      "slug": "subscapular-measurement",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 279,
+      "excerpt": "Locate the middle of the scapula and measure a vertical skinfold about one inch from the spine.",
+      "status": "idea"
+    },
+    {
+      "term": "Posterior Caliper Sites",
+      "slug": "posterior-caliper-sites",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 279,
+      "excerpt": "Triceps and Subscapula Chest (pectoral) measurement: Measure about one inch below the collarbone and two to three inches out from the inside edge of the pectoral muscle.",
+      "status": "idea"
+    },
+    {
+      "term": "Midaxillary measurement",
+      "slug": "midaxillary-measurement",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 279,
+      "excerpt": "Measure the fold in a horizontal line at the point where a vertical line from the mid axilla (middle of armpit) intersects with a horizontal line level with the sternum.",
+      "status": "idea"
+    },
+    {
+      "term": "Suprailiac measurement",
+      "slug": "suprailiac-measurement",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 279,
+      "excerpt": "Measure about halfway between the navel and the top of the hip bone.",
+      "status": "idea"
+    },
+    {
+      "term": "Abdominal measurement",
+      "slug": "abdominal-measurement",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 280,
+      "excerpt": "Measure about one inch to the left of and one inch down from the navel.",
+      "status": "idea"
+    },
+    {
+      "term": "High temperatures",
+      "slug": "high-temperatures",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "Pulse may raise when in higher temperatures.",
+      "status": "idea"
+    },
+    {
+      "term": "Emotions",
+      "slug": "emotions",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "Stress, anxiety, and excitement can all cause a rise in heart rate.",
+      "status": "idea"
+    },
+    {
+      "term": "Medications",
+      "slug": "medications",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "There are medications that can increase or decrease heart rate.",
+      "status": "drafted"
+    },
+    {
+      "term": "Stimulants",
+      "slug": "stimulants",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "Caffeine, nicotine, and tobacco can all cause a rise in heart rate.",
+      "status": "drafted"
+    },
+    {
+      "term": "Recent exercise",
+      "slug": "recent-exercise",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "Heart rate will usually remain elevated immediately following a workout.",
+      "status": "drafted"
+    },
+    {
+      "term": "Standing up",
+      "slug": "standing-up",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 285,
+      "excerpt": "There will usually be a spike in blood pressure when getting up from a seated position.",
+      "status": "idea"
+    },
+    {
+      "term": "If SPECIFIC WARM-UPS",
+      "slug": "if-specific-warm-ups",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 293,
+      "excerpt": "Activities that prepare the body for specific exercise to follow by incorporating movements that mimic the planned activity.",
+      "status": "idea"
+    },
+    {
+      "term": "Neck flexors FLAT BACK",
+      "slug": "neck-flexors-flat-back",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 311,
+      "excerpt": "An excessive lumbar flexion and posterior pelvic tilt.",
+      "status": "idea"
+    },
+    {
+      "term": "Overhead Squat Assessment",
+      "slug": "overhead-squat-assessment",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 317,
+      "excerpt": "Lateral, Anterior As with all other dynamic postural assessments, this overhead squat should be observed from a lateral, posterior, and anterior position.",
+      "status": "idea"
+    },
+    {
+      "term": "Vastus lateralis OVERHEAD SQUAT ASSESSMENT",
+      "slug": "vastus-lateralis-overhead-squat-assessment",
+      "theme": "Assessment & Safety",
+      "source": "High Res_CPT",
+      "chunk_index": 317,
+      "excerpt": "The uncoached movement assessment of the overhead squat with the goal of identifying movement dysfunctions along the kinetic chain.",
+      "status": "drafted"
+    },
+    {
+      "term": "YES or a NO",
+      "slug": "yes-or-a-no",
+      "theme": "Assessment & Safety",
+      "source": "High Res_CPT",
+      "chunk_index": 320,
+      "excerpt": "If you answered YES to one or more ques ti ons: Talk to your doctor BEFORE you begin physical ac ti vity and BEFORE comple ti ng any fi tness assessments.",
+      "status": "idea"
+    },
+    {
+      "term": "Personal Training Liability Waiver Disclaimer",
+      "slug": "personal-training-liability-waiver-disclaimer",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 322,
+      "excerpt": "The form is provided by ISSA as an example.",
+      "status": "idea"
+    },
+    {
+      "term": "LIENT A SSESSMENTS Please note",
+      "slug": "lient-a-ssessments-please-note",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 324,
+      "excerpt": "Possession of this form does not indicate certification status with ISSA.",
+      "status": "idea"
+    },
+    {
+      "term": "Relationship",
+      "slug": "relationship",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 325,
+      "excerpt": "Address: City, State, Zip: Home Phone: Work Phone: Physician Information Current Physician: Phone: Are you under the care of a physician, chiropractor, or other health care professional for any reason Yes No (circle)?",
+      "status": "idea"
+    },
+    {
+      "term": "Yes No Medication",
+      "slug": "yes-no-medication",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 325,
+      "excerpt": "Dosage/Frequency: Condition: List any and all allergies: Has your doctor ever diagnosed you with high blood pressure?",
+      "status": "idea"
+    },
+    {
+      "term": "Please note",
+      "slug": "please-note",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 325,
+      "excerpt": "Possession of this form does not indicate certification status with ISSA.",
+      "status": "idea"
+    },
+    {
+      "term": "HEALTH HISTORY QUESTIONNAIRE Pain History",
+      "slug": "health-history-questionnaire-pain-history",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 329,
+      "excerpt": "Check if you have or have had pain in the following.",
+      "status": "idea"
+    },
+    {
+      "term": "Work",
+      "slug": "work",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 332,
+      "excerpt": "Minimal Moderate Average Extremely Home: Minimal Moderate Average Extremely Do you work more than 40 hours a week?",
+      "status": "idea"
+    },
+    {
+      "term": "Name",
+      "slug": "name",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 332,
+      "excerpt": "Date: This dietary record must be as accurate as possible.",
+      "status": "idea"
+    },
+    {
+      "term": "The THR RESISTANCE TRAINING",
+      "slug": "the-thr-resistance-training",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 356,
+      "excerpt": "The category of training that includes physical activities designed to increase muscle mass, improve strength, muscular endurance, or muscular power.",
+      "status": "idea"
+    },
+    {
+      "term": "Motion FITNESS PROGRAM DESIGN",
+      "slug": "motion-fitness-program-design",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 362,
+      "excerpt": "The systematic development of a fitness program or process using assessments, the elements of fitness, periodization, and periodic reassessment.",
+      "status": "idea"
+    },
+    {
+      "term": "Static stretching",
+      "slug": "static-stretching",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 408,
+      "excerpt": "This technique involves holding a joint at the end of its ROM for a period of time, generally up to 60 seconds.",
+      "status": "idea"
+    },
+    {
+      "term": "Dynamic stretching",
+      "slug": "dynamic-stretching",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 408,
+      "excerpt": "This includes actively moving a joint through its entire ROM.",
+      "status": "idea"
+    },
+    {
+      "term": "Ballistic stretching",
+      "slug": "ballistic-stretching",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 408,
+      "excerpt": "Often referred to as bouncing stretching, this technique uses the momentum of the body or limb to force it beyond a normal ROM by bouncing in and out of a stretched position.",
+      "status": "idea"
+    },
+    {
+      "term": "Rating of Perceived Exertion",
+      "slug": "rating-of-perceived-exertion",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 469,
+      "excerpt": "Borg and Modified Borg Scales BORG RPE MODIFIED RPE BREATHING, TALK TEST THR (PERCENT OF MAX HR) EXERCISE TYPE 6 0 No exertion 50–60 percent Warm-up 7 Very light breathing.",
+      "status": "idea"
+    },
+    {
+      "term": "Frequency I",
+      "slug": "frequency-i",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 474,
+      "excerpt": "Intensity T: Time T: Type TIME/DURATION The duration of a training session is inversely related to exercise intensity.",
+      "status": "idea"
+    },
+    {
+      "term": "Spirometer SPIROMETER",
+      "slug": "spirometer-spirometer",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 479,
+      "excerpt": "An apparatus for measuring the volume of air inspired and expired by the lungs.",
+      "status": "idea"
+    },
+    {
+      "term": "Age",
+      "slug": "age",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 481,
+      "excerpt": "Lungs are at their maximum capacity during early adulthood and decline with age.",
+      "status": "idea"
+    },
+    {
+      "term": "Sex",
+      "slug": "sex",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 481,
+      "excerpt": "Female reproductive hormones lower aerobic power and pulmonary function.",
+      "status": "idea"
+    },
+    {
+      "term": "Body size",
+      "slug": "body-size",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 481,
+      "excerpt": "Smaller bodies naturally have smaller lung capacity.",
+      "status": "idea"
+    },
+    {
+      "term": "Physical conditioning",
+      "slug": "physical-conditioning",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 481,
+      "excerpt": "Lung capacity improves (up to about 15 percent) with frequent aerobic exercise.",
+      "status": "drafted"
+    },
+    {
+      "term": "Karvonen formula as follows",
+      "slug": "karvonen-formula-as-follows",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 496,
+      "excerpt": "THR = ([HR max – HR rest ] × desired intensity) + HR rest Consider the 35-year-old client again with a resting heart rate of 55 beats per minute.",
+      "status": "idea"
+    },
+    {
+      "term": "Tires",
+      "slug": "tires",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 506,
+      "excerpt": "Road bikes have thinner tires that reduce resistance on the street, while mountain bikes have thicker, rugged tires to grip the terrain for better traction.",
+      "status": "idea"
+    },
+    {
+      "term": "Cycle frame",
+      "slug": "cycle-frame",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 506,
+      "excerpt": "In outdoor cycling, the lighter the frame, the lower the resistance.",
+      "status": "idea"
+    },
+    {
+      "term": "Cadence",
+      "slug": "cadence",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 506,
+      "excerpt": "The rhythm at which pedals affect muscle activation.",
+      "status": "idea"
+    },
+    {
+      "term": "Environment",
+      "slug": "environment",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 506,
+      "excerpt": "Weather affects cycling performance in outdoor cycling.",
+      "status": "idea"
+    },
+    {
+      "term": "Terrain",
+      "slug": "terrain",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 506,
+      "excerpt": "The condition of streets or trails affects overall performance as do incline and decline (hills).",
+      "status": "idea"
+    },
+    {
+      "term": "The drive",
+      "slug": "the-drive",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 508,
+      "excerpt": "With back straight, core tight, and feet secured, the client should push back with the lower body.",
+      "status": "idea"
+    },
+    {
+      "term": "The finish",
+      "slug": "the-finish",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 508,
+      "excerpt": "When the legs are almost fully extended, the client should hinge backward at the hips and use the upper back to pull the oar toward the chest.",
+      "status": "idea"
+    },
+    {
+      "term": "The recovery",
+      "slug": "the-recovery",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 509,
+      "excerpt": "This is the return to the catch.",
+      "status": "idea"
+    },
+    {
+      "term": "Thickness",
+      "slug": "thickness",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 511,
+      "excerpt": "Thicker ropes increase intensity by activating the forearm and hand muscles to challenge (and develop) grip strength.",
+      "status": "idea"
+    },
+    {
+      "term": "Distance from the anchor",
+      "slug": "distance-from-the-anchor",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 511,
+      "excerpt": "Waves should reach all the way to the anchor.",
+      "status": "idea"
+    },
+    {
+      "term": "Wave size/pace",
+      "slug": "wave-size-pace",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 511,
+      "excerpt": "Wave size is subjective, but the larger the upper body motion, the larger the wave and the greater the intensity.",
+      "status": "idea"
+    },
+    {
+      "term": "Body position",
+      "slug": "body-position",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 511,
+      "excerpt": "To vary muscle activation, vary body position.",
+      "status": "idea"
+    },
+    {
+      "term": "Wraps",
+      "slug": "wraps",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 511,
+      "excerpt": "To perform pulling exercises, a fitness professional can wrap the rope around an anchor, and the client can pull the rope through the anchor, hand over hand, and repeat.",
+      "status": "idea"
+    },
+    {
+      "term": "Kettlebell Exercises",
+      "slug": "kettlebell-exercises",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 512,
+      "excerpt": "Halo, Overhead Press, and Goblet Squat CIRCUIT TRAINING Circuit training includes strength training and cardiovascular training.",
+      "status": "idea"
+    },
+    {
+      "term": "Force is mass times acceleration",
+      "slug": "force-is-mass-times-acceleration",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 522,
+      "excerpt": "F = M x A The more strength an individual or athlete has, the more muscular power they are capable of producing.",
+      "status": "idea"
+    },
+    {
+      "term": "Power Fastest controllable tempo SYNCOPE",
+      "slug": "power-fastest-controllable-tempo-syncope",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 552,
+      "excerpt": "Temporary loss of consciousness related to insufficient blood flow to the brain.",
+      "status": "idea"
+    },
+    {
+      "term": "Poor mobility or flexibility",
+      "slug": "poor-mobility-or-flexibility",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 570,
+      "excerpt": "Both mobility and flexibility impact every movement pattern.",
+      "status": "idea"
+    },
+    {
+      "term": "Poor exercise form or technique",
+      "slug": "poor-exercise-form-or-technique",
+      "theme": "Assessment & Safety",
+      "source": "High Res_CPT",
+      "chunk_index": 571,
+      "excerpt": "A client may experience movement dysfunctions that lead to injury when they perform an exercise incorrectly.",
+      "status": "idea"
+    },
+    {
+      "term": "Poor preparation for movement",
+      "slug": "poor-preparation-for-movement",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 571,
+      "excerpt": "When a warm-up is skipped (general or specific), the body may not be prepared to execute the necessary movement patterns.",
+      "status": "idea"
+    },
+    {
+      "term": "Insufficient energy or exhaustion",
+      "slug": "insufficient-energy-or-exhaustion",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 571,
+      "excerpt": "When the body is fatigued, under recovered, or exhausted, movement will suffer, and injury can result.",
+      "status": "idea"
+    },
+    {
+      "term": "Barbell Deadlift Prime movers",
+      "slug": "barbell-deadlift-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 584,
+      "excerpt": "Hamstrings, Quadriceps, Glutes Begin by stepping up to the barbell with the shins to the bar and with the feet just outside hip width.",
+      "status": "idea"
+    },
+    {
+      "term": "Prime movers",
+      "slug": "prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 585,
+      "excerpt": "Hamstrings, Glutes To begin the exercise, pick up the dumbbells and stand tall.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Kettlebell Swing Prime movers",
+      "slug": "echnique-kettlebell-swing-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 586,
+      "excerpt": "Hamstrings, Glutes Begin standing with the feet just outside the hips with the kettlebell in hand.",
+      "status": "idea"
+    },
+    {
+      "term": "Single-Leg RDL Prime movers",
+      "slug": "single-leg-rdl-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 587,
+      "excerpt": "Hamstrings, Glutes Begin in a standing position with the desired weight in the hands and with the arms fully extended at the sides (or slightly in front of the thighs).",
+      "status": "idea"
+    },
+    {
+      "term": "Push-Up Prime mover",
+      "slug": "push-up-prime-mover",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 589,
+      "excerpt": "Pectoralis Major Begin in a high plank position with the body in a straight line from the head to the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Cable Chest Press Prime mover",
+      "slug": "cable-chest-press-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 589,
+      "excerpt": "Pectoralis Major For this exercise, the handles on the cable cross should be set at approximately chest height.",
+      "status": "idea"
+    },
+    {
+      "term": "Barbell Bench Press Prime mover",
+      "slug": "barbell-bench-press-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 591,
+      "excerpt": "Pectoralis Major Lie supine on a flat bench with the feet on the floor and the head, shoulders, and glutes in contact with the bench.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Chest Press Prime mover",
+      "slug": "dumbbell-chest-press-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 591,
+      "excerpt": "Pectoralis Major With dumbbells in hand, lie supine on a flat bench with the feet on the floor and the head, shoulders, and glutes in contact with the bench.",
+      "status": "idea"
+    },
+    {
+      "term": "Machine Chest Press Prime mover",
+      "slug": "machine-chest-press-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 592,
+      "excerpt": "Pectoralis Major Sit in the machine with the glutes, upper back, and head in contact with the seat.",
+      "status": "idea"
+    },
+    {
+      "term": "Machine Assisted Dips Prime mover",
+      "slug": "machine-assisted-dips-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 593,
+      "excerpt": "Triceps Brachii Adjust the weight pin for the desired amount of assistance (may require trial and error to find the right assistance).",
+      "status": "idea"
+    },
+    {
+      "term": "Bent-Over Row Prime mover",
+      "slug": "bent-over-row-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 594,
+      "excerpt": "Latissimus Dorsi Begin with the shins behind a barbell loaded with the appropriate weight.",
+      "status": "idea"
+    },
+    {
+      "term": "Arm Cable Row Prime mover",
+      "slug": "arm-cable-row-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 595,
+      "excerpt": "Latissimus Dorsi Begin standing under a cable cross machine with a single handle set at a height between the belly button and chest.",
+      "status": "idea"
+    },
+    {
+      "term": "Seated Cable Row Prime mover",
+      "slug": "seated-cable-row-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 596,
+      "excerpt": "Latissimus Dorsi Set the appropriate weight on the weight stack, and sit on the extended bench.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Lat Pulldown Prime mover",
+      "slug": "echnique-lat-pulldown-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 597,
+      "excerpt": "Latissimus Dorsi Sit in the lat pulldown machine, and adjust the leg roller pads to secure the upper thigh in place with the knees bent at 90 degrees.",
+      "status": "idea"
+    },
+    {
+      "term": "Pull-Up Prime mover",
+      "slug": "pull-up-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 597,
+      "excerpt": "Latissimus Dorsi Begin standing under the pull-up bar.",
+      "status": "idea"
+    },
+    {
+      "term": "Assisted Pull-Up Prime mover",
+      "slug": "assisted-pull-up-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 598,
+      "excerpt": "Latissimus Dorsi Adjust the weight pin for the desired amount of assistance (may require trial and error to find the right assistance).",
+      "status": "idea"
+    },
+    {
+      "term": "Upright Row Prime mover",
+      "slug": "upright-row-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 599,
+      "excerpt": "Deltoids Begin standing with the barbell (straight or EZ bar) in hand with the desired hand placement.",
+      "status": "idea"
+    },
+    {
+      "term": "Goblet Squat Prime movers",
+      "slug": "goblet-squat-prime-movers",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 600,
+      "excerpt": "Quadriceps, Glutes This exercise begins with the elbows flexed to hold the load at chest height against the body.",
+      "status": "idea"
+    },
+    {
+      "term": "Barbell Back Squat Prime movers",
+      "slug": "barbell-back-squat-prime-movers",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 601,
+      "excerpt": "Quadriceps, Glutes Standing in front of a racked barbell, step under the bar, and place it either on the trapezius and shoulder (high bar) or just above the spine of the scapula (low bar).",
+      "status": "idea"
+    },
+    {
+      "term": "Seated Leg Press Prime movers",
+      "slug": "seated-leg-press-prime-movers",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 603,
+      "excerpt": "Quadriceps, Glutes Adjust the weight stack to the desired load, and sit into the machine.",
+      "status": "idea"
+    },
+    {
+      "term": "Angled Leg Press Prime movers",
+      "slug": "angled-leg-press-prime-movers",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 604,
+      "excerpt": "Quadriceps, Glutes Add the desired load, and sit into the leg press.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Forward Lunge Prime movers",
+      "slug": "dumbbell-forward-lunge-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 605,
+      "excerpt": "Quadriceps, Glutes Starting from a standing position with the feet hip width apart, take a large step forward, maintaining the hip-width foot placement.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Reverse Lunge Prime movers",
+      "slug": "echnique-reverse-lunge-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 606,
+      "excerpt": "Quadriceps, Glutes Starting from a standing position with the feet hip width apart, take a large step back, maintaining the hip-width foot placement.",
+      "status": "idea"
+    },
+    {
+      "term": "Step-Up Prime movers",
+      "slug": "step-up-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 606,
+      "excerpt": "Quadriceps, Hamstrings, Glutes Starting by standing in front of a platform of the desired height, lift one leg with the knee flexed, and place the entire foot onto the platform.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Lateral Lunge Prime movers",
+      "slug": "echnique-lateral-lunge-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 607,
+      "excerpt": "Quadriceps, Glutes Starting from a standing position with the feet straight and hip width apart, take a large step to the side.",
+      "status": "idea"
+    },
+    {
+      "term": "Lunge with Rotation Prime movers",
+      "slug": "lunge-with-rotation-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 608,
+      "excerpt": "Quadriceps, Glutes, Core Hold a weight or weighted implement (such as a medicine ball) in front of the chest with the elbows tight to the body and shoulders relaxed and away from the ears.",
+      "status": "idea"
+    },
+    {
+      "term": "Farmer Carry Prime movers",
+      "slug": "farmer-carry-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 610,
+      "excerpt": "Quadriceps, Core, Hamstrings, and Glutes Start in a standing position with the feet at hip width and the desired weight next to the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Suitcase Carry Prime movers",
+      "slug": "suitcase-carry-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 610,
+      "excerpt": "Quadriceps, Core, Hamstrings, and Glutes Start in a standing position with the feet at hip width and the desired single weight next to the feet.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Walking Lunge Prime movers",
+      "slug": "dumbbell-walking-lunge-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 611,
+      "excerpt": "Quadriceps, Glutes Starting from a standing position with the feet hip width apart, take a large step forward, maintaining the hip-width foot placement.",
+      "status": "idea"
+    },
+    {
+      "term": "Monster Band Walk Prime movers",
+      "slug": "monster-band-walk-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 612,
+      "excerpt": "Tensor Fasciae Latae, Glutes From a standing position, place a mini band around both legs at the knees or the ankles.",
+      "status": "idea"
+    },
+    {
+      "term": "Lateral Band Walk Prime movers",
+      "slug": "lateral-band-walk-prime-movers",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 612,
+      "excerpt": "Glutes From a standing position, place a mini band around both legs at the knees or the ankles.",
+      "status": "idea"
+    },
+    {
+      "term": "Forearm Plank Prime mover",
+      "slug": "forearm-plank-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 614,
+      "excerpt": "Core Begin in a kneeling position.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Glute Bridge Prime movers",
+      "slug": "echnique-glute-bridge-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 615,
+      "excerpt": "Core, Glutes Lie flat on the back (supine) with the knees flexed and the feet flat on the floor.",
+      "status": "idea"
+    },
+    {
+      "term": "ECHNIQUE Back Extension Prime mover",
+      "slug": "echnique-back-extension-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 617,
+      "excerpt": "Erector Spinae Set the back extension apparatus to the desired height.",
+      "status": "idea"
+    },
+    {
+      "term": "Seated Calf Raise Prime mover",
+      "slug": "seated-calf-raise-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 618,
+      "excerpt": "Gastrocnemius, Soleus Load the machine with the appropriate weight, and sit on the seat with the ball of each foot on the foot platforms.",
+      "status": "idea"
+    },
+    {
+      "term": "Over Reverse Fly Prime movers",
+      "slug": "over-reverse-fly-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 620,
+      "excerpt": "Rhomboids, Rear Deltoid Begin in a standing position with the appropriate weights in hand.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Front Raise Prime mover",
+      "slug": "dumbbell-front-raise-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 620,
+      "excerpt": "Anterior Deltoid Begin in a standing position with the feet at hip width and the dumbbells in hand.",
+      "status": "idea"
+    },
+    {
+      "term": "Leg Extension Prime mover",
+      "slug": "leg-extension-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 621,
+      "excerpt": "Quadriceps Set the leg extension machine to the appropriate seat position.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Lateral Raise Prime mover",
+      "slug": "dumbbell-lateral-raise-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 622,
+      "excerpt": "Deltoid Begin in a standing position with the feet at hip width and the dumbbells in hand.",
+      "status": "idea"
+    },
+    {
+      "term": "Prone Leg Curl Prime movers",
+      "slug": "prone-leg-curl-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 622,
+      "excerpt": "Hamstrings Lay face down on the pads for the body and grasp the handles to stabilize the upper body.",
+      "status": "idea"
+    },
+    {
+      "term": "Hip Adduction Machine Prime movers",
+      "slug": "hip-adduction-machine-prime-movers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 623,
+      "excerpt": "Adductor Group Sit in the adductor machine with one foot in each foothold.",
+      "status": "idea"
+    },
+    {
+      "term": "Hip Abduction Machine Prime mover",
+      "slug": "hip-abduction-machine-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 624,
+      "excerpt": "Gluteus Medius, Gluteus Minimus, Piriformis Sit in the abduction machine with feet in the footholds.",
+      "status": "idea"
+    },
+    {
+      "term": "Cable Triceps Pushdown Prime mover",
+      "slug": "cable-triceps-pushdown-prime-mover",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 624,
+      "excerpt": "Triceps Brachii Begin standing in front of a cable machine with the rope attachment set at the top.",
+      "status": "idea"
+    },
+    {
+      "term": "Dumbbell Biceps Curl Prime mover",
+      "slug": "dumbbell-biceps-curl-prime-mover",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 625,
+      "excerpt": "Biceps Brachii Begin in a seated or standing position with the appropriate dumbbells in hand and the arms fully extended.",
+      "status": "idea"
+    },
+    {
+      "term": "Intake Recommendations",
+      "slug": "intake-recommendations",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 632,
+      "excerpt": "Carbohydrates Carbohydrates are essential nutrients that most people need in their diets in significant quantities for good overall health.",
+      "status": "idea"
+    },
+    {
+      "term": "NUTRITION FOUNDATIONS Intake Recommendations",
+      "slug": "nutrition-foundations-intake-recommendations",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 637,
+      "excerpt": "Fiber Fiber is essential to one’s health, yet the typical American still falls short of the recommended daily amount.",
+      "status": "idea"
+    },
+    {
+      "term": "Fatty acids are the FATS",
+      "slug": "fatty-acids-are-the-fats",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 639,
+      "excerpt": "Organic compounds that are made up of carbon, hydrogen, and oxygen.",
+      "status": "idea"
+    },
+    {
+      "term": "Potassium and magnesium ELECTROLYTES",
+      "slug": "potassium-and-magnesium-electrolytes",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 653,
+      "excerpt": "Minerals in the body that have an electric charge.",
+      "status": "idea"
+    },
+    {
+      "term": "Lower blood pressure DIET",
+      "slug": "lower-blood-pressure-diet",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 677,
+      "excerpt": "The foods that a person or community eats most often and habitually; a choice of regular foods consumed for the purpose of losing weight or for medical reasons.",
+      "status": "idea"
+    },
+    {
+      "term": "Blood Type A",
+      "slug": "blood-type-a",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 680,
+      "excerpt": "People with this blood type should consume fruit, vegetables, tofu, seafood, soy, and whole grains, and avoid most meats.",
+      "status": "idea"
+    },
+    {
+      "term": "Blood Type AB",
+      "slug": "blood-type-ab",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 680,
+      "excerpt": "AB types should focus on tofu, seafood, dairy, and green leafy vegetables while avoiding caffeine, alcohol, and cured meats.",
+      "status": "idea"
+    },
+    {
+      "term": "Blood Type O",
+      "slug": "blood-type-o",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 680,
+      "excerpt": "Type Os should eat a diet of lean meats, poultry, fish, and vegetables while avoiding grains, beans, and dairy.",
+      "status": "idea"
+    },
+    {
+      "term": "Paleo Diet Pyramid ANIMAL PRODUCTS",
+      "slug": "paleo-diet-pyramid-animal-products",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 691,
+      "excerpt": "Any material derived from the body of an animal, including dairy products, eggs, honey, and gelatin.",
+      "status": "idea"
+    },
+    {
+      "term": "Fruits and vegetables GLUTEN",
+      "slug": "fruits-and-vegetables-gluten",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 692,
+      "excerpt": "A mixture of proteins found in wheat, rye, and barley and gives dough its elastic texture.",
+      "status": "idea"
+    },
+    {
+      "term": "Also note",
+      "slug": "also-note",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 702,
+      "excerpt": "Just like any other form of nutrition planning, this guide serves as a starting point.",
+      "status": "idea"
+    },
+    {
+      "term": "This ANTICATABOLIC",
+      "slug": "this-anticatabolic",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 733,
+      "excerpt": "Properties that protect muscle mass from being broken down.",
+      "status": "idea"
+    },
+    {
+      "term": "Some clients may REMISSION",
+      "slug": "some-clients-may-remission",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 777,
+      "excerpt": "A significant reduction in symptoms and signs of rheumatoid arthritis.",
+      "status": "idea"
+    },
+    {
+      "term": "Young Children",
+      "slug": "young-children",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 811,
+      "excerpt": "Under Six Years Old Physiology : After the rapid growth and development from birth to age two, growth slows.",
+      "status": "idea"
+    },
+    {
+      "term": "Psychology",
+      "slug": "psychology",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 811,
+      "excerpt": "This age group enjoys parallel play , and children are still learning to share, work in a team, and follow detailed instructions.",
+      "status": "idea"
+    },
+    {
+      "term": "Years Old Physiology",
+      "slug": "years-old-physiology",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 813,
+      "excerpt": "Children have continued slow, steady growth until the adolescent growth spurt when they see rapid physical changes in height and weight.",
+      "status": "idea"
+    },
+    {
+      "term": "Virtual platform",
+      "slug": "virtual-platform",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 861,
+      "excerpt": "There are many platforms, such as Zoom, video calls, and Google Meet, for conducting virtual meetings.",
+      "status": "idea"
+    },
+    {
+      "term": "Camera",
+      "slug": "camera",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 861,
+      "excerpt": "For quick video calls, a phone can suffice.",
+      "status": "idea"
+    },
+    {
+      "term": "Lighting",
+      "slug": "lighting",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 862,
+      "excerpt": "Many virtual personal trainers neglect lighting when on a call.",
+      "status": "idea"
+    },
+    {
+      "term": "Space and appearance",
+      "slug": "space-and-appearance",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 862,
+      "excerpt": "The space where a trainer sets up for an online training session matters.",
+      "status": "idea"
+    },
+    {
+      "term": "Exercise equipment",
+      "slug": "exercise-equipment",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 863,
+      "excerpt": "Virtual training is typically conducted with no or minimal exercise equipment.",
+      "status": "idea"
+    },
+    {
+      "term": "Space and equipment",
+      "slug": "space-and-equipment",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 866,
+      "excerpt": "Specifically how much space and what equipment is available to support all participants.",
+      "status": "idea"
+    },
+    {
+      "term": "Exercise programming",
+      "slug": "exercise-programming",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 866,
+      "excerpt": "With small groups, it is important to keep all participants engaged.",
+      "status": "idea"
+    },
+    {
+      "term": "Observability",
+      "slug": "observability",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 866,
+      "excerpt": "When programming exercise for a small group, the fitness professional will attempt to watch all participants at the same time.",
+      "status": "idea"
+    },
+    {
+      "term": "The following are examples",
+      "slug": "the-following-are-examples",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 875,
+      "excerpt": "Nordstrom: to give customers the most compelling shopping experience possible.",
+      "status": "idea"
+    },
+    {
+      "term": "Here is an example",
+      "slug": "here-is-an-example",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 889,
+      "excerpt": "Subject Line: Hey, Brian! Are you still training?",
+      "status": "idea"
+    },
+    {
+      "term": "Body",
+      "slug": "body",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 889,
+      "excerpt": "Hey, Brian! It’s Sarah from Monner Training!",
+      "status": "idea"
+    },
+    {
+      "term": "Sarah Monner LEADS",
+      "slug": "sarah-monner-leads",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 889,
+      "excerpt": "Potential clients not yet using a professional’s services.",
+      "status": "idea"
+    },
+    {
+      "term": "Two",
+      "slug": "two",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 905,
+      "excerpt": "Don’t use high pressure. Just as a trainer wouldn’t expect a new client to perform 60 seconds of burpees on day one, they also shouldn’t expect someone to purchase a package right away either.",
+      "status": "idea"
+    },
+    {
+      "term": "Three",
+      "slug": "three",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 905,
+      "excerpt": "ASK! If someone hasn’t purchased a package yet, it doesn’t mean they aren’t ready to.",
+      "status": "idea"
+    },
+    {
+      "term": "Disinfecting",
+      "slug": "disinfecting",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 918,
+      "excerpt": "Killing germs and virus on surfaces or objects with the use of chemicals.",
+      "status": "idea"
+    },
+    {
+      "term": "Mood changes DIABETIC COMA",
+      "slug": "mood-changes-diabetic-coma",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 941,
+      "excerpt": "A comatose state resulting from excessively high blood sugar levels.",
+      "status": "idea"
+    },
+    {
+      "term": "Adaptive Physical Fitness",
+      "slug": "adaptive-physical-fitness",
+      "theme": "Recovery & Adaptation",
+      "source": "High Res_CPT",
+      "chunk_index": 945,
+      "excerpt": "The art and science of developing, implementing, and monitoring a carefully designed physical fitness program for a person with a disability.",
+      "status": "idea"
+    },
+    {
+      "term": "Added Sugars",
+      "slug": "added-sugars",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 945,
+      "excerpt": "Any type of sugar that is added to a food or beverage when it is processed.",
+      "status": "idea"
+    },
+    {
+      "term": "Valves",
+      "slug": "valves",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 950,
+      "excerpt": "Valves between the atria and ventricles preventing the backward flow of blood during cardiac contractions - 100 Atrium - One of the two upper cavities of the heart passing blood to the ventricles.",
+      "status": "idea"
+    },
+    {
+      "term": "Carb Cycling",
+      "slug": "carb-cycling",
+      "theme": "Nutrition & Fuel",
+      "source": "High Res_CPT",
+      "chunk_index": 954,
+      "excerpt": "Increasing and reducing carb intake on a daily, weekly, or monthly basis.",
+      "status": "idea"
+    },
+    {
+      "term": "Cardiometabolic",
+      "slug": "cardiometabolic",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 955,
+      "excerpt": "A combination of metabolic dysfunctions mainly characterized by insulin resistance, impaired glucose tolerance, dyslipidemia, hypertension, and central adiposity.",
+      "status": "idea"
+    },
+    {
+      "term": "Certified Group Fitness Instructors",
+      "slug": "certified-group-fitness-instructors",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 956,
+      "excerpt": "Fitness professionals certified in delivering large group fitness classes.",
+      "status": "idea"
+    },
+    {
+      "term": "Force",
+      "slug": "force",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 971,
+      "excerpt": "The interaction that creates work or physical change.",
+      "status": "idea"
+    },
+    {
+      "term": "Golgi Tendon Organ",
+      "slug": "golgi-tendon-organ",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 974,
+      "excerpt": "The proprioceptive sensory organ that senses muscle tension in a tendon and inhibits muscle action - 91 , 314 , 361 Good Samaritan Laws - Legal protections offered in much of the U.S.",
+      "status": "idea"
+    },
+    {
+      "term": "Internal Stimuli",
+      "slug": "internal-stimuli",
+      "theme": "Mobility & Correctives",
+      "source": "High Res_CPT",
+      "chunk_index": 980,
+      "excerpt": "Sensory input from within the body - 67 International Units (IU) - The quantity of a substance that has a biological effect.",
+      "status": "idea"
+    },
+    {
+      "term": "GLOSSARY L Lactate Threshold",
+      "slug": "glossary-l-lactate-threshold",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 983,
+      "excerpt": "The maximum effort or intensity an individual can maintain for an extended time with minimal effect on blood lactate levels.",
+      "status": "idea"
+    },
+    {
+      "term": "Mass",
+      "slug": "mass",
+      "theme": "Cardio & Energy",
+      "source": "High Res_CPT",
+      "chunk_index": 985,
+      "excerpt": "The amount of matter in an object - 139 , 142 Maximum Heart Rate - The estimated maximum number of times the heart should beat per minute during exercise.",
+      "status": "idea"
+    },
+    {
+      "term": "Nociceptors",
+      "slug": "nociceptors",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 992,
+      "excerpt": "Pain-sensitive nerve endings - 93 Non-Exercise Activity Thermogenesis (NEAT) - Energy expended as a result of any movements of the body that require energy.",
+      "status": "idea"
+    },
+    {
+      "term": "Triggers",
+      "slug": "triggers",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 1015,
+      "excerpt": "Any chemical, irritant, or allergen that causes an inflammatory response of the airways - 625 , 626 Triglyceride - A chemical compund formed when three fatty acids combine with glycerol.",
+      "status": "idea"
+    },
+    {
+      "term": "Physical Activity and Health",
+      "slug": "physical-activity-and-health",
+      "theme": "Programming & Variables",
+      "source": "High Res_CPT",
+      "chunk_index": 1019,
+      "excerpt": "A Report of the Surgeon General.",
+      "status": "idea"
+    },
+    {
+      "term": "Atlanta",
+      "slug": "atlanta",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 1019,
+      "excerpt": "US Department of Health and Human Services, Centers for Disease Control and Prevention, National Center for Chronic Disease Prevention and Health Promotion, 1996.",
+      "status": "idea"
+    },
+    {
+      "term": "Motivational Interviewing",
+      "slug": "motivational-interviewing",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 1021,
+      "excerpt": "Helping People Change. Guilford Press, 2012.",
+      "status": "idea"
+    },
+    {
+      "term": "Wiley Interdisciplinary Reviews",
+      "slug": "wiley-interdisciplinary-reviews",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 1025,
+      "excerpt": "Systems Biology and Medicine 2, no.",
+      "status": "idea"
+    },
+    {
+      "term": "The Training Process",
+      "slug": "the-training-process",
+      "theme": "Training Foundations",
+      "source": "High Res_CPT",
+      "chunk_index": 1033,
+      "excerpt": "Planning for Strength—Power Training in Track and Field.",
+      "status": "idea"
+    },
+    {
+      "term": "Dietary Reference Intakes",
+      "slug": "dietary-reference-intakes",
+      "theme": "Anatomy & Movement",
+      "source": "High Res_CPT",
+      "chunk_index": 1047,
+      "excerpt": "For Energy Carbohydrate, Fiber, Fat, Fatty Acids, Cholesterol, Protein, and Amino Acids .",
+      "status": "idea"
+    },
+    {
+      "term": "US Toxicity",
+      "slug": "us-toxicity",
+      "theme": "Training Foundations",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 4,
+      "excerpt": "Toxic level: more than 2 grams per day.",
+      "status": "idea"
+    },
+    {
+      "term": "Roles",
+      "slug": "roles",
+      "theme": "Recovery & Adaptation",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 4,
+      "excerpt": "Converted into coenzymes to aid in the breakdown of carbs and BCAAs and produces ribose (needed for normal growth and cellular function) Deficiency: Abnormalities of carbohydrate metabolism, fatigue, and loss of appetite.",
+      "status": "idea"
+    },
+    {
+      "term": "Athletes",
+      "slug": "athletes",
+      "theme": "Nutrition & Fuel",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 4,
+      "excerpt": "Megadoses may improve performance when taken 335 days before a competition (more research is needed) Vitamin B2 (riboflavin) Roles: Is a coenzyme.",
+      "status": "idea"
+    },
+    {
+      "term": "Deficiency",
+      "slug": "deficiency",
+      "theme": "Training Foundations",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 5,
+      "excerpt": "Inflamed lips, dry skin, growth reduction, hair loss, and cataracts Toxicity: No identified unsafe amount.",
+      "status": "idea"
+    },
+    {
+      "term": "Toxicity",
+      "slug": "toxicity",
+      "theme": "Training Foundations",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 5,
+      "excerpt": "Toxic level: amounts over 50 mg.",
+      "status": "idea"
+    },
+    {
+      "term": "Food sources",
+      "slug": "food-sources",
+      "theme": "Cardio & Energy",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 6,
+      "excerpt": "Chicken, fish, kidney, liver, eggs, rice, soybeans, bananas, and walnuts Athletes: Endurance athletes should avoid high doses.",
+      "status": "idea"
+    },
+    {
+      "term": "Deficiency is rare Toxicity",
+      "slug": "deficiency-is-rare-toxicity",
+      "theme": "Training Foundations",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 7,
+      "excerpt": "Toxic level: over 10 to 20g daily.",
+      "status": "idea"
+    },
+    {
+      "term": "Vitamin-like compounds",
+      "slug": "vitamin-like-compounds",
+      "theme": "Nutrition & Fuel",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 8,
+      "excerpt": "Neither fat-soluble nor water-soluble Choline Roles: Involved in fatty acid metabolism, liver function, and structural integrity of cell membranes.",
+      "status": "idea"
+    },
+    {
+      "term": "Major minerals Calcium Roles",
+      "slug": "major-minerals-calcium-roles",
+      "theme": "Anatomy & Movement",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 9,
+      "excerpt": "Bone building and strength, transmission of nerve impulses, maintaining a regular heartbeat, muscle contraction, cellular membrane permeability, and blood clotting.",
+      "status": "idea"
+    },
+    {
+      "term": "Phosphorus Roles",
+      "slug": "phosphorus-roles",
+      "theme": "Nutrition & Fuel",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 10,
+      "excerpt": "Involved in many of the same processes as calcium Dietary Reference Intakes: Children under the age of 18 and pregnant females: 1,200 mg per day.",
+      "status": "idea"
+    },
+    {
+      "term": "Dietary Reference Intake",
+      "slug": "dietary-reference-intake",
+      "theme": "Mobility & Correctives",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 12,
+      "excerpt": "No established DRIs Deficiency: Can occur with a lack of essential amino acid intake from malnourishment (lack of available food, voluntary low-calorie intake, plant-based dieting).",
+      "status": "idea"
+    },
+    {
+      "term": "Minor Minerals Iron Roles",
+      "slug": "minor-minerals-iron-roles",
+      "theme": "Nutrition & Fuel",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 12,
+      "excerpt": "Carries oxygen throughout the body and takes the form of myoglobin for oxygen storage.",
+      "status": "idea"
+    },
+    {
+      "term": "Selenium Roles",
+      "slug": "selenium-roles",
+      "theme": "Mobility & Correctives",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 15,
+      "excerpt": "Vital component of an antioxidant enzyme called glutathione peroxidase (protects the body from free radical damage, in particular hydroperoxides).",
+      "status": "idea"
+    },
+    {
+      "term": "DNA synthesis Dietary Reference Intake",
+      "slug": "dna-synthesis-dietary-reference-intake",
+      "theme": "Nutrition & Fuel",
+      "source": "Micro fact sheet (1)",
+      "chunk_index": 15,
+      "excerpt": "Adults: 55 mcg per day. Pregnant females: 60 mcg per day.",
+      "status": "idea"
+    }
+  ]
+}

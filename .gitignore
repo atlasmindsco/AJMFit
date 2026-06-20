@@ -44,3 +44,11 @@ docs/*.pdf
 assets/Intro video*
 assets/hero_video.mp4
 public/hero-video.mp4
+.gstack/
+
+.vercel
+
+.env.netlify
+.tmp/
+__pycache__/
+*.pyc
