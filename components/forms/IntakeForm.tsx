@@ -47,6 +47,7 @@ const tierOptions = [
     value: 'blueprint',
     label: 'The Blueprint',
     monthlyPrice: 19.97,
+    monthlyOnly: true,
     tagline: 'Self-guided. Full app access.',
     features: [
       'Full studio app — workouts, nutrition, programs library',
@@ -60,7 +61,7 @@ const tierOptions = [
   {
     value: 'accelerator',
     label: 'The Accelerator',
-    monthlyPrice: 497,
+    monthlyPrice: 397,
     tagline: 'For those ready to level up.',
     featured: true,
     features: [
@@ -137,10 +138,15 @@ export default function IntakeForm() {
       // Submit to the server route, which writes with the service-role key.
       // No studio access is granted here — the client is invited by email once
       // Anthony approves the application.
+      // Blueprint is monthly-only.
+      const payload = {
+        ...data,
+        billingCycle: data.tier === 'blueprint' ? 'monthly' : data.billingCycle,
+      }
       const res = await fetch('/api/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
 
       if (!res.ok) {
@@ -358,7 +364,8 @@ export default function IntakeForm() {
                   {tierOptions.map((opt) => {
                     const isSelected = watch('tier') === opt.value
                     const isExpanded = hoveredTier === opt.value
-                    const isWeekly = watch('billingCycle') === 'weekly'
+                    const monthlyOnly = (opt as { monthlyOnly?: boolean }).monthlyOnly
+                    const isWeekly = !monthlyOnly && watch('billingCycle') === 'weekly'
                     const displayPrice = isWeekly
                       ? Math.ceil(opt.monthlyPrice / 4)
                       : opt.monthlyPrice

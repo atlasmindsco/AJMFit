@@ -10,31 +10,35 @@ interface Tier {
   tagline: string
   features: string[]
   featured?: boolean
+  monthlyOnly?: boolean
 }
 
 const tiers: Tier[] = [
   {
     name: 'The Blueprint',
-    monthlyPrice: 297,
-    tagline: 'Your foundation. Built right.',
+    monthlyPrice: 19.97,
+    monthlyOnly: true,
+    tagline: 'Self-guided. Full app access.',
     features: [
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Scaled to your equipment',
+      'Full studio app — workouts, nutrition, programs library',
+      'Photo food recognition + macro tracking',
+      'Workout logging + PR tracking',
+      'Chea AI assistant',
+      'Community access',
       'M-F messaging access',
-      'Supplement recommendations',
     ],
   },
   {
     name: 'The Accelerator',
-    monthlyPrice: 497,
+    monthlyPrice: 397,
     tagline: 'For those ready to level up.',
     featured: true,
     features: [
       'Everything in The Blueprint',
+      'Custom 3-4 day/week workout plan',
+      'New plan every 30 days (3 phases)',
       'Weekly 30-45 min video check-in',
       'Form feedback via video review',
-      'Progress tracking & adjustments',
       'Priority response M-F',
     ],
   },
@@ -151,10 +155,10 @@ export default function Pricing() {
           className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch"
         >
           {tiers.map((tier) => {
-            const displayPrice =
-              billingCycle === 'monthly'
-                ? tier.monthlyPrice
-                : getWeeklyPrice(tier.monthlyPrice)
+            const isMonthly = tier.monthlyOnly || billingCycle === 'monthly'
+            const displayPrice = isMonthly
+              ? tier.monthlyPrice
+              : getWeeklyPrice(tier.monthlyPrice)
 
             return (
               <motion.div
@@ -184,7 +188,7 @@ export default function Pricing() {
                   <div className="mt-4 flex items-baseline gap-1">
                     <AnimatePresence mode="wait">
                       <motion.span
-                        key={`${tier.name}-${billingCycle}`}
+                        key={`${tier.name}-${isMonthly ? 'm' : 'w'}`}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
@@ -201,7 +205,7 @@ export default function Pricing() {
                         tier.featured ? 'text-white/50' : 'text-brand-slate'
                       }`}
                     >
-                      /{billingCycle === 'monthly' ? 'month' : 'week'}
+                      /{isMonthly ? 'month' : 'week'}
                     </span>
                   </div>
 

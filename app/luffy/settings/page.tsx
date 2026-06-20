@@ -137,9 +137,9 @@ export default function SettingsPage() {
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Pricing Tiers</h2>
             <div className="space-y-3">
               {[
-                { name: 'The Blueprint', price: '$197', features: 'Custom program only' },
-                { name: 'The Accelerator', price: '$497', features: 'Program + weekly check-ins + nutrition' },
-                { name: 'The Full Experience', price: '$997', features: 'Everything + daily access + live training' },
+                { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided — full app access' },
+                { name: 'The Accelerator', price: '$397/mo', features: 'Custom program + weekly check-ins' },
+                { name: 'The Full Experience', price: '$697/mo', features: 'Everything + 2x live training/week' },
               ].map((tier) => (
                 <div key={tier.name} className="flex items-center justify-between p-4 rounded-lg bg-white/[0.02] border border-white/[0.04]">
                   <div>

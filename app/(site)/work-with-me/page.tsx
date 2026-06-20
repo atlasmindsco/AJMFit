@@ -6,34 +6,36 @@ import Button from '@/components/ui/Button'
 const tiers = [
   {
     name: 'The Blueprint',
-    price: '$297',
-    tagline: 'Your foundation. Built right.',
-    equipment: 'Dumbbells or Resistance Bands',
+    price: '$19.97',
+    tagline: 'Self-guided. Full app access.',
+    equipment: 'Any equipment — programs library scales to what you have',
     features: [
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Scaled to your equipment',
+      'Full studio app — workouts, nutrition, programs library',
+      'Photo food recognition + macro tracking',
+      'Workout logging + PR tracking',
+      'Chea AI assistant',
+      'Community access',
       'M-F messaging access',
-      'Supplement recommendations',
     ],
     idealFor:
-      'You know you need structure but want to train on your own. This is the roadmap — designed around your goals, equipment, and schedule.',
+      "You want structure without the cost of 1:1 coaching. Track your training, nutrition, and progress in one place — choose from the programs library and run your own training.",
   },
   {
     name: 'The Accelerator',
-    price: '$497',
+    price: '$397',
     tagline: 'For those ready to level up.',
     equipment: 'Dumbbells, Bands, or Full Home Gym',
     featured: true,
     features: [
       'Everything in The Blueprint',
+      'Custom 3-4 day/week workout plan',
+      'New plan every 30 days (3 phases)',
       'Weekly 30-45 min video check-in',
       'Form feedback via video review',
-      'Progress tracking & adjustments',
       'Priority response M-F',
     ],
     idealFor:
-      "You want more than just a plan — you want a coach in your corner. Weekly check-ins keep you accountable, and form reviews make sure you're training right.",
+      "You want more than just the app — you want a coach in your corner. Custom programming, weekly check-ins, and form reviews keep you accountable and training right.",
   },
   {
     name: 'The Full Experience',

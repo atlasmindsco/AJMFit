@@ -40,7 +40,9 @@ export async function POST(request: Request) {
     .single()
   if (!app) return NextResponse.json({ error: 'No application on file.' }, { status: 400 })
 
-  const cycle: Cycle = app.billing_cycle === 'weekly' ? 'weekly' : 'monthly'
+  // Blueprint is monthly-only regardless of what the application recorded.
+  const cycle: Cycle =
+    app.tier === 'blueprint' ? 'monthly' : app.billing_cycle === 'weekly' ? 'weekly' : 'monthly'
   const lookup = priceLookupKey(app.tier as Tier, cycle)
   const prices = await stripe.prices.list({ lookup_keys: [lookup], limit: 1 })
   const price = prices.data[0]
