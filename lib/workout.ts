@@ -155,6 +155,22 @@ export async function fetchPRs(userId: string): Promise<PRRow[]> {
   return (data ?? []) as PRRow[]
 }
 
+/** Count of workouts logged since the start of the current week (Mon). */
+export async function fetchWorkoutsThisWeek(userId: string): Promise<number> {
+  const now = new Date()
+  const diffToMonday = (now.getDay() + 6) % 7 // days since Monday
+  const monday = new Date(now)
+  monday.setDate(now.getDate() - diffToMonday)
+  const startStr = monday.toISOString().slice(0, 10)
+  const { count, error } = await db
+    .from('workouts')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('date', startStr)
+  if (error) throw error
+  return count ?? 0
+}
+
 export async function saveSwap(userId: string, originalName: string, swappedName: string) {
   const { error } = await db
     .from('exercise_swaps')
