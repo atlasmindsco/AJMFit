@@ -79,6 +79,14 @@ What Cowork reads to translate requests into the right operation, in order, with
 - **Append-only action log** so there's a record of what Cowork did.
 - **Secrets:** AJM Fit's keys live only in Cowork's secret store. Consider restricting/scoping the highest-risk keys (Stripe) where possible.
 
+## Portability principle (account-level, never machine-local)
+
+Shane sets this up by signing into **Anthony's account** from any computer. This works **only because Cowork state is account-level (cloud), not device-level** — connectors, the project/workspace, files in it, and the secret store persist against Anthony's account, so they're all present when Anthony later signs in on his own laptop.
+
+**Hard rule:** nothing AJM-Fit-specific may live only on Shane's machine. No local folder, no local `.env`, no locally-running MCP server — those do **not** travel to Anthony. Everything lives in: Cowork's project + its secret store + cloud connectors + the **connected GitHub repo** (the reason the toolkit ships *via the repo*, not as local files).
+
+**Connectors must use Anthony's / the business's own logins** (his Kit, Supabase, Google, etc.), so the connections belong to him and don't break if Shane's access is removed.
+
 ## Deployment plan (Shane, one-time, in Anthony's Cowork)
 
 0. **Verify Cowork capabilities** — confirm Anthony's Cowork can: run code (the script toolkit), connect a GitHub repo, hold env secrets, and add the needed MCP connectors. *This gates the rest;* if code execution isn't available, fall back to a connectors-only design (and a custom MCP for the glue).
