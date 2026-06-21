@@ -17,8 +17,9 @@ export default function SchedulePage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [clients, setClients] = useState<Array<{ id: string; name: string }>>([])
   const [loading, setLoading] = useState(true)
-  const [form, setForm] = useState({ user_id: '', date: '', time: '', type: SESSION_TYPES[0], duration_min: 45, notes: '' })
+  const [form, setForm] = useState({ user_id: '', date: '', time: '', type: SESSION_TYPES[0], duration_min: 45, notes: '', zoom: true })
   const [creating, setCreating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const s = await fetchAllSessions()
@@ -34,16 +35,53 @@ export default function SchedulePage() {
   const add = async () => {
     if (!form.user_id || !form.date || !form.time) return
     setCreating(true)
+    setError(null)
     try {
       const starts_at = new Date(`${form.date}T${form.time}`).toISOString()
-      await createSession({ user_id: form.user_id, starts_at, duration_min: Number(form.duration_min), type: form.type, notes: form.notes })
-      setForm({ user_id: '', date: '', time: '', type: SESSION_TYPES[0], duration_min: 45, notes: '' })
+
+      // Create a Zoom meeting first (server-side) when requested, then store its link on the session.
+      let join_url: string | null = null
+      let zoom_meeting_id: string | null = null
+      if (form.zoom) {
+        const clientName = clients.find((c) => c.id === form.user_id)?.name ?? 'Client'
+        const res = await fetch('/api/zoom/meeting', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: `AJM Fit — ${form.type} with ${clientName}`,
+            startISO: starts_at,
+            durationMin: Number(form.duration_min),
+            agenda: form.notes || undefined,
+          }),
+        })
+        const data = (await res.json()) as { join_url?: string; meeting_id?: string; error?: string }
+        if (!res.ok || !data.join_url) throw new Error(data.error || 'Could not create Zoom link')
+        join_url = data.join_url
+        zoom_meeting_id = data.meeting_id ?? null
+      }
+
+      await createSession({ user_id: form.user_id, starts_at, duration_min: Number(form.duration_min), type: form.type, notes: form.notes, join_url, zoom_meeting_id })
+      setForm({ user_id: '', date: '', time: '', type: SESSION_TYPES[0], duration_min: 45, notes: '', zoom: true })
       await load()
     } catch (e) {
       console.error('[schedule] create failed', e)
+      setError(e instanceof Error ? e.message : 'Something went wrong')
     } finally {
       setCreating(false)
     }
+  }
+
+  const cancel = async (s: Session) => {
+    // Best-effort: remove the Zoom meeting, then mark the session cancelled regardless.
+    if (s.zoom_meeting_id) {
+      try {
+        await fetch(`/api/zoom/meeting?meeting_id=${encodeURIComponent(s.zoom_meeting_id)}`, { method: 'DELETE' })
+      } catch (e) {
+        console.error('[schedule] zoom delete failed', e)
+      }
+    }
+    await setSessionStatus(s.id, 'cancelled')
+    await load()
   }
 
   const now = Date.now()
@@ -70,15 +108,20 @@ export default function SchedulePage() {
               <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30 [color-scheme:dark]" />
               <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30 [color-scheme:dark]" />
             </div>
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30">
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30">
               {SESSION_TYPES.map((t) => <option key={t}>{t}</option>)}
             </select>
             <div className="flex items-center gap-2">
               <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30" />
               <span className="text-white/40 text-xs font-body">minutes</span>
             </div>
+            <label className="flex items-center gap-2.5 px-1 py-1 cursor-pointer select-none">
+              <input type="checkbox" checked={form.zoom} onChange={(e) => setForm({ ...form, zoom: e.target.checked })} className="w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-[#F76B16] cursor-pointer" />
+              <span className="text-white/60 text-xs font-body">Generate a Zoom link for this session</span>
+            </label>
+            {error && <p className="text-red-400/80 text-xs font-body">{error}</p>}
             <button onClick={add} disabled={creating || !form.user_id || !form.date || !form.time} className="w-full py-2.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200 disabled:opacity-40">
-              {creating ? 'Adding…' : 'Add Session'}
+              {creating ? (form.zoom ? 'Creating Zoom link…' : 'Adding…') : 'Add Session'}
             </button>
           </div>
 
@@ -102,10 +145,16 @@ export default function SchedulePage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-body font-medium truncate">{s.clientName}</p>
                       <p className="text-white/30 text-xs font-body">{s.type} · {s.duration_min} min · {fmt(s.starts_at)}</p>
+                      {s.join_url && (
+                        <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-[#1A7BFF] text-xs font-body hover:underline">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                          Join Zoom
+                        </a>
+                      )}
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-display font-bold uppercase hover:bg-emerald-500/20">Done</button>
-                      <button onClick={() => setSessionStatus(s.id, 'cancelled').then(load)} title="Cancel" className="px-2.5 py-1.5 rounded-md bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
+                      <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-md bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
                     </div>
                   </div>
                 ))}

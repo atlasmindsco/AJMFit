@@ -11,6 +11,8 @@ export interface Session {
   type: string | null
   notes: string | null
   status: 'scheduled' | 'completed' | 'cancelled'
+  join_url: string | null
+  zoom_meeting_id: string | null
   clientName?: string
 }
 
@@ -42,6 +44,8 @@ export async function createSession(input: {
   duration_min: number
   type: string
   notes?: string
+  join_url?: string | null
+  zoom_meeting_id?: string | null
 }): Promise<void> {
   const { error } = await db.from('scheduled_sessions').insert({ ...input, status: 'scheduled' })
   if (error) throw error
