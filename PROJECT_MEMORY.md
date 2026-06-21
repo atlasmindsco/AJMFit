@@ -16,11 +16,8 @@
   - **Deliverability**: sender name "Coach Anthony". DNS at Hostinger (`HOSTINGER_API_KEY` in `.env.local`; `PUT developers.hostinger.com/api/dns/v1/zones/ajmfit.com`, `overwrite:false` to upsert). Kit Verified Sending Domain CNAMEs added + resolving: `ckespa`(SPF), `cka._domainkey`,`cka2._domainkey`(DKIM) → *.sg3.convertkit.com; `_dmarc` = p=none. Apex A MUST stay 76.76.21.21 (Vercel) — never Kit's landing-page IPs.
   - **Deploy note**: ajmfit lives under PERSONAL Vercel `shane-richardsons-projects` (live ajmfit.com), NOT Atlas Minds team — the local `.vercel/project.json` is stale (team org); re-link before deploying. Kit signup deployed via isolated git worktree to keep unrelated uncommitted work out of prod.
   - Old Beehiiv (`BEEHIIV_API_KEY`/`_PUBLICATION_ID` still on Vercel) holds ~5 legacy subs, not migrated to Kit yet.
-- **ExerciseDB**: Using free v1 open-source API (`exercisedb-api.vercel.app`) — no key needed
-  - GIF CDN: `https://static.exercisedb.dev/media/{exerciseId}.gif`
-  - 1,500 exercises with animated 3D GIFs
-  - RapidAPI Pro plan ($11.99/mo) can be cancelled — v2 API never returned gifUrl
-  - `RAPIDAPI_KEY` still on Vercel but unused now
+- **Exercise library**: SELF-HOSTED, no API at runtime. Both client + trainer pages `fetch('/exercises/exercises.json')` (static file in `public/exercises/`, free-exercise-db, 873 exercises + local images). One-time fetch done by `scripts/download-exercises.mjs` from the free-exercise-db GitHub repo.
+  - **RapidAPI / ExerciseDB is NOT used anywhere in code** (verified Jun 21, 2026 — grep clean). The old RapidAPI Pro plan ($11.99/mo) is unused → CANCEL it. `RAPIDAPI_KEY` on Vercel is dead → remove. (There is NO `/api/exercises` route — earlier doc claim was wrong.)
 - **OpenAI**: `OPENAI_API_KEY` in `.env.local` for Chaedyn chatbot
 - **ClickUp**: workspace 9017723361, list 901711321605
 - **Email (Hostinger)**: anthony@ajmfit.com / `Iamdiamond1988$`
@@ -41,7 +38,7 @@
 - Fonts: `font-display` (Barlow Condensed) for headings, `font-body` (Barlow) for body
 - Custom dumbbell cursor in root layout (JS-injected `cursor:none` only on pointer:fine devices)
 - Hero video synced to real-time clock (`Date.now() % duration`) so all visitors see same frame
-- Exercise library uses ExerciseDB v1 free API proxied through `/api/exercises`
+- Exercise library loads a self-hosted static file `public/exercises/exercises.json` (no API, no key)
 - Chaedyn AI chatbot component at `components/chat/ChaedynChat.tsx` (floating widget in studio layout)
 - `.npmrc` has `legacy-peer-deps=true` for Three.js peer dep resolution (Three.js installed but not currently used)
 - Beehiiv free plan limitations: No Send API, no post creation via API, no automation creation via API (all Enterprise-only)
@@ -118,10 +115,27 @@ Gym, Dumbbells, Calisthenics, Resistance Bands, Kettlebells, Landmine, Full Home
 - Studio booking UI: `/studio/schedule` page + `components/studio/CalendlyEmbed.tsx` + nav tab. Tier gating via `lib/scheduling-tiers.ts` (blueprint onboarding-only; accelerator 1 weekly; full-experience 2 weekly). Weekly quota enforced by counting this-week sessions.
 - **Pending (user, in Calendly dashboard)**: create event types + give real slugs to fill `scheduling-tiers.ts`; connect Zoom in Calendly for auto meeting links; enable recurring on weekly event types; run register-webhook script → paste signing key into `.env.local` + Vercel; **rotate the PAT** (was pasted in chat); commit + deploy.
 
+## Launch Status (updated Jun 21, 2026)
+**App is launch-ready.** Built + live across this + parallel sessions:
+- ✅ **Auth** — real Supabase Auth (SSR cookies, middleware gating, trainer role). Members login → studio works.
+- ✅ **Payments** — Stripe **LIVE** on Anthony's account (catalog, webhook, paywall). Blueprint $19.97/mo (monthly-only), Accelerator $397/$100, Full $697/$175.
+- ✅ **App complete** — every studio + luffy page backed by real Supabase data (messaging, community, nutrition, scheduling, programs admin, stats, feedback). No mock data left after the Jun 21 audit.
+- ✅ **Beta** — `is_beta` flag (free studio, bypasses paywall) + trainer toggle + in-app feedback inbox.
+- ✅ **Branded auth emails** — Hostinger SMTP (port 465, anthony@ajmfit.com) + AJM Fit templates.
+- ✅ **Blog** — `/blog` auto-syncs published Kit issues (newsletter merged in; `/newsletter` → `/blog`). Full SEO/AEO: slug URLs, JSON-LD, sitemap, robots, OG/Twitter. Google Search Console + Bing submitted.
+- ✅ **Scheduling** — Zoom (auto meeting links) + Calendly (tier-based) LIVE.
+- ✅ **Programs page reframed** — was a hardcoded demo; now honest self-guided sample + real logger (no fabricated client data). Real personalized programs come later via the AI builder.
+
 ## Pending Work
-- **Authentication**: Wire up real auth (Firebase/Supabase/Clerk) for Members login → studio access
-- **Payment integration**: Connect Stripe to pricing tiers
-- **Cancel ExerciseDB Pro**: $11.99/mo RapidAPI plan is unused — cancel it
-- **Beehiiv welcome email**: Set up in Beehiiv dashboard manually
-- **Commit all changes**: Large batch of uncommitted work
-- **Netlify failover**: Dual-deploy per deployment infra standards
+**User actions (dashboards, not code):**
+- **Calendly**: set "Live Training" event to **45 min** (site copy says 45).
+- **Rotate the Calendly PAT** (pasted in chat once).
+- **Validate Kit sending domain** (click Validate in Kit) for deliverability.
+- **Cancel ExerciseDB RapidAPI Pro** ($11.99/mo, unused — library is now self-hosted local JSON). Remove dead `RAPIDAPI_KEY` + Beehiiv env vars from Vercel.
+- **Mark beta testers** via /luffy/clients toggle once they apply.
+
+**Deferred feature (Cowork phase):**
+- **AI program builder** — generates personalized programs from the intake form + Anthony, run via Cowork when ready. Populates the (currently self-guided) programs page with real content.
+
+**Infra (optional):**
+- Netlify failover dual-deploy per deployment-infra standards.
