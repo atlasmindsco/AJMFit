@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AJM Fit — Blog Preview</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { white: '#FFFFFF', offwhite: '#F4F6F9', navy: '#1B2D50', blue: '#1A7BFF', orange: '#F76B16', slate: '#64748B' },
+        },
+        fontFamily: { display: ['Barlow Condensed', 'sans-serif'], body: ['Barlow', 'sans-serif'] },
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Barlow', sans-serif; background: #F4F6F9; color: #1B2D50; }
+  .font-display { font-family: 'Barlow Condensed', sans-serif; }
+  /* subtle grain overlay for depth */
+  .grain::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.035; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .article-prose p { margin-bottom: 1.35rem; line-height: 1.8; color: #3a4a63; font-size: 1.075rem; }
+  .article-prose h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: -0.01em; font-size: 1.6rem; color: #1B2D50; margin: 2.6rem 0 0.9rem; }
+  .article-prose strong { color: #1B2D50; font-weight: 600; }
+  .reveal { opacity: 0; transform: translateY(20px); animation: rise 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}.d4{animation-delay:.29s}.d5{animation-delay:.37s}.d6{animation-delay:.45s}
+  .preview-label { position: sticky; top: 0; z-index: 60; }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- ============ VIEW LABEL ============ -->
+<div class="preview-label bg-brand-navy text-white text-center py-2 font-display font-semibold text-xs uppercase tracking-[0.3em]">
+  Preview · View 1 of 2 — Blog Index ( /blog )
+</div>
+
+<!-- ============ NAV (matches live site) ============ -->
+<div class="bg-brand-navy text-white h-9">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 h-full flex items-center justify-end gap-6">
+    <span class="text-white/70 text-xs">anthony@ajmfit.com</span>
+    <span class="text-white/70 text-xs">@anthony.j.martin</span>
+  </div>
+</div>
+<nav class="bg-white/90 backdrop-blur-md shadow-[0_2px_24px_rgba(27,45,80,0.08)] sticky top-9 z-50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-20">
+    <img src="https://ajmfit.com/AJMfit.png" alt="AJM Fit" class="w-14 h-14 object-contain" />
+    <div class="hidden md:flex items-center gap-9">
+      <a class="font-display font-semibold text-sm uppercase tracking-[0.15em] text-brand-navy/60 hover:text-brand-navy transition" href="#">Home</a>
+      <a class="font-display font-semibold text-sm uppercase tracking-[0.15em] text-brand-navy/60 hover:text-brand-navy transition" href="#">Programs</a>
+      <a class="font-display font-semibold text-sm uppercase tracking-[0.15em] text-brand-navy/60 hover:text-brand-navy transition" href="#">About</a>
+      <a class="font-display font-semibold text-sm uppercase tracking-[0.15em] text-brand-orange" href="#">Blog</a>
+      <a class="font-display font-semibold text-sm uppercase tracking-[0.15em] text-brand-navy/60 hover:text-brand-navy transition" href="#">Newsletter</a>
+      <a class="inline-flex items-center px-7 py-3 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.3)]" href="#">Apply Now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ BLOG INDEX ============ -->
+<header class="relative grain overflow-hidden pt-20 pb-16">
+  <div class="absolute -top-24 -right-24 w-[460px] h-[460px] rounded-full bg-brand-blue/[0.06] blur-3xl"></div>
+  <div class="absolute top-32 -left-32 w-[380px] h-[380px] rounded-full bg-brand-orange/[0.05] blur-3xl"></div>
+  <div class="max-w-5xl mx-auto px-6 lg:px-8 relative">
+    <span class="reveal d1 font-display font-semibold text-sm uppercase tracking-[0.3em] text-brand-blue">The Blog</span>
+    <h1 class="reveal d2 font-display font-extrabold text-6xl md:text-8xl uppercase tracking-[-0.03em] mt-4 leading-[0.92]">
+      Brains &amp;<br /><span class="text-brand-orange">Gains</span>
+    </h1>
+    <p class="reveal d3 mt-6 text-brand-slate text-lg max-w-2xl leading-relaxed">
+      Training insight, mindset, and updates from Coach Anthony — every issue of the newsletter, archived and readable right here.
+    </p>
+  </div>
+</header>
+
+<!-- Featured post -->
+<section class="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
+  <a href="#post" class="reveal d3 group block">
+    <div class="grid md:grid-cols-2 gap-0 rounded-md overflow-hidden border border-brand-navy/[0.07] bg-white shadow-[0_10px_40px_rgba(27,45,80,0.06)] hover:shadow-[0_18px_60px_rgba(247,107,22,0.12)] transition-all duration-300">
+      <div class="relative bg-brand-navy grain overflow-hidden min-h-[280px] flex items-center justify-center p-10">
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-navy via-brand-navy to-[#0f1d38]"></div>
+        <div class="absolute -bottom-10 -right-6 w-56 h-56 rounded-full bg-brand-orange/20 blur-2xl"></div>
+        <div class="relative text-center">
+          <img src="https://ajmfit.com/AJMfit.png" alt="" class="w-20 h-20 object-contain mx-auto mb-4 drop-shadow-[0_6px_20px_rgba(0,0,0,0.4)]" />
+          <div class="font-display font-extrabold text-3xl uppercase tracking-[0.05em] text-white leading-none">We're<br />Live</div>
+        </div>
+      </div>
+      <div class="p-9 lg:p-10 flex flex-col justify-center">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-sm">Announcement</span>
+          <span class="text-brand-slate text-xs">June 21, 2026</span>
+        </div>
+        <h2 class="font-display font-extrabold text-4xl uppercase tracking-[-0.02em] leading-[0.95] group-hover:text-brand-orange transition-colors duration-200">AJM Fit Is Live</h2>
+        <p class="mt-4 text-brand-slate leading-[1.7]">
+          The doors are open. Your training, nutrition, and a direct line to your coach — all in one place. Here's what's inside and how to get started.
+        </p>
+        <span class="mt-6 inline-flex items-center gap-2 font-display font-bold text-sm uppercase tracking-[0.15em] text-brand-navy group-hover:gap-3 transition-all">
+          Read the post
+          <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+        </span>
+      </div>
+    </div>
+  </a>
+</section>
+
+<!-- Newsletter join band -->
+<section class="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
+  <div class="relative grain overflow-hidden rounded-md bg-gradient-to-br from-brand-blue to-[#0f5fe0] text-white p-9 lg:p-11">
+    <div class="absolute -top-10 -right-8 w-52 h-52 rounded-full bg-white/10 blur-2xl"></div>
+    <div class="absolute -bottom-12 left-10 w-44 h-44 rounded-full bg-brand-orange/20 blur-2xl"></div>
+    <div class="relative grid lg:grid-cols-2 gap-8 items-center">
+      <div>
+        <span class="font-display font-semibold text-xs uppercase tracking-[0.3em] text-white/80">Brains &amp; Gains Newsletter</span>
+        <h3 class="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight mt-2 leading-[0.95]">Get Every Issue First</h3>
+        <p class="text-white/80 mt-3 leading-relaxed max-w-md">Weekly training, nutrition, and mindset — straight to your inbox before it hits the archive. No fluff, no spam.</p>
+      </div>
+      <form class="flex flex-col sm:flex-row gap-3" onsubmit="return false">
+        <input type="email" placeholder="your@email.com" class="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none" />
+        <button class="px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)] whitespace-nowrap hover:bg-orange-600 transition">Subscribe</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Issue grid -->
+<section class="max-w-5xl mx-auto px-6 lg:px-8 pb-24">
+  <div class="flex items-end justify-between mb-8 border-b border-brand-navy/10 pb-4">
+    <h3 class="font-display font-extrabold text-2xl uppercase tracking-tight">Recent Issues</h3>
+    <span class="text-brand-slate text-xs font-display uppercase tracking-[0.2em]">Auto-synced from Kit</span>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- representative cards -->
+    <a href="#" class="reveal d4 group bg-white border border-brand-navy/[0.06] rounded-md p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col">
+      <span class="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-blue">Issue #003</span>
+      <h4 class="font-display font-bold text-xl uppercase tracking-tight mt-3 leading-tight group-hover:text-brand-orange transition-colors">The Compound Effect of Consistency</h4>
+      <p class="text-brand-slate text-sm leading-[1.7] mt-3 flex-1">Why showing up at 70% beats waiting for the perfect 100% day — plus an 8-minute finisher.</p>
+      <span class="text-brand-slate/70 text-xs mt-5 font-display uppercase tracking-[0.15em]">Jun 19, 2026</span>
+    </a>
+    <a href="#" class="reveal d5 group bg-white border border-brand-navy/[0.06] rounded-md p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col">
+      <span class="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-blue">Issue #002</span>
+      <h4 class="font-display font-bold text-xl uppercase tracking-tight mt-3 leading-tight group-hover:text-brand-orange transition-colors">You Don't Need More Time</h4>
+      <p class="text-brand-slate text-sm leading-[1.7] mt-3 flex-1">Build a training schedule around the life you actually have — not the one you wish you had.</p>
+      <span class="text-brand-slate/70 text-xs mt-5 font-display uppercase tracking-[0.15em]">Jun 12, 2026</span>
+    </a>
+    <a href="#" class="reveal d6 group bg-white border border-brand-navy/[0.06] rounded-md p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col">
+      <span class="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-blue">Issue #001</span>
+      <h4 class="font-display font-bold text-xl uppercase tracking-tight mt-3 leading-tight group-hover:text-brand-orange transition-colors">The Supplement Stack That Matters</h4>
+      <p class="text-brand-slate text-sm leading-[1.7] mt-3 flex-1">Cutting the noise: what's worth your money, what's marketing, and what most people miss.</p>
+      <span class="text-brand-slate/70 text-xs mt-5 font-display uppercase tracking-[0.15em]">Jun 5, 2026</span>
+    </a>
+  </div>
+  <p class="text-center text-brand-slate/60 text-xs mt-10 italic">
+    These three are placeholders to show the grid. In production this list is pulled live from Kit — only issues you mark “public” appear.
+  </p>
+</section>
+
+<!-- ============ VIEW LABEL 2 ============ -->
+<div id="post" class="preview-label bg-brand-navy text-white text-center py-2 font-display font-semibold text-xs uppercase tracking-[0.3em]">
+  Preview · View 2 of 2 — Blog Post ( /blog/ajm-fit-is-live )
+</div>
+
+<!-- ============ BLOG POST ============ -->
+<article class="pb-24">
+  <!-- post hero -->
+  <div class="relative grain overflow-hidden bg-brand-navy text-white pt-20 pb-16">
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-navy via-brand-navy to-[#0e1b34]"></div>
+    <div class="absolute -bottom-16 right-10 w-80 h-80 rounded-full bg-brand-orange/15 blur-3xl"></div>
+    <div class="absolute top-10 -left-20 w-72 h-72 rounded-full bg-brand-blue/15 blur-3xl"></div>
+    <div class="max-w-3xl mx-auto px-6 lg:px-8 relative">
+      <a href="#" class="inline-flex items-center gap-2 text-white/50 hover:text-white text-xs font-display uppercase tracking-[0.2em] mb-8 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+        All posts
+      </a>
+      <div class="flex items-center gap-3 mb-5">
+        <span class="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-white bg-brand-orange px-2.5 py-1 rounded-sm">Announcement</span>
+        <span class="text-white/50 text-xs">June 21, 2026 · 3 min read</span>
+      </div>
+      <h1 class="font-display font-extrabold text-5xl md:text-7xl uppercase tracking-[-0.03em] leading-[0.92]">
+        AJM Fit <span class="text-brand-orange">Is Live</span>
+      </h1>
+      <p class="mt-6 text-white/70 text-xl leading-relaxed max-w-2xl">
+        The doors are open. Your training, your nutrition, and a direct line to your coach — finally in one place.
+      </p>
+      <div class="mt-8 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-brand-orange to-[#c2530a] flex items-center justify-center font-display font-bold text-white">AM</div>
+        <div>
+          <div class="font-display font-bold text-sm uppercase tracking-[0.1em]">Coach Anthony Martin</div>
+          <div class="text-white/40 text-xs">Founder, AJM Fit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- post body -->
+  <div class="max-w-2xl mx-auto px-6 lg:px-8 pt-14 article-prose">
+    <p><strong>After months of building, AJM Fit is officially live.</strong> Not another app full of generic workouts you'll ignore by week two — a coaching system built around you. Your goals, your schedule, your starting point.</p>
+
+    <h2>What's inside</h2>
+    <p><strong>A program built for you.</strong> No copy-paste templates. I look at where you are and where you want to be, and I build the plan to bridge it — then adjust it as you go.</p>
+    <p><strong>Nutrition that fits your life.</strong> Log meals, track your macros, and hit your targets without weighing every gram or obsessing over a number. Scan a barcode, search a food, done.</p>
+    <p><strong>A direct line to me.</strong> Message me right inside the app. Questions, check-ins, accountability — you're not doing this alone, and you're not waiting days for a reply.</p>
+    <p><strong>A community that shows up.</strong> Wins, events, and real people training alongside you. Motivation hits different when you're not the only one in the room.</p>
+    <p><strong>Chea, your AI assistant.</strong> Quick answers on form, nutrition, or where to find something in the app — any time, day or night.</p>
+
+    <figure class="my-10 border-l-4 border-brand-orange pl-6">
+      <blockquote class="font-display font-bold text-2xl md:text-3xl uppercase tracking-tight leading-[1.1] text-brand-navy">
+        “Consistency beats intensity. Show up at 70% and you'll pass the person waiting for the perfect day.”
+      </blockquote>
+    </figure>
+
+    <h2>How to start</h2>
+    <p>Apply in about two minutes. I read <strong>every</strong> application personally — if we're the right fit, you're in, and we'll get your plan built and your first call on the calendar.</p>
+    <p>This is the part most people overthink. Don't. The hardest rep is the decision to begin — everything after that, we handle together.</p>
+  </div>
+
+  <!-- End-of-post newsletter signup -->
+  <div class="max-w-2xl mx-auto px-6 lg:px-8 mt-14">
+    <div class="rounded-md border border-brand-navy/10 bg-white p-8 text-center shadow-[0_8px_30px_rgba(27,45,80,0.05)]">
+      <span class="font-display font-semibold text-xs uppercase tracking-[0.3em] text-brand-blue">Brains &amp; Gains</span>
+      <h3 class="font-display font-extrabold text-2xl uppercase tracking-tight mt-2">Don't Miss the Next Issue</h3>
+      <p class="text-brand-slate mt-2 mb-5 max-w-md mx-auto">Get insight like this in your inbox every week — free.</p>
+      <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="return false">
+        <input type="email" placeholder="your@email.com" class="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition" />
+        <button class="px-7 py-3.5 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm whitespace-nowrap hover:bg-orange-600 transition">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CTA block -->
+  <div class="max-w-2xl mx-auto px-6 lg:px-8 mt-8">
+    <div class="relative grain overflow-hidden rounded-md bg-brand-navy text-white p-10 text-center">
+      <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-brand-orange/20 blur-2xl"></div>
+      <div class="relative">
+        <h3 class="font-display font-extrabold text-3xl uppercase tracking-tight">Ready to start?</h3>
+        <p class="text-white/60 mt-3 mb-7 max-w-md mx-auto">Applications are open. Let's build the plan that actually fits your life.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="#" class="inline-flex items-center justify-center px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)]">Apply Now</a>
+          <a href="#" class="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white/25 text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm hover:bg-white/5 transition">Explore Programs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- footer strip -->
+<footer class="bg-brand-navy text-white/50 py-10">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <img src="https://ajmfit.com/AJMfit.png" alt="AJM Fit" class="w-10 h-10 object-contain opacity-80" />
+    <span class="text-xs font-body">© 2026 AJM Fit · Personal Training &amp; Coaching</span>
+  </div>
+</footer>
+
+</body>
+</html>

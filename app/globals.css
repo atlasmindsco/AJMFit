@@ -102,3 +102,42 @@ a {
 input, textarea, select {
   font-family: var(--font-barlow), sans-serif;
 }
+
+/* ---- Blog / Kit issue content ---- */
+/* Styles the article body pulled from Kit. Semantic posts (our announcement)
+   pick these up; emailed-newsletter HTML carries its own inline styles. */
+.kit-content {
+  font-family: var(--font-barlow), sans-serif;
+  color: #3a4a63;
+  font-size: 1.075rem;
+  line-height: 1.8;
+  word-break: break-word;
+}
+.kit-content p { margin: 0 0 1.35rem; }
+.kit-content h1, .kit-content h2, .kit-content h3 {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  line-height: 1.05;
+}
+.kit-content h2 { font-size: 1.6rem; margin: 2.6rem 0 0.9rem; }
+.kit-content h3 { font-size: 1.3rem; margin: 2rem 0 0.75rem; }
+.kit-content strong { color: var(--navy); font-weight: 600; }
+.kit-content a { color: var(--blue); text-decoration: underline; }
+.kit-content ul, .kit-content ol { margin: 0 0 1.35rem 1.25rem; }
+.kit-content li { margin-bottom: 0.5rem; }
+.kit-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 1.5rem 0; }
+.kit-content blockquote {
+  border-left: 4px solid var(--orange);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: var(--navy);
+}

@@ -1,30 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
 import Button from '@/components/ui/Button'
 
-const previewIssues = [
-  {
-    number: '#012',
-    title: 'The Compound Effect of Consistency',
-    excerpt:
-      'Why showing up at 70% beats waiting for the perfect 100% day. Plus: a 3-move finisher you can do in 8 minutes.',
-  },
-  {
-    number: '#011',
-    title: 'You Don\'t Need More Time — You Need a System',
-    excerpt:
-      'How to build a training schedule that fits your real life, not the one you wish you had.',
-  },
-  {
-    number: '#010',
-    title: 'The Supplement Stack That Actually Matters',
-    excerpt:
-      'Cutting through the noise: what\'s worth your money, what\'s marketing, and what most people are missing.',
-  },
-]
+type RecentIssue = { id: number; title: string; excerpt: string; date: string }
+
+function shortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 const benefits = [
   'Weekly training insights & programming tips',
@@ -40,6 +26,16 @@ export default function NewsletterPage() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [issues, setIssues] = useState<RecentIssue[]>([])
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/blog')
+      .then((r) => (r.ok ? r.json() : { issues: [] }))
+      .then((d) => { if (active) setIssues((d.issues ?? []).slice(0, 3)) })
+      .catch(() => {})
+    return () => { active = false }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -164,44 +160,58 @@ export default function NewsletterPage() {
         </motion.ul>
       </section>
 
-      {/* Recent Issues */}
-      <section className="max-w-4xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight text-brand-navy">
-            Recent <span className="text-brand-blue">Issues</span>
-          </h2>
-        </motion.div>
+      {/* Recent Issues — pulled live from the blog (Kit) */}
+      {issues.length > 0 && (
+        <section className="max-w-4xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight text-brand-navy">
+              Recent <span className="text-brand-blue">Issues</span>
+            </h2>
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {previewIssues.map((issue, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="bg-brand-offwhite border border-brand-navy/[0.06] rounded-sm p-8 hover:border-brand-orange/20 hover:shadow-[0_4px_24px_rgba(240,139,30,0.06)] transition-all duration-300"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {issues.map((issue, i) => (
+              <motion.div
+                key={issue.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <Link
+                  href={`/blog/${issue.id}`}
+                  className="group block h-full bg-brand-offwhite border border-brand-navy/[0.06] rounded-sm p-8 hover:border-brand-orange/20 hover:shadow-[0_4px_24px_rgba(240,139,30,0.06)] transition-all duration-300"
+                >
+                  <span className="font-display font-bold text-xs uppercase tracking-[0.2em] text-brand-blue">
+                    {shortDate(issue.date)}
+                  </span>
+                  <h3 className="font-display font-bold text-lg uppercase tracking-tight text-brand-navy mt-3 mb-3 group-hover:text-brand-orange transition-colors">
+                    {issue.title}
+                  </h3>
+                  {issue.excerpt && (
+                    <p className="text-brand-slate font-body text-sm leading-[1.7]">{issue.excerpt}</p>
+                  )}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/blog"
+              className="font-display font-bold text-sm uppercase tracking-[0.15em] text-brand-navy hover:text-brand-orange transition-colors"
             >
-              <span className="font-display font-bold text-xs uppercase tracking-[0.2em] text-brand-blue">
-                {issue.number}
-              </span>
-              <h3 className="font-display font-bold text-lg uppercase tracking-tight text-brand-navy mt-3 mb-3">
-                {issue.title}
-              </h3>
-              <p className="text-brand-slate font-body text-sm leading-[1.7]">
-                {/* [PLACEHOLDER] — Replace with real excerpts */}
-                {issue.excerpt}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              View all issues →
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
