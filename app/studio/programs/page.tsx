@@ -72,14 +72,17 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
 
 type ProgramView = 'preview' | 'workout' | 'exercise'
 
-/* ── Current Program ── */
+/* ── Current Program ──
+ * Self-guided sample routine. A personalized program is generated for each
+ * client later (AI builder, trainer-assisted). Until then this is a labeled
+ * starter routine to train + log against — not presented as a coach-assigned plan. */
 const currentProgram = {
-  name: 'Muscle Builder',
-  level: 'Intermediate',
-  phase: 'Phase 2 — Hypertrophy',
-  weeks: { current: 5, total: 10 },
-  startDate: 'Feb 3, 2026',
-  coach: 'Anthony M.',
+  name: 'Self-Guided Training',
+  level: 'All Levels',
+  phase: 'Sample routine',
+  weeks: { current: 1, total: 1 },
+  startDate: '—',
+  coach: 'Self-guided',
 }
 
 /* ── Weekly Split ── */
@@ -90,7 +93,7 @@ const weeklyPlan = [
     muscles: 'Chest, Shoulders, Triceps',
     primaryMuscle: 'chest',
     duration: '~55 min',
-    completed: true,
+    completed: false,
     exercises: [
       { name: 'Barbell Bench Press', sets: 3, reps: '8-10', rest: '90s', series: 'A' },
       { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: '75s', series: 'B' },
@@ -105,7 +108,7 @@ const weeklyPlan = [
     muscles: 'Quads, Hamstrings, Glutes, Calves',
     primaryMuscle: 'quadriceps',
     duration: '~60 min',
-    completed: true,
+    completed: false,
     exercises: [
       { name: 'Barbell Squat', sets: 3, reps: '6-8', rest: '120s', series: 'A' },
       { name: 'Romanian Deadlift', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
@@ -120,7 +123,7 @@ const weeklyPlan = [
     muscles: 'Mobility & Cardio',
     primaryMuscle: '',
     duration: '~40 min',
-    completed: true,
+    completed: false,
     exercises: [
       { name: 'Foam Rolling', sets: 1, reps: '10 min', rest: '--', series: 'A' },
       { name: 'Dynamic Stretching', sets: 1, reps: '10 min', rest: '--', series: 'B' },
@@ -185,27 +188,7 @@ interface PRRecord {
   previous?: number  // previous PR weight for comparison
 }
 
-const exercisePRs: Record<string, PRRecord> = {
-  'Barbell Bench Press':   { weight: 185, reps: 8, date: 'Mar 26', previous: 175 },
-  'Incline Dumbbell Press':{ weight: 65,  reps: 10, date: 'Mar 19', previous: 60 },
-  'Overhead Press':        { weight: 115, reps: 8, date: 'Mar 12', previous: 110 },
-  'Lateral Raises':        { weight: 25,  reps: 14, date: 'Mar 26' },
-  'Tricep Pushdowns':      { weight: 60,  reps: 15, date: 'Mar 19' },
-  'Barbell Squat':         { weight: 225, reps: 6, date: 'Mar 25', previous: 215 },
-  'Romanian Deadlift':     { weight: 185, reps: 10, date: 'Mar 18', previous: 175 },
-  'Leg Press':             { weight: 360, reps: 10, date: 'Mar 25', previous: 340 },
-  'Walking Lunges':        { weight: 50,  reps: 12, date: 'Mar 11' },
-  'Calf Raises':           { weight: 80,  reps: 18, date: 'Mar 25' },
-  'Pull-Ups (Weighted)':   { weight: 25,  reps: 8, date: 'Mar 22', previous: 20 },
-  'Barbell Row':           { weight: 165, reps: 10, date: 'Mar 22', previous: 155 },
-  'Seated Cable Row':      { weight: 140, reps: 12, date: 'Mar 15' },
-  'Face Pulls':            { weight: 40,  reps: 18, date: 'Mar 22' },
-  'Barbell Curls':         { weight: 75,  reps: 10, date: 'Mar 15', previous: 70 },
-  'Hip Thrusts':           { weight: 225, reps: 10, date: 'Mar 8', previous: 205 },
-  'Front Squat':           { weight: 155, reps: 8, date: 'Mar 8', previous: 145 },
-  'Leg Curl':              { weight: 100, reps: 12, date: 'Mar 1' },
-  'Cable Woodchops':       { weight: 35,  reps: 12, date: 'Mar 1' },
-}
+/* Real PRs come from the DB (dbPRs); no demo PRs are shown to clients. */
 
 /* ── Exercise Alternatives (same muscle group substitutions) ── */
 const exerciseAlternatives: Record<string, string[]> = {
@@ -230,14 +213,6 @@ const exerciseAlternatives: Record<string, string[]> = {
   'Cable Woodchops':        ['Dumbbell Woodchops', 'Medicine Ball Rotations', 'Pallof Press'],
   'Plank Hold':             ['Dead Bug', 'Ab Wheel Rollout', 'Hollow Body Hold'],
 }
-
-/* ── Exercise Log History ── */
-const recentLogs = [
-  { date: 'Mar 26', workout: 'Chest', topSet: 'Bench Press — 185 lbs x 8', prs: 1 },
-  { date: 'Mar 25', workout: 'Legs', topSet: 'Squat — 225 lbs x 6', prs: 0 },
-  { date: 'Mar 24', workout: 'Active Recovery', topSet: '30 min walk + stretch', prs: 0 },
-  { date: 'Mar 22', workout: 'Back', topSet: 'Pull-Ups — BW+25 x 8', prs: 1 },
-]
 
 /* ── Fuzzy name matching ── */
 const EXERCISE_ALIASES: Record<string, string> = {
@@ -403,7 +378,6 @@ export default function ProgramsPage() {
   }, [])
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
-  const progressPct = (currentProgram.weeks.current / currentProgram.weeks.total) * 100
 
   // Load exercise database
   useEffect(() => {
@@ -568,34 +542,24 @@ export default function ProgramsPage() {
       <div className="lg:col-span-8">
         {/* Program Header */}
         <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-6 mb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-display font-extrabold text-xl text-white tracking-tight">
                   {currentProgram.name}
                 </h1>
-                <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded bg-[#22C55E]/15 text-[#22C55E]">
+                <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
                   {currentProgram.level}
                 </span>
               </div>
-              <p className="text-white/40 text-sm font-body mt-1">
-                {currentProgram.phase} &middot; Coach: {currentProgram.coach}
+              <p className="text-white/40 text-sm font-body mt-1 max-w-md">
+                Sample routine to train and log against. Your personalized program is being built — message Coach Anthony anytime.
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-white font-display font-bold text-sm">
-                Week {currentProgram.weeks.current} / {currentProgram.weeks.total}
-              </p>
-              <p className="text-white/30 text-xs font-body">Started {currentProgram.startDate}</p>
-            </div>
+            <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-[#F76B16]/15 text-[#F76B16] uppercase tracking-wide shrink-0">
+              Self-Guided
+            </span>
           </div>
-          <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#1A7BFF] rounded-full transition-[width] duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-          <p className="text-white/30 text-xs font-body mt-2">{Math.round(progressPct)}% complete</p>
         </div>
 
         {/* View Content */}
@@ -658,11 +622,9 @@ export default function ProgramsPage() {
                       <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
                       {[
                         { label: 'Program', value: currentProgram.name },
-                        { label: 'Phase', value: currentProgram.phase },
+                        { label: 'Type', value: 'Sample routine' },
                         { label: 'Level', value: currentProgram.level },
-                        { label: 'Coach', value: currentProgram.coach },
-                        { label: 'Started', value: currentProgram.startDate },
-                        { label: 'Duration', value: `${currentProgram.weeks.total} weeks` },
+                        { label: 'Training days', value: `${weeklyPlan.filter((d) => d.exercises.length > 0).length} / week` },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
                           <span className="text-white/50 text-sm font-body shrink-0">{item.label}</span>
@@ -873,7 +835,7 @@ export default function ProgramsPage() {
                             : fullLogs
                           const currentLogs = backingLogs.slice(0, workingSetCount)
                           const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
-                          const pr = dbPRs[exercise.name] ?? exercisePRs[exercise.name] ?? null
+                          const pr = dbPRs[exercise.name] ?? null
                           // Check if any entered set beats the PR
                           const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.weight && l.reps ? Number(l.weight) : 0)))
                           const isNewPR = pr ? bestEnteredWeight > pr.weight : bestEnteredWeight > 0
@@ -1660,67 +1622,28 @@ export default function ProgramsPage() {
           <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Recent Logs</h2>
           </div>
-          <div className="p-5 space-y-3">
-            {recentLogs.map((log) => (
-              <div key={log.date} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.10] flex items-center justify-center shrink-0">
-                  <span className="text-white/40 text-[10px] font-display font-bold">{log.date}</span>
-                </div>
-                <div className="min-w-0">
-                  <p className="font-body font-semibold text-white text-sm">{log.workout}</p>
-                  <p className="text-white/40 text-xs font-body truncate">{log.topSet}</p>
-                  {log.prs > 0 && (
-                    <span className="inline-block mt-1 text-[10px] font-display font-bold text-[#F76B16] bg-[#F76B16]/10 px-2 py-0.5 rounded">
-                      {log.prs} PR
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="p-5">
+            <p className="text-white/40 text-sm font-body leading-relaxed">
+              Your logged workouts will show up here. Start a session above and log your sets to build your history.
+            </p>
           </div>
         </motion.div>
 
-        {/* Coach Notes */}
+        {/* Your Coach */}
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10]">
-            <h2 className="font-display font-bold text-sm text-white">Coach Notes</h2>
+            <h2 className="font-display font-bold text-sm text-white">Your Coach</h2>
           </div>
-          <div className="p-5 space-y-4">
-            <div className="p-3 rounded-lg bg-white/[0.06] border border-white/[0.10]">
-              <p className="text-white/70 text-sm font-body leading-relaxed">
-                &ldquo;Great progress on bench — you&apos;re ready to push to 190 next week. Keep rest times strict on accessories.&rdquo;
-              </p>
-              <p className="text-white/30 text-xs font-body mt-2">— Anthony, Mar 26</p>
-            </div>
-            <div className="p-3 rounded-lg bg-white/[0.06] border border-white/[0.10]">
-              <p className="text-white/70 text-sm font-body leading-relaxed">
-                &ldquo;Focus on mind-muscle connection during pull-ups. Slow the eccentric to 3 seconds.&rdquo;
-              </p>
-              <p className="text-white/30 text-xs font-body mt-2">— Anthony, Mar 22</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Past Programs */}
-        <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
-          <div className="px-5 py-4 border-b border-white/[0.10]">
-            <h2 className="font-display font-bold text-sm text-white">Past Programs</h2>
-          </div>
-          <div className="p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body font-semibold text-white text-sm">Fat Loss Kickstart</p>
-                <p className="text-white/40 text-xs font-body">8 weeks &middot; Completed</p>
-              </div>
-              <span className="text-emerald-400 text-xs font-display font-bold">100%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body font-semibold text-white text-sm">Strength Foundations</p>
-                <p className="text-white/40 text-xs font-body">6 weeks &middot; Completed</p>
-              </div>
-              <span className="text-emerald-400 text-xs font-display font-bold">100%</span>
-            </div>
+          <div className="p-5">
+            <p className="text-white/40 text-sm font-body leading-relaxed">
+              A personalized program built around your goals is on the way. In the meantime, follow this sample routine and message Coach Anthony anytime.
+            </p>
+            <a
+              href="/studio/messages"
+              className="mt-4 inline-block text-[#1A7BFF] text-sm font-display font-bold uppercase tracking-wide hover:underline"
+            >
+              Message Coach →
+            </a>
           </div>
         </motion.div>
       </div>
