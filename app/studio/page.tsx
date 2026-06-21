@@ -17,6 +17,7 @@ import {
   type NutritionTotals,
 } from '@/lib/nutrition'
 import { fetchPRs, fetchWorkoutsThisWeek, type PRRow } from '@/lib/workout'
+import { fetchMyProgram, type Program } from '@/lib/programs'
 
 const CheckIcon = (
   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -55,6 +56,7 @@ export default function ClientDashboard() {
   const [waterOz, setWaterOz] = useState(0)
   const [weekCals, setWeekCals] = useState<Array<{ date: string; calories: number }>>([])
   const [prs, setPrs] = useState<PRRow[]>([])
+  const [myProgram, setMyProgram] = useState<Program | null>(null)
 
   useEffect(() => {
     let active = true
@@ -65,13 +67,14 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows] = await Promise.all([
+        const [t, logs, dl, week, workouts, prRows, program] = await Promise.all([
           fetchTargets(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
           fetchWeeklyCalories(id),
           fetchWorkoutsThisWeek(id),
           fetchPRs(id),
+          fetchMyProgram(id),
         ])
         if (!active) return
         setTargets(t)
@@ -80,6 +83,7 @@ export default function ClientDashboard() {
         setWeekCals(week)
         setWorkoutsThisWeek(workouts)
         setPrs(prRows)
+        setMyProgram(program)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -307,15 +311,45 @@ export default function ClientDashboard() {
           {/* Today's Workout CTA */}
           <motion.div custom={7} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-5">
             <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
-            <p className="text-white/50 text-sm font-body mt-1 mb-4">
-              Your program is ready — jump in and log today&rsquo;s session.
-            </p>
-            <Link
-              href="/studio/programs"
-              className="block w-full text-center py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
-            >
-              Go to Programs
-            </Link>
+            {loading ? (
+              <p className="text-white/30 text-sm font-body mt-1 mb-4">Loading…</p>
+            ) : myProgram ? (
+              <>
+                <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
+                <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
+                  {myProgram.split && (
+                    <span className="px-2 py-0.5 rounded-md bg-[#1A7BFF]/10 text-[#1A7BFF] text-[11px] font-body font-semibold">{myProgram.split}</span>
+                  )}
+                  {myProgram.days_per_week != null && (
+                    <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold">{myProgram.days_per_week}× / week</span>
+                  )}
+                  {myProgram.level && (
+                    <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold capitalize">{myProgram.level}</span>
+                  )}
+                </div>
+                {myProgram.description && (
+                  <p className="text-white/50 text-sm font-body mb-4 line-clamp-2">{myProgram.description}</p>
+                )}
+                <Link
+                  href="/studio/programs"
+                  className="block w-full text-center py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
+                >
+                  Start Training
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="text-white/50 text-sm font-body mt-1 mb-4">
+                  Coach Anthony hasn&rsquo;t assigned your program yet. Browse the exercise library in the meantime.
+                </p>
+                <Link
+                  href="/studio/programs"
+                  className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
+                >
+                  Browse Exercises
+                </Link>
+              </>
+            )}
           </motion.div>
         </div>
       </div>
