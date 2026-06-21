@@ -25,6 +25,15 @@
 - **ClickUp**: workspace 9017723361, list 901711321605
 - **Email (Hostinger)**: anthony@ajmfit.com / `Iamdiamond1988$`
 - **Instagram**: https://www.instagram.com/anthony.j.martin?igsh=cm1qZXdsMW4wb212&utm_source=qr
+- **Calendly**: account `anthony@ajmfit.com`, booking base `https://calendly.com/anthony-ajmfit`. Single-account integration via Personal Access Token.
+  - User URI: `https://api.calendly.com/users/afd845a3-09a0-41a6-ae8e-436ca16b977a`; Org URI: `https://api.calendly.com/organizations/7961c91c-c17c-4184-b149-99c50e3b4975`
+  - Env: `CALENDLY_API_TOKEN` (PAT, `.env.local` only — NOT needed in prod runtime), `CALENDLY_WEBHOOK_TOKEN` (shared secret, in `.env.local` + Vercel prod). **PAT was pasted in chat once — ROTATE before go-live.**
+  - **This Calendly plan does NOT issue webhook signing keys** (field absent at user AND org scope). So webhook auth = shared secret in callback URL `?token=...` (CALENDLY_WEBHOOK_TOKEN), checked constant-time. Route falls back to HMAC automatically if a signing key ever exists (`CALENDLY_WEBHOOK_SIGNING_KEY`).
+  - **LIVE**: deployed to ajmfit.com (personal Vercel scope). Webhook registered (sub `a70d4d6a-...`, user scope, invitee.created+canceled). Auth verified on prod: no/bad token → 401, good token → 200.
+  - Booking syncs into `scheduled_sessions` via `/api/calendly/webhook` (matches invitee by email → users row). Reschedule = Calendly fires canceled+created, both handled. Cancel flips status.
+  - Real Calendly event types (verified, slugs wired): "Onboarding Call"=`30min` (30m), "Weekly Check-In"=`weekly-accelerator` (45m), "Live Training"=`live-training` (30m). NOTE: Live Training is 30m in Calendly but page advertises 45m — reconcile.
+  - Tier → event-type mapping + weekly quotas in `lib/scheduling-tiers.ts`, matched to signup page (components/sections/Pricing.tsx): **3 event types** — Welcome Call (onboarding), Weekly Check-in (30-45min), Live Training Session (45min). Blueprint = NO calls (self-guided); Accelerator = welcome + 1 check-in/wk; Full = welcome + 1 check-in/wk + 2 training/wk. **Slugs are placeholders (welcome-call, weekly-checkin, training-session) — must match real Calendly event type URLs.**
+  - Client books in studio at `/studio/schedule` (CalendlyEmbed prefills email so webhook matches).
 
 ## Architecture & Patterns
 - Route groups: `app/(site)/` for marketing pages, `app/studio/` for client portal, `app/luffy/` for trainer portal
@@ -102,6 +111,12 @@ Gym, Dumbbells, Calisthenics, Resistance Bands, Kettlebells, Landmine, Full Home
 - OpenAI API key added to Vercel production env vars
 - Studio nav: Dashboard, Programs, Nutrition, Messages, Community (Exercises tab removed by user)
 - Admin programs page enhanced with full exercise DB from `/exercises/exercises.json` with start/end image cycling
+
+### Jun 21, 2026 — Calendly scheduling (onboarding + tier-based weekly calls)
+- Got Calendly dev/API access (PAT for anthony@ajmfit.com), verified via /users/me. Account on paid plan (API + webhooks unlocked).
+- Built integration: `lib/calendly.ts` (auth, webhook CRUD, HMAC signature verify), `/api/calendly/webhook` (email-match → upsert `scheduled_sessions`), migration `0008_calendly.sql` (applied: `calendly_event_uri`, `calendly_invitee_uri` + unique idx), `scripts/calendly-register-webhook.mjs`.
+- Studio booking UI: `/studio/schedule` page + `components/studio/CalendlyEmbed.tsx` + nav tab. Tier gating via `lib/scheduling-tiers.ts` (blueprint onboarding-only; accelerator 1 weekly; full-experience 2 weekly). Weekly quota enforced by counting this-week sessions.
+- **Pending (user, in Calendly dashboard)**: create event types + give real slugs to fill `scheduling-tiers.ts`; connect Zoom in Calendly for auto meeting links; enable recurring on weekly event types; run register-webhook script → paste signing key into `.env.local` + Vercel; **rotate the PAT** (was pasted in chat); commit + deploy.
 
 ## Pending Work
 - **Authentication**: Wire up real auth (Firebase/Supabase/Clerk) for Members login → studio access
