@@ -44,12 +44,12 @@ export default function FinalCTA() {
           <p className="mt-8 text-white/30 font-body text-sm">
             Not ready yet?{' '}
             <a
-              href="/newsletter"
+              href="/blog"
               className="text-brand-orange/70 hover:text-brand-orange transition-colors duration-200 underline underline-offset-4"
             >
-              Join the newsletter
+              Read the blog &amp; join the newsletter
             </a>{' '}
-            and start learning.
+            to start learning.
           </p>
         </motion.div>
       </div>

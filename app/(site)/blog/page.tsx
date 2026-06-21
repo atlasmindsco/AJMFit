@@ -18,6 +18,15 @@ const ArrowRight = (
   </svg>
 )
 
+// Carried over from the old newsletter page (now merged here).
+const benefits = [
+  'Weekly training insights & programming tips',
+  'Mindset strategies for long-term discipline',
+  'Supplement recommendations backed by science',
+  'Early access to program openings',
+  'Real talk — no fluff, no gimmicks',
+]
+
 export default async function BlogIndex() {
   const issues = await fetchIssues()
   const featured = issues[0]
@@ -86,8 +95,30 @@ export default async function BlogIndex() {
             </Link>
           </section>
 
-          {/* Newsletter band */}
+          {/* Join Brains & Gains — identity + benefits + signup (merged from /newsletter) */}
           <section className="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
+            <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-8 lg:gap-10 items-center mb-8">
+              <Image
+                src="/BandGnewsletter.png"
+                alt="Brains & Gains Newsletter"
+                width={400}
+                height={225}
+                className="rounded-sm w-full max-w-sm mx-auto lg:mx-0 shadow-[0_10px_40px_rgba(27,45,80,0.10)]"
+              />
+              <div>
+                <h2 className="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight text-brand-navy">
+                  What You <span className="text-brand-orange">Get</span>
+                </h2>
+                <ul className="mt-5 grid sm:grid-cols-2 gap-x-6 gap-y-3">
+                  {benefits.map((b) => (
+                    <li key={b} className="flex items-start gap-2.5">
+                      <span className="mt-1.5 shrink-0 text-[10px] text-brand-orange">◆</span>
+                      <span className="text-brand-slate font-body text-sm leading-relaxed">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             <NewsletterSignup variant="band" />
           </section>
 
