@@ -48,9 +48,15 @@ Each script is service-role-authed, reads secrets from Cowork's env, and is revi
 ### 4. Runbook (the workflow)
 What Cowork reads to translate requests into the right operation, in order, with edge-case handling and the safety rules below.
 
-### 5. Two docs
-- **`SETUP.md` (Shane, one-time)** — the deploy-to-Anthony's-Cowork checklist (below).
-- **`OPERATIONS.md` (Anthony, daily)** — plain-English "what you can ask for," grouped by the operation surface, with example phrasings and what to expect.
+### 5. One master operating file (Cowork's "brain") — in the repo
+A single authoritative root instructions file (the `AGENTS.md` / `CLAUDE.md` convention) **committed to the repo**, so connecting the repo **auto-delivers it** to Cowork and it **persists every session** — no manual paste, version-controlled, easy to update. It merges three things:
+1. **Identity + guardrails** — what Cowork is, what it may do, read-free/confirm-write rules.
+2. **The runbook** — every operation, when/how to run it, edge cases.
+3. **The setup walkthrough** — step-by-step for the **human-only** actions Cowork can't self-do (OAuth/login to connect Kit, Supabase, GitHub; pasting secrets). The file guides Shane/Anthony through these, then operates autonomously.
+
+**Honest limit:** the file can't self-authorize connections — OAuth/login clicks are human-gated. So first-run = human does the auth steps the file lists; everything after is autonomous.
+
+Optionally, a lighter **`OPERATIONS-QUICKREF.md`** for Anthony (plain-English "what you can ask for" + example phrasings) — but it can also just be a section of the master file.
 
 ## Operation surface
 
