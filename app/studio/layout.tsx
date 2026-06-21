@@ -15,6 +15,7 @@ const navTabs = [
   { label: 'Dashboard', href: '/studio' },
   { label: 'Programs', href: '/studio/programs' },
   { label: 'Nutrition', href: '/studio/nutrition' },
+  { label: 'Schedule', href: '/studio/schedule' },
   { label: 'Messages', href: '/studio/messages' },
   { label: 'Community', href: '/studio/community' },
 ]
@@ -241,7 +242,7 @@ export default function ClientPortalLayout({
       {/* Floating Chaedyn Chat Widget */}
       {chatOpen && (
         <div className="fixed bottom-20 right-6 z-50 w-[380px] h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-xl overflow-hidden">
-          <ChaedynChat portal="client" />
+          <ChaedynChat portal="client" onNavigate={() => setChatOpen(false)} />
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { buildContext, CHAEDYN_SYSTEM_PROMPT } from '@/lib/chaedyn'
+import { clientAppMapPrompt } from '@/lib/app-map'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -20,7 +21,11 @@ export async function POST(req: NextRequest) {
 
     const systemMessage = `${CHAEDYN_SYSTEM_PROMPT}
 
-${portal === 'admin' ? `You are also helping Coach Anthony (the admin) with client management, program design, and ISSA reference lookups. Be more technical and detailed in your responses since you're talking to the coach.` : ''}
+${
+  portal === 'admin'
+    ? `You are also helping Coach Anthony (the admin) with client management, program design, and ISSA reference lookups. Be more technical and detailed in your responses since you're talking to the coach.`
+    : clientAppMapPrompt()
+}
 
 Here is relevant ISSA documentation to help answer the question:
 

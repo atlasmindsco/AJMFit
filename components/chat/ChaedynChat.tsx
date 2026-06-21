@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { CLIENT_ROUTES } from '@/lib/app-map'
 
 type Message = {
   role: 'user' | 'assistant'
@@ -12,13 +14,40 @@ type Message = {
 
 type ChaedynChatProps = {
   portal: 'client' | 'admin'
+  onNavigate?: () => void
 }
 
 function formatTime(date: Date) {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
 
-export default function ChaedynChat({ portal }: ChaedynChatProps) {
+/**
+ * Pulls [[go:/route|Label]] navigation tags out of an assistant message,
+ * returning the display text (tags + any still-streaming partial tag removed)
+ * and the validated, de-duplicated list of navigation links.
+ */
+function parseAssistant(content: string): { text: string; links: Array<{ route: string; label: string }> } {
+  const tagRe = /\[\[go:([^|\]]+)\|([^\]]+)\]\]/g
+  const links: Array<{ route: string; label: string }> = []
+  const seen = new Set<string>()
+  let m: RegExpExecArray | null
+  while ((m = tagRe.exec(content)) !== null) {
+    const route = m[1].trim()
+    const label = m[2].trim()
+    if (CLIENT_ROUTES.has(route) && !seen.has(route)) {
+      seen.add(route)
+      links.push({ route, label })
+    }
+  }
+  const text = content
+    .replace(tagRe, '')
+    .replace(/\[\[go:[^\]]*$/, '') // drop a trailing partial tag mid-stream
+    .trim()
+  return { text, links }
+}
+
+export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -153,6 +182,9 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user'
             const showAvatar = !isUser && (i === 0 || messages[i - 1]?.role === 'user')
+            const parsed = isUser ? null : parseAssistant(msg.content)
+            const displayText = isUser ? msg.content : parsed!.text
+            const links = isUser ? [] : parsed!.links
 
             return (
               <motion.div
@@ -184,7 +216,7 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
                         ? 'bg-white/[0.08] text-white/85 rounded-2xl rounded-bl-md'
                         : 'bg-white text-[#1B2D50] rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                   }`}>
-                    {msg.content || (
+                    {displayText || (
                       <span className="flex items-center gap-1 py-0.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-current opacity-40 animate-bounce" style={{ animationDelay: '0ms' }} />
                         <span className="w-1.5 h-1.5 rounded-full bg-current opacity-40 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -192,6 +224,28 @@ export default function ChaedynChat({ portal }: ChaedynChatProps) {
                       </span>
                     )}
                   </div>
+
+                  {/* Navigation buttons (assistant only) */}
+                  {links.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {links.map((l) => (
+                        <button
+                          key={l.route}
+                          onClick={() => {
+                            router.push(l.route)
+                            onNavigate?.()
+                          }}
+                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-[#1A7BFF] text-white text-[12px] font-body font-semibold hover:bg-[#0F5FE0] active:scale-95 transition-all duration-200"
+                        >
+                          {l.label}
+                          <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <p className={`text-[9px] font-body mt-0.5 px-1 ${
                     isUser ? 'text-right' : ''
                   } ${isDark ? 'text-white/15' : 'text-[#64748B]/40'}`}>
