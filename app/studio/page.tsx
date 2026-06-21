@@ -18,6 +18,7 @@ import {
 } from '@/lib/nutrition'
 import { fetchPRs, fetchWorkoutsThisWeek, type PRRow } from '@/lib/workout'
 import { fetchMyProgram, type Program } from '@/lib/programs'
+import { fetchMySessions, type Session } from '@/lib/scheduling'
 
 const CheckIcon = (
   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -57,6 +58,7 @@ export default function ClientDashboard() {
   const [weekCals, setWeekCals] = useState<Array<{ date: string; calories: number }>>([])
   const [prs, setPrs] = useState<PRRow[]>([])
   const [myProgram, setMyProgram] = useState<Program | null>(null)
+  const [sessions, setSessions] = useState<Session[]>([])
 
   useEffect(() => {
     let active = true
@@ -67,7 +69,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program] = await Promise.all([
+        const [t, logs, dl, week, workouts, prRows, program, mySessions] = await Promise.all([
           fetchTargets(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
@@ -75,6 +77,7 @@ export default function ClientDashboard() {
           fetchWorkoutsThisWeek(id),
           fetchPRs(id),
           fetchMyProgram(id),
+          fetchMySessions(id),
         ])
         if (!active) return
         setTargets(t)
@@ -84,6 +87,7 @@ export default function ClientDashboard() {
         setWorkoutsThisWeek(workouts)
         setPrs(prRows)
         setMyProgram(program)
+        setSessions(mySessions)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -115,6 +119,10 @@ export default function ClientDashboard() {
   const val = (v: string | number) => (loading ? '—' : v)
   const caloriesMax = Math.max(targets.calories, ...weekCals.map((d) => d.calories), 1)
   const recentPRs = [...prs].sort((a, b) => +new Date(b.set_at) - +new Date(a.set_at)).slice(0, 5)
+  const upcomingSessions = [...sessions]
+    .filter((s) => s.status === 'scheduled' && new Date(s.starts_at).getTime() > Date.now())
+    .sort((a, b) => +new Date(a.starts_at) - +new Date(b.starts_at))
+    .slice(0, 3)
 
   const stats = [
     {
@@ -270,6 +278,43 @@ export default function ClientDashboard() {
 
         {/* RIGHT: nutrition + today's workout */}
         <div className="lg:col-span-4 space-y-4">
+          {/* Upcoming Sessions */}
+          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+            <div className={cardHeader}>
+              <h2 className="font-display font-bold text-sm text-white">Upcoming Sessions</h2>
+            </div>
+            <div className="p-5">
+              {loading ? (
+                <p className="text-white/30 text-sm font-body">Loading…</p>
+              ) : upcomingSessions.length === 0 ? (
+                <p className="text-white/40 text-sm font-body">
+                  No sessions scheduled. Coach Anthony will book your next call.
+                </p>
+              ) : (
+                <div className="space-y-2.5">
+                  {upcomingSessions.map((s) => (
+                    <div key={s.id} className="flex items-center gap-3 rounded-lg bg-white/[0.03] p-3">
+                      <div className="w-9 h-9 rounded-lg bg-[#F76B16]/10 flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-body font-medium truncate">{s.type || 'Session'}</p>
+                        <p className="text-white/40 text-[11px] font-body mt-0.5">
+                          {new Date(s.starts_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · {s.duration_min} min
+                        </p>
+                      </div>
+                      {s.join_url && (
+                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-md bg-[#F76B16] text-white text-[11px] font-display font-bold uppercase tracking-wide hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200">
+                          Join
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
           {/* Nutrition Today */}
           <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
             <div className={cardHeader}>

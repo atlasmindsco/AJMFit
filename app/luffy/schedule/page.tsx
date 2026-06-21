@@ -61,6 +61,14 @@ export default function SchedulePage() {
       }
 
       await createSession({ user_id: form.user_id, starts_at, duration_min: Number(form.duration_min), type: form.type, notes: form.notes, join_url, zoom_meeting_id })
+
+      // Email the client their confirmation + calendar invite (best-effort).
+      fetch('/api/sessions/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: form.user_id, type: form.type, starts_at, duration_min: Number(form.duration_min), join_url }),
+      }).catch((e) => console.error('[schedule] notify failed', e))
+
       setForm({ user_id: '', date: '', time: '', type: SESSION_TYPES[0], duration_min: 45, notes: '', zoom: true })
       await load()
     } catch (e) {
