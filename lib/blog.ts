@@ -13,12 +13,26 @@
 const KIT_BASE = 'https://api.kit.com/v4'
 const REVALIDATE_SECONDS = 600 // refresh published issues every 10 min
 
+export const SITE_URL = 'https://ajmfit.com'
+
 export interface BlogIssue {
   id: number
+  slug: string
   title: string
   excerpt: string
   date: string // ISO timestamp, best available
   thumbnailUrl: string | null
+}
+
+/** URL-safe slug from a title, e.g. "AJM Fit Is Live" -> "ajm-fit-is-live". */
+export function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'post'
 }
 
 export interface BlogPost extends BlogIssue {
@@ -66,9 +80,11 @@ function deriveExcerpt(b: KitBroadcast): string {
 }
 
 function toIssue(b: KitBroadcast): BlogIssue {
+  const title = cleanTitle(b.subject)
   return {
     id: b.id,
-    title: cleanTitle(b.subject),
+    slug: slugify(title),
+    title,
     excerpt: deriveExcerpt(b),
     date: issueDate(b),
     thumbnailUrl: b.thumbnail_url,
@@ -122,6 +138,16 @@ export async function fetchPost(id: number): Promise<BlogPost | null> {
   const b = data.broadcast
   if (!b || b.public !== true) return null // never expose non-public via direct URL
   return { ...toIssue(b), bodyHtml: extractBody(b.content || '') }
+}
+
+/**
+ * Resolves a /blog/[param] segment to a post. Accepts a slug (preferred) or a
+ * raw numeric Kit id (back-compat for any already-shared numeric links).
+ */
+export async function fetchPostByParam(param: string): Promise<BlogPost | null> {
+  if (/^\d+$/.test(param)) return fetchPost(Number(param))
+  const issue = (await fetchIssues()).find((i) => i.slug === param)
+  return issue ? fetchPost(issue.id) : null
 }
 
 /** Formats an ISO date as "June 21, 2026". */

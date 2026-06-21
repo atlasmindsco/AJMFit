@@ -19,20 +19,32 @@ const barlowCondensed = Barlow_Condensed({
 })
 
 export const metadata: Metadata = {
-  title: 'AJMFit — Personal Training That Counts',
+  metadataBase: new URL('https://ajmfit.com'),
+  title: {
+    default: 'AJM Fit — Personal Training That Counts',
+    template: '%s | AJM Fit',
+  },
   description:
-    "You're already showing up. Let's make it count. Custom training programs, accountability coaching, and real results with AJMFit.",
-  keywords: ['personal training', 'online coaching', 'fitness', 'AJMFit', 'home workouts', 'ISSA certified'],
+    "You're already showing up. Let's make it count. Custom training programs, accountability coaching, and real results with AJM Fit.",
+  keywords: ['personal training', 'online coaching', 'fitness', 'AJM Fit', 'home workouts', 'ISSA certified'],
+  alternates: { canonical: '/' },
   icons: {
     icon: '/favicon.png',
     apple: '/favicon.png',
   },
   openGraph: {
-    title: 'AJMFit — Personal Training That Counts',
+    title: 'AJM Fit — Personal Training That Counts',
     description: "You're already showing up. Let's make it count.",
     url: 'https://ajmfit.com',
-    siteName: 'AJMFit',
+    siteName: 'AJM Fit',
     type: 'website',
+    images: [{ url: '/BandGnewsletter.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AJM Fit — Personal Training That Counts',
+    description: "You're already showing up. Let's make it count.",
+    images: ['/BandGnewsletter.png'],
   },
 }
 

@@ -1,19 +1,46 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { fetchPost, formatIssueDate } from '@/lib/blog'
+import { fetchIssues, fetchPostByParam, formatIssueDate, SITE_URL } from '@/lib/blog'
 import NewsletterSignup from '@/components/newsletter/NewsletterSignup'
 
 export const revalidate = 600
 
-type Params = { params: { id: string } }
+type Params = { params: { slug: string } }
+
+const DEFAULT_OG = `${SITE_URL}/BandGnewsletter.png`
+
+// Pre-render the known posts at build; new ones stream in via ISR.
+export async function generateStaticParams() {
+  const issues = await fetchIssues()
+  return issues.map((i) => ({ slug: i.slug }))
+}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const post = await fetchPost(Number(params.id))
-  if (!post) return { title: 'Post — AJM Fit' }
+  const post = await fetchPostByParam(params.slug)
+  if (!post) return { title: 'Post' }
+  const url = `${SITE_URL}/blog/${post.slug}`
+  const image = post.thumbnailUrl || DEFAULT_OG
   return {
-    title: `${post.title} | AJM Fit`,
+    title: post.title,
     description: post.excerpt || 'A Brains & Gains issue from AJM Fit.',
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.excerpt,
+      url,
+      siteName: 'AJM Fit',
+      publishedTime: post.date,
+      authors: ['Anthony Martin'],
+      images: [{ url: image }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [image],
+    },
   }
 }
 
@@ -23,13 +50,37 @@ function readingMinutes(html: string): number {
 }
 
 export default async function BlogPostPage({ params }: Params) {
-  const post = await fetchPost(Number(params.id))
+  const post = await fetchPostByParam(params.slug)
   if (!post) notFound()
 
   const mins = readingMinutes(post.bodyHtml)
+  const url = `${SITE_URL}/blog/${post.slug}`
+  const image = post.thumbnailUrl || DEFAULT_OG
+
+  // Structured data — the AEO/rich-result signal for this article.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    image: [image],
+    datePublished: post.date,
+    dateModified: post.date,
+    url,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    author: { '@type': 'Person', name: 'Anthony Martin', url: SITE_URL },
+    publisher: {
+      '@type': 'Organization',
+      name: 'AJM Fit',
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/AJMfit.png` },
+    },
+    isPartOf: { '@type': 'Blog', name: 'Brains & Gains', url: `${SITE_URL}/blog` },
+  }
 
   return (
     <article className="pb-24">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       {/* Hero */}
       <div className="relative overflow-hidden bg-brand-navy text-white pt-28 pb-16 grain-overlay">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-navy via-brand-navy to-[#0e1b34]" />

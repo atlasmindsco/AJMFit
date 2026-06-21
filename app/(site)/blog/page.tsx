@@ -5,8 +5,9 @@ import { fetchIssues, formatIssueDate } from '@/lib/blog'
 import NewsletterSignup from '@/components/newsletter/NewsletterSignup'
 
 export const metadata: Metadata = {
-  title: 'Blog — Brains & Gains | AJM Fit',
+  title: 'Blog — Brains & Gains',
   description: 'Training insight, mindset, and updates from Coach Anthony Martin. Every issue of the Brains & Gains newsletter, archived and readable.',
+  alternates: { canonical: '/blog' },
 }
 
 // Pull fresh published issues from Kit on a 10-min cadence.
@@ -62,7 +63,7 @@ export default async function BlogIndex() {
         <>
           {/* Featured (latest) */}
           <section className="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
-            <Link href={`/blog/${featured.id}`} className="group block">
+            <Link href={`/blog/${featured.slug}`} className="group block">
               <div className="grid md:grid-cols-2 gap-0 rounded-md overflow-hidden border border-brand-navy/[0.07] bg-white shadow-[0_10px_40px_rgba(27,45,80,0.06)] hover:shadow-[0_18px_60px_rgba(247,107,22,0.12)] transition-all duration-300">
                 <div className="relative bg-brand-navy overflow-hidden min-h-[280px] flex items-center justify-center p-10 grain-overlay">
                   <div className="absolute inset-0 bg-gradient-to-br from-brand-navy via-brand-navy to-[#0f1d38]" />
@@ -132,7 +133,7 @@ export default async function BlogIndex() {
                 {rest.map((issue) => (
                   <Link
                     key={issue.id}
-                    href={`/blog/${issue.id}`}
+                    href={`/blog/${issue.slug}`}
                     className="group bg-white border border-brand-navy/[0.06] rounded-md p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col"
                   >
                     <span className="text-brand-slate/70 text-xs font-display uppercase tracking-[0.15em]">{formatIssueDate(issue.date)}</span>
