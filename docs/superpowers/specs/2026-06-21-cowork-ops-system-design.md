@@ -93,6 +93,14 @@ Shane sets this up by signing into **Anthony's account** from any computer. This
 
 **Connectors must use Anthony's / the business's own logins** (his Kit, Supabase, Google, etc.), so the connections belong to him and don't break if Shane's access is removed.
 
+## File delivery (incl. if Shane can't sign into Anthony's account)
+
+The files live in the repo, so delivery = **connecting the repo to Anthony's Cowork** — done from *his* login, so it works whether Shane or Anthony drives setup.
+- **Prerequisite:** Anthony has **read access to the repo** — either add him as a GitHub read collaborator, or stand up a dedicated `ajmfit-cowork` repo (operating file + toolkit + copies of the data model / intake fields / exercise dataset for grounding) and share that.
+- **His computer needs nothing local** for cloud Cowork — files stay in the repo and flow in via the connection. Only if his Cowork executes code *locally* would he clone the repo once (confirmed at Step 0).
+- **Self-serve path** (Shane can't use Anthony's account): Anthony does the human-only steps himself, **guided by the master file's setup walkthrough**; Shane hands over secrets via a password manager (not chat).
+- **Fallback if Cowork can't connect GitHub:** Shane sends the operating file; Anthony uploads/attaches it into his Cowork project (manual, loses auto-update — repo connection strongly preferred).
+
 ## Deployment plan (Shane, one-time, in Anthony's Cowork)
 
 0. **Verify Cowork capabilities** — confirm Anthony's Cowork can: run code (the script toolkit), connect a GitHub repo, hold env secrets, and add the needed MCP connectors. *This gates the rest;* if code execution isn't available, fall back to a connectors-only design (and a custom MCP for the glue).
