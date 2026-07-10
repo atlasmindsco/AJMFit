@@ -18,16 +18,18 @@ export async function sendMail(opts: {
   html: string
   text?: string
   ics?: string
+  replyTo?: string
 }): Promise<boolean> {
   const transport = getTransport()
   if (!transport) {
-    console.warn('[email] SMTP not configured — skipping send')
+    console.warn('[email] SMTP not configured, skipping send')
     return false
   }
   const from = process.env.SMTP_FROM ?? `AJM Fit <${process.env.SMTP_USER}>`
   await transport.sendMail({
     from,
     to: opts.to,
+    ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
     subject: opts.subject,
     text: opts.text,
     html: opts.html,
@@ -67,6 +69,51 @@ export function buildEventICS(opts: {
   ]
     .filter(Boolean)
     .join('\r\n')
+}
+
+/** Branded HTML notifying Coach Anthony of a new application. */
+export function applicationNotificationHTML(opts: {
+  name: string
+  email: string
+  phone: string
+  tierLabel: string
+  billingCycle: string
+  goals: string
+  equipment: string[]
+  availability: string
+  healthLimitations?: string | null
+  referral?: string | null
+}): string {
+  const row = (label: string, value: string) =>
+    `<tr><td style="color:#94a3b8;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px;padding:12px 0 2px;">${label}</td></tr>
+     <tr><td style="color:#1B2D50;font-size:15px;line-height:1.6;padding-bottom:10px;border-bottom:1px solid #eef1f5;">${value}</td></tr>`
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f1420;padding:32px 0;font-family:Arial,Helvetica,sans-serif;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;">
+      <tr><td style="background:#1B2D50;padding:24px 32px;" align="center">
+        <img src="https://ajmfit.com/AJMfit.png" width="44" height="44" alt="AJM Fit" style="display:block;margin:0 auto 8px;" />
+        <div style="color:#ffffff;font-size:14px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;">AJM FIT</div>
+      </td></tr>
+      <tr><td style="padding:32px 32px 8px;">
+        <p style="margin:0 0 4px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">New application</p>
+        <h1 style="margin:0 0 6px;color:#1B2D50;font-size:22px;font-weight:800;">${opts.name}</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:15px;line-height:1.6;">Applied for <strong>${opts.tierLabel}</strong> (${opts.billingCycle}). Reply to this email to reach them directly.</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          ${row('Email', `<a href="mailto:${opts.email}" style="color:#1A7BFF;">${opts.email}</a>`)}
+          ${row('Phone', opts.phone)}
+          ${row('Goals', opts.goals)}
+          ${row('Equipment', opts.equipment.join(', '))}
+          ${row('Availability', opts.availability)}
+          ${opts.healthLimitations ? row('Health notes', opts.healthLimitations) : ''}
+          ${opts.referral ? row('Referral', opts.referral) : ''}
+        </table>
+      </td></tr>
+      <tr><td style="padding:24px 32px 32px;" align="center">
+        <a href="https://ajmfit.com/luffy" style="display:inline-block;background:#F76B16;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 28px;border-radius:8px;">Review in dashboard</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`
 }
 
 /** Branded HTML for a session booking confirmation (matches AJM Fit auth emails). */

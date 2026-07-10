@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendMail, applicationNotificationHTML } from '@/lib/email'
+
+const TIER_LABELS: Record<string, string> = {
+  blueprint: 'The Blueprint',
+  accelerator: 'The Accelerator',
+  'full-experience': 'The Full Experience',
+}
+const COACH_EMAIL = 'anthony@ajmfit.com'
 
 /**
  * Public application submission. Runs server-side with the service-role key so
@@ -84,6 +92,30 @@ export async function POST(request: Request) {
       { error: 'Could not save your application. Please try again.' },
       { status: 500 }
     )
+  }
+
+  // 3. Notify Coach Anthony. Best-effort: a mail hiccup must never fail the
+  //    applicant's submission (it's already saved above).
+  try {
+    await sendMail({
+      to: COACH_EMAIL,
+      replyTo: data.email,
+      subject: `New application: ${data.name} (${TIER_LABELS[data.tier] ?? data.tier})`,
+      html: applicationNotificationHTML({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        tierLabel: TIER_LABELS[data.tier] ?? data.tier,
+        billingCycle: data.billingCycle,
+        goals: data.goals,
+        equipment: data.equipment,
+        availability: data.availability,
+        healthLimitations: data.healthLimitations,
+        referral: data.referral,
+      }),
+    })
+  } catch (e) {
+    console.error('[apply] notification email failed', e)
   }
 
   return NextResponse.json({ ok: true })
