@@ -324,13 +324,13 @@ export default function ClientsPage() {
                     tier: 'The Accelerator',
                     count: clients.filter((c) => c.application?.tier === 'accelerator' && c.status === 'active').length,
                     color: '#1A7BFF',
-                    price: '$497/mo',
+                    price: '$397/mo',
                   },
                   {
                     tier: 'The Blueprint',
                     count: clients.filter((c) => c.application?.tier === 'blueprint' && c.status === 'active').length,
                     color: '#64748B',
-                    price: '$297/mo',
+                    price: '$19.97/mo',
                   },
                 ].map((t) => (
                   <div key={t.tier} className="flex items-center justify-between">
