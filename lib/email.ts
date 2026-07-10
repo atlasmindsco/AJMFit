@@ -87,6 +87,7 @@ export function applicationNotificationHTML(opts: {
   const row = (label: string, value: string) =>
     `<tr><td style="color:#94a3b8;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px;padding:12px 0 2px;">${label}</td></tr>
      <tr><td style="color:#1B2D50;font-size:15px;line-height:1.6;padding-bottom:10px;border-bottom:1px solid #eef1f5;">${value}</td></tr>`
+  const first = opts.name.trim().split(/\s+/)[0]
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f1420;padding:32px 0;font-family:Arial,Helvetica,sans-serif;">
   <tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;">
@@ -97,7 +98,20 @@ export function applicationNotificationHTML(opts: {
       <tr><td style="padding:32px 32px 8px;">
         <p style="margin:0 0 4px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">New application</p>
         <h1 style="margin:0 0 6px;color:#1B2D50;font-size:22px;font-weight:800;">${opts.name}</h1>
-        <p style="margin:0 0 18px;color:#475569;font-size:15px;line-height:1.6;">Applied for <strong>${opts.tierLabel}</strong> (${opts.billingCycle}). Reply to this email to reach them directly.</p>
+        <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">${first} applied for <strong>${opts.tierLabel}</strong> (${opts.billingCycle}).</p>
+
+        <!-- What to do next -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F6F9;border-left:4px solid #F76B16;border-radius:6px;margin:0 0 24px;">
+          <tr><td style="padding:18px 20px;">
+            <p style="margin:0 0 12px;color:#1B2D50;font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">What to do next</p>
+            <p style="margin:0 0 8px;color:#475569;font-size:14px;line-height:1.6;"><strong>1.</strong> Tap the orange <strong>Review in dashboard</strong> button below to open your coach portal.</p>
+            <p style="margin:0 0 8px;color:#475569;font-size:14px;line-height:1.6;"><strong>2.</strong> Find <strong>${first}</strong> in your Clients list (they'll be marked <strong>Pending</strong>).</p>
+            <p style="margin:0 0 8px;color:#475569;font-size:14px;line-height:1.6;"><strong>3.</strong> Tap <strong>Approve</strong> to send ${first} a welcome email to set up their account and start their plan. Tap <strong>Decline</strong> if they're not the right fit.</p>
+            <p style="margin:0;color:#475569;font-size:14px;line-height:1.6;"><strong>4.</strong> Want to ask a question first? Just <strong>reply to this email</strong> and it goes straight to ${first}.</p>
+          </td></tr>
+        </table>
+
+        <p style="margin:0 0 6px;color:#94a3b8;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px;">Their application</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           ${row('Email', `<a href="mailto:${opts.email}" style="color:#1A7BFF;">${opts.email}</a>`)}
           ${row('Phone', opts.phone)}
@@ -110,6 +124,7 @@ export function applicationNotificationHTML(opts: {
       </td></tr>
       <tr><td style="padding:24px 32px 32px;" align="center">
         <a href="https://ajmfit.com/luffy" style="display:inline-block;background:#F76B16;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 28px;border-radius:8px;">Review in dashboard</a>
+        <p style="margin:16px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">This is where you manage every client. Bookmark it: <a href="https://ajmfit.com/luffy" style="color:#1A7BFF;">ajmfit.com/luffy</a></p>
       </td></tr>
     </table>
   </td></tr>
