@@ -5,7 +5,7 @@ import { fetchIssues, formatIssueDate } from '@/lib/blog'
 import NewsletterSignup from '@/components/newsletter/NewsletterSignup'
 
 export const metadata: Metadata = {
-  title: 'Blog — Brains & Gains',
+  title: 'Blog, Brains & Gains',
   description: 'Training insight, mindset, and updates from Coach Anthony Martin. Every issue of the Brains & Gains newsletter, archived and readable.',
   alternates: { canonical: '/blog' },
 }
@@ -25,7 +25,7 @@ const benefits = [
   'Mindset strategies for long-term discipline',
   'Supplement recommendations backed by science',
   'Early access to program openings',
-  'Real talk — no fluff, no gimmicks',
+  'Real talk, no fluff, no gimmicks',
 ]
 
 export default async function BlogIndex() {
@@ -45,7 +45,7 @@ export default async function BlogIndex() {
             Brains &amp;<br /><span className="text-brand-orange">Gains</span>
           </h1>
           <p className="mt-6 text-brand-slate text-lg max-w-2xl leading-relaxed">
-            Training insight, mindset, and updates from Coach Anthony — every issue of the newsletter, archived and readable right here.
+            Training insight, mindset, and updates from Coach Anthony, every issue of the newsletter, archived and readable right here.
           </p>
         </div>
       </header>
@@ -96,7 +96,7 @@ export default async function BlogIndex() {
             </Link>
           </section>
 
-          {/* Join Brains & Gains — identity + benefits + signup (merged from /newsletter) */}
+          {/* Join Brains & Gains, identity + benefits + signup (merged from /newsletter) */}
           <section className="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
             <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-8 lg:gap-10 items-center mb-8">
               <Image

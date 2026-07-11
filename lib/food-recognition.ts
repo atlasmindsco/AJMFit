@@ -63,7 +63,7 @@ const SHARED_RULES = `Break dishes into INDIVIDUAL INGREDIENT COMPONENTS so we c
 
 CRITICAL RULES:
 - Break dishes into separate ingredients (protein, starch, vegetables, sauces, oils)
-- Include cooking oils, marinades, dressings, butter etc. — these often dominate fat content
+- Include cooking oils, marinades, dressings, butter etc., these often dominate fat content
 - Use canonical USDA-style names ("chicken breast, cooked, roasted" not "grilled chicken")
 - Estimate grams per ingredient, not per dish
 - Confidence: "high" for clearly identifiable single dishes, "medium" for typical complexity, "low" for ambiguous

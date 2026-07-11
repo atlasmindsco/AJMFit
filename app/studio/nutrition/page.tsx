@@ -183,7 +183,7 @@ export default function NutritionPage() {
       setTypedLookupActive(false)
       return
     }
-    if (macroFieldsTouchedRef.current) return // user is editing macros — leave them alone
+    if (macroFieldsTouchedRef.current) return // user is editing macros, leave them alone
 
     lookupTimerRef.current = setTimeout(async () => {
       const controller = new AbortController()
@@ -243,7 +243,7 @@ export default function NutritionPage() {
         body: JSON.stringify({ barcode }),
       })
       if (res.status === 404) {
-        setAnalysisError(`Barcode ${barcode} not found — try the photo or type the product name.`)
+        setAnalysisError(`Barcode ${barcode} not found, try the photo or type the product name.`)
         return
       }
       if (!res.ok) {
@@ -514,7 +514,7 @@ export default function NutritionPage() {
                                       </div>
                                     )}
                                     <p className="text-[10px] text-emerald-700/80 font-body mt-1.5 leading-relaxed">
-                                      <strong>Review before saving.</strong> {analysisSource === 'off' ? 'Macros come from the product label — verify the serving size matches what you ate.' : 'Portion sizes are estimates and may be off by ±20%.'}
+                                      <strong>Review before saving.</strong> {analysisSource === 'off' ? 'Macros come from the product label, verify the serving size matches what you ate.' : 'Portion sizes are estimates and may be off by ±20%.'}
                                     </p>
                                   </div>
                                 )}
@@ -783,7 +783,7 @@ export default function NutritionPage() {
                 <p className="text-[#1B2D50] text-sm font-body leading-relaxed">
                   &ldquo;Try to get 30-40g of protein within 30 minutes post-workout. Your shake + a banana is a solid combo.&rdquo;
                 </p>
-                <p className="text-[#64748B] text-xs font-body mt-2">— Anthony</p>
+                <p className="text-[#64748B] text-xs font-body mt-2">, Anthony</p>
               </div>
             </div>
           </motion.div>

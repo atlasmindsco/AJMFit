@@ -82,7 +82,7 @@ export default function Footer() {
             <p className="text-white/60 text-base font-body leading-relaxed italic">
               &ldquo;To whom much is given, much is required.&rdquo;
             </p>
-            <p className="text-white/40 text-sm font-body">— Luke 12:48</p>
+            <p className="text-white/40 text-sm font-body">, Luke 12:48</p>
           </div>
         </div>
 

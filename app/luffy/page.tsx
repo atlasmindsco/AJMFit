@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     }
   }, [])
 
-  const dash = (v: number | string | undefined) => (loading || v === undefined ? '—' : v)
+  const dash = (v: number | string | undefined) => (loading || v === undefined ? ', ' : v)
   const pending = clients.filter((c) => c.application?.status === 'pending')
 
   const cards = [
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
     { label: 'Total Clients', value: dash(stats?.totalClients) },
     {
       label: 'Revenue (MTD)',
-      value: loading || !stats ? '—' : `$${(stats.revenueMtdCents / 100).toLocaleString()}`,
+      value: loading || !stats ? ', ' : `$${(stats.revenueMtdCents / 100).toLocaleString()}`,
     },
   ]
 

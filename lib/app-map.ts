@@ -1,9 +1,9 @@
 /**
- * Client studio app map — gives Chea (the in-app assistant) awareness of how
+ * Client studio app map, gives Chea (the in-app assistant) awareness of how
  * the client side of AJM Fit is laid out so it can answer "where/how do I…"
  * questions and link the client straight to the right page.
  *
- * Pure data + string builders — safe to import in both the chat API route and
+ * Pure data + string builders, safe to import in both the chat API route and
  * the client chat component. CLIENT_ROUTES is the whitelist the UI validates
  * navigation tags against.
  */
@@ -21,7 +21,7 @@ export const CLIENT_APP_MAP: AppDestination[] = [
     route: '/studio',
     label: 'Dashboard',
     title: 'Dashboard',
-    does: 'Your training snapshot — workouts this week, calories & macros today, water, recent PRs, and your currently assigned program.',
+    does: 'Your training snapshot, workouts this week, calories & macros today, water, recent PRs, and your currently assigned program.',
     keywords: ['home', 'dashboard', 'overview', 'snapshot', 'summary', 'progress', 'prs', 'personal records'],
   },
   {
@@ -49,7 +49,7 @@ export const CLIENT_APP_MAP: AppDestination[] = [
     route: '/studio/community',
     label: 'Community',
     title: 'Community',
-    does: 'The member feed — share posts, comment, see upcoming events, and check the leaderboard.',
+    does: 'The member feed, share posts, comment, see upcoming events, and check the leaderboard.',
     keywords: ['community', 'feed', 'post', 'comment', 'event', 'leaderboard', 'members', 'social'],
   },
 ]
@@ -60,7 +60,7 @@ export const CLIENT_ROUTES = new Set(CLIENT_APP_MAP.map((d) => d.route))
 /** Compact app map + navigation instructions for the client system prompt. */
 export function clientAppMapPrompt(): string {
   const lines = CLIENT_APP_MAP.map((d) => `- ${d.title} (${d.route}): ${d.does}`).join('\n')
-  return `APP NAVIGATION — you also know how the AJM Fit member studio is organized and can guide clients around it:
+  return `APP NAVIGATION, you also know how the AJM Fit member studio is organized and can guide clients around it:
 
 ${lines}
 
@@ -70,6 +70,6 @@ When the client asks where or how to do something inside the app (log food, see 
 [[go:/studio/nutrition|Nutrition]]
 Rules for tags:
 - Use ONLY the exact routes listed above. Never invent a route.
-- Add at most 1–2 tags, only when navigation actually helps.
+- Add at most 1-2 tags, only when navigation actually helps.
 - Do NOT add a tag for general fitness/nutrition questions that aren't about using the app.`
 }

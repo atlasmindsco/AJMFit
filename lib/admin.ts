@@ -109,7 +109,7 @@ export async function acceptApplication(applicationId: string, userId: string) {
     .eq('id', applicationId)
   if (appErr) throw appErr
 
-  // Keep the user 'pending' until they start their subscription — the Stripe
+  // Keep the user 'pending' until they start their subscription, the Stripe
   // webhook flips them to 'active' on payment/trial start.
   const { error: userErr } = await db
     .from('users')
@@ -161,12 +161,12 @@ const TIER_LABELS: Record<Tier, string> = {
 }
 
 export function tierLabel(tier: Tier | null | undefined): string {
-  if (!tier) return '—'
+  if (!tier) return ', '
   return TIER_LABELS[tier]
 }
 
 export function relativeTime(iso: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return ', '
   const diffMs = Date.now() - new Date(iso).getTime()
   const mins = Math.floor(diffMs / 60000)
   if (mins < 1) return 'Just now'

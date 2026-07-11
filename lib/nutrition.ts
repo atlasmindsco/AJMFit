@@ -40,7 +40,7 @@ export interface DailyLogRow {
   notes: string | null
 }
 
-/** Default meals for new users — we seed these on first load. */
+/** Default meals for new users, we seed these on first load. */
 const DEFAULT_MEALS: Array<{ name: string; time: string; order: number }> = [
   { name: 'Breakfast', time: '07:00:00', order: 1 },
   { name: 'Snack', time: '10:00:00', order: 2 },

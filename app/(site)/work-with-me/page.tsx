@@ -8,9 +8,9 @@ const tiers = [
     name: 'The Blueprint',
     price: '$19.97',
     tagline: 'Self-guided. Full app access.',
-    equipment: 'Any equipment — programs library scales to what you have',
+    equipment: 'Any equipment, programs library scales to what you have',
     features: [
-      'Full studio app — workouts, nutrition, programs library',
+      'Full studio app, workouts, nutrition, programs library',
       'Photo food recognition + macro tracking',
       'Workout logging + PR tracking',
       'Chea AI assistant',
@@ -18,7 +18,7 @@ const tiers = [
       'M-F messaging access',
     ],
     idealFor:
-      "You want structure without the cost of 1:1 coaching. Track your training, nutrition, and progress in one place — choose from the programs library and run your own training.",
+      "You want structure without the cost of 1:1 coaching. Track your training, nutrition, and progress in one place, choose from the programs library and run your own training.",
   },
   {
     name: 'The Accelerator',
@@ -35,7 +35,7 @@ const tiers = [
       'Priority response M-F',
     ],
     idealFor:
-      "You want more than just the app — you want a coach in your corner. Custom programming, weekly check-ins, and form reviews keep you accountable and training right.",
+      "You want more than just the app, you want a coach in your corner. Custom programming, weekly check-ins, and form reviews keep you accountable and training right.",
   },
   {
     name: 'The Full Experience',
@@ -56,7 +56,7 @@ const tiers = [
 const faqs = [
   {
     q: "I don't have a gym membership. Can I still do this?",
-    a: 'Absolutely. Every program is scaled to your available equipment — whether that\'s a pair of dumbbells, resistance bands, or a full home gym setup. No commercial gym required.',
+    a: 'Absolutely. Every program is scaled to your available equipment, whether that\'s a pair of dumbbells, resistance bands, or a full home gym setup. No commercial gym required.',
   },
   {
     q: 'How long are the programs?',
@@ -68,7 +68,7 @@ const faqs = [
   },
   {
     q: 'Can I upgrade my tier later?',
-    a: "Yes. You can upgrade at any time — you'll simply shift into the higher tier at the start of your next billing cycle.",
+    a: "Yes. You can upgrade at any time, you'll simply shift into the higher tier at the start of your next billing cycle.",
   },
   {
     q: 'What if I need to cancel?',

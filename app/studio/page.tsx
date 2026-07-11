@@ -116,7 +116,7 @@ export default function ClientDashboard() {
     }
   }, [])
 
-  const val = (v: string | number) => (loading ? '—' : v)
+  const val = (v: string | number) => (loading ? ', ' : v)
   const caloriesMax = Math.max(targets.calories, ...weekCals.map((d) => d.calories), 1)
   const recentPRs = [...prs].sort((a, b) => +new Date(b.set_at) - +new Date(a.set_at)).slice(0, 5)
   const upcomingSessions = [...sessions]
@@ -342,7 +342,7 @@ export default function ClientDashboard() {
                     <div className="relative">
                       <MacroRing current={macro.current} goal={macro.goal} color={macro.color} size={72} />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="font-display font-bold text-white text-sm">{loading ? '—' : `${macro.current}g`}</span>
+                        <span className="font-display font-bold text-white text-sm">{loading ? ', ' : `${macro.current}g`}</span>
                       </div>
                     </div>
                     <span className="font-body font-semibold text-white text-xs mt-2">{macro.name}</span>

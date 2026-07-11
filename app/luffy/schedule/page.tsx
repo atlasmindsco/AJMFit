@@ -48,7 +48,7 @@ export default function SchedulePage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            topic: `AJM Fit — ${form.type} with ${clientName}`,
+            topic: `AJM Fit, ${form.type} with ${clientName}`,
             startISO: starts_at,
             durationMin: Number(form.duration_min),
             agenda: form.notes || undefined,

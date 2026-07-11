@@ -1,5 +1,5 @@
 // Server-only Calendly helper. Uses a Personal Access Token (single account:
-// Anthony's). Never import this from a client component — it reads CALENDLY_API_TOKEN.
+// Anthony's). Never import this from a client component, it reads CALENDLY_API_TOKEN.
 
 import crypto from 'node:crypto'
 
@@ -37,7 +37,7 @@ export interface CalendlyUser {
   timezone: string
 }
 
-/** GET /users/me — returns the token owner, including the user + organization URIs. */
+/** GET /users/me, returns the token owner, including the user + organization URIs. */
 export async function getCurrentUser(): Promise<CalendlyUser> {
   const { resource } = await calendly<{ resource: CalendlyUser }>('/users/me')
   return resource
@@ -51,7 +51,7 @@ export interface WebhookSubscription {
 }
 
 /**
- * POST /webhook_subscriptions — registers a webhook. The response (and only the
+ * POST /webhook_subscriptions, registers a webhook. The response (and only the
  * response) contains nothing secret, but the SIGNING KEY is returned separately
  * and must be saved to CALENDLY_WEBHOOK_SIGNING_KEY to verify incoming events.
  */
@@ -79,7 +79,7 @@ export async function createWebhookSubscription(input: {
   }
 }
 
-/** GET /webhook_subscriptions — list existing subscriptions for an org/user. */
+/** GET /webhook_subscriptions, list existing subscriptions for an org/user. */
 export async function listWebhookSubscriptions(input: {
   organizationUri: string
   userUri: string

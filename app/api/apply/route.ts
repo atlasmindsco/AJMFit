@@ -14,7 +14,7 @@ const COACH_EMAIL = 'anthony@ajmfit.com'
  * Public application submission. Runs server-side with the service-role key so
  * the browser needs no write access to the (now RLS-protected) users /
  * applications tables. Creates or updates a *pending* user by email and stores
- * the application snapshot. No auth account is created here — that happens when
+ * the application snapshot. No auth account is created here, that happens when
  * the trainer approves and the client is invited.
  */
 const bodySchema = z.object({

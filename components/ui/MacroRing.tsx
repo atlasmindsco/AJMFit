@@ -1,6 +1,6 @@
 /**
  * Circular progress ring for macro / calorie targets.
- * Single source of truth — used by the studio dashboard (dark)
+ * Single source of truth, used by the studio dashboard (dark)
  * and the nutrition page (light) via the `bgStroke` prop.
  */
 

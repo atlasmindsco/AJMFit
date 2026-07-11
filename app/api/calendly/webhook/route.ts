@@ -40,7 +40,7 @@ function isAuthentic(request: Request, rawBody: string): boolean {
  * show self-booked sessions alongside trainer-created ones.
  *
  * Bookings are matched to clients by email. A booking from someone who isn't a
- * registered user is acknowledged (200) but skipped — there's nowhere to file it.
+ * registered user is acknowledged (200) but skipped, there's nowhere to file it.
  */
 export async function POST(request: Request) {
   const rawBody = await request.text()
@@ -64,13 +64,13 @@ export async function POST(request: Request) {
   const sessions = db.from('scheduled_sessions') as any
   const { payload } = evt
 
-  // 3a. Cancellation — flip the matching row to cancelled.
+  // 3a. Cancellation, flip the matching row to cancelled.
   if (evt.event === 'invitee.canceled') {
     await sessions.update({ status: 'cancelled' }).eq('calendly_invitee_uri', payload.uri)
     return NextResponse.json({ ok: true })
   }
 
-  // 3b. New booking — match the client by email, then upsert.
+  // 3b. New booking, match the client by email, then upsert.
   if (evt.event === 'invitee.created') {
     const email = payload.email?.toLowerCase().trim()
     if (!email) return NextResponse.json({ ok: true, skipped: 'no email' })
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (!user) {
-      // Prospect, not a registered client — nothing to file against.
+      // Prospect, not a registered client, nothing to file against.
       return NextResponse.json({ ok: true, skipped: 'no matching user' })
     }
 
@@ -107,6 +107,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true })
   }
 
-  // Unhandled event type — acknowledge so Calendly doesn't retry.
+  // Unhandled event type, acknowledge so Calendly doesn't retry.
   return NextResponse.json({ ok: true, ignored: evt.event })
 }

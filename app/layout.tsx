@@ -21,7 +21,7 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata: Metadata = {
   metadataBase: new URL('https://ajmfit.com'),
   title: {
-    default: 'AJM Fit — Personal Training That Counts',
+    default: 'AJM Fit, Personal Training That Counts',
     template: '%s | AJM Fit',
   },
   description:
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     apple: '/favicon.png',
   },
   openGraph: {
-    title: 'AJM Fit — Personal Training That Counts',
+    title: 'AJM Fit, Personal Training That Counts',
     description: "You're already showing up. Let's make it count.",
     url: 'https://ajmfit.com',
     siteName: 'AJM Fit',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AJM Fit — Personal Training That Counts',
+    title: 'AJM Fit, Personal Training That Counts',
     description: "You're already showing up. Let's make it count.",
     images: ['/BandGnewsletter.png'],
   },

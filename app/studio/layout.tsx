@@ -39,7 +39,7 @@ export default function ClientPortalLayout({
     const supabase = createClient()
     let cancelled = false
     // When returning from Stripe checkout, the webhook may land a moment after
-    // the redirect — poll briefly so we don't flash the paywall at a paid member.
+    // the redirect, poll briefly so we don't flash the paywall at a paid member.
     const justSubscribed =
       typeof window !== 'undefined' &&
       new URLSearchParams(window.location.search).has('subscribed')

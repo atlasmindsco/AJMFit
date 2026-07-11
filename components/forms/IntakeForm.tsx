@@ -50,7 +50,7 @@ const tierOptions = [
     monthlyOnly: true,
     tagline: 'Self-guided. Full app access.',
     features: [
-      'Full studio app — workouts, nutrition, programs library',
+      'Full studio app, workouts, nutrition, programs library',
       'Photo food recognition + macro tracking',
       'Workout logging + PR tracking',
       'Chea AI assistant',
@@ -136,7 +136,7 @@ export default function IntakeForm() {
     setSubmitError(null)
     try {
       // Submit to the server route, which writes with the service-role key.
-      // No studio access is granted here — the client is invited by email once
+      // No studio access is granted here, the client is invited by email once
       // Anthony approves the application.
       // Blueprint is monthly-only.
       const payload = {

@@ -10,7 +10,7 @@ interface CalendlyApi {
 
 /**
  * Inline Calendly scheduler. Prefills the client's name + email so the booking's
- * invitee email matches our users table — that's how /api/calendly/webhook links
+ * invitee email matches our users table, that's how /api/calendly/webhook links
  * the session back to the right client.
  */
 export default function CalendlyEmbed({

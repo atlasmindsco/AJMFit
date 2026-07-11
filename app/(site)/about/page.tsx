@@ -74,7 +74,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <p>
-                  I started AJMFit because I saw too many people putting in the work but not getting the results. Not because they lacked effort — but because they lacked the right plan and someone to hold them to a higher standard.
+                  I started AJMFit because I saw too many people putting in the work but not getting the results. Not because they lacked effort, but because they lacked the right plan and someone to hold them to a higher standard.
                 </p>
               </div>
               <div className="flex items-start gap-5">
@@ -102,7 +102,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <p>
-                  That&rsquo;s why every program I build isn&rsquo;t just about reps and sets — it&rsquo;s about maximizing the potential you already have. You showed up. My job is to make sure that effort actually counts.
+                  That&rsquo;s why every program I build isn&rsquo;t just about reps and sets, it&rsquo;s about maximizing the potential you already have. You showed up. My job is to make sure that effort actually counts.
                 </p>
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function AboutPage() {
               ISSA Certified Personal Trainer
             </h3>
             <p className="text-brand-slate font-body leading-[1.7]">
-              Every program is built on a foundation of exercise science — not guesswork. ISSA certification means evidence-based programming, proper form standards, and the knowledge to adapt training to any body, any goal, any equipment setup.
+              Every program is built on a foundation of exercise science, not guesswork. ISSA certification means evidence-based programming, proper form standards, and the knowledge to adapt training to any body, any goal, any equipment setup.
             </p>
           </div>
         </motion.div>
@@ -146,7 +146,7 @@ export default function AboutPage() {
             The <span className="text-brand-orange">40%</span> Gap
           </h2>
           <p className="mt-8 text-brand-slate font-body text-lg max-w-3xl mx-auto leading-relaxed">
-            Most people train at about 60% of their actual capacity — not because they&rsquo;re lazy, but because they don&rsquo;t know what they&rsquo;re leaving on the table. That gap between where you are and where you could be? That&rsquo;s your unfair advantage. My job is to close it.
+            Most people train at about 60% of their actual capacity, not because they&rsquo;re lazy, but because they don&rsquo;t know what they&rsquo;re leaving on the table. That gap between where you are and where you could be? That&rsquo;s your unfair advantage. My job is to close it.
           </p>
         </motion.div>
       </section>
@@ -168,11 +168,10 @@ export default function AboutPage() {
             <blockquote className="font-display font-extrabold italic text-2xl md:text-4xl uppercase leading-[1.1] tracking-[-0.01em] text-brand-navy">
               &ldquo;To whom much is given, much is required.&rdquo;
             </blockquote>
-            <p className="mt-6 text-brand-slate text-sm font-body tracking-widest uppercase">
-              — Luke 12:48
+            <p className="mt-6 text-brand-slate text-sm font-body tracking-widest uppercase">, Luke 12:48
             </p>
             <p className="mt-8 text-brand-slate font-body leading-[1.8] max-w-2xl mx-auto">
-              This isn&rsquo;t just a tagline — it&rsquo;s the standard. You&rsquo;ve been given a body, talent, time, and opportunity. The question isn&rsquo;t whether you&rsquo;ll work hard. It&rsquo;s whether you&rsquo;ll be a good steward of what you&rsquo;ve been given.
+              This isn&rsquo;t just a tagline, it&rsquo;s the standard. You&rsquo;ve been given a body, talent, time, and opportunity. The question isn&rsquo;t whether you&rsquo;ll work hard. It&rsquo;s whether you&rsquo;ll be a good steward of what you&rsquo;ve been given.
             </p>
           </div>
         </motion.div>

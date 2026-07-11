@@ -1,9 +1,9 @@
 /**
- * Blog data layer — pulls published issues from Kit (formerly ConvertKit).
+ * Blog data layer, pulls published issues from Kit (formerly ConvertKit).
  *
  * Source of truth is Kit broadcasts. An issue shows on the blog when it's
  * marked `public` in Kit (the "publish to web" flag), independent of whether
- * it was emailed — so a never-sent public draft is a web-only post, and an
+ * it was emailed, so a never-sent public draft is a web-only post, and an
  * emailed + public broadcast is a newsletter that also lands here.
  *
  * Server-only: uses KIT_API_KEY (no NEXT_PUBLIC_ prefix). Never import into a
@@ -124,8 +124,7 @@ function extractBody(html: string): string {
 
 /**
  * All issues currently published to the web, newest first.
- * THROWS on a Kit API failure (auth/billing/5xx) instead of returning [] —
- * with ISR, a thrown regeneration keeps serving the last good cached page,
+ * THROWS on a Kit API failure (auth/billing/5xx) instead of returning [], * with ISR, a thrown regeneration keeps serving the last good cached page,
  * whereas returning [] would "successfully" replace the live archive with the
  * empty state (this actually happened when the Kit plan lapsed).
  */

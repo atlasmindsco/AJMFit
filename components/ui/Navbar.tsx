@@ -69,7 +69,7 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-20">
-          {/* Logo — swap point: replace /AJMfit.png with updated logo if needed */}
+          {/* Logo, swap point: replace /AJMfit.png with updated logo if needed */}
           <Link href="/" className="relative z-10 shrink-0">
             <Image
               src="/AJMfit.png"

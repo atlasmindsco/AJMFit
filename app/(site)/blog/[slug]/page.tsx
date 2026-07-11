@@ -12,7 +12,7 @@ const DEFAULT_OG = `${SITE_URL}/BandGnewsletter.png`
 
 // Pre-render the known posts at build; new ones stream in via ISR.
 // Swallow Kit failures here: a Kit hiccup during `next build` should not fail
-// the deploy — pages simply render on demand instead.
+// the deploy, pages simply render on demand instead.
 export async function generateStaticParams() {
   try {
     const issues = await fetchIssues()
@@ -63,7 +63,7 @@ export default async function BlogPostPage({ params }: Params) {
   const url = `${SITE_URL}/blog/${post.slug}`
   const image = post.thumbnailUrl || DEFAULT_OG
 
-  // Structured data — the AEO/rich-result signal for this article.
+  // Structured data, the AEO/rich-result signal for this article.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',

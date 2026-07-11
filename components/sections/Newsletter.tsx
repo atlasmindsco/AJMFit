@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
 export default function Newsletter() {
+  const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
@@ -13,7 +14,7 @@ export default function Newsletter() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || loading) return
+    if (!firstName || !email || loading) return
     setLoading(true)
     setError('')
 
@@ -21,7 +22,7 @@ export default function Newsletter() {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, first_name: firstName }),
       })
 
       if (!res.ok) throw new Error('Signup failed')
@@ -51,7 +52,7 @@ export default function Newsletter() {
           Brains &amp; Gains
         </h2>
         <p className="mt-6 text-brand-slate font-body leading-relaxed">
-          Weekly insights on training smarter, building discipline, and making your time in the gym actually count. No fluff — just real talk.
+          Weekly insights on training smarter, building discipline, and making your time in the gym actually count. No fluff, just real talk.
         </p>
 
         {submitted ? (
@@ -70,17 +71,27 @@ export default function Newsletter() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="mt-10 flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+            className="mt-10 flex flex-col gap-3 max-w-md mx-auto"
           >
-            <input
-              type="email"
-              required
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
-            />
-            <Button type="submit" variant="primary" disabled={loading}>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                required
+                placeholder="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
+              />
+              <input
+                type="email"
+                required
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
+              />
+            </div>
+            <Button type="submit" variant="primary" fullWidth disabled={loading}>
               {loading ? 'Subscribing...' : 'Subscribe'}
             </Button>
           </form>

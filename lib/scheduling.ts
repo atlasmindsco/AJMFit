@@ -61,7 +61,7 @@ export async function setSessionStatus(id: string, status: Session['status']): P
 
 /**
  * The signed-in client's plan tier, or null. Prefers the Stripe subscription;
- * falls back to their latest application's tier — beta testers (and any
+ * falls back to their latest application's tier, beta testers (and any
  * admin-activated client) have NO subscriptions row and would otherwise be
  * locked out of booking calls entirely.
  */

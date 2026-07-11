@@ -6,7 +6,6 @@ import {
   fetchClients,
   acceptApplication,
   inviteClient,
-  declineApplication,
   setUserBeta,
   tierLabel,
   relativeTime,
@@ -72,7 +71,7 @@ export default function ClientsPage() {
     try {
       await acceptApplication(client.application.id, client.id)
       // Email the client their set-password invite so they can reach the studio.
-      // Invite failure must not strand the (already-committed) acceptance —
+      // Invite failure must not strand the (already-committed) acceptance;
       // the Resend invite button covers the retry.
       try {
         await inviteClient(client.id)
@@ -104,15 +103,50 @@ export default function ClientsPage() {
     }
   }
 
-  const handleDecline = async (client: ClientRow) => {
+  // Decline flow: coach picks a reason (drives the polite email the applicant
+  // receives) plus an optional personal note.
+  const [declineTarget, setDeclineTarget] = useState<ClientRow | null>(null)
+  const [declineReason, setDeclineReason] = useState<'capacity' | 'fit' | 'medical' | 'other'>('capacity')
+  const [declineNote, setDeclineNote] = useState('')
+
+  const DECLINE_REASONS: Array<{ key: typeof declineReason; label: string; hint: string }> = [
+    { key: 'capacity', label: 'At capacity', hint: 'Roster is full. Invites them to the newsletter and to re-apply when spots open.' },
+    { key: 'fit', label: 'Not the right fit', hint: 'Their goals need a different program or coach. Warm, no hard feelings.' },
+    { key: 'medical', label: 'Needs doctor clearance', hint: 'Health notes warrant medical sign-off first. Invites re-apply after clearance.' },
+    { key: 'other', label: 'Other', hint: 'General polite decline. Add a personal note below if you want to say more.' },
+  ]
+
+  const handleDecline = (client: ClientRow) => {
     if (!client.application) return
-    if (!confirm(`Decline ${client.name}'s application?`)) return
+    setDeclineReason('capacity')
+    setDeclineNote('')
+    setDeclineTarget(client)
+  }
+
+  const submitDecline = async () => {
+    const client = declineTarget
+    if (!client?.application) return
     setProcessing(client.id)
     try {
-      await declineApplication(client.application.id, client.id)
+      const res = await fetch('/api/admin/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: client.id,
+          applicationId: client.application.id,
+          reason: declineReason,
+          note: declineNote.trim() || undefined,
+        }),
+      })
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null
+        throw new Error(body?.error ?? 'Could not decline the application.')
+      }
+      setDeclineTarget(null)
       loadClients()
     } catch (err) {
       console.error('[Decline] Failed:', err)
+      alert(err instanceof Error ? err.message : 'Could not decline the application.')
     } finally {
       setProcessing(null)
     }
@@ -295,7 +329,7 @@ export default function ClientsPage() {
                               </span>
                             ))
                           ) : (
-                            <span className="text-white/40 text-[11px] font-body">—</span>
+                            <span className="text-white/40 text-[11px] font-body">, </span>
                           )}
                         </div>
                       </div>
@@ -315,7 +349,7 @@ export default function ClientsPage() {
                       )}
                       <div>
                         <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Phone</p>
-                        <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? '—'}</p>
+                        <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? ', '}</p>
                       </div>
                       <div>
                         <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Applied</p>
@@ -420,6 +454,61 @@ export default function ClientsPage() {
                 )}
               </div>
             </motion.div>
+          </div>
+        </div>
+      )}
+
+      {/* Decline modal: reason drives the applicant's polite email */}
+      {declineTarget && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => processing === null && setDeclineTarget(null)}>
+          <div className="w-full max-w-md bg-[#161616] border border-white/[0.10] rounded-xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-display font-extrabold text-lg text-white tracking-tight">
+              Decline {declineTarget.name.split(' ')[0]}&rsquo;s application
+            </h2>
+            <p className="text-white/40 text-xs font-body mt-1 mb-4">
+              They&rsquo;ll get a polite email based on the reason you pick. Reply-to goes to your inbox.
+            </p>
+            <div className="space-y-2 mb-4">
+              {DECLINE_REASONS.map((r) => (
+                <button
+                  key={r.key}
+                  onClick={() => setDeclineReason(r.key)}
+                  className={`w-full text-left px-3.5 py-2.5 rounded-lg border transition-colors duration-150 ${
+                    declineReason === r.key
+                      ? 'bg-[#F76B16]/10 border-[#F76B16]/40'
+                      : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.16]'
+                  }`}
+                >
+                  <span className={`block text-sm font-body font-semibold ${declineReason === r.key ? 'text-[#F76B16]' : 'text-white/80'}`}>
+                    {r.label}
+                  </span>
+                  <span className="block text-white/35 text-xs font-body mt-0.5">{r.hint}</span>
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={declineNote}
+              onChange={(e) => setDeclineNote(e.target.value)}
+              placeholder="Optional personal note (included in the email, in your words)"
+              rows={2}
+              className="w-full px-3.5 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-[#1A7BFF]/50 resize-none"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setDeclineTarget(null)}
+                disabled={processing !== null}
+                className="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitDecline}
+                disabled={processing !== null}
+                className="px-4 py-2 rounded-lg bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-[#D8590C] transition-colors disabled:opacity-50"
+              >
+                {processing !== null ? 'Sending…' : 'Decline & send email'}
+              </button>
+            </div>
           </div>
         </div>
       )}

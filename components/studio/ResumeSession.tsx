@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 /**
  * Fallback "sign-in required" card. Real auth is enforced server-side in
- * middleware, so this is rarely seen — it's a graceful prompt for any client
+ * middleware, so this is rarely seen, it's a graceful prompt for any client
  * render path that loads without a session. Sends the user to /members.
  */
 export default function ResumeSession({ title = 'Sign in to continue' }: { title?: string }) {

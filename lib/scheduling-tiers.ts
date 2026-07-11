@@ -1,12 +1,12 @@
 import type { Tier } from '@/lib/stripe/catalog'
 
 /**
- * Calendly scheduling config per plan tier — mirrors what the signup page
+ * Calendly scheduling config per plan tier, mirrors what the signup page
  * (components/sections/Pricing.tsx) advertises:
  *
- *   blueprint        ($19.97) — self-guided, NO calls (app + messaging only)
- *   accelerator      ($397)   — welcome call + 1 weekly 30-45min check-in
- *   full-experience  ($697)   — welcome call + 1 weekly check-in + 2 live 45min training sessions
+ *   blueprint        ($19.97), self-guided, NO calls (app + messaging only)
+ *   accelerator      ($397), welcome call + 1 weekly 30-45min check-in
+ *   full-experience  ($697), welcome call + 1 weekly check-in + 2 live 45min training sessions
  *
  * Calendly event types are created in the Calendly dashboard (the API can't
  * create them). Each `slug` below must match the tail of an event type URL,

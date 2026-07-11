@@ -53,7 +53,7 @@ export default function MembershipPaywall() {
           </h1>
           <p className="mt-3 text-white/60 text-sm font-body leading-relaxed">
             You&rsquo;re in. Begin your 7-day free trial to unlock your custom plan, nutrition tracking,
-            and direct access to Coach Anthony. No charge today &mdash; cancel anytime during the trial.
+            and direct access to Coach Anthony. No charge today, cancel anytime during the trial.
           </p>
 
           {error && <p className="mt-4 text-red-300 text-sm font-body">{error}</p>}

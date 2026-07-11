@@ -53,7 +53,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
       role: 'assistant',
       content: portal === 'admin'
         ? "What's up Coach! Need help with ISSA references, program design, or a client question?"
-        : "Hey! I'm Chea — your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
+        : "Hey! I'm Chea, your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
       timestamp: new Date(),
     },
   ])

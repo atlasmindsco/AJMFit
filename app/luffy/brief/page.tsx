@@ -49,10 +49,10 @@ const commitmentDiscounts = [
 ]
 
 const marketTiers = [
-  { model: 'DIY / App-Only', range: '$30 – $100', avg: 65, color: '#94A3B8' },
-  { model: 'Group / Hybrid', range: '$100 – $300', avg: 200, color: '#1A7BFF' },
-  { model: 'Standard 1:1', range: '$200 – $500', avg: 350, color: '#F76B16' },
-  { model: 'Premium 1:1', range: '$350 – $800+', avg: 575, color: '#1B2D50' },
+  { model: 'DIY / App-Only', range: '$30, $100', avg: 65, color: '#94A3B8' },
+  { model: 'Group / Hybrid', range: '$100, $300', avg: 200, color: '#1A7BFF' },
+  { model: 'Standard 1:1', range: '$200, $500', avg: 350, color: '#F76B16' },
+  { model: 'Premium 1:1', range: '$350, $800+', avg: 575, color: '#1B2D50' },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -125,7 +125,7 @@ export default function BriefPage() {
             <span className="text-brand-orange">Pricing Benchmark Report</span>
           </h1>
           <p className="mt-5 text-white/60 text-lg max-w-xl leading-relaxed">
-            Competitive analysis, platform value premium, and pricing recommendations for AJM FIT — 2025-2026.
+            Competitive analysis, platform value premium, and pricing recommendations for AJM FIT, 2025-2026.
           </p>
           <div className="mt-8 flex flex-wrap gap-3 text-sm text-white/40">
             <span className="bg-white/10 rounded-full px-4 py-1.5">Prepared April 2026</span>
@@ -162,7 +162,7 @@ export default function BriefPage() {
           <div className="space-y-16">
             {/* Executive Summary */}
             <section>
-              <SectionHeader label="Executive Summary" title="Your pricing is correct." subtitle="The primary opportunity isn't a price change — it's adding a self-guided entry tier and commitment discounts." />
+              <SectionHeader label="Executive Summary" title="Your pricing is correct." subtitle="The primary opportunity isn't a price change, it's adding a self-guided entry tier and commitment discounts." />
               <div className="bg-white rounded-2xl p-8 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -173,7 +173,7 @@ export default function BriefPage() {
                   <div>
                     <p className="text-brand-navy font-semibold text-lg leading-snug">All three tiers ($297 / $497 / $697) are market-aligned and correctly priced.</p>
                     <p className="text-brand-slate mt-2 leading-relaxed">
-                      AJM FIT competes in the Standard-to-Premium 1:1 coaching segment. The platform&apos;s feature depth — AI assistant, community, macro tracking, exercise swaps — exceeds every direct competitor. The $200 gap between tiers is well-structured, with each jump adding clear, tangible service upgrades.
+                      AJM FIT competes in the Standard-to-Premium 1:1 coaching segment. The platform&apos;s feature depth, AI assistant, community, macro tracking, exercise swaps, exceeds every direct competitor. The $200 gap between tiers is well-structured, with each jump adding clear, tangible service upgrades.
                     </p>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export default function BriefPage() {
                     </div>
                     <div className="mt-6 pt-5 border-t border-brand-offwhite">
                       <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-full px-3 py-1.5 inline-block">
-                        Market-aligned — no change needed
+                        Market-aligned, no change needed
                       </div>
                     </div>
                   </div>
@@ -259,7 +259,7 @@ export default function BriefPage() {
                 ))}
                 <div className="bg-brand-navy/5 rounded-xl p-5 border border-brand-navy/10 mt-2">
                   <p className="text-sm text-brand-navy">
-                    <strong>Blueprint ($297)</strong> sits in the Standard 1:1 range. <strong>Accelerator ($497)</strong> at the top of Standard 1:1. <strong>Full Experience ($697)</strong> lands in Premium 1:1 territory — all defensible given AJM FIT&apos;s platform depth.
+                    <strong>Blueprint ($297)</strong> sits in the Standard 1:1 range. <strong>Accelerator ($497)</strong> at the top of Standard 1:1. <strong>Full Experience ($697)</strong> lands in Premium 1:1 territory, all defensible given AJM FIT&apos;s platform depth.
                   </p>
                 </div>
               </div>
@@ -280,7 +280,7 @@ export default function BriefPage() {
               {/* Competitor Bar Chart */}
               <div className="bg-white rounded-2xl p-8 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] mb-8">
                 <div className="space-y-4">
-                  {[...competitors, ...ajmTiers.map(t => ({ name: `AJM FIT — ${t.name}`, price: t.price, model: '', features: '' }))].sort((a, b) => a.price - b.price).map((c) => {
+                  {[...competitors, ...ajmTiers.map(t => ({ name: `AJM FIT, ${t.name}`, price: t.price, model: '', features: '' }))].sort((a, b) => a.price - b.price).map((c) => {
                     const isAjm = c.name.startsWith('AJM')
                     return (
                       <div key={c.name} className="flex items-center gap-4">
@@ -337,12 +337,12 @@ export default function BriefPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-2xl p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-xs font-semibold tracking-[0.15em] uppercase text-red-400 mb-3">Without Platform</div>
-                  <div className="text-3xl font-display font-bold text-brand-navy">$100 – $200<span className="text-lg font-normal text-brand-slate">/mo</span></div>
+                  <div className="text-3xl font-display font-bold text-brand-navy">$100, $200<span className="text-lg font-normal text-brand-slate">/mo</span></div>
                   <p className="text-sm text-brand-slate mt-3 leading-relaxed">PDF programs, WhatsApp check-ins, spreadsheet tracking. Fragmented experience, low accountability infrastructure.</p>
                 </div>
                 <div className="bg-white rounded-2xl p-7 border border-emerald-200 shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] ring-2 ring-emerald-100">
                   <div className="text-xs font-semibold tracking-[0.15em] uppercase text-emerald-600 mb-3">With Platform (AJM FIT)</div>
-                  <div className="text-3xl font-display font-bold text-brand-navy">$200 – $600+<span className="text-lg font-normal text-brand-slate">/mo</span></div>
+                  <div className="text-3xl font-display font-bold text-brand-navy">$200, $600+<span className="text-lg font-normal text-brand-slate">/mo</span></div>
                   <p className="text-sm text-brand-slate mt-3 leading-relaxed">Branded portal, full tracking, AI assistant, community, accountability systems. 50-100% price premium justified by platform.</p>
                 </div>
               </div>
@@ -394,7 +394,7 @@ export default function BriefPage() {
               <div className="mt-8 bg-brand-orange/5 rounded-xl p-6 border border-brand-orange/15">
                 <p className="text-sm text-brand-navy leading-relaxed">
                   <strong>Key insight:</strong> Competitors charge $99-$266/mo for coaching with 4-6 platform features.
-                  AJM FIT delivers 16 features including an AI assistant, community ecosystem, and comprehensive nutrition tracking — at a comparable effective cost per feature.
+                  AJM FIT delivers 16 features including an AI assistant, community ecosystem, and comprehensive nutrition tracking, at a comparable effective cost per feature.
                   The platform alone would cost clients $30-$50/mo if purchased as standalone apps.
                 </p>
               </div>
@@ -408,7 +408,7 @@ export default function BriefPage() {
                   <div className="text-2xl mb-3">AI</div>
                   <h3 className="font-display font-bold text-xl text-brand-navy">Chea AI Assistant</h3>
                   <p className="text-sm text-brand-slate mt-2 leading-relaxed">
-                    Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo — AJM FIT includes it in every tier.
+                    Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo, AJM FIT includes it in every tier.
                   </p>
                   <div className="mt-4 text-xs font-semibold text-brand-blue">AI fitness market: $16.9B (2025) projected $35B+ by 2030</div>
                 </div>
@@ -433,7 +433,7 @@ export default function BriefPage() {
               <SectionHeader
                 label="Recommendation #1"
                 title="Keep current pricing. Add a self-guided tier."
-                subtitle="The primary strategic gap is the absence of a lower-entry tier — not a mispricing of existing tiers."
+                subtitle="The primary strategic gap is the absence of a lower-entry tier, not a mispricing of existing tiers."
               />
               <div className="bg-white rounded-2xl border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] overflow-x-auto">
                 <table className="w-full text-sm">
@@ -449,7 +449,7 @@ export default function BriefPage() {
                   <tbody>
                     <tr className="border-b border-brand-offwhite/50 bg-emerald-50/30">
                       <td className="p-4 font-bold text-brand-navy">Platform Access <span className="text-xs text-emerald-600 font-semibold ml-1">NEW</span></td>
-                      <td className="p-4 text-center text-brand-slate">—</td>
+                      <td className="p-4 text-center text-brand-slate">, </td>
                       <td className="p-4 text-center font-display font-bold text-emerald-600 text-lg">$79/mo</td>
                       <td className="p-4 text-center"><span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">New tier</span></td>
                       <td className="p-4 text-brand-slate hidden lg:table-cell">Full app access, AI assistant, community, pre-built programs. No coaching.</td>
@@ -492,7 +492,7 @@ export default function BriefPage() {
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-brand-orange font-bold text-lg leading-none mt-0.5">3</span>
-                    <p><strong className="text-white">Passive revenue.</strong> Minimal coach time required — the platform does the work.</p>
+                    <p><strong className="text-white">Passive revenue.</strong> Minimal coach time required, the platform does the work.</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-brand-orange font-bold text-lg leading-none mt-0.5">4</span>
@@ -550,7 +550,7 @@ export default function BriefPage() {
                 </div>
                 <div className="bg-white rounded-2xl p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">Reframe the Value Prop</h3>
-                  <p className="text-sm text-brand-slate leading-relaxed">Shift marketing from &quot;coaching + app&quot; to <strong>&quot;a complete fitness operating system, powered by a certified coach.&quot;</strong> Competitors charge $199-$266 for coaching alone — AJM FIT delivers more at a comparable cost per feature.</p>
+                  <p className="text-sm text-brand-slate leading-relaxed">Shift marketing from &quot;coaching + app&quot; to <strong>&quot;a complete fitness operating system, powered by a certified coach.&quot;</strong> Competitors charge $199-$266 for coaching alone, AJM FIT delivers more at a comparable cost per feature.</p>
                 </div>
                 <div className="bg-white rounded-2xl p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">No Higher Tier (Yet)</h3>
@@ -564,19 +564,19 @@ export default function BriefPage() {
               <SectionHeader label="Sources" title="Data sources cited in this research" />
               <div className="bg-white rounded-2xl p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                 <ol className="text-sm text-brand-slate space-y-2 list-decimal list-inside">
-                  <li>TrueCoach — How Much Should I Charge for Personal Training? (2025)</li>
-                  <li>WarriorBabe — Online Fitness Coaching Prices 2026 Data</li>
-                  <li>PT Distinction — How to Price Your Coaching Services (2025)</li>
-                  <li>ISSA — The Human Advantage: AI in Personal Training (2025)</li>
-                  <li>Rayfit — Top AI Personal Trainer Apps 2026</li>
-                  <li>The Health Rocks — Premium Online Coaching vs. Cheap Apps (2025)</li>
-                  <li>ISSA — How Much Should I Charge for Online Personal Training? (2024)</li>
-                  <li>PTDC / Jonathan Goodman — How to Get Started as an Online Personal Trainer (2025)</li>
-                  <li>Tailored Coaching Method — Online Fitness Coaching Cost in 2025</li>
-                  <li>Garage Gym Reviews — Best Online Personal Trainers (2026)</li>
-                  <li>Reddit r/personaltraining — Online coaching pricing thread (2025)</li>
-                  <li>Zenoti — From Free Trials to Full Membership (2025)</li>
-                  <li>Garage Gym Reviews — FlexIt session pricing data (2026)</li>
+                  <li>TrueCoach, How Much Should I Charge for Personal Training? (2025)</li>
+                  <li>WarriorBabe, Online Fitness Coaching Prices 2026 Data</li>
+                  <li>PT Distinction, How to Price Your Coaching Services (2025)</li>
+                  <li>ISSA, The Human Advantage: AI in Personal Training (2025)</li>
+                  <li>Rayfit, Top AI Personal Trainer Apps 2026</li>
+                  <li>The Health Rocks, Premium Online Coaching vs. Cheap Apps (2025)</li>
+                  <li>ISSA, How Much Should I Charge for Online Personal Training? (2024)</li>
+                  <li>PTDC / Jonathan Goodman, How to Get Started as an Online Personal Trainer (2025)</li>
+                  <li>Tailored Coaching Method, Online Fitness Coaching Cost in 2025</li>
+                  <li>Garage Gym Reviews, Best Online Personal Trainers (2026)</li>
+                  <li>Reddit r/personaltraining, Online coaching pricing thread (2025)</li>
+                  <li>Zenoti, From Free Trials to Full Membership (2025)</li>
+                  <li>Garage Gym Reviews, FlexIt session pricing data (2026)</li>
                 </ol>
               </div>
             </section>
@@ -588,7 +588,7 @@ export default function BriefPage() {
       <footer className="bg-brand-navy text-white/40 py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <span>Prepared for AJM FIT by Atlas Minds Co.</span>
-          <span>Confidential — not for distribution</span>
+          <span>Confidential, not for distribution</span>
         </div>
       </footer>
     </div>

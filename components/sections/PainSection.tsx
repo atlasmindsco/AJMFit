@@ -13,19 +13,19 @@ const painPoints = [
     number: '02',
     title: 'No Time For The Gym',
     description:
-      "Between work, family, and everything else — finding time feels impossible. You need a program that fits your life, not the other way around.",
+      "Between work, family, and everything else, finding time feels impossible. You need a program that fits your life, not the other way around.",
   },
   {
     number: '03',
     title: 'Tried Everything, Nothing Sticks',
     description:
-      "You've done the apps, the YouTube workouts, the 30-day challenges. Results come and go. What's missing isn't effort — it's structure and accountability.",
+      "You've done the apps, the YouTube workouts, the 30-day challenges. Results come and go. What's missing isn't effort, it's structure and accountability.",
   },
   {
     number: '04',
     title: 'Training Wrong Without Knowing It',
     description:
-      "Bad form, imbalanced programming, skipping fundamentals — you could be building on a broken foundation. The right guidance changes everything.",
+      "Bad form, imbalanced programming, skipping fundamentals, you could be building on a broken foundation. The right guidance changes everything.",
   },
 ]
 
@@ -101,7 +101,7 @@ export default function PainSection() {
           className="mt-6 bg-brand-orange/10 border border-brand-orange/20 rounded-sm p-8 text-center"
         >
           <p className="font-display font-bold text-lg md:text-xl uppercase tracking-wide text-brand-navy">
-            It&rsquo;s not about working harder —{' '}
+            It&rsquo;s not about working harder, {' '}
             <span className="text-brand-orange">it&rsquo;s about working right.</span>
           </p>
         </motion.div>

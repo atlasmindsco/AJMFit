@@ -32,8 +32,7 @@ export default function Scripture() {
             </p>
           </blockquote>
 
-          <p className="mt-8 text-brand-slate font-body text-sm tracking-widest uppercase">
-            — Luke 12:48
+          <p className="mt-8 text-brand-slate font-body text-sm tracking-widest uppercase">, Luke 12:48
           </p>
         </motion.div>
       </div>

@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
   const ics = buildEventICS({
     uid: `${body.userId}-${new Date(body.starts_at).getTime()}@ajmfit.com`,
-    title: `AJM Fit — ${type}`,
+    title: `AJM Fit, ${type}`,
     description: body.join_url ? `Join on Zoom: ${body.join_url}` : 'Session with Coach Anthony',
     location: body.join_url ?? undefined,
     startISO: body.starts_at,
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   try {
     const sent = await sendMail({
       to: client.email,
-      subject: `Your ${type} is booked — AJM Fit`,
+      subject: `Your ${type} is booked, AJM Fit`,
       html: sessionConfirmationHTML({ firstName, type, when, durationMin: Number(body.duration_min), joinUrl: body.join_url }),
       text: `Your ${type} is booked for ${when} (${body.duration_min} min).${body.join_url ? ` Join: ${body.join_url}` : ''}`,
       ics,

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const origin = new URL(request.url).origin
 
   // Already has an auth account: a second invite is impossible, but the
-  // trainer's intent is "get them a working set-password link" — so send the
+  // trainer's intent is "get them a working set-password link", so send the
   // branded password-recovery email instead of silently no-oping. This makes
   // "Resend invite" work for lost/expired invite links.
   const sendRecovery = async (): Promise<boolean> => {
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
   )
 
   if (inviteErr) {
-    // Auth user exists but the users row wasn't linked yet — fall back to recovery.
+    // Auth user exists but the users row wasn't linked yet, fall back to recovery.
     if (/already/i.test(inviteErr.message)) {
       const sent = await sendRecovery()
       return sent

@@ -10,18 +10,19 @@ type Variant = 'band' | 'card'
  *  - 'card': white bordered card (end of a post)
  */
 export default function NewsletterSignup({ variant = 'card' }: { variant?: Variant }) {
+  const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || state === 'loading') return
+    if (!firstName || !email || state === 'loading') return
     setState('loading')
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, first_name: firstName }),
       })
       if (!res.ok) throw new Error('failed')
       setState('done')
@@ -44,32 +45,42 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
               Get Every Issue First
             </h3>
             <p className="text-white/80 mt-3 leading-relaxed max-w-md">
-              Weekly training, nutrition, and mindset — straight to your inbox before it hits the archive. No fluff, no spam.
+              Weekly training, nutrition, and mindset, straight to your inbox before it hits the archive. No fluff, no spam.
             </p>
           </div>
           {state === 'done' ? (
-            <p className="font-display font-bold text-lg uppercase tracking-wide">You&rsquo;re in — check your inbox.</p>
+            <p className="font-display font-bold text-lg uppercase tracking-wide">You&rsquo;re in, check your inbox.</p>
           ) : (
-            <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
-              />
+            <form onSubmit={submit} className="flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First name"
+                  className="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
+                />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={state === 'loading'}
-                className="px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)] whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
+                className="w-full px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)] whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
               >
                 {state === 'loading' ? 'Subscribing…' : 'Subscribe'}
               </button>
             </form>
           )}
         </div>
-        {state === 'error' && <p className="relative mt-3 text-white text-sm">Something went wrong — try again.</p>}
+        {state === 'error' && <p className="relative mt-3 text-white text-sm">Something went wrong, try again.</p>}
       </div>
     )
   }
@@ -81,28 +92,38 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
         Don&rsquo;t Miss the Next Issue
       </h3>
       {state === 'done' ? (
-        <p className="text-brand-slate mt-3 font-body">You&rsquo;re in — check your inbox to confirm.</p>
+        <p className="text-brand-slate mt-3 font-body">You&rsquo;re in, check your inbox to confirm.</p>
       ) : (
         <>
-          <p className="text-brand-slate mt-2 mb-5 max-w-md mx-auto">Get insight like this in your inbox every week — free.</p>
-          <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
-            />
+          <p className="text-brand-slate mt-2 mb-5 max-w-md mx-auto">Get insight like this in your inbox every week, free.</p>
+          <form onSubmit={submit} className="flex flex-col gap-3 max-w-md mx-auto">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+                className="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
+              />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
+              />
+            </div>
             <button
               type="submit"
               disabled={state === 'loading'}
-              className="px-7 py-3.5 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
+              className="w-full px-7 py-3.5 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
             >
               {state === 'loading' ? 'Subscribing…' : 'Subscribe'}
             </button>
           </form>
-          {state === 'error' && <p className="mt-3 text-red-500 text-sm">Something went wrong — try again.</p>}
+          {state === 'error' && <p className="mt-3 text-red-500 text-sm">Something went wrong, try again.</p>}
         </>
       )}
     </div>

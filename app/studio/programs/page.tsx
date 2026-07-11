@@ -75,13 +75,13 @@ type ProgramView = 'preview' | 'workout' | 'exercise'
 /* ── Current Program ──
  * Self-guided sample routine. A personalized program is generated for each
  * client later (AI builder, trainer-assisted). Until then this is a labeled
- * starter routine to train + log against — not presented as a coach-assigned plan. */
+ * starter routine to train + log against, not presented as a coach-assigned plan. */
 const currentProgram = {
   name: 'Self-Guided Training',
   level: 'All Levels',
   phase: 'Sample routine',
   weeks: { current: 1, total: 1 },
-  startDate: '—',
+  startDate: ', ',
   coach: 'Self-guided',
 }
 
@@ -332,7 +332,7 @@ export default function ProgramsPage() {
   const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number } | null>(null)
   const [editingRest, setEditingRest] = useState<string | null>(null)
   const [workoutStartTime, setWorkoutStartTime] = useState<Record<number, number>>({}) // day index → unix ms
-  const [workoutElapsed, setWorkoutElapsed] = useState(0) // seconds — ticks for active workout
+  const [workoutElapsed, setWorkoutElapsed] = useState(0) // seconds, ticks for active workout
   const [intensityOn, setIntensityOn] = useState<Record<string, boolean>>({}) // exercise key → toggle
   const [intensityChoice, setIntensityChoice] = useState<Record<string, IntensityTechnique>>({}) // exercise key → selected technique
   const [intensityLogs, setIntensityLogs] = useState<Record<string, { weight: string; done: boolean }[]>>({}) // exercise key → 2 intensity set logs
@@ -553,7 +553,7 @@ export default function ProgramsPage() {
                 </span>
               </div>
               <p className="text-white/40 text-sm font-body mt-1 max-w-md">
-                Sample routine to train and log against. Your personalized program is being built — message Coach Anthony anytime.
+                Sample routine to train and log against. Your personalized program is being built, message Coach Anthony anytime.
               </p>
             </div>
             <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-[#F76B16]/15 text-[#F76B16] uppercase tracking-wide shrink-0">
@@ -768,7 +768,7 @@ export default function ProgramsPage() {
                           onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
                           className="w-full mt-4 py-3.5 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
                         >
-                          Continue — {weeklyPlan[todayIndex].name}
+                          Continue, {weeklyPlan[todayIndex].name}
                         </button>
                       )
                     })()}
@@ -844,7 +844,7 @@ export default function ProgramsPage() {
                             <div key={exercise.name} className="rounded-xl bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
                               {/* Exercise row */}
                               <div className="flex items-center gap-3 p-3">
-                                {/* Thumbnail — tap for exercise detail */}
+                                {/* Thumbnail, tap for exercise detail */}
                                 <button
                                   onClick={() => {
                                     if (dbMatch) {
@@ -878,7 +878,7 @@ export default function ProgramsPage() {
                                   )}
                                 </button>
 
-                                {/* Info — tap to expand log */}
+                                {/* Info, tap to expand log */}
                                 <button
                                   onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                   className="flex-1 min-w-0 text-left"
@@ -917,7 +917,7 @@ export default function ProgramsPage() {
                                   </div>
                                 </button>
 
-                                {/* Right side — expand toggle */}
+                                {/* Right side, expand toggle */}
                                 <button
                                   onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                   className="text-right shrink-0 flex flex-col items-end"
@@ -1095,7 +1095,7 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder="—"
+                                                placeholder=", "
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
                                                 className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1103,7 +1103,7 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder="—"
+                                                placeholder=", "
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
                                                 className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1212,7 +1212,7 @@ export default function ProgramsPage() {
                                           </button>
                                         </div>
 
-                                        {/* Technique picker — visible when on */}
+                                        {/* Technique picker, visible when on */}
                                         {intensityEnabled && (
                                           <div className="grid grid-cols-3 gap-1.5 mt-3">
                                             {(['dropset', 'restpause', 'partial'] as IntensityTechnique[]).map((key) => {
@@ -1267,7 +1267,7 @@ export default function ProgramsPage() {
                                                     originalExerciseName: isSwapped ? exercise.name : null,
                                                     setNumber: idx + 1,
                                                     weight: Number(row.weight) || null,
-                                                    reps: null, // intensity sets are to failure — no rep count
+                                                    reps: null, // intensity sets are to failure, no rep count
                                                     isIntensitySet: true,
                                                     intensityTechnique: selectedTechnique,
                                                     completed: row.done,
@@ -1289,7 +1289,7 @@ export default function ProgramsPage() {
                                                   <input
                                                     type="number"
                                                     inputMode="numeric"
-                                                    placeholder="—"
+                                                    placeholder=", "
                                                     value={iLog.weight}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
                                                     className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1316,7 +1316,7 @@ export default function ProgramsPage() {
                                               )
                                             })}
                                             <p className="text-white/20 text-[10px] font-body mt-2 text-center">
-                                              To failure — check when complete
+                                              To failure, check when complete
                                             </p>
                                           </div>
                                         )}
@@ -1666,14 +1666,14 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
     <div className="relative w-full h-56 rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/[0.10]">
       <img
         src={images[0]}
-        alt={`${name} — start`}
+        alt={`${name}, start`}
         className="absolute inset-0 w-full h-full object-contain p-2 transition-opacity duration-[1500ms]"
         style={{ opacity: showEnd && images[1] ? 0 : 1 }}
       />
       {images[1] && (
         <img
           src={images[1]}
-          alt={`${name} — end`}
+          alt={`${name}, end`}
           className="absolute inset-0 w-full h-full object-contain p-2 transition-opacity duration-[1500ms]"
           style={{ opacity: showEnd ? 1 : 0 }}
         />

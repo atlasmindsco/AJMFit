@@ -2,8 +2,8 @@
  * Shared framer-motion variants.
  *
  * Two flavors to match the two surface personalities:
- *  - fadeIn       — snappier, used across the dark studio (client-facing).
- *  - fadeInAdmin  — slightly larger drop & slower stagger, used in the luffy admin.
+ *  - fadeIn, snappier, used across the dark studio (client-facing).
+ *  - fadeInAdmin, slightly larger drop & slower stagger, used in the luffy admin.
  */
 
 export const fadeIn = {

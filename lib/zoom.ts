@@ -1,5 +1,5 @@
 // Server-only Zoom helper. Uses Server-to-Server OAuth (account_credentials grant).
-// Never import this from a client component — it reads ZOOM_CLIENT_SECRET.
+// Never import this from a client component, it reads ZOOM_CLIENT_SECRET.
 
 const ZOOM_OAUTH = 'https://zoom.us/oauth/token'
 const ZOOM_API = 'https://api.zoom.us/v2'

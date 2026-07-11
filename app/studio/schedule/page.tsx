@@ -108,7 +108,7 @@ export default function SchedulePage() {
             Coaching calls
           </h2>
           <p className="text-white/50 text-sm font-body">
-            Your plan is self-guided — full app access plus M-F messaging with Coach
+            Your plan is self-guided, full app access plus M-F messaging with Coach
             Anthony. Live welcome and weekly calls come with the Accelerator and Full
             Experience plans; upgrade any time to add them.
           </p>
@@ -131,7 +131,7 @@ export default function SchedulePage() {
 
           {onboardingDone ? (
             <p className="text-white/50 text-sm font-body">
-              Your welcome call is on the books — see it under Upcoming below. Need a
+              Your welcome call is on the books, see it under Upcoming below. Need a
               different time? Use the reschedule link in your Calendly confirmation email.
             </p>
           ) : (

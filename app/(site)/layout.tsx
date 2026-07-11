@@ -2,7 +2,7 @@ import Navbar from '@/components/ui/Navbar'
 import Footer from '@/components/ui/Footer'
 import { SITE_URL } from '@/lib/blog'
 
-// Entity-level structured data — tells search + answer engines who AJM Fit is.
+// Entity-level structured data, tells search + answer engines who AJM Fit is.
 const organizationLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',

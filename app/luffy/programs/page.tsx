@@ -123,7 +123,7 @@ export default function ProgramsPage() {
       {activeTab === 'programs' ? (
         <ProgramLibrary />
       ) : (
-        /* Exercise Library — Full Database */
+        /* Exercise Library, Full Database */
         <div className="space-y-4">
           {/* Search + Filters */}
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 space-y-4">
@@ -237,7 +237,7 @@ export default function ProgramsPage() {
 
           {!libLoading && filteredExercises.length > 60 && (
             <p className="text-center text-white/20 text-xs font-body py-4">
-              Showing 60 of {filteredExercises.length} — use search or filters to narrow down
+              Showing 60 of {filteredExercises.length}, use search or filters to narrow down
             </p>
           )}
 
@@ -280,14 +280,14 @@ export default function ProgramsPage() {
                       <div className="relative max-h-[260px] w-full flex items-center justify-center">
                         <img
                           src={selectedExercise.images[0]}
-                          alt={`${selectedExercise.name} — start`}
+                          alt={`${selectedExercise.name}, start`}
                           className="max-h-[260px] object-contain rounded-lg transition-opacity duration-[1500ms]"
                           style={{ opacity: showEndImage && selectedExercise.images[1] ? 0 : 1 }}
                         />
                         {selectedExercise.images[1] && (
                           <img
                             src={selectedExercise.images[1]}
-                            alt={`${selectedExercise.name} — end`}
+                            alt={`${selectedExercise.name}, end`}
                             className="max-h-[260px] object-contain rounded-lg absolute inset-0 m-auto transition-opacity duration-[1500ms]"
                             style={{ opacity: showEndImage ? 1 : 0 }}
                           />

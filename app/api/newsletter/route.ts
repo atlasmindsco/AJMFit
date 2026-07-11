@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/email'
 
-// Kit (formerly ConvertKit) — Brains & Gains newsletter.
+// Kit (formerly ConvertKit), Brains & Gains newsletter.
 // Signup flow: create subscriber -> add to welcome sequence (fires the welcome
 // email) -> tag so they receive the weekly Thursday broadcasts.
 const KIT_API_KEY = process.env.KIT_API_KEY || ''

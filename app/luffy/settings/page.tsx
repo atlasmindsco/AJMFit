@@ -13,7 +13,7 @@ const inputCls =
 const labelCls = 'text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
-  { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided — full app access' },
+  { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided, full app access' },
   { name: 'The Accelerator', price: '$397/mo', features: 'Custom program + weekly check-ins' },
   { name: 'The Full Experience', price: '$697/mo', features: 'Everything + 2x live training/week' },
 ]
@@ -162,7 +162,7 @@ export default function SettingsPage() {
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Revenue</h2>
             <div className="flex items-baseline gap-3">
               <p className="font-display font-extrabold text-3xl text-[#F76B16]">
-                {revenue === null ? '—' : `$${(revenue / 100).toLocaleString()}`}
+                {revenue === null ? ', ' : `$${(revenue / 100).toLocaleString()}`}
               </p>
               <span className="text-white/30 text-xs font-display uppercase tracking-wide">this month</span>
             </div>
