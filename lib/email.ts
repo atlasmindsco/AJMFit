@@ -71,6 +71,47 @@ export function buildEventICS(opts: {
     .join('\r\n')
 }
 
+/**
+ * Branded HTML congratulating an approved applicant, with their next steps:
+ * set password (separate email), start the trial, fill the onboarding form,
+ * and book the onboarding call. Links point at the studio so they survive
+ * scheduler changes (Calendly -> Cal.com).
+ */
+export function approvalEmailHTML(opts: { firstName: string }): string {
+  const step = (n: number, text: string) =>
+    `<p style="margin:0 0 10px;color:#475569;font-size:14px;line-height:1.6;"><strong>${n}.</strong> ${text}</p>`
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f1420;padding:32px 0;font-family:Arial,Helvetica,sans-serif;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;">
+      <tr><td style="background:#1B2D50;padding:24px 32px;" align="center">
+        <img src="https://ajmfit.com/AJMfit.png" width="44" height="44" alt="AJM Fit" style="display:block;margin:0 auto 8px;" />
+        <div style="color:#ffffff;font-size:14px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;">AJM FIT</div>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <p style="margin:0 0 4px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">Application approved</p>
+        <h1 style="margin:0 0 12px;color:#1B2D50;font-size:24px;font-weight:800;">Welcome to AJM Fit${opts.firstName ? ', ' + opts.firstName : ''}</h1>
+        <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">Coach Anthony reviewed your application and you're in. Here's how to get started, in order:</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F6F9;border-left:4px solid #F76B16;border-radius:6px;margin:0 0 24px;">
+          <tr><td style="padding:18px 20px;">
+            ${step(1, 'Check your inbox for a separate AJM Fit email called <strong>"set up your account"</strong> and use it to create your password.')}
+            ${step(2, 'Sign in at <a href="https://ajmfit.com/members" style="color:#1A7BFF;">ajmfit.com/members</a> and start your <strong>7-day free trial</strong> (no charge today).')}
+            ${step(3, 'Fill out your <strong>onboarding form</strong> so Anthony can build your plan around you. It takes about 3 minutes.')}
+            ${step(4, '<strong>Book your onboarding call</strong>, your first 1-on-1 with Coach Anthony.')}
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:0 32px 8px;" align="center">
+        <a href="https://ajmfit.com/studio/onboarding" style="display:inline-block;background:#F76B16;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 28px;border-radius:8px;margin:0 4px 10px;">Fill your onboarding form</a>
+        <a href="https://ajmfit.com/studio/schedule" style="display:inline-block;background:#1B2D50;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 28px;border-radius:8px;margin:0 4px 10px;">Book your onboarding call</a>
+      </td></tr>
+      <tr><td style="padding:16px 32px 32px;border-top:1px solid #eef1f5;">
+        <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6;">Both buttons will ask you to sign in first, so do steps 1 and 2 before tapping them. Questions? Just reply to this email and it goes straight to Coach Anthony.<br />AJM Fit &middot; Personal Training &amp; Coaching</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`
+}
+
 /** Branded HTML notifying Coach Anthony of a new application. */
 export function applicationNotificationHTML(opts: {
   name: string

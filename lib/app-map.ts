@@ -52,6 +52,20 @@ export const CLIENT_APP_MAP: AppDestination[] = [
     does: 'The member feed, share posts, comment, see upcoming events, and check the leaderboard.',
     keywords: ['community', 'feed', 'post', 'comment', 'event', 'leaderboard', 'members', 'social'],
   },
+  {
+    route: '/studio/schedule',
+    label: 'Schedule',
+    title: 'Schedule',
+    does: 'Book your calls with Coach Anthony (onboarding call, weekly check-ins, live training depending on your plan) and see upcoming sessions.',
+    keywords: ['schedule', 'book', 'booking', 'call', 'onboarding call', 'check-in call', 'session', 'appointment', 'zoom'],
+  },
+  {
+    route: '/studio/onboarding',
+    label: 'Onboarding Form',
+    title: 'Onboarding Form',
+    does: 'The pre-call questionnaire Coach Anthony uses to build your plan: stats, training background, health, nutrition, and your 90-day goal.',
+    keywords: ['onboarding', 'onboarding form', 'questionnaire', 'intake', 'form', 'get started', 'new client form'],
+  },
 ]
 
 /** Routes the assistant is allowed to navigate the client to. */

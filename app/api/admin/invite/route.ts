@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendMail, approvalEmailHTML } from '@/lib/email'
 
 /**
  * Sends a "set your password" invite to an approved client. Trainer-only.
@@ -19,12 +20,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // 2. Resolve the target user's email.
+  // 2. Resolve the target user's email. `approval: true` (set only by the
+  //    Accept flow, not by Resend invite) also sends the branded "you're
+  //    approved, here are your next steps" email with the onboarding links.
   let userId: string
+  let isApproval = false
   try {
-    const body = (await request.json()) as { userId?: string }
+    const body = (await request.json()) as { userId?: string; approval?: boolean }
     if (!body.userId) throw new Error('missing userId')
     userId = body.userId
+    isApproval = body.approval === true
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
@@ -32,9 +37,9 @@ export async function POST(request: Request) {
   const admin = createAdminClient()
   const { data: target, error: lookupErr } = await admin
     .from('users')
-    .select('email, auth_id')
+    .select('email, auth_id, name')
     .eq('id', userId)
-    .single<{ email: string; auth_id: string | null }>()
+    .single<{ email: string; auth_id: string | null; name: string | null }>()
 
   if (lookupErr || !target) {
     return NextResponse.json({ error: 'Client not found' }, { status: 404 })
@@ -61,8 +66,27 @@ export async function POST(request: Request) {
     return res.ok
   }
 
+  // On approval, also send the branded welcome/next-steps email (with the
+  // onboarding form + call booking links). Best-effort: the invite is the
+  // critical path.
+  const sendApprovalEmail = async () => {
+    if (!isApproval) return
+    try {
+      const firstName = String(target.name || '').trim().split(/\s+/)[0]
+      await sendMail({
+        to: target.email,
+        replyTo: 'anthony@ajmfit.com',
+        subject: "You're approved! Here's how to get started",
+        html: approvalEmailHTML({ firstName }),
+      })
+    } catch (e) {
+      console.error('[invite] approval email failed', e)
+    }
+  }
+
   if (target.auth_id) {
     const sent = await sendRecovery()
+    if (sent) await sendApprovalEmail()
     return sent
       ? NextResponse.json({ ok: true, resent: true })
       : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
@@ -77,6 +101,7 @@ export async function POST(request: Request) {
     // Auth user exists but the users row wasn't linked yet, fall back to recovery.
     if (/already/i.test(inviteErr.message)) {
       const sent = await sendRecovery()
+      if (sent) await sendApprovalEmail()
       return sent
         ? NextResponse.json({ ok: true, resent: true })
         : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
@@ -84,5 +109,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: inviteErr.message }, { status: 500 })
   }
 
+  await sendApprovalEmail()
   return NextResponse.json({ ok: true })
 }

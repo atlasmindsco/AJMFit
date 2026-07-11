@@ -121,12 +121,14 @@ export async function acceptApplication(applicationId: string, userId: string) {
 /**
  * Sends the approved client their "set your password" invite email (via the
  * trainer-only server route). Safe to call after acceptApplication().
+ * Pass { approval: true } (Accept flow only) to ALSO send the branded
+ * "you're approved, next steps" email with the onboarding form + call links.
  */
-export async function inviteClient(userId: string): Promise<void> {
+export async function inviteClient(userId: string, opts?: { approval?: boolean }): Promise<void> {
   const res = await fetch('/api/admin/invite', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify({ userId, approval: opts?.approval === true }),
   })
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { error?: string } | null

@@ -13,6 +13,7 @@ import {
   type UserStatus,
 } from '@/lib/admin'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
+import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type OnboardingForm } from '@/lib/onboarding'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-[#F76B16]/15 text-[#F76B16]'
@@ -39,10 +40,15 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
 
+  const [onboardingMap, setOnboardingMap] = useState<Map<string, OnboardingForm>>(new Map())
+
   const loadClients = () => {
     setLoading(true)
-    fetchClients()
-      .then(setClients)
+    Promise.all([fetchClients(), fetchAllOnboarding().catch(() => new Map<string, OnboardingForm>())])
+      .then(([rows, forms]) => {
+        setClients(rows)
+        setOnboardingMap(forms)
+      })
       .catch((err) => {
         console.error('[Clients] Failed to load:', err)
       })
@@ -74,7 +80,7 @@ export default function ClientsPage() {
       // Invite failure must not strand the (already-committed) acceptance;
       // the Resend invite button covers the retry.
       try {
-        await inviteClient(client.id)
+        await inviteClient(client.id, { approval: true })
       } catch (inviteErr) {
         console.error('[Accept] Invite email failed:', inviteErr)
         alert(
@@ -329,7 +335,7 @@ export default function ClientsPage() {
                               </span>
                             ))
                           ) : (
-                            <span className="text-white/40 text-[11px] font-body">, </span>
+                            <span className="text-white/40 text-[11px] font-body">None listed</span>
                           )}
                         </div>
                       </div>
@@ -349,7 +355,7 @@ export default function ClientsPage() {
                       )}
                       <div>
                         <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Phone</p>
-                        <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? ', '}</p>
+                        <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? 'Not provided'}</p>
                       </div>
                       <div>
                         <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Applied</p>
@@ -363,6 +369,29 @@ export default function ClientsPage() {
                           <p className="text-white/70 text-sm font-body mt-1">{client.application.referral}</p>
                         </div>
                       )}
+
+                      {/* Onboarding form answers (pre-call questionnaire) */}
+                      <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
+                        <p className="text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+                          Onboarding form
+                        </p>
+                        {onboardingMap.get(client.id) ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3">
+                            {(Object.keys(ONBOARDING_LABELS) as Array<keyof OnboardingAnswers>)
+                              .filter((k) => (onboardingMap.get(client.id)!.answers[k] ?? '').toString().trim())
+                              .map((k) => (
+                                <div key={k}>
+                                  <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">{ONBOARDING_LABELS[k]}</p>
+                                  <p className="text-white/70 text-sm font-body mt-0.5 leading-relaxed">
+                                    {String(onboardingMap.get(client.id)!.answers[k])}
+                                  </p>
+                                </div>
+                              ))}
+                          </div>
+                        ) : (
+                          <p className="text-white/35 text-sm font-body">Not filled out yet.</p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </motion.div>

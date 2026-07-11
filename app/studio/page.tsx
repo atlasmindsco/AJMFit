@@ -19,6 +19,7 @@ import {
 import { fetchPRs, fetchWorkoutsThisWeek, type PRRow } from '@/lib/workout'
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, type Session } from '@/lib/scheduling'
+import { fetchMyOnboarding } from '@/lib/onboarding'
 
 const CheckIcon = (
   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -59,6 +60,7 @@ export default function ClientDashboard() {
   const [prs, setPrs] = useState<PRRow[]>([])
   const [myProgram, setMyProgram] = useState<Program | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
+  const [needsOnboarding, setNeedsOnboarding] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -69,7 +71,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions] = await Promise.all([
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding] = await Promise.all([
           fetchTargets(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
@@ -78,6 +80,7 @@ export default function ClientDashboard() {
           fetchPRs(id),
           fetchMyProgram(id),
           fetchMySessions(id),
+          fetchMyOnboarding(id),
         ])
         if (!active) return
         setTargets(t)
@@ -88,6 +91,7 @@ export default function ClientDashboard() {
         setPrs(prRows)
         setMyProgram(program)
         setSessions(mySessions)
+        setNeedsOnboarding(!onboarding)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -175,6 +179,29 @@ export default function ClientDashboard() {
         </h1>
         <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
       </div>
+
+      {/* Onboarding nudge: shown until the pre-call form is filled */}
+      {!loading && needsOnboarding && (
+        <Link
+          href="/studio/onboarding"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-[#F76B16]/10 border border-[#F76B16]/25 hover:bg-[#F76B16]/15 transition-colors duration-200"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-[#F76B16]/15 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="font-display font-bold text-sm text-white">Fill out your onboarding form</p>
+              <p className="text-white/45 text-xs font-body mt-0.5">Coach Anthony uses it to build your plan and prep your onboarding call. About 3 minutes.</p>
+            </div>
+          </div>
+          <span className="shrink-0 text-[#F76B16] font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+            Start →
+          </span>
+        </Link>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
