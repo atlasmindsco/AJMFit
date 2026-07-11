@@ -72,11 +72,33 @@ export default function ClientsPage() {
     try {
       await acceptApplication(client.application.id, client.id)
       // Email the client their set-password invite so they can reach the studio.
-      await inviteClient(client.id)
+      // Invite failure must not strand the (already-committed) acceptance —
+      // the Resend invite button covers the retry.
+      try {
+        await inviteClient(client.id)
+      } catch (inviteErr) {
+        console.error('[Accept] Invite email failed:', inviteErr)
+        alert(
+          `${client.name} was approved, but the invite email failed to send. Use the "Resend invite" button on their card to try again.`
+        )
+      }
       loadClients()
     } catch (err) {
       console.error('[Accept] Failed:', err)
       alert(err instanceof Error ? err.message : 'Could not accept application.')
+    } finally {
+      setProcessing(null)
+    }
+  }
+
+  const handleResendInvite = async (client: ClientRow) => {
+    setProcessing(client.id)
+    try {
+      await inviteClient(client.id)
+      alert(`Invite sent to ${client.email}. It may take a minute to arrive.`)
+    } catch (err) {
+      console.error('[Resend invite] Failed:', err)
+      alert(err instanceof Error ? err.message : 'Could not send the invite.')
     } finally {
       setProcessing(null)
     }
@@ -207,6 +229,21 @@ export default function ClientsPage() {
                         </div>
                       ) : (
                         <>
+                          {/* Approved but not signed in yet: let the coach re-send the
+                              set-password link (covers lost/expired invites). */}
+                          {client.status === 'pending' && client.application?.status === 'accepted' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleResendInvite(client)
+                              }}
+                              disabled={processing === client.id}
+                              title="Send them a fresh set-password link"
+                              className="px-2.5 py-1.5 rounded-lg bg-[#1A7BFF]/15 border border-[#1A7BFF]/25 text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide hover:bg-[#1A7BFF]/25 transition-colors duration-200 disabled:opacity-50"
+                            >
+                              {processing === client.id ? '...' : 'Resend invite'}
+                            </button>
+                          )}
                           <button
                             onClick={(e) => {
                               e.stopPropagation()

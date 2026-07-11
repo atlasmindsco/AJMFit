@@ -119,7 +119,7 @@ def render(content_html: str, *, preheader: str,
         Anthony J. Martin
       </td></tr>
       <tr><td align="center" style="padding:0 40px 14px;text-align:center;font-family:{_FONT_BODY};font-size:13px;color:{SLATE};">
-        AJMfit — ISSA Certified Personal Trainer<br>
+        AJMfit, Certified Personal Trainer<br>
         <a href="{IG_URL}" target="_blank" style="color:{BLUE};text-decoration:none;">@anthony.j.martin</a>
         &nbsp;·&nbsp;
         <a href="{SITE}" target="_blank" style="color:{BLUE};text-decoration:none;">ajmfit.com</a>
@@ -139,7 +139,7 @@ def _esc(s: str) -> str:
 if __name__ == "__main__":  # quick local preview
     import pathlib
     sample = ("<p>Welcome to <strong>Brains &amp; Gains</strong>. Every Thursday, "
-              "one idea from the ISSA cert — read in 90 seconds.</p>"
+              "one idea you can use, read in 90 seconds.</p>"
               "<ul><li><strong>Science, not bro-myths</strong></li>"
               "<li><strong>Mindset for the long game</strong></li></ul>"
               "<p>Talk soon,<br>Anthony</p>")

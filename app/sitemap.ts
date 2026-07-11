@@ -14,12 +14,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/apply`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
   ]
 
-  const posts: MetadataRoute.Sitemap = (await fetchIssues()).map((i) => ({
-    url: `${SITE_URL}/blog/${i.slug}`,
-    lastModified: new Date(i.date),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }))
+  // Kit failure -> ship the static routes rather than failing the build/regen.
+  let posts: MetadataRoute.Sitemap = []
+  try {
+    posts = (await fetchIssues()).map((i) => ({
+      url: `${SITE_URL}/blog/${i.slug}`,
+      lastModified: new Date(i.date),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    }))
+  } catch {
+    posts = []
+  }
 
   return [...staticRoutes, ...posts]
 }

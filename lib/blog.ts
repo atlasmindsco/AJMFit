@@ -92,6 +92,22 @@ function toIssue(b: KitBroadcast): BlogIssue {
 }
 
 /**
+ * Makes slugs unique and STABLE across new posts: assignment runs oldest-first,
+ * so the oldest post with a given title keeps the bare slug forever and any
+ * newer duplicate gets a `-<id>` suffix (id is immutable). Without this, two
+ * issues titled the same would shadow each other (.find returns one).
+ */
+function assignUniqueSlugs(issues: BlogIssue[]): BlogIssue[] {
+  const seen = new Set<string>()
+  const oldestFirst = [...issues].sort((a, b) => +new Date(a.date) - +new Date(b.date))
+  for (const issue of oldestFirst) {
+    if (seen.has(issue.slug)) issue.slug = `${issue.slug}-${issue.id}`
+    seen.add(issue.slug)
+  }
+  return issues
+}
+
+/**
  * Extracts the renderable body from Kit content. Email issues arrive as full
  * HTML documents; we take the <body> inner HTML. Scripts are stripped.
  */
@@ -106,7 +122,13 @@ function extractBody(html: string): string {
     .trim()
 }
 
-/** All issues currently published to the web, newest first. */
+/**
+ * All issues currently published to the web, newest first.
+ * THROWS on a Kit API failure (auth/billing/5xx) instead of returning [] —
+ * with ISR, a thrown regeneration keeps serving the last good cached page,
+ * whereas returning [] would "successfully" replace the live archive with the
+ * empty state (this actually happened when the Kit plan lapsed).
+ */
 export async function fetchIssues(): Promise<BlogIssue[]> {
   const key = process.env.KIT_API_KEY
   if (!key) return []
@@ -115,17 +137,22 @@ export async function fetchIssues(): Promise<BlogIssue[]> {
     next: { revalidate: REVALIDATE_SECONDS },
   })
   if (!res.ok) {
-    console.error('[blog] Kit list failed:', res.status, await res.text().catch(() => ''))
-    return []
+    const detail = await res.text().catch(() => '')
+    console.error('[blog] Kit list failed:', res.status, detail)
+    throw new Error(`Kit broadcasts list failed (HTTP ${res.status})`)
   }
   const data = (await res.json()) as { broadcasts?: KitBroadcast[] }
-  return (data.broadcasts ?? [])
+  const issues = (data.broadcasts ?? [])
     .filter((b) => b.public === true)
     .sort((a, b) => +new Date(issueDate(b)) - +new Date(issueDate(a)))
     .map(toIssue)
+  return assignUniqueSlugs(issues)
 }
 
-/** A single public issue with its rendered body, or null if not public/found. */
+/**
+ * A single public issue with its rendered body. Returns null only for a
+ * genuine not-found/not-public; THROWS on Kit API failures (see fetchIssues).
+ */
 export async function fetchPost(id: number): Promise<BlogPost | null> {
   const key = process.env.KIT_API_KEY
   if (!key || !Number.isFinite(id)) return null
@@ -133,7 +160,8 @@ export async function fetchPost(id: number): Promise<BlogPost | null> {
     headers: kitHeaders(),
     next: { revalidate: REVALIDATE_SECONDS },
   })
-  if (!res.ok) return null
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Kit broadcast fetch failed (HTTP ${res.status})`)
   const data = (await res.json()) as { broadcast?: KitBroadcast }
   const b = data.broadcast
   if (!b || b.public !== true) return null // never expose non-public via direct URL
@@ -143,11 +171,17 @@ export async function fetchPost(id: number): Promise<BlogPost | null> {
 /**
  * Resolves a /blog/[param] segment to a post. Accepts a slug (preferred) or a
  * raw numeric Kit id (back-compat for any already-shared numeric links).
+ * The returned slug always matches the archive's (collision-suffixed) slug so
+ * canonical URLs stay consistent.
  */
 export async function fetchPostByParam(param: string): Promise<BlogPost | null> {
-  if (/^\d+$/.test(param)) return fetchPost(Number(param))
-  const issue = (await fetchIssues()).find((i) => i.slug === param)
-  return issue ? fetchPost(issue.id) : null
+  const issues = await fetchIssues()
+  const issue = /^\d+$/.test(param)
+    ? issues.find((i) => i.id === Number(param))
+    : issues.find((i) => i.slug === param)
+  if (!issue) return null
+  const post = await fetchPost(issue.id)
+  return post ? { ...post, slug: issue.slug } : null
 }
 
 /** Formats an ISO date as "June 21, 2026". */

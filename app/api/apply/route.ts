@@ -52,31 +52,57 @@ export async function POST(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = createAdminClient() as any
 
-  // 1. Upsert the pending user by email (re-applications don't collide).
-  const { data: user, error: userErr } = await db
+  // 1. Create or update the user by email WITHOUT clobbering their status.
+  //    A blind upsert here once downgraded ACTIVE (paying) members back to
+  //    'pending' when they re-submitted the public form, locking them out at
+  //    the paywall and opening a double-subscribe path. Rules:
+  //      - new email            -> insert as 'pending'
+  //      - existing 'cancelled' -> back to 'pending' (declined/churned re-apply)
+  //      - existing active/paused/pending -> keep status; refresh name/phone only
+  const email = data.email.toLowerCase()
+  const { data: existing, error: findErr } = await db
     .from('users')
-    .upsert(
-      {
-        name: data.name,
-        email: data.email.toLowerCase(),
-        phone: data.phone,
-        status: 'pending',
-      },
-      { onConflict: 'email' }
-    )
-    .select('id')
-    .single()
+    .select('id, status')
+    .eq('email', email)
+    .maybeSingle()
 
-  if (userErr || !user) {
+  if (findErr) {
     return NextResponse.json(
       { error: 'Could not save your application. Please try again.' },
       { status: 500 }
     )
   }
 
+  let userId: string
+  if (!existing) {
+    const { data: created, error: insErr } = await db
+      .from('users')
+      .insert({ name: data.name, email, phone: data.phone, status: 'pending' })
+      .select('id')
+      .single()
+    if (insErr || !created) {
+      return NextResponse.json(
+        { error: 'Could not save your application. Please try again.' },
+        { status: 500 }
+      )
+    }
+    userId = created.id as string
+  } else {
+    const update: Record<string, string> = { name: data.name, phone: data.phone }
+    if (existing.status === 'cancelled') update.status = 'pending'
+    const { error: updErr } = await db.from('users').update(update).eq('id', existing.id)
+    if (updErr) {
+      return NextResponse.json(
+        { error: 'Could not save your application. Please try again.' },
+        { status: 500 }
+      )
+    }
+    userId = existing.id as string
+  }
+
   // 2. Insert the application snapshot.
   const { error: appErr } = await db.from('applications').insert({
-    user_id: user.id,
+    user_id: userId,
     goals: data.goals,
     equipment: data.equipment,
     health_limitations: data.healthLimitations || null,

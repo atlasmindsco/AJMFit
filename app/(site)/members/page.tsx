@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -17,7 +17,21 @@ export default function MembersLogin() {
   const [forgotEmail, setForgotEmail] = useState('')
   const [forgotSent, setForgotSent] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Auth callback bounces expired/already-used invite + reset links here with
+  // ?error=link_expired. Without this, the user lands on a bare login form
+  // with no password set and no idea what happened.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('error') === 'link_expired') {
+      setShowForgot(true)
+      setNotice(
+        'That link has expired or was already used. Enter your email below and we will send you a fresh one.'
+      )
+    }
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -162,6 +176,12 @@ export default function MembersLogin() {
               <p className="text-center text-sm font-body text-brand-slate mt-2">
                 Enter your email and we&apos;ll send you a reset link
               </p>
+
+              {notice && (
+                <p className="mt-4 px-4 py-3 bg-brand-orange/10 border border-brand-orange/20 rounded-sm text-sm font-body text-brand-navy text-center">
+                  {notice}
+                </p>
+              )}
 
               {!forgotSent ? (
                 <form onSubmit={handleForgotPassword} className="mt-8 space-y-5">

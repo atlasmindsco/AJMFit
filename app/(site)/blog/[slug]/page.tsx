@@ -11,9 +11,15 @@ type Params = { params: { slug: string } }
 const DEFAULT_OG = `${SITE_URL}/BandGnewsletter.png`
 
 // Pre-render the known posts at build; new ones stream in via ISR.
+// Swallow Kit failures here: a Kit hiccup during `next build` should not fail
+// the deploy — pages simply render on demand instead.
 export async function generateStaticParams() {
-  const issues = await fetchIssues()
-  return issues.map((i) => ({ slug: i.slug }))
+  try {
+    const issues = await fetchIssues()
+    return issues.map((i) => ({ slug: i.slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

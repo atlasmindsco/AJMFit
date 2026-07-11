@@ -40,21 +40,46 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Client not found' }, { status: 404 })
   }
 
-  // Already has an auth account → nothing to send.
-  if (target.auth_id) {
-    return NextResponse.json({ ok: true, alreadyInvited: true })
+  const origin = new URL(request.url).origin
+
+  // Already has an auth account: a second invite is impossible, but the
+  // trainer's intent is "get them a working set-password link" — so send the
+  // branded password-recovery email instead of silently no-oping. This makes
+  // "Resend invite" work for lost/expired invite links.
+  const sendRecovery = async (): Promise<boolean> => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/recover`, {
+      method: 'POST',
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: target.email,
+        options: { redirect_to: `${origin}/auth/callback?next=/members/reset` },
+      }),
+    })
+    return res.ok
   }
 
-  const origin = new URL(request.url).origin
+  if (target.auth_id) {
+    const sent = await sendRecovery()
+    return sent
+      ? NextResponse.json({ ok: true, resent: true })
+      : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
+  }
+
   const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
     target.email,
     { redirectTo: `${origin}/auth/callback?next=/members/reset` }
   )
 
   if (inviteErr) {
-    // If the auth user already exists, treat as success (they can log in / reset).
+    // Auth user exists but the users row wasn't linked yet — fall back to recovery.
     if (/already/i.test(inviteErr.message)) {
-      return NextResponse.json({ ok: true, alreadyInvited: true })
+      const sent = await sendRecovery()
+      return sent
+        ? NextResponse.json({ ok: true, resent: true })
+        : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
     }
     return NextResponse.json({ error: inviteErr.message }, { status: 500 })
   }

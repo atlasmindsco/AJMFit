@@ -59,14 +59,29 @@ export async function setSessionStatus(id: string, status: Session['status']): P
 
 // ---- Calendly booking gating ------------------------------------------------
 
-/** The signed-in client's plan tier (from their subscription), or null. */
+/**
+ * The signed-in client's plan tier, or null. Prefers the Stripe subscription;
+ * falls back to their latest application's tier — beta testers (and any
+ * admin-activated client) have NO subscriptions row and would otherwise be
+ * locked out of booking calls entirely.
+ */
 export async function fetchMyTier(userId: string): Promise<Tier | null> {
   const { data } = await db
     .from('subscriptions')
     .select('tier')
     .eq('user_id', userId)
     .maybeSingle()
-  return (data?.tier as Tier | undefined) ?? null
+  const subTier = data?.tier as Tier | undefined
+  if (subTier) return subTier
+
+  const { data: app } = await db
+    .from('applications')
+    .select('tier')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (app?.tier as Tier | undefined) ?? null
 }
 
 /** ISO bounds of the current week, Monday 00:00 → next Monday 00:00 (local). */
