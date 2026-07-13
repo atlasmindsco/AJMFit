@@ -16,6 +16,10 @@ import {
   fetchSwaps as dbFetchSwaps,
   fetchInProgressWorkout as dbFetchInProgressWorkout,
 } from '@/lib/workout'
+import BlueprintPicker from '@/components/studio/BlueprintPicker'
+import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
+import { fetchMyTier } from '@/lib/scheduling'
+import { fetchMyProgram } from '@/lib/programs'
 
 /* ── Types ── */
 interface ExerciseDB {
@@ -76,7 +80,7 @@ type ProgramView = 'preview' | 'workout' | 'exercise'
  * Self-guided sample routine. A personalized program is generated for each
  * client later (AI builder, trainer-assisted). Until then this is a labeled
  * starter routine to train + log against, not presented as a coach-assigned plan. */
-const currentProgram = {
+const SAMPLE_PROGRAM = {
   name: 'Self-Guided Training',
   level: 'All Levels',
   phase: 'Sample routine',
@@ -85,8 +89,8 @@ const currentProgram = {
   coach: 'Self-guided',
 }
 
-/* ── Weekly Split ── */
-const weeklyPlan = [
+/* ── Weekly Split (fallback sample; replaced by the client's assigned program) ── */
+const SAMPLE_WEEKLY_PLAN = [
   {
     day: 'Monday',
     name: 'Chest',
@@ -343,6 +347,64 @@ export default function ProgramsPage() {
   const [workoutIds, setWorkoutIds] = useState<Record<number, string>>({}) // day index → DB workout id
   const [dbPRs, setDbPRs] = useState<Record<string, PRRecord>>({}) // overrides hardcoded demo PRs when present
 
+  // ── Assigned program + Blueprint self-serve picker ──
+  const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(SAMPLE_WEEKLY_PLAN)
+  const [currentProgram, setCurrentProgram] = useState<PlanProgram>(SAMPLE_PROGRAM)
+  const [showPicker, setShowPicker] = useState(false)
+  const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
+  const [hasAssigned, setHasAssigned] = useState(false)
+
+  const applyLoadedProgram = useCallback(async (programId: string) => {
+    const loaded = await loadAssignedProgram(programId)
+    if (loaded) {
+      setWeeklyPlan(loaded.weeklyPlan)
+      setCurrentProgram(loaded.program)
+      setProgramLocation(loaded.location)
+      setHasAssigned(true)
+    }
+  }, [])
+
+  const handlePickerDone = useCallback(async (programId: string) => {
+    await applyLoadedProgram(programId)
+    setShowPicker(false)
+  }, [applyLoadedProgram])
+
+  // On load: render the client's assigned program; if a Blueprint member has
+  // none yet, show the pick-your-program flow.
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const id = await getCurrentUserId()
+      if (!active || !id) return
+      const [tier, program] = await Promise.all([fetchMyTier(id), fetchMyProgram(id)])
+      if (!active) return
+      if (program) await applyLoadedProgram(program.id)
+      else if (tier === 'blueprint') setShowPicker(true)
+    })()
+    return () => { active = false }
+  }, [applyLoadedProgram])
+
+  // Same-muscle alternatives for the swap menu. Falls back to the exercise DB
+  // (honoring a home client's dumbbell/bodyweight constraint) when there's no
+  // hardcoded list for a given exercise.
+  const getAlternatives = useCallback((name: string): string[] => {
+    const hard = exerciseAlternatives[name]
+    if (hard && hard.length) return hard
+    const match = findExerciseMatch(name, exerciseDB)
+    const primary = match?.primaryMuscles?.[0]
+    if (!primary) return []
+    const homeEq = new Set(['dumbbell', 'body only'])
+    return exerciseDB
+      .filter(
+        (e) =>
+          e.primaryMuscles?.includes(primary) &&
+          normalizeExName(e.name) !== normalizeExName(name) &&
+          (programLocation !== 'home' || homeEq.has(e.equipment))
+      )
+      .slice(0, 6)
+      .map((e) => e.name)
+  }, [exerciseDB, programLocation])
+
   const parseRestSeconds = (rest: string): number => {
     const match = rest.match(/(\d+)/)
     if (!match) return 60
@@ -536,6 +598,15 @@ export default function ProgramsPage() {
   const selectedExerciseData = selected?.exercises.find((e) => e.name === selectedExercise) ?? null
   const selectedExerciseDB = selectedExercise ? matchedExercises.get(selectedExercise) ?? null : null
 
+  // Blueprint member with no program yet → pick-your-program flow.
+  if (showPicker) {
+    return (
+      <div className="py-8">
+        <BlueprintPicker onDone={handlePickerDone} />
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       {/* MAIN CONTENT */}
@@ -553,12 +624,24 @@ export default function ProgramsPage() {
                 </span>
               </div>
               <p className="text-white/40 text-sm font-body mt-1 max-w-md">
-                Sample routine to train and log against. Your personalized program is being built, message Coach Anthony anytime.
+                {hasAssigned
+                  ? 'Your program. Train and log against it. Swap any exercise you can’t do.'
+                  : 'Sample routine to train and log against. Your personalized program is being built, message Coach Anthony anytime.'}
               </p>
             </div>
-            <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-[#F76B16]/15 text-[#F76B16] uppercase tracking-wide shrink-0">
-              Self-Guided
-            </span>
+            <div className="flex items-center gap-2 shrink-0">
+              {programLocation !== null && (
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
+                >
+                  Change Program
+                </button>
+              )}
+              <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-[#F76B16]/15 text-[#F76B16] uppercase tracking-wide">
+                Self-Guided
+              </span>
+            </div>
           </div>
         </div>
 
@@ -819,7 +902,7 @@ export default function ProgramsPage() {
                           const swapKey = `${selectedDay}-${exercise.name}`
                           const displayName = swappedExercises[swapKey] ?? exercise.name
                           const isSwapped = displayName !== exercise.name
-                          const alternatives = exerciseAlternatives[exercise.name] ?? []
+                          const alternatives = getAlternatives(exercise.name)
                           const showSwapMenu = swapMenuOpen === exercise.name
                           const dbMatch = matchedExercises.get(exercise.name) ?? null
                           const showEnd = imagePreview[exercise.name] ?? false

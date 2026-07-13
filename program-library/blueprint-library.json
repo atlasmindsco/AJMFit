@@ -1,0 +1,898 @@
+{
+  "meta": {
+    "name": "Brains & Gains — Blueprint Program Library",
+    "tier": "blueprint",
+    "generated": "2026-07-12",
+    "picker": [
+      "goal",
+      "days_per_week",
+      "location"
+    ],
+    "goals": [
+      "strength",
+      "muscle",
+      "lean_out"
+    ],
+    "locations": [
+      "gym",
+      "home"
+    ],
+    "home_equipment": "dumbbells + bodyweight only",
+    "notes": "Goal changes sets/reps/rest only (by role). Location swaps the exercise. All names matched to public/exercises/exercises.json for demo images. Clients may swap any exercise via existing exercise_swaps."
+  },
+  "goals": {
+    "strength": {
+      "label": "Build Strength",
+      "description": "Heavy, low-rep work on the big lifts with long rest. Move real weight.",
+      "byRole": {
+        "primary": {
+          "sets": 5,
+          "reps": "5",
+          "rest_seconds": 180
+        },
+        "secondary": {
+          "sets": 4,
+          "reps": "6",
+          "rest_seconds": 150
+        },
+        "accessory": {
+          "sets": 3,
+          "reps": "8",
+          "rest_seconds": 90
+        },
+        "isolation": {
+          "sets": 3,
+          "reps": "10",
+          "rest_seconds": 60
+        },
+        "core": {
+          "sets": 3,
+          "reps": "10",
+          "rest_seconds": 60
+        },
+        "calves": {
+          "sets": 4,
+          "reps": "10",
+          "rest_seconds": 60
+        }
+      },
+      "dayNote": ""
+    },
+    "muscle": {
+      "label": "Build Muscle",
+      "description": "Moderate reps, controlled tempo, and enough volume to grow.",
+      "byRole": {
+        "primary": {
+          "sets": 4,
+          "reps": "8",
+          "rest_seconds": 120
+        },
+        "secondary": {
+          "sets": 4,
+          "reps": "10",
+          "rest_seconds": 90
+        },
+        "accessory": {
+          "sets": 3,
+          "reps": "12",
+          "rest_seconds": 75
+        },
+        "isolation": {
+          "sets": 3,
+          "reps": "12-15",
+          "rest_seconds": 60
+        },
+        "core": {
+          "sets": 3,
+          "reps": "15",
+          "rest_seconds": 45
+        },
+        "calves": {
+          "sets": 4,
+          "reps": "12-15",
+          "rest_seconds": 45
+        }
+      },
+      "dayNote": ""
+    },
+    "lean_out": {
+      "label": "Lean Out",
+      "description": "Higher reps, short rest, and a conditioning finisher to burn more.",
+      "byRole": {
+        "primary": {
+          "sets": 3,
+          "reps": "10",
+          "rest_seconds": 60
+        },
+        "secondary": {
+          "sets": 3,
+          "reps": "12",
+          "rest_seconds": 45
+        },
+        "accessory": {
+          "sets": 3,
+          "reps": "15",
+          "rest_seconds": 45
+        },
+        "isolation": {
+          "sets": 3,
+          "reps": "15-20",
+          "rest_seconds": 30
+        },
+        "core": {
+          "sets": 3,
+          "reps": "20",
+          "rest_seconds": 30
+        },
+        "calves": {
+          "sets": 3,
+          "reps": "15-20",
+          "rest_seconds": 30
+        }
+      },
+      "dayNote": "Finish with 8–10 min of conditioning — intervals, a circuit, or brisk incline walk."
+    }
+  },
+  "splits": {
+    "3day_fullbody": {
+      "label": "Full Body (3-day)",
+      "days_per_week": 3,
+      "recommended": true,
+      "note": "Three full-body days. Best return for three sessions a week.",
+      "days": [
+        {
+          "name": "Day 1 — Full Body A",
+          "focus": "Squat focus",
+          "exercises": [
+            {
+              "gym": "Barbell Squat",
+              "home": "Dumbbell Squat",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Bent Over Barbell Row",
+              "home": "One-Arm Dumbbell Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Dumbbell Bicep Curl",
+              "home": "Dumbbell Bicep Curl",
+              "role": "isolation"
+            },
+            {
+              "gym": "Plank",
+              "home": "Plank",
+              "role": "core"
+            }
+          ]
+        },
+        {
+          "name": "Day 2 — Full Body B",
+          "focus": "Hinge focus",
+          "exercises": [
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "primary"
+            },
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Bent Over Two-Dumbbell Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Triceps Pushdown",
+              "home": "Lying Dumbbell Tricep Extension",
+              "role": "isolation"
+            },
+            {
+              "gym": "Hanging Leg Raise",
+              "home": "Air Bike",
+              "role": "core"
+            }
+          ]
+        },
+        {
+          "name": "Day 3 — Full Body C",
+          "focus": "Mixed",
+          "exercises": [
+            {
+              "gym": "Leg Press",
+              "home": "Dumbbell Lunges",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Seated Cable Rows",
+              "home": "Dumbbell Incline Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Cable Seated Lateral Raise",
+              "home": "Dumbbell Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        }
+      ]
+    },
+    "4day_ul": {
+      "label": "Upper / Lower (4-day)",
+      "days_per_week": 4,
+      "recommended": true,
+      "note": "Upper, Lower, Upper, Lower. Each muscle hit twice a week.",
+      "days": [
+        {
+          "name": "Day 1 — Upper A",
+          "focus": "Horizontal push/pull",
+          "exercises": [
+            {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Bent Over Barbell Row",
+              "home": "One-Arm Dumbbell Row",
+              "role": "secondary"
+            },
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "accessory"
+            },
+            {
+              "gym": "Barbell Curl",
+              "home": "Dumbbell Bicep Curl",
+              "role": "isolation"
+            },
+            {
+              "gym": "Triceps Pushdown",
+              "home": "Lying Dumbbell Tricep Extension",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 2 — Lower A",
+          "focus": "Quad focus",
+          "exercises": [
+            {
+              "gym": "Barbell Squat",
+              "home": "Dumbbell Squat",
+              "role": "primary"
+            },
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "secondary"
+            },
+            {
+              "gym": "Leg Press",
+              "home": "Dumbbell Lunges",
+              "role": "accessory"
+            },
+            {
+              "gym": "Lying Leg Curls",
+              "home": "Single Leg Glute Bridge",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        },
+        {
+          "name": "Day 3 — Upper B",
+          "focus": "Vertical push/pull",
+          "exercises": [
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Pullups",
+              "role": "secondary"
+            },
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "accessory"
+            },
+            {
+              "gym": "Cable Seated Lateral Raise",
+              "home": "Dumbbell Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Hammer Curls",
+              "home": "Hammer Curls",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 4 — Lower B",
+          "focus": "Posterior focus",
+          "exercises": [
+            {
+              "gym": "Barbell Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Hip Thrust",
+              "home": "Single Leg Glute Bridge",
+              "role": "secondary"
+            },
+            {
+              "gym": "Barbell Walking Lunge",
+              "home": "Dumbbell Rear Lunge",
+              "role": "accessory"
+            },
+            {
+              "gym": "Seated Leg Curl",
+              "home": "Floor Glute-Ham Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Seated Calf Raise",
+              "home": "Calf Raise On A Dumbbell",
+              "role": "calves"
+            }
+          ]
+        }
+      ]
+    },
+    "5day_ulppl": {
+      "label": "Upper / Lower / Push / Pull / Legs (5-day)",
+      "days_per_week": 5,
+      "recommended": true,
+      "note": "The recommended 5-day: upper, lower, then push/pull/legs.",
+      "days": [
+        {
+          "name": "Day 1 — Upper",
+          "focus": "Chest / Back / Shoulders / Arms",
+          "exercises": [
+            {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Bent Over Barbell Row",
+              "home": "One-Arm Dumbbell Row",
+              "role": "secondary"
+            },
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "accessory"
+            },
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Pullups",
+              "role": "accessory"
+            },
+            {
+              "gym": "Barbell Curl",
+              "home": "Dumbbell Bicep Curl",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 2 — Lower",
+          "focus": "Legs",
+          "exercises": [
+            {
+              "gym": "Barbell Squat",
+              "home": "Dumbbell Squat",
+              "role": "primary"
+            },
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "secondary"
+            },
+            {
+              "gym": "Leg Press",
+              "home": "Dumbbell Lunges",
+              "role": "accessory"
+            },
+            {
+              "gym": "Lying Leg Curls",
+              "home": "Single Leg Glute Bridge",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        },
+        {
+          "name": "Day 3 — Push",
+          "focus": "Chest / Shoulders / Triceps",
+          "exercises": [
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Cable Crossover",
+              "home": "Dumbbell Flyes",
+              "role": "accessory"
+            },
+            {
+              "gym": "Cable Seated Lateral Raise",
+              "home": "Dumbbell Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Triceps Pushdown",
+              "home": "Lying Dumbbell Tricep Extension",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 4 — Pull",
+          "focus": "Back / Rear Delts / Biceps",
+          "exercises": [
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Pullups",
+              "role": "primary"
+            },
+            {
+              "gym": "Seated Cable Rows",
+              "home": "Bent Over Two-Dumbbell Row",
+              "role": "secondary"
+            },
+            {
+              "gym": "Face Pull",
+              "home": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
+              "role": "accessory"
+            },
+            {
+              "gym": "Barbell Shrug",
+              "home": "Dumbbell Shrug",
+              "role": "isolation"
+            },
+            {
+              "gym": "Hammer Curls",
+              "home": "Hammer Curls",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 5 — Legs",
+          "focus": "Posterior / Quads",
+          "exercises": [
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "primary"
+            },
+            {
+              "gym": "Leg Press",
+              "home": "Bodyweight Walking Lunge",
+              "role": "secondary"
+            },
+            {
+              "gym": "Barbell Lunge",
+              "home": "Split Squat with Dumbbells",
+              "role": "accessory"
+            },
+            {
+              "gym": "Seated Leg Curl",
+              "home": "Floor Glute-Ham Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        }
+      ]
+    },
+    "5day_bro": {
+      "label": "Bro Split (5-day)",
+      "days_per_week": 5,
+      "recommended": false,
+      "note": "One muscle group per day: Chest, Back, Shoulders, Arms, Legs.",
+      "days": [
+        {
+          "name": "Day 1 — Chest",
+          "focus": "Chest",
+          "exercises": [
+            {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Cable Crossover",
+              "home": "Dumbbell Flyes",
+              "role": "accessory"
+            },
+            {
+              "gym": "Dips - Chest Version",
+              "home": "Decline Push-Up",
+              "role": "accessory"
+            },
+            {
+              "gym": "Plank",
+              "home": "Plank",
+              "role": "core"
+            }
+          ]
+        },
+        {
+          "name": "Day 2 — Back",
+          "focus": "Back",
+          "exercises": [
+            {
+              "gym": "Barbell Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "primary"
+            },
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Pullups",
+              "role": "secondary"
+            },
+            {
+              "gym": "Bent Over Barbell Row",
+              "home": "One-Arm Dumbbell Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Seated Cable Rows",
+              "home": "Bent Over Two-Dumbbell Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Barbell Shrug",
+              "home": "Dumbbell Shrug",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 3 — Shoulders",
+          "focus": "Shoulders",
+          "exercises": [
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Arnold Dumbbell Press",
+              "home": "Arnold Dumbbell Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Cable Seated Lateral Raise",
+              "home": "Dumbbell Raise",
+              "role": "accessory"
+            },
+            {
+              "gym": "Face Pull",
+              "home": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
+              "role": "isolation"
+            },
+            {
+              "gym": "Barbell Rear Delt Row",
+              "home": "Dumbbell Lying Rear Lateral Raise",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 4 — Arms",
+          "focus": "Biceps / Triceps",
+          "exercises": [
+            {
+              "gym": "Barbell Curl",
+              "home": "Dumbbell Bicep Curl",
+              "role": "primary"
+            },
+            {
+              "gym": "EZ-Bar Skullcrusher",
+              "home": "Decline Dumbbell Triceps Extension",
+              "role": "secondary"
+            },
+            {
+              "gym": "Hammer Curls",
+              "home": "Hammer Curls",
+              "role": "accessory"
+            },
+            {
+              "gym": "Triceps Pushdown",
+              "home": "Lying Dumbbell Tricep Extension",
+              "role": "accessory"
+            },
+            {
+              "gym": "Concentration Curls",
+              "home": "Concentration Curls",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 5 — Legs",
+          "focus": "Legs",
+          "exercises": [
+            {
+              "gym": "Barbell Squat",
+              "home": "Dumbbell Squat",
+              "role": "primary"
+            },
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "secondary"
+            },
+            {
+              "gym": "Leg Press",
+              "home": "Dumbbell Lunges",
+              "role": "accessory"
+            },
+            {
+              "gym": "Lying Leg Curls",
+              "home": "Single Leg Glute Bridge",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        }
+      ]
+    },
+    "6day_ppl_arnold": {
+      "label": "Push/Pull/Legs Split (6-day)",
+      "days_per_week": 6,
+      "recommended": true,
+      "note": "Six lifting days + one active-rest day. Quad and hamstring/glute lower days, split horizontal/vertical pulls and two push days.",
+      "days": [
+        {
+          "name": "Day 1 — Lower (Quad focus)",
+          "focus": "Quads",
+          "exercises": [
+            {
+              "gym": "Barbell Squat",
+              "home": "Dumbbell Squat",
+              "role": "primary"
+            },
+            {
+              "gym": "Leg Press",
+              "home": "Dumbbell Lunges",
+              "role": "secondary"
+            },
+            {
+              "gym": "Barbell Walking Lunge",
+              "home": "Split Squat with Dumbbells",
+              "role": "accessory"
+            },
+            {
+              "gym": "Leg Extensions",
+              "home": "Freehand Jump Squat",
+              "role": "isolation"
+            },
+            {
+              "gym": "Standing Calf Raises",
+              "home": "Standing Dumbbell Calf Raise",
+              "role": "calves"
+            }
+          ]
+        },
+        {
+          "name": "Day 2 — Horizontal Pull",
+          "focus": "Back thickness",
+          "exercises": [
+            {
+              "gym": "Bent Over Barbell Row",
+              "home": "Bent Over Two-Dumbbell Row",
+              "role": "primary"
+            },
+            {
+              "gym": "Seated Cable Rows",
+              "home": "One-Arm Dumbbell Row",
+              "role": "secondary"
+            },
+            {
+              "gym": "Inverted Row",
+              "home": "Inverted Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Face Pull",
+              "home": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
+              "role": "isolation"
+            },
+            {
+              "gym": "Barbell Shrug",
+              "home": "Dumbbell Shrug",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 3 — Push A",
+          "focus": "Chest emphasis",
+          "exercises": [
+            {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "accessory"
+            },
+            {
+              "gym": "Cable Crossover",
+              "home": "Dumbbell Flyes",
+              "role": "isolation"
+            },
+            {
+              "gym": "Triceps Pushdown",
+              "home": "Lying Dumbbell Tricep Extension",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 4 — Lower (Hamstring & Glute focus)",
+          "focus": "Hamstrings / Glutes",
+          "exercises": [
+            {
+              "gym": "Romanian Deadlift",
+              "home": "Stiff-Legged Dumbbell Deadlift",
+              "role": "primary"
+            },
+            {
+              "gym": "Barbell Hip Thrust",
+              "home": "Single Leg Glute Bridge",
+              "role": "secondary"
+            },
+            {
+              "gym": "Lying Leg Curls",
+              "home": "Floor Glute-Ham Raise",
+              "role": "accessory"
+            },
+            {
+              "gym": "Glute Kickback",
+              "home": "Butt Lift (Bridge)",
+              "role": "isolation"
+            },
+            {
+              "gym": "Seated Calf Raise",
+              "home": "Calf Raise On A Dumbbell",
+              "role": "calves"
+            }
+          ]
+        },
+        {
+          "name": "Day 5 — Vertical Pull",
+          "focus": "Lats / Biceps",
+          "exercises": [
+            {
+              "gym": "Wide-Grip Lat Pulldown",
+              "home": "Pullups",
+              "role": "primary"
+            },
+            {
+              "gym": "Chin-Up",
+              "home": "Chin-Up",
+              "role": "secondary"
+            },
+            {
+              "gym": "Straight-Arm Pulldown",
+              "home": "One-Arm Dumbbell Row",
+              "role": "accessory"
+            },
+            {
+              "gym": "Face Pull",
+              "home": "Dumbbell Lying Rear Lateral Raise",
+              "role": "isolation"
+            },
+            {
+              "gym": "Hammer Curls",
+              "home": "Hammer Curls",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 6 — Push B",
+          "focus": "Shoulder emphasis",
+          "exercises": [
+            {
+              "gym": "Standing Military Press",
+              "home": "Dumbbell Shoulder Press",
+              "role": "primary"
+            },
+            {
+              "gym": "Arnold Dumbbell Press",
+              "home": "Arnold Dumbbell Press",
+              "role": "secondary"
+            },
+            {
+              "gym": "Cable Seated Lateral Raise",
+              "home": "Dumbbell Raise",
+              "role": "accessory"
+            },
+            {
+              "gym": "Barbell Incline Bench Press - Medium Grip",
+              "home": "Incline Dumbbell Press",
+              "role": "isolation"
+            },
+            {
+              "gym": "EZ-Bar Skullcrusher",
+              "home": "Decline Dumbbell Triceps Extension",
+              "role": "isolation"
+            }
+          ]
+        },
+        {
+          "name": "Day 7 — Active Rest",
+          "focus": "Recovery",
+          "activeRest": true,
+          "exercises": [],
+          "note": "No lifting. Go for a run, hike, bike, swim, sport, or any fun moving activity for 30–45 min."
+        }
+      ]
+    }
+  }
+}
