@@ -45,8 +45,22 @@ export async function POST(request: Request) {
   const { data: dbUser } = await admin.from('users').select('id').eq('auth_id', user.id).single()
   if (!dbUser) return NextResponse.json({ error: 'No account' }, { status: 404 })
 
+  // Prefer the Stripe subscription; fall back to the latest application's tier
+  // (beta testers and admin-activated clients have no subscriptions row —
+  // matches fetchMyTier in lib/scheduling.ts, which is what shows the picker).
   const { data: sub } = await admin.from('subscriptions').select('tier').eq('user_id', dbUser.id).maybeSingle()
-  if (sub?.tier !== 'blueprint') {
+  let tier: string | undefined = sub?.tier
+  if (!tier) {
+    const { data: app } = await admin
+      .from('applications')
+      .select('tier')
+      .eq('user_id', dbUser.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    tier = app?.tier
+  }
+  if (tier !== 'blueprint') {
     return NextResponse.json({ error: 'This picker is for Blueprint members.' }, { status: 403 })
   }
 

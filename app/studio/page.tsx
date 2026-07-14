@@ -18,7 +18,7 @@ import {
 } from '@/lib/nutrition'
 import { fetchPRs, fetchWorkoutsThisWeek, type PRRow } from '@/lib/workout'
 import { fetchMyProgram, type Program } from '@/lib/programs'
-import { fetchMySessions, type Session } from '@/lib/scheduling'
+import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 
 const CheckIcon = (
@@ -61,6 +61,7 @@ export default function ClientDashboard() {
   const [myProgram, setMyProgram] = useState<Program | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
+  const [tier, setTier] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -71,7 +72,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding] = await Promise.all([
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier] = await Promise.all([
           fetchTargets(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
@@ -81,6 +82,7 @@ export default function ClientDashboard() {
           fetchMyProgram(id),
           fetchMySessions(id),
           fetchMyOnboarding(id),
+          fetchMyTier(id),
         ])
         if (!active) return
         setTargets(t)
@@ -92,6 +94,7 @@ export default function ClientDashboard() {
         setMyProgram(program)
         setSessions(mySessions)
         setNeedsOnboarding(!onboarding)
+        setTier(myTier)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -180,8 +183,33 @@ export default function ClientDashboard() {
         <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
       </div>
 
-      {/* Onboarding nudge: shown until the pre-call form is filled */}
-      {!loading && needsOnboarding && (
+      {/* Blueprint is self-serve: no onboarding form, no call. Point them
+          straight at the program picker until they've chosen one. */}
+      {!loading && tier === 'blueprint' && !myProgram && (
+        <Link
+          href="/studio/programs"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-[#1A7BFF]/10 border border-[#1A7BFF]/25 hover:bg-[#1A7BFF]/15 transition-colors duration-200"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-[#1A7BFF]/15 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#1A7BFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="font-display font-bold text-sm text-white">Pick your training program</p>
+              <p className="text-white/45 text-xs font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
+            </div>
+          </div>
+          <span className="shrink-0 text-[#1A7BFF] font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+            Choose →
+          </span>
+        </Link>
+      )}
+
+      {/* Onboarding nudge (coaching tiers only): shown until the pre-call form
+          is filled. Blueprint skips onboarding entirely. */}
+      {!loading && needsOnboarding && tier !== 'blueprint' && (
         <Link
           href="/studio/onboarding"
           className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-[#F76B16]/10 border border-[#F76B16]/25 hover:bg-[#F76B16]/15 transition-colors duration-200"
@@ -407,6 +435,18 @@ export default function ClientDashboard() {
                   className="block w-full text-center py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
                 >
                   Start Training
+                </Link>
+              </>
+            ) : tier === 'blueprint' ? (
+              <>
+                <p className="text-white/50 text-sm font-body mt-1 mb-4">
+                  Pick your program: goal, days per week, gym or home. Ready in seconds.
+                </p>
+                <Link
+                  href="/studio/programs"
+                  className="block w-full text-center py-3 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
+                >
+                  Pick Your Program
                 </Link>
               </>
             ) : (

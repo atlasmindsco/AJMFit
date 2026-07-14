@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { fetchMyOnboarding, saveMyOnboarding, type OnboardingAnswers } from '@/lib/onboarding'
+import { fetchMyTier } from '@/lib/scheduling'
 
 const inputCls =
   'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-lg text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-[#1A7BFF]/60 transition-colors'
@@ -62,6 +63,13 @@ export default function OnboardingFormPage() {
       }
       setUserId(id)
       try {
+        // Blueprint is self-serve: no onboarding form or call. Send them to
+        // the program picker instead.
+        const tier = await fetchMyTier(id)
+        if (tier === 'blueprint') {
+          router.replace('/studio/programs')
+          return
+        }
         const existing = await fetchMyOnboarding(id)
         if (active && existing) {
           setAnswers(existing.answers ?? {})
