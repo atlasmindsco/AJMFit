@@ -144,5 +144,31 @@ export async function POST(request: Request) {
     console.error('[apply] notification email failed', e)
   }
 
+  // 4. Blueprint is self-guided (no coaching), so it skips the manual approval
+  //    queue: auto-accept the application and send the "set your password"
+  //    invite immediately, so the client goes straight into the app. Coaching
+  //    tiers still wait for the trainer to approve them in the dashboard.
+  //    Best-effort — a hiccup here must never fail the applicant's submission.
+  if (data.tier === 'blueprint') {
+    try {
+      await db
+        .from('applications')
+        .update({ status: 'accepted', reviewed_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('status', 'pending')
+
+      // Only send the set-password invite if they don't already have a login.
+      const { data: u } = await db.from('users').select('auth_id').eq('id', userId).maybeSingle()
+      if (!u?.auth_id) {
+        const origin = new URL(request.url).origin
+        await db.auth.admin.inviteUserByEmail(email, {
+          redirectTo: `${origin}/auth/callback?next=/members/reset`,
+        })
+      }
+    } catch (e) {
+      console.error('[apply] blueprint auto-approve failed', e)
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }
