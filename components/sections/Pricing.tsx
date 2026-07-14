@@ -241,13 +241,25 @@ export default function Pricing() {
                   </ul>
 
                   <div className="mt-10">
-                    <Button
-                      href="/apply"
-                      variant={tier.featured ? 'primary' : 'secondary'}
-                      fullWidth
-                    >
-                      Get Started
-                    </Button>
+                    {tier.name === 'The Blueprint' ? (
+                      // Blueprint is self-serve: no application, straight to
+                      // Stripe Checkout (account + program picker follow).
+                      // Plain <a> so the checkout route is never prefetched.
+                      <a
+                        href="/api/stripe/checkout-blueprint"
+                        className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
+                      >
+                        Start Now
+                      </a>
+                    ) : (
+                      <Button
+                        href="/apply"
+                        variant={tier.featured ? 'primary' : 'secondary'}
+                        fullWidth
+                      >
+                        Get Started
+                      </Button>
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -194,13 +194,23 @@ export default function WorkWithMePage() {
                   ))}
                 </ul>
                 <div className="mt-10">
-                  <Button
-                    href="/apply"
-                    variant={tier.featured ? 'primary' : 'secondary'}
-                    fullWidth
-                  >
-                    Apply Now
-                  </Button>
+                  {tier.name === 'The Blueprint' ? (
+                    // Self-serve: straight to Stripe Checkout, no application.
+                    <a
+                      href="/api/stripe/checkout-blueprint"
+                      className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
+                    >
+                      Start Now
+                    </a>
+                  ) : (
+                    <Button
+                      href="/apply"
+                      variant={tier.featured ? 'primary' : 'secondary'}
+                      fullWidth
+                    >
+                      Apply Now
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>

@@ -85,6 +85,79 @@ export async function POST(request: Request) {
             })
             sub.metadata = { ...sub.metadata, user_id: session.client_reference_id }
           }
+
+          // Blueprint direct checkout (guest, no application funnel): the buyer
+          // has no account yet. Create/find the user from the checkout email,
+          // record a placeholder accepted application (keeps tier resolution +
+          // the coach dashboard coherent), send the set-password invite, and
+          // backfill user_id so subscription events sync from here on.
+          if (!sub.metadata?.user_id && session.metadata?.flow === 'blueprint_direct') {
+            const email = session.customer_details?.email?.toLowerCase()
+            if (email) {
+              const name =
+                session.customer_details?.name?.trim() || email.split('@')[0]
+              let { data: user } = await db
+                .from('users')
+                .select('id, auth_id')
+                .eq('email', email)
+                .maybeSingle()
+              if (!user) {
+                const { data: created } = await db
+                  .from('users')
+                  .insert({ name, email, status: 'pending' })
+                  .select('id, auth_id')
+                  .single()
+                user = created
+              }
+              if (user) {
+                await db
+                  .from('users')
+                  .update({
+                    stripe_customer_id:
+                      typeof session.customer === 'string' ? session.customer : session.customer?.id,
+                  })
+                  .eq('id', user.id)
+
+                // Placeholder application so /luffy and tier fallbacks work.
+                const { data: existingApp } = await db
+                  .from('applications')
+                  .select('id')
+                  .eq('user_id', user.id)
+                  .limit(1)
+                  .maybeSingle()
+                if (!existingApp) {
+                  await db.from('applications').insert({
+                    user_id: user.id,
+                    goals: 'Blueprint self-serve signup (direct checkout)',
+                    equipment: [],
+                    availability: 'Self-guided',
+                    tier: 'blueprint',
+                    billing_cycle: 'monthly',
+                    status: 'accepted',
+                    reviewed_at: new Date().toISOString(),
+                  })
+                }
+
+                // Set-password invite (only if they have no login yet).
+                if (!user.auth_id) {
+                  try {
+                    const origin = new URL(request.url).origin
+                    await db.auth.admin.inviteUserByEmail(email, {
+                      redirectTo: `${origin}/auth/callback?next=/members/reset`,
+                    })
+                  } catch (e) {
+                    console.error('[stripe webhook] blueprint invite failed', e)
+                  }
+                }
+
+                await stripe.subscriptions.update(sub.id, {
+                  metadata: { ...sub.metadata, user_id: user.id },
+                })
+                sub.metadata = { ...sub.metadata, user_id: user.id }
+              }
+            }
+          }
+
           await syncSubscription(sub)
         }
         break
