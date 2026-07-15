@@ -245,12 +245,22 @@ export default function Pricing() {
                       // Blueprint is self-serve: no application, straight to
                       // Stripe Checkout (account + program picker follow).
                       // Plain <a> so the checkout route is never prefetched.
-                      <a
-                        href="/api/stripe/checkout-blueprint"
-                        className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
-                      >
-                        Start Now
-                      </a>
+                      <>
+                        <a
+                          href="/api/stripe/checkout-blueprint"
+                          className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
+                        >
+                          Start Now
+                        </a>
+                        <p className="mt-3 text-center text-xs font-body text-brand-slate">
+                          Have a free code? Enter{' '}
+                          <span className="font-bold text-brand-navy tracking-wide">ZEROOUT</span>{' '}
+                          at checkout for $0.
+                          <span className="mt-0.5 block text-brand-slate/70">
+                            On a phone, tap the price at the top of the payment page, then &ldquo;Add promotion code.&rdquo;
+                          </span>
+                        </p>
+                      </>
                     ) : (
                       <Button
                         href="/apply"
