@@ -1,17 +1,38 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { stripe } from '@/lib/stripe/server'
+import ResendInviteButton from '@/components/blueprint/ResendInviteButton'
 
 export const metadata: Metadata = {
   title: 'Welcome to The Blueprint',
   robots: { index: false, follow: false },
 }
 
+export const dynamic = 'force-dynamic'
+
 /**
- * Landing page after a direct Blueprint checkout. The webhook has already
- * created their account and emailed the set-password link, so this page's
- * one job is pointing them at that email.
+ * Landing page after a direct Blueprint checkout. Verifies the session with
+ * Stripe server-side, tells the buyer exactly which inbox their set-password
+ * email went to, and offers a resend so a lost email never strands them.
  */
-export default function BlueprintWelcome() {
+export default async function BlueprintWelcome({
+  searchParams,
+}: {
+  searchParams: { session_id?: string }
+}) {
+  const sessionId = searchParams.session_id
+  let email: string | null = null
+  let paid = false
+  if (sessionId && /^cs_(live|test)_[A-Za-z0-9]+$/.test(sessionId)) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId)
+      paid = session.status === 'complete'
+      email = session.customer_details?.email?.toLowerCase() ?? null
+    } catch {
+      // fall through to the generic copy
+    }
+  }
+
   return (
     <div className="pt-36 pb-24 min-h-[70vh]">
       <div className="max-w-xl mx-auto px-6 text-center">
@@ -27,15 +48,26 @@ export default function BlueprintWelcome() {
           You&rsquo;re in
         </h1>
         <p className="mt-5 text-brand-slate font-body text-lg leading-relaxed">
-          Payment confirmed. One step left:
+          {paid ? 'Payment confirmed. Your login is on its way:' : 'One step left:'}
         </p>
 
         <div className="mt-8 bg-brand-offwhite border-l-4 border-brand-orange rounded-sm p-6 text-left">
           <ol className="space-y-3 text-brand-navy font-body text-[15px] leading-relaxed">
             <li>
-              <strong>1.</strong> Check your inbox for an AJM Fit email called{' '}
-              <strong>&ldquo;set up your account&rdquo;</strong> and create your password. (Give it a
-              minute, and check spam if it&rsquo;s not there.)
+              <strong>1.</strong>{' '}
+              {email ? (
+                <>
+                  We sent your <strong>&ldquo;set up your account&rdquo;</strong> email to{' '}
+                  <strong>{email}</strong>. Open it and create your password. (Give it a minute, and
+                  check spam if it&rsquo;s not there.)
+                </>
+              ) : (
+                <>
+                  Check your inbox for an AJM Fit email called{' '}
+                  <strong>&ldquo;set up your account&rdquo;</strong> and create your password. (Give
+                  it a minute, and check spam if it&rsquo;s not there.)
+                </>
+              )}
             </li>
             <li>
               <strong>2.</strong> Sign in, then <strong>pick your program</strong>: your goal, days per
@@ -55,11 +87,15 @@ export default function BlueprintWelcome() {
             Go to sign in
           </Link>
         </div>
-        <p className="mt-6 text-brand-slate/70 text-sm font-body">
-          Didn&rsquo;t get the email after a few minutes? Reply to any AJM Fit email or write{' '}
-          <a href="mailto:anthony@ajmfit.com" className="text-brand-blue">anthony@ajmfit.com</a> and
-          we&rsquo;ll sort it out.
-        </p>
+
+        <div className="mt-6 space-y-2">
+          {sessionId && paid && <ResendInviteButton sessionId={sessionId} />}
+          <p className="text-brand-slate/70 text-sm font-body">
+            Still stuck? Write{' '}
+            <a href="mailto:anthony@ajmfit.com" className="text-brand-blue">anthony@ajmfit.com</a> and
+            we&rsquo;ll sort it out.
+          </p>
+        </div>
       </div>
     </div>
   )
