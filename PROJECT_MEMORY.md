@@ -10,6 +10,7 @@
 
 ## Credentials & Config
 - **Newsletter**: **Kit (formerly ConvertKit)** — migrated off Beehiiv 2026-06-20 (Beehiiv free had no post/automation API). Account "AJMFit", login `anthony@ajmfit.com`. "Brains & Gains" micro-drip course, weekly Thursday.
+  - **Plan PAID as of Jul 10, 2026** (Creator, renews Aug 10). Drips stalled during the Jul 3-10 trial lapse (subscribers' last sends: Jun 21). **WATCH: verify drips resume Thursday Jul 16** (check a subscriber's last_sent on Fri Jul 17). Signup route now emails Anthony an instructional alert if Kit refuses sequence adds, so a future lapse is no longer silent.
   - API route: `/api/newsletter` → Kit v4 (create subscriber → add to welcome sequence → tag). Env on Vercel: `KIT_API_KEY` (also in `.env.local`). Verified live: ajmfit.com signup creates active tagged Kit subscriber.
   - **Model = evergreen SEQUENCE** (not broadcasts): sequence "Brains & Gains — Welcome" (id 2800010) = welcome (immediate, pos 0) + **51 weekly Thursday drips** (delay 7d, send_days=thursday, send_hour 11 ET). Every new subscriber starts at issue 1. Tag "Brains & Gains" id 20490383.
   - **Content automation** in `tools/`: `generate_topic_plan.py` (513 ISSA seeds → `newsletter-content/topic-plan.json`), `generate_drips.py` (gpt-4o-mini drafts faithful drips, ~462 seeds remain), `email_template.py`/`markdown_email.py` (branded HTML: BandGnewsletter.png banner + chea-avatar.jpg footer), `kit_schedule_drip.py`, `kit_schedule_batch.py` (queue+interleaver), `kit_build_sequence.py` (REST append to sequence), `build_review.py` (review.html). 51 drips drafted/in sequence.
@@ -22,7 +23,9 @@
 - **ClickUp**: workspace 9017723361, list 901711321605
 - **Email (Hostinger)**: anthony@ajmfit.com / `Iamdiamond1988$`
 - **Instagram**: https://www.instagram.com/anthony.j.martin?igsh=cm1qZXdsMW4wb212&utm_source=qr
-- **Calendly**: account `anthony@ajmfit.com`, booking base `https://calendly.com/anthony-ajmfit`. Single-account integration via Personal Access Token.
+- **Cal.com**: REPLACING Calendly (decision Jul 10, 2026). API key `CALCOM_API_KEY` in `.env.local`. Migration not started — Calendly integration below still live until cal.com is wired in.
+- **Calendly**: account `anthony@ajmfit.com`, booking base `https://calendly.com/anthony-ajmfit`. Single-account integration via Personal Access Token. **Being replaced by Cal.com (see above).**
+  - **BOOKING CURRENTLY BROKEN (live state Jul 10 audit)**: "Onboarding Call" (30m) and "Weekly Check-In" (45m) event types are INACTIVE in Calendly (inactive events cannot be booked, so /studio/schedule embeds error for those), and "Live Training" was changed to 60m (site advertises 45m). Likely mid-Cal.com-migration state. Until the Cal.com migration lands, clients cannot book onboarding or check-ins.
   - User URI: `https://api.calendly.com/users/afd845a3-09a0-41a6-ae8e-436ca16b977a`; Org URI: `https://api.calendly.com/organizations/7961c91c-c17c-4184-b149-99c50e3b4975`
   - Env: `CALENDLY_API_TOKEN` (PAT, `.env.local` only — NOT needed in prod runtime), `CALENDLY_WEBHOOK_TOKEN` (shared secret, in `.env.local` + Vercel prod). **PAT was pasted in chat once — ROTATE before go-live.**
   - **This Calendly plan does NOT issue webhook signing keys** (field absent at user AND org scope). So webhook auth = shared secret in callback URL `?token=...` (CALENDLY_WEBHOOK_TOKEN), checked constant-time. Route falls back to HMAC automatically if a signing key ever exists (`CALENDLY_WEBHOOK_SIGNING_KEY`).
