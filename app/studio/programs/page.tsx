@@ -1202,8 +1202,16 @@ export default function ProgramsPage() {
                                                         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                                                       },
                                                     }))
-                                                    // Celebrate beating an existing record (not the first-ever log).
-                                                    if (currentPR > 0) setPrCelebration({ name: displayName, weight: w })
+                                                    // Celebrate beating an existing record (not the first-ever log),
+                                                    // and ping Coach Anthony so he can reach out and celebrate them.
+                                                    if (currentPR > 0) {
+                                                      setPrCelebration({ name: displayName, weight: w })
+                                                      fetch('/api/studio/pr-notify', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ exerciseName: displayName, weight: w, reps: r, previousWeight: currentPR }),
+                                                      }).catch(() => {})
+                                                    }
                                                   })
                                                   .catch((err) => console.error('[PR upsert] Failed:', err))
                                               }
