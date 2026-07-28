@@ -162,7 +162,7 @@ export async function POST(request: Request) {
       if (!u?.auth_id) {
         const origin = new URL(request.url).origin
         await db.auth.admin.inviteUserByEmail(email, {
-          redirectTo: `${origin}/auth/callback?next=/members/reset`,
+          redirectTo: `${origin}/auth/callback`,
         })
       }
     } catch (e) {
