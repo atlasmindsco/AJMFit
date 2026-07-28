@@ -146,7 +146,7 @@ export default function IntakeForm() {
       // Anthony approves the application.
       const payload = {
         ...data,
-        billingCycle: data.tier === 'blueprint' ? 'monthly' : data.billingCycle,
+        billingCycle: data.billingCycle,
       }
       const res = await fetch('/api/apply', {
         method: 'POST',
