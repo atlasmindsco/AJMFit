@@ -15,6 +15,9 @@ import {
   removeSwap as dbRemoveSwap,
   fetchSwaps as dbFetchSwaps,
   fetchInProgressWorkout as dbFetchInProgressWorkout,
+  fetchWorkoutHistory as dbFetchWorkoutHistory,
+  autoCloseStaleWorkouts as dbAutoCloseStaleWorkouts,
+  type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -354,6 +357,15 @@ export default function ProgramsPage() {
   const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
   const [hasAssigned, setHasAssigned] = useState(false)
 
+  // Workout history (Recent Logs) + PR celebration
+  const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
+  const [prCelebration, setPrCelebration] = useState<{ name: string; weight: number } | null>(null)
+  const loadHistory = useCallback((uid: string) => {
+    dbFetchWorkoutHistory(uid, 12)
+      .then(setHistory)
+      .catch((e) => console.error('[History] load failed', e))
+  }, [])
+
   const applyLoadedProgram = useCallback(async (programId: string) => {
     const loaded = await loadAssignedProgram(programId)
     if (loaded) {
@@ -413,6 +425,20 @@ export default function ProgramsPage() {
     return val
   }
 
+  const formatDuration = (sec: number): string => {
+    const m = Math.round(sec / 60)
+    if (m < 1) return '<1m'
+    if (m < 60) return `${m}m`
+    return `${Math.floor(m / 60)}h ${m % 60}m`
+  }
+  const formatHistoryDate = (w: WorkoutHistoryRow): string => {
+    const iso = w.date ? `${w.date}T00:00:00` : (w.ended_at ?? '')
+    const d = iso ? new Date(iso) : null
+    return d && !isNaN(d.getTime())
+      ? d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      : ''
+  }
+
   const startRestTimer = useCallback((exerciseKey: string, seconds: number) => {
     if (timerRef.current) clearInterval(timerRef.current)
     setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds })
@@ -458,6 +484,9 @@ export default function ProgramsPage() {
     void getCurrentUserId().then((id) => {
     if (!active || !id) return
     setUserId(id)
+
+    // Close any session left open from a previous day, then load history.
+    dbAutoCloseStaleWorkouts(id).finally(() => loadHistory(id))
 
     dbFetchPRs(id)
       .then((rows) => {
@@ -609,6 +638,15 @@ export default function ProgramsPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <AnimatePresence>
+        {prCelebration && (
+          <PRCelebration
+            name={prCelebration.name}
+            weight={prCelebration.weight}
+            onDone={() => setPrCelebration(null)}
+          />
+        )}
+      </AnimatePresence>
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8">
         {/* Program Header */}
@@ -1164,6 +1202,8 @@ export default function ProgramsPage() {
                                                         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                                                       },
                                                     }))
+                                                    // Celebrate beating an existing record (not the first-ever log).
+                                                    if (currentPR > 0) setPrCelebration({ name: displayName, weight: w })
                                                   })
                                                   .catch((err) => console.error('[PR upsert] Failed:', err))
                                               }
@@ -1536,6 +1576,7 @@ export default function ProgramsPage() {
                           if (workoutId) {
                             try {
                               await dbEndWorkout(workoutId, elapsed)
+                              if (userId) loadHistory(userId)
                             } catch (err) {
                               console.error('[Workout] Failed to end:', err)
                             }
@@ -1702,13 +1743,46 @@ export default function ProgramsPage() {
       <div className="lg:col-span-4 space-y-4">
         {/* Recent Workout Logs */}
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
-          <div className="px-5 py-4 border-b border-white/[0.10]">
-            <h2 className="font-display font-bold text-sm text-white">Recent Logs</h2>
+          <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
+            <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
+            {history.length > 0 && (
+              <span className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide">
+                {history.length} logged
+              </span>
+            )}
           </div>
-          <div className="p-5">
-            <p className="text-white/40 text-sm font-body leading-relaxed">
-              Your logged workouts will show up here. Start a session above and log your sets to build your history.
-            </p>
+          <div className="p-4">
+            {history.length === 0 ? (
+              <p className="text-white/40 text-sm font-body leading-relaxed px-1">
+                Your logged workouts will show up here. Start a session above and log your sets to build your history.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {history.map((w) => (
+                  <li
+                    key={w.id}
+                    className="flex items-center justify-between gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-white text-sm font-body font-semibold truncate">{w.day_name}</p>
+                      <p className="text-white/35 text-xs font-body mt-0.5">
+                        {formatHistoryDate(w)} &middot; {w.set_count} {w.set_count === 1 ? 'set' : 'sets'}
+                        {w.duration_seconds ? ` · ${formatDuration(w.duration_seconds)}` : ''}
+                      </p>
+                    </div>
+                    {w.ended_at ? (
+                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-[#22C55E] bg-[#22C55E]/10 px-2 py-0.5 rounded-full">
+                        Done
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-0.5 rounded-full">
+                        Active
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </motion.div>
 
@@ -1735,6 +1809,63 @@ export default function ProgramsPage() {
 }
 
 /* ── Sub-components ── */
+
+/* ── PR Celebration — confetti + trophy badge when a client beats a record ── */
+function PRCelebration({ name, weight, onDone }: { name: string; weight: number; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3400)
+    return () => clearTimeout(t)
+  }, [onDone])
+
+  const colors = ['#F59E0B', '#F76B16', '#1A7BFF', '#22C55E', '#EF4444', '#A855F7']
+  const pieces = Array.from({ length: 48 }, (_, i) => i)
+
+  return (
+    <div className="fixed inset-0 z-[60] pointer-events-none flex items-center justify-center overflow-hidden">
+      {pieces.map((i) => {
+        const left = Math.random() * 100
+        const delay = Math.random() * 0.35
+        const duration = 1.8 + Math.random() * 1.6
+        const size = 7 + Math.random() * 9
+        return (
+          <motion.div
+            key={i}
+            initial={{ y: '-12vh', opacity: 1, rotate: 0 }}
+            animate={{ y: '112vh', x: (Math.random() - 0.5) * 240, rotate: Math.random() * 900, opacity: [1, 1, 0.9, 0] }}
+            transition={{ duration, delay, ease: 'easeIn' }}
+            style={{
+              position: 'absolute',
+              left: `${left}%`,
+              top: 0,
+              width: size,
+              height: size * 0.45,
+              backgroundColor: colors[i % colors.length],
+              borderRadius: 2,
+            }}
+          />
+        )
+      })}
+      <motion.div
+        initial={{ scale: 0.3, opacity: 0, y: 12 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.85, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 15 }}
+        className="relative text-center px-9 py-7 rounded-2xl bg-[#1C1C1C] border-2 border-[#F59E0B]/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
+      >
+        <motion.div
+          className="text-5xl mb-1"
+          animate={{ rotate: [0, -12, 12, -8, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 0.8, delay: 0.15 }}
+        >
+          🏆
+        </motion.div>
+        <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-[#F59E0B]">New PR!</p>
+        <p className="text-white font-body font-semibold text-sm mt-1">{name}</p>
+        <p className="text-white/60 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
+      </motion.div>
+    </div>
+  )
+}
 
 function ExerciseImageCycler({ images, name }: { images: string[]; name: string }) {
   const [showEnd, setShowEnd] = useState(false)

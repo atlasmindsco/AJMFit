@@ -30,12 +30,78 @@ export async function startWorkout(input: StartWorkoutInput): Promise<string> {
   return data.id as string
 }
 
+// No real training session runs longer than this; caps runaway timers that
+// kept counting while the app was closed (which produced 100+ hour durations).
+const MAX_WORKOUT_SECONDS = 4 * 60 * 60
+
 export async function endWorkout(workoutId: string, durationSeconds: number) {
+  const dur = Math.max(0, Math.min(Math.round(durationSeconds || 0), MAX_WORKOUT_SECONDS))
   const { error } = await db
     .from('workouts')
-    .update({ ended_at: new Date().toISOString(), duration_seconds: durationSeconds })
+    .update({ ended_at: new Date().toISOString(), duration_seconds: dur })
     .eq('id', workoutId)
   if (error) throw error
+}
+
+/**
+ * Close out any workout left open from a previous day. Without this, an
+ * un-ended session stays "active" and its timer accumulates for days. We stamp
+ * a modest estimated duration so it shows up as a completed workout in history.
+ */
+export async function autoCloseStaleWorkouts(userId: string): Promise<void> {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const { data: stale } = await db
+    .from('workouts')
+    .select('id')
+    .eq('user_id', userId)
+    .is('ended_at', null)
+    .lt('started_at', todayStart.toISOString())
+  for (const w of (stale ?? []) as { id: string }[]) {
+    await db
+      .from('workouts')
+      .update({ ended_at: new Date().toISOString(), duration_seconds: 45 * 60 })
+      .eq('id', w.id)
+  }
+}
+
+export interface WorkoutHistoryRow {
+  id: string
+  date: string
+  day_name: string
+  program_name: string | null
+  duration_seconds: number | null
+  ended_at: string | null
+  set_count: number
+}
+
+/** The client's recent workouts (most recent first), with a set count each. */
+export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<WorkoutHistoryRow[]> {
+  const { data: workouts, error } = await db
+    .from('workouts')
+    .select('id, date, day_name, program_name, duration_seconds, ended_at, started_at')
+    .eq('user_id', userId)
+    .order('started_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  const rows = (workouts ?? []) as Array<WorkoutHistoryRow & { started_at: string }>
+  if (rows.length === 0) return []
+
+  const ids = rows.map((w) => w.id)
+  const { data: sets } = await db.from('workout_sets').select('workout_id').in('workout_id', ids)
+  const counts = new Map<string, number>()
+  for (const s of (sets ?? []) as { workout_id: string }[]) {
+    counts.set(s.workout_id, (counts.get(s.workout_id) ?? 0) + 1)
+  }
+  return rows.map((w) => ({
+    id: w.id,
+    date: w.date,
+    day_name: w.day_name,
+    program_name: w.program_name,
+    duration_seconds: w.duration_seconds,
+    ended_at: w.ended_at,
+    set_count: counts.get(w.id) ?? 0,
+  }))
 }
 
 export interface SaveSetInput {
@@ -220,11 +286,14 @@ export interface WorkoutSetRow {
 export async function fetchInProgressWorkout(
   userId: string
 ): Promise<{ workout: InProgressWorkoutRow; sets: WorkoutSetRow[] } | null> {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
   const { data: workout, error: wErr } = await db
     .from('workouts')
     .select('id, day_name, program_name, program_phase, started_at')
     .eq('user_id', userId)
     .is('ended_at', null)
+    .gte('started_at', todayStart.toISOString())
     .order('started_at', { ascending: false })
     .limit(1)
     .maybeSingle()

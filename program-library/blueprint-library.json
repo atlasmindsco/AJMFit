@@ -440,6 +440,12 @@
           "focus": "Chest / Shoulders / Triceps",
           "exercises": [
             {
+              "gym": "Barbell Bench Press - Medium Grip",
+              "home": "Dumbbell Bench Press",
+              "role": "primary",
+              "notes": "Training solo? Use a Smith machine or set the safety bars so you can push hard safely."
+            },
+            {
               "gym": "Barbell Incline Bench Press - Medium Grip",
               "home": "Incline Dumbbell Press",
               "role": "primary"
