@@ -135,18 +135,13 @@ export default function IntakeForm() {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      // Blueprint is self-serve: no application, no approval. Straight to
-      // Stripe Checkout; the webhook creates their account after payment.
-      if (data.tier === 'blueprint') {
-        window.location.href = '/api/stripe/checkout-blueprint'
-        return
-      }
       // Submit to the server route, which writes with the service-role key.
       // No studio access is granted here, the client is invited by email once
       // Anthony approves the application.
+      // Blueprint is monthly-only.
       const payload = {
         ...data,
-        billingCycle: data.billingCycle,
+        billingCycle: data.tier === 'blueprint' ? 'monthly' : data.billingCycle,
       }
       const res = await fetch('/api/apply', {
         method: 'POST',

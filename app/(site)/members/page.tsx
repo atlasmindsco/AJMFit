@@ -68,7 +68,9 @@ export default function MembersLogin() {
     if (!forgotEmail) return
     setLoading(true)
     await supabase.auth.resetPasswordForEmail(forgotEmail.trim().toLowerCase(), {
-      redirectTo: `${window.location.origin}/auth/callback?next=/members/reset`,
+      // Bare URL only: a query string fails the Supabase redirect allow-list
+      // (falls back to Site URL). The callback defaults to /members/reset.
+      redirectTo: `${window.location.origin}/auth/callback`,
     })
     setLoading(false)
     // Always show success (don't reveal whether an account exists).

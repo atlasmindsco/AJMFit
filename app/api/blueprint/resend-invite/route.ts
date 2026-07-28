@@ -38,7 +38,9 @@ export async function POST(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
   const origin = new URL(request.url).origin
-  const redirectTo = `${origin}/auth/callback?next=/members/reset`
+  // Bare URL only: a query string fails the Supabase redirect allow-list and
+  // falls back to the Site URL. The callback defaults to /members/reset.
+  const redirectTo = `${origin}/auth/callback`
 
   const { data: user } = await admin
     .from('users')
