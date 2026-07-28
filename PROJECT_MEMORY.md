@@ -64,6 +64,13 @@ Gym, Dumbbells, Calisthenics, Resistance Bands, Kettlebells, Landmine, Full Home
 - `/luffy` — Trainer portal
 
 ## Session Log
+### Jul 28, 2026 - Auth-link outage fixed, ZEROOUT made private, Anthony fully enabled
+- ROOT CAUSE of "site can't be reached" password links: Supabase Site URL was still localhost:3000 AND ?next= query strings failed the redirect allow-list (fallback -> localhost). Fixed in code (bare /auth/callback everywhere) + Shane fixed dashboard (Site URL + wildcard). Verified empirically. Ruth subscribed within hours.
+- ZEROOUT ruling: private code only, entered at Stripe checkout (allow_promotion_codes on); public pricing-card hint REMOVED. All 3 current subs comped (intentional beta, $0 revenue).
+- Restored features accidentally reverted by the emergency-cleanup commit: promo box, apply-form blueprint->checkout redirect, welcome-page resend button.
+- Anthony enabled: repo Write (pushing + auto-deploying fine), live DB keys, .env.example committed for self-audit, invited to Supabase org (must accept email). Newsletter verified sending again (Jul 23 drip delivered); list growing.
+- PENDING: Cal.com migration (other session); Cowork ops doc (pinned, spec in docs/superpowers/specs/); scanner-safe email flow re-land (optional, app/auth/handoff survives untracked).
+
 ### Jun 20, 2026 — Newsletter shipped on Kit (Brains & Gains)
 - Migrated newsletter Beehiiv → **Kit**; connected Kit MCP. Repointed `/api/newsletter` to Kit, deployed to personal Vercel (isolated worktree), verified live signup → active tagged Kit subscriber.
 - Built **content automation pipeline** (tools/): topic miner (513 ISSA seeds), gpt-4o-mini drafter, branded HTML template (banner+mascot), queue/interleaver. Drafted 51 varied drips (~1 yr), reviewed via review.html.
