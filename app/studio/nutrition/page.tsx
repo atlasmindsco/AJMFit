@@ -287,187 +287,180 @@ export default function NutritionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="w-8 h-8 border-2 border-[#1B2D50]/10 border-t-[#1A7BFF] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
       </div>
     )
   }
 
   const weekMax = Math.max(targets.calories * 1.2, ...weekly.map((d) => d.calories))
+  const caloriesRemaining = Math.max(0, targets.calories - totals.calories)
 
   return (
-    <div>
+    <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen pb-8">
       {scanningMealId && (
         <BarcodeScanner
           onDetect={handleBarcodeDetected}
           onClose={() => setScanningMealId(null)}
         />
       )}
-      {/* Top Macro Summary */}
+
+      {/* Header with Remaining Calories */}
       <motion.div
         custom={0}
         variants={fadeIn}
         initial="hidden"
         animate="visible"
-        className="bg-white rounded-xl border border-[#1B2D50]/[0.06] p-6 mb-6"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-8 mb-6 rounded-b-3xl shadow-md"
       >
-        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-          {/* Calorie bar */}
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">Today&apos;s Nutrition</h1>
-              <span className="text-[#1B2D50] text-sm font-body font-semibold">
-                {totals.calories.toLocaleString()} / {targets.calories.toLocaleString()} kcal
-              </span>
-            </div>
-            <div className="w-full h-4 bg-[#E5E7EB] rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${calPct > 100 ? 'bg-[#F76B16]' : 'bg-[#1A7BFF]'}`}
-                style={{ width: `${Math.min(calPct, 100)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-[#64748B] text-xs font-body">{Math.round(calPct)}% of daily goal</span>
-              <span className={`text-xs font-body font-medium ${totals.calories > targets.calories ? 'text-[#F76B16]' : 'text-emerald-500'}`}>
-                {Math.abs(targets.calories - totals.calories)} kcal {totals.calories > targets.calories ? 'over' : 'remaining'}
-              </span>
-            </div>
+        <div className="max-w-7xl mx-auto">
+          <p className="text-blue-100 text-sm font-semibold mb-2">CALORIES REMAINING</p>
+          <div className="flex items-baseline gap-3 mb-4">
+            <span className="font-display font-extrabold text-5xl">{caloriesRemaining}</span>
+            <span className="text-blue-100 text-lg">of {targets.calories} kcal</span>
           </div>
-
-          {/* Macro rings */}
-          <div className="flex items-center justify-around lg:justify-end gap-6 lg:gap-8">
-            {[
-              { label: 'Protein', current: totals.protein, goal: targets.protein, unit: 'g', color: '#1A7BFF' },
-              { label: 'Carbs', current: totals.carbs, goal: targets.carbs, unit: 'g', color: '#F76B16' },
-              { label: 'Fats', current: totals.fats, goal: targets.fats, unit: 'g', color: '#64748B' },
-            ].map((macro) => (
-              <div key={macro.label} className="flex flex-col items-center">
-                <div className="relative">
-                  <MacroRing current={macro.current} goal={macro.goal} color={macro.color} size={80} bgStroke="#E5E7EB" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display font-bold text-[#1B2D50] text-sm">
-                      {Math.round(macro.current)}{macro.unit}
-                    </span>
-                  </div>
-                </div>
-                <span className="font-body font-semibold text-[#1B2D50] text-xs mt-1.5">{macro.label}</span>
-                <span className="text-[#64748B] text-[10px] font-body">
-                  / {macro.goal}{macro.unit}
-                </span>
-              </div>
-            ))}
+          <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-white rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(calPct, 100)}%` }}
+            />
           </div>
+          <p className="text-blue-100 text-xs mt-2">{Math.round(calPct)}% of daily goal</p>
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT: Meal Plan */}
-        <div className="lg:col-span-8 space-y-4">
-          <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-[#1B2D50]/[0.06]">
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06] flex items-center justify-between">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Meal Plan</h2>
-              <span className="text-[#64748B] text-xs font-body">
-                {meals.filter((m) => logsByMeal(m.id).length > 0).length} / {meals.length} logged
-              </span>
+      {/* Macro Summary Cards */}
+      <motion.div
+        custom={1}
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        className="max-w-7xl mx-auto px-6 mb-6 grid grid-cols-3 gap-3"
+      >
+        {[
+          { label: 'Protein', current: totals.protein, goal: targets.protein, unit: 'g', color: 'from-blue-400 to-blue-500', textColor: 'text-blue-600' },
+          { label: 'Carbs', current: totals.carbs, goal: targets.carbs, unit: 'g', color: 'from-orange-400 to-orange-500', textColor: 'text-orange-600' },
+          { label: 'Fats', current: totals.fats, goal: targets.fats, unit: 'g', color: 'from-green-400 to-green-500', textColor: 'text-green-600' },
+        ].map((macro) => (
+          <div key={macro.label} className={`bg-gradient-to-br ${macro.color} rounded-2xl p-4 text-white shadow-md`}>
+            <p className="text-white/80 text-xs font-semibold mb-2">{macro.label}</p>
+            <div className="flex items-baseline gap-1">
+              <span className="font-display font-bold text-2xl">{Math.round(macro.current)}</span>
+              <span className="text-white/70 text-xs">/ {macro.goal}{macro.unit}</span>
             </div>
-            <div className="divide-y divide-[#1B2D50]/[0.04]">
-              {meals.map((meal) => {
-                const mealLogs = logsByMeal(meal.id)
-                const mealCalories = mealLogs.reduce((sum, l) => sum + l.calories, 0)
-                const isLogged = mealLogs.length > 0
-                const isExpanded = expandedMeal === meal.id
-                const isAdding = addingToMeal === meal.id
-                return (
-                  <div key={meal.id}>
-                    <button
-                      onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
-                      className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFBFD] transition-colors duration-200"
+            <div className="w-full h-1.5 bg-white/20 rounded-full mt-2 overflow-hidden">
+              <div
+                className="h-full bg-white rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((macro.current / macro.goal) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </motion.div>
+
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Meals List */}
+        <div className="space-y-3 mb-8">
+          {meals.map((meal) => {
+            const mealLogs = logsByMeal(meal.id)
+            const mealCalories = mealLogs.reduce((sum, l) => sum + l.calories, 0)
+            const mealProtein = mealLogs.reduce((sum, l) => sum + l.protein, 0)
+            const mealCarbs = mealLogs.reduce((sum, l) => sum + l.carbs, 0)
+            const mealFats = mealLogs.reduce((sum, l) => sum + l.fats, 0)
+            const isLogged = mealLogs.length > 0
+            const isExpanded = expandedMeal === meal.id
+            const isAdding = addingToMeal === meal.id
+            return (
+              <motion.div
+                key={meal.id}
+                custom={2}
+                variants={fadeIn}
+                initial="hidden"
+                animate="visible"
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+              >
+                <button
+                  onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
+                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 font-display font-bold text-lg ${
+                      meal.name === 'Breakfast' ? 'bg-yellow-100 text-yellow-600' :
+                      meal.name === 'Lunch' ? 'bg-green-100 text-green-600' :
+                      meal.name === 'Dinner' ? 'bg-orange-100 text-orange-600' :
+                      'bg-purple-100 text-purple-600'
+                    }`}>
+                      {meal.name.charAt(0)}
+                    </div>
+                    <div className="text-left min-w-0">
+                      <p className="font-body font-semibold text-gray-800 text-sm">{meal.name}</p>
+                      <p className="text-gray-500 text-xs font-body">{mealLogs.length} items • {mealCalories} kcal</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden border-t border-gray-200"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isLogged ? 'bg-emerald-500/10' : 'bg-[#1B2D50]/[0.04]'}`}>
-                          {isLogged ? (
-                            <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
-                          ) : (
-                            <svg className="w-4 h-4 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <p className="font-body font-semibold text-[#1B2D50] text-sm">{meal.name}</p>
-                          <p className="text-[#64748B] text-xs font-body">{formatTime(meal.scheduled_time)}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[#1B2D50] text-sm font-display font-bold">{mealCalories} kcal</span>
-                        <svg className={`w-4 h-4 text-[#64748B] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                        </svg>
-                      </div>
-                    </button>
-
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-5 pb-4">
-                            {mealLogs.length > 0 ? (
-                              <div className="bg-[#FAFBFD] rounded-lg border border-[#1B2D50]/[0.04] overflow-hidden">
-                                <table className="w-full text-xs font-body">
-                                  <thead>
-                                    <tr className="text-[#64748B] uppercase tracking-wide">
-                                      <th className="text-left px-3 py-2 font-semibold">Food</th>
-                                      <th className="text-right px-3 py-2 font-semibold">Cal</th>
-                                      <th className="text-right px-3 py-2 font-semibold hidden sm:table-cell">P</th>
-                                      <th className="text-right px-3 py-2 font-semibold hidden sm:table-cell">C</th>
-                                      <th className="text-right px-3 py-2 font-semibold hidden sm:table-cell">F</th>
-                                      <th className="w-8" />
-                                    </tr>
-                                  </thead>
-                                  <tbody className="divide-y divide-[#1B2D50]/[0.04]">
-                                    {mealLogs.map((item) => (
-                                      <tr key={item.id} className="group">
-                                        <td className="px-3 py-2 text-[#1B2D50] font-medium">
-                                          {item.food_name}
-                                          {item.serving_size && (
-                                            <span className="text-[#64748B] text-[11px] ml-1">({item.serving_size})</span>
-                                          )}
-                                        </td>
-                                        <td className="px-3 py-2 text-right text-[#1B2D50]">{item.calories}</td>
-                                        <td className="px-3 py-2 text-right text-[#1A7BFF] hidden sm:table-cell">{item.protein}g</td>
-                                        <td className="px-3 py-2 text-right text-[#F76B16] hidden sm:table-cell">{item.carbs}g</td>
-                                        <td className="px-3 py-2 text-right text-[#64748B] hidden sm:table-cell">{item.fats}g</td>
-                                        <td className="px-2 py-2 text-right">
-                                          <button
-                                            onClick={() => handleDeleteFood(item.id)}
-                                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity duration-150"
-                                            aria-label="Delete food"
-                                          >
-                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
+                      <div className="px-5 py-4">
+                        {mealLogs.length > 0 ? (
+                          <div className="space-y-2 mb-4">
+                            {mealLogs.map((item) => (
+                              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors">
+                                <div className="flex-1">
+                                  <p className="font-body font-semibold text-gray-800 text-sm">{item.food_name}</p>
+                                  {item.serving_size && (
+                                    <p className="text-gray-500 text-xs">{item.serving_size}</p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-4 ml-4">
+                                  <div className="text-right">
+                                    <p className="font-display font-bold text-gray-800 text-sm">{item.calories}</p>
+                                    <p className="text-gray-500 text-xs">cal</p>
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteFood(item.id)}
+                                    className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1"
+                                    aria-label="Delete food"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
                               </div>
-                            ) : (
-                              <p className="text-[#64748B] text-xs font-body italic py-2">No food logged yet.</p>
-                            )}
+                            ))}
+                            {/* Meal Totals */}
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <div className="flex justify-between text-sm">
+                                <span className="font-semibold text-gray-800">Totals</span>
+                                <div className="flex gap-4 text-xs">
+                                  <span className="text-blue-600 font-semibold">P: {Math.round(mealProtein)}g</span>
+                                  <span className="text-orange-600 font-semibold">C: {Math.round(mealCarbs)}g</span>
+                                  <span className="text-green-600 font-semibold">F: {Math.round(mealFats)}g</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm font-body italic py-2">No food logged yet.</p>
+                        )}
 
-                            {/* Add food form */}
-                            {isAdding ? (
-                              <div className="mt-3 bg-[#FAFBFD] rounded-lg border border-[#1A7BFF]/20 p-3">
-                                {analysisSource && (
-                                  <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-2">
+                        {/* Add food form */}
+                        {isAdding ? (
+                          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            {analysisSource && (
+                              <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-2">
                                     <div className="flex items-center gap-2 text-[10px] font-display font-bold uppercase tracking-wide text-emerald-700">
                                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -733,59 +726,92 @@ export default function NutritionPage() {
           </motion.div>
         </div>
 
-        {/* RIGHT: Hydration + Tip */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* Hydration */}
-          <motion.div custom={3} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-[#1B2D50]/[0.06]">
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Hydration</h2>
+        {/* Weekly Trend */}
+        <motion.div
+          custom={3}
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-8"
+        >
+          <h2 className="font-display font-bold text-lg text-gray-800 mb-6">This Week</h2>
+          <div className="flex items-end justify-between gap-2 h-40">
+            {weekly.map((day) => {
+              const heightPct = day.calories > 0 ? (day.calories / weekMax) * 100 : 0
+              const onTarget = Math.abs(day.calories - targets.calories) < targets.calories * 0.15
+              const dateObj = new Date(day.date + 'T00:00:00')
+              const label = dateObj.toLocaleDateString('en-US', { weekday: 'short' })
+              return (
+                <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
+                  <span className="text-xs font-display font-bold text-gray-600 h-5">
+                    {day.calories > 0 ? day.calories.toLocaleString() : '--'}
+                  </span>
+                  <div className="w-full rounded-lg overflow-hidden bg-gray-100 flex-1 flex items-end" style={{ minHeight: '120px' }}>
+                    <div
+                      className={`w-full rounded-lg transition-all ${
+                        day.calories === 0 ? 'bg-gray-200' : onTarget ? 'bg-blue-500' : 'bg-orange-500'
+                      }`}
+                      style={{ height: `${Math.max(heightPct, 4)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-body text-gray-500 h-4">{label}</span>
+                </div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* Hydration Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <motion.div
+            custom={4}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+          >
+            <h3 className="font-display font-bold text-lg text-gray-800 mb-4">💧 Hydration</h3>
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="font-display font-extrabold text-4xl text-blue-500">{waterOz}</span>
+              <span className="text-gray-600 text-lg">/ {WATER_GOAL_OZ} oz</span>
             </div>
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => adjustWater(-8)}
-                    className="w-8 h-8 rounded-full bg-[#FAFBFD] border border-[#1B2D50]/10 text-[#1B2D50] font-display font-bold text-lg hover:bg-[#1A7BFF]/5 hover:border-[#1A7BFF]/30 transition-colors duration-200"
-                    aria-label="Subtract 8 oz"
-                  >
-                    −
-                  </button>
-                  <button
-                    onClick={() => adjustWater(8)}
-                    className="w-8 h-8 rounded-full bg-[#1A7BFF] text-white font-display font-bold text-lg hover:bg-[#0F5FE0] transition-colors duration-200"
-                    aria-label="Add 8 oz"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-right">
-                  <span className="font-display font-extrabold text-2xl text-[#1A7BFF]">{waterOz}</span>
-                  <span className="text-[#64748B] text-sm font-body"> / {WATER_GOAL_OZ} oz</span>
-                </div>
-              </div>
-              <div className="w-full h-3 bg-[#E5E7EB] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#1A7BFF] rounded-full transition-all duration-300"
-                  style={{ width: `${waterPct}%` }}
-                />
-              </div>
-              <p className="text-[#64748B] text-[10px] font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
+            <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden mb-4">
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                style={{ width: `${waterPct}%` }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => adjustWater(-8)}
+                className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                aria-label="Remove 8 oz"
+              >
+                − 8 oz
+              </button>
+              <button
+                onClick={() => adjustWater(8)}
+                className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                aria-label="Add 8 oz"
+              >
+                + 8 oz
+              </button>
             </div>
           </motion.div>
 
-          {/* Coach Nutrition Tip (placeholder for future coach-authored tips) */}
-          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-[#1B2D50]/[0.06]">
-            <div className="px-5 py-4 border-b border-[#1B2D50]/[0.06]">
-              <h2 className="font-display font-bold text-sm text-[#1B2D50]">Nutrition Tip</h2>
-            </div>
-            <div className="p-5">
-              <div className="p-3 rounded-lg bg-[#F76B16]/[0.04] border border-[#F76B16]/10">
-                <p className="text-[#1B2D50] text-sm font-body leading-relaxed">
-                  &ldquo;Try to get 30-40g of protein within 30 minutes post-workout. Your shake + a banana is a solid combo.&rdquo;
-                </p>
-                <p className="text-[#64748B] text-xs font-body mt-2">, Anthony</p>
-              </div>
-            </div>
+          {/* Coach Tip */}
+          <motion.div
+            custom={5}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 shadow-sm p-6"
+          >
+            <h3 className="font-display font-bold text-lg text-gray-800 mb-3">💡 Nutrition Tip</h3>
+            <p className="text-gray-700 text-sm font-body leading-relaxed mb-2">
+              &ldquo;Try to get 30-40g of protein within 30 minutes post-workout. Your shake + a banana is a solid combo.&rdquo;
+            </p>
+            <p className="text-gray-600 text-xs font-body">— Anthony</p>
           </motion.div>
         </div>
       </div>
