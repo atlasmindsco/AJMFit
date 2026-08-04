@@ -145,9 +145,9 @@ export async function POST(request: Request) {
   }
 
   // 4. Blueprint is self-guided (no coaching), so it skips the manual approval
-  //    queue: auto-accept the application and send the "set your password"
-  //    invite immediately, so the client goes straight into the app. Coaching
-  //    tiers still wait for the trainer to approve them in the dashboard.
+  //    queue: auto-accept the application and create an instant login with a
+  //    temporary password. No expiring email links — they can log in immediately.
+  //    Coaching tiers still wait for the trainer to approve them in the dashboard.
   //    Best-effort — a hiccup here must never fail the applicant's submission.
   if (data.tier === 'blueprint') {
     try {
@@ -157,13 +157,61 @@ export async function POST(request: Request) {
         .eq('user_id', userId)
         .eq('status', 'pending')
 
-      // Only send the set-password invite if they don't already have a login.
+      // Only create auth account if they don't already have one
       const { data: u } = await db.from('users').select('auth_id').eq('id', userId).maybeSingle()
       if (!u?.auth_id) {
-        const origin = new URL(request.url).origin
-        await db.auth.admin.inviteUserByEmail(email, {
-          redirectTo: `${origin}/auth/callback`,
+        // Generate a temporary password
+        const tempPassword = `AJM${Math.random().toString(36).substring(2, 11).toUpperCase()}`
+
+        // Create auth account and confirm email immediately (no recovery link needed)
+        const { data: authUser, error: authErr } = await db.auth.admin.createUser({
+          email,
+          password: tempPassword,
+          email_confirm: true, // Confirm email immediately
         })
+
+        if (!authErr && authUser?.id) {
+          // Link the auth account to the user
+          await db.from('users').update({ auth_id: authUser.id }).eq('id', userId)
+
+          // Send them their login credentials (no expiring link)
+          await sendMail({
+            to: email,
+            subject: 'Welcome to AJM Fit – Access Your Studio',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(to right, #3b82f6, #2563eb); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                  <h1 style="margin: 0; font-size: 24px;">Welcome to AJM Fit</h1>
+                </div>
+                <div style="background: white; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb;">
+                  <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                    Hi ${data.name},
+                  </p>
+                  <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                    Your application is approved! You can now access The Blueprint and start training immediately.
+                  </p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="color: #666; font-size: 14px; margin: 0 0 10px;"><strong>Your Login Credentials:</strong></p>
+                    <p style="color: #333; font-size: 14px; margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+                    <p style="color: #333; font-size: 14px; margin: 5px 0;"><strong>Password:</strong> <code style="background: white; padding: 4px 8px; border-radius: 4px;">${tempPassword}</code></p>
+                  </div>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://ajmfit.com/members" style="background: #3b82f6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                      Log In Now
+                    </a>
+                  </div>
+                  <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 20px 0 0;">
+                    <strong>Pro tip:</strong> Change your password to something personal in your account settings after you log in.
+                  </p>
+                </div>
+                <div style="text-align: center; color: #999; font-size: 12px; padding: 20px; border-top: 1px solid #e5e7eb;">
+                  <p>© 2026 AJM Fit. All rights reserved.</p>
+                </div>
+              </div>
+            `,
+            text: `Welcome to AJM Fit!\n\nYour application is approved! Log in with:\nEmail: ${email}\nPassword: ${tempPassword}\n\nChange your password after logging in.`,
+          })
+        }
       }
     } catch (e) {
       console.error('[apply] blueprint auto-approve failed', e)

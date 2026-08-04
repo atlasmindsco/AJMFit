@@ -47,68 +47,63 @@ export async function POST(request: Request) {
 
   const origin = new URL(request.url).origin
 
-  // Already has an auth account: a second invite is impossible, but the
-  // trainer's intent is "get them a working set-password link", so send the
-  // branded password-recovery email instead of silently no-oping. This makes
-  // "Resend invite" work for lost/expired invite links.
-  const sendRecovery = async (): Promise<boolean> => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/recover`, {
-      method: 'POST',
-      headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: target.email,
-        options: { redirect_to: `${origin}/auth/callback` },
-      }),
-    })
-    return res.ok
-  }
-
-  // On approval, also send the branded welcome/next-steps email (with the
-  // onboarding form + call booking links). Best-effort: the invite is the
-  // critical path.
-  const sendApprovalEmail = async () => {
-    if (!isApproval) return
+  // Send approval email with login credentials (no expiring links)
+  const sendApprovalEmail = async (tempPassword?: string): Promise<boolean> => {
     try {
       const firstName = String(target.name || '').trim().split(/\s+/)[0]
       await sendMail({
         to: target.email,
         replyTo: 'anthony@ajmfit.com',
         subject: "You're approved! Here's how to get started",
-        html: approvalEmailHTML({ firstName }),
+        html: approvalEmailHTML({ firstName, tempPassword, email: target.email }),
       })
+      return true
     } catch (e) {
       console.error('[invite] approval email failed', e)
+      return false
     }
   }
 
+  // If they already have an auth account, just send the approval email
   if (target.auth_id) {
-    const sent = await sendRecovery()
-    if (sent) await sendApprovalEmail()
+    const sent = await sendApprovalEmail()
     return sent
       ? NextResponse.json({ ok: true, resent: true })
-      : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
+      : NextResponse.json({ error: 'Could not send approval email. Try again.' }, { status: 502 })
   }
 
-  const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
-    target.email,
-    { redirectTo: `${origin}/auth/callback` }
-  )
+  // Create new auth account with temporary password (no expiring invite links)
+  try {
+    const tempPassword = `AJM${Math.random().toString(36).substring(2, 11).toUpperCase()}`
 
-  if (inviteErr) {
-    // Auth user exists but the users row wasn't linked yet, fall back to recovery.
-    if (/already/i.test(inviteErr.message)) {
-      const sent = await sendRecovery()
-      if (sent) await sendApprovalEmail()
-      return sent
-        ? NextResponse.json({ ok: true, resent: true })
-        : NextResponse.json({ error: 'Could not send the reset link. Try again.' }, { status: 502 })
+    const { data: authUser, error: authErr } = await admin.auth.admin.createUser({
+      email: target.email,
+      password: tempPassword,
+      email_confirm: true, // Confirm email immediately
+    })
+
+    if (authErr) {
+      // Auth user exists but wasn't linked yet - just send approval with login reminder
+      if (/already/i.test(authErr.message)) {
+        const sent = await sendApprovalEmail()
+        return sent
+          ? NextResponse.json({ ok: true, resent: true })
+          : NextResponse.json({ error: 'Could not send approval email. Try again.' }, { status: 502 })
+      }
+      return NextResponse.json({ error: authErr.message }, { status: 500 })
     }
-    return NextResponse.json({ error: inviteErr.message }, { status: 500 })
-  }
 
-  await sendApprovalEmail()
-  return NextResponse.json({ ok: true })
+    if (authUser?.id) {
+      // Link the auth account to the user
+      await admin.from('users').update({ auth_id: authUser.id }).eq('id', userId)
+
+      // Send approval email with credentials
+      await sendApprovalEmail(tempPassword)
+    }
+
+    return NextResponse.json({ ok: true })
+  } catch (e) {
+    console.error('[invite] create auth failed', e)
+    return NextResponse.json({ error: 'Could not create account. Try again.' }, { status: 500 })
+  }
 }

@@ -77,9 +77,10 @@ export function buildEventICS(opts: {
  * and book the onboarding call. Links point at the studio so they survive
  * scheduler changes (Calendly -> Cal.com).
  */
-export function approvalEmailHTML(opts: { firstName: string }): string {
+export function approvalEmailHTML(opts: { firstName: string; tempPassword?: string; email?: string }): string {
   const step = (n: number, text: string) =>
     `<p style="margin:0 0 10px;color:#475569;font-size:14px;line-height:1.6;"><strong>${n}.</strong> ${text}</p>`
+  const hasCredentials = opts.tempPassword && opts.email
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f1420;padding:32px 0;font-family:Arial,Helvetica,sans-serif;">
   <tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;">
@@ -91,12 +92,20 @@ export function approvalEmailHTML(opts: { firstName: string }): string {
         <p style="margin:0 0 4px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">Application approved</p>
         <h1 style="margin:0 0 12px;color:#1B2D50;font-size:24px;font-weight:800;">Welcome to AJM Fit${opts.firstName ? ', ' + opts.firstName : ''}</h1>
         <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">Coach Anthony reviewed your application and you're in. Here's how to get started, in order:</p>
+        ${hasCredentials ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#E8F5E9;border-left:4px solid #22C55E;border-radius:6px;margin:0 0 24px;">
+          <tr><td style="padding:18px 20px;">
+            <p style="margin:0 0 12px;color:#1B2D50;font-size:14px;font-weight:bold;">Your Login Credentials</p>
+            <p style="margin:0 0 8px;color:#475569;font-size:14px;"><strong>Email:</strong> ${opts.email}</p>
+            <p style="margin:0;color:#475569;font-size:14px;"><strong>Password:</strong> <code style="background:white;padding:4px 8px;border-radius:4px;font-family:monospace;">${opts.tempPassword}</code></p>
+            <p style="margin:8px 0 0;color:#666;font-size:12px;">Change your password after logging in for security.</p>
+          </td></tr>
+        </table>` : ''}
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F6F9;border-left:4px solid #F76B16;border-radius:6px;margin:0 0 24px;">
           <tr><td style="padding:18px 20px;">
-            ${step(1, 'Check your inbox for a separate AJM Fit email called <strong>"set up your account"</strong> and use it to create your password.')}
-            ${step(2, 'Sign in at <a href="https://ajmfit.com/members" style="color:#1A7BFF;">ajmfit.com/members</a> and start your <strong>7-day free trial</strong> (no charge today).')}
-            ${step(3, 'Fill out your <strong>onboarding form</strong> so Anthony can build your plan around you. It takes about 3 minutes.')}
-            ${step(4, '<strong>Book your onboarding call</strong>, your first 1-on-1 with Coach Anthony.')}
+            ${hasCredentials ? step(1, 'Sign in at <a href="https://ajmfit.com/members" style="color:#1A7BFF;">ajmfit.com/members</a> with your email and password above.') : step(1, 'Check your inbox for a separate AJM Fit email called <strong>"set up your account"</strong> and use it to create your password.')}
+            ${step(hasCredentials ? 2 : 2, 'Start your <strong>7-day free trial</strong> (no charge today).')}
+            ${step(hasCredentials ? 3 : 3, 'Fill out your <strong>onboarding form</strong> so Anthony can build your plan around you. It takes about 3 minutes.')}
+            ${step(hasCredentials ? 4 : 4, '<strong>Book your onboarding call</strong>, your first 1-on-1 with Coach Anthony.')}
           </td></tr>
         </table>
       </td></tr>
