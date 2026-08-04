@@ -2,25 +2,54 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 /**
- * Global catcher for Supabase auth-error redirects.
+ * Global handler for Supabase auth redirects that arrive in the URL HASH,
+ * which server code can never see. Two cases:
  *
- * When an invite/reset link is expired or already used, GoTrue redirects the
- * browser to the Site URL (or the callback) with the error in the URL HASH,
- * e.g. `#error=access_denied&error_code=otp_expired&...`. Server code never
- * sees fragments, so without this the user just lands on the homepage with no
- * explanation (exactly what confused real users). This runs on every page,
- * spots that hash, and forwards to the members screen which explains it and
- * offers a fresh link.
+ * 1. IMPLICIT-FLOW TOKENS (#access_token=...&type=recovery|invite): links in
+ *    server-sent emails (admin invites, REST /recover resends) use the
+ *    implicit flow, not PKCE, so /auth/callback finds no ?code and wrongly
+ *    reports "expired" while a perfectly good token rides along in the hash.
+ *    We consume it here (setSession) and forward to the set-password page.
+ *    This was the root cause of "fresh link says expired".
+ *
+ * 2. ERROR HASHES (#error=...&error_code=otp_expired): genuinely dead links
+ *    bounce to the Site URL with the error in the hash; forward to the
+ *    members screen which explains and offers a fresh link.
  */
 export default function AuthErrorCatcher() {
   const router = useRouter()
   useEffect(() => {
     const hash = window.location.hash
-    if (!hash) return
+    if (!hash || hash.length < 2) return
+    const params = new URLSearchParams(hash.slice(1))
+
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+    if (accessToken && refreshToken) {
+      const type = params.get('type') // recovery | invite | signup | magiclink
+      const supabase = createClient()
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ error }) => {
+          window.history.replaceState(null, '', window.location.pathname)
+          if (error) {
+            router.replace('/members?error=link_expired')
+            return
+          }
+          const dest =
+            type === 'recovery' || type === 'invite' || type === 'signup'
+              ? '/members/reset'
+              : '/studio'
+          router.replace(dest)
+          router.refresh()
+        })
+      return
+    }
+
     if (/error_code=otp_expired|error=access_denied/.test(hash)) {
-      // Clear the hash so back-navigation doesn't loop.
       window.history.replaceState(null, '', window.location.pathname)
       router.replace('/members?error=link_expired')
     }
