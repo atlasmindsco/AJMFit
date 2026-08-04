@@ -1860,6 +1860,15 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         transition={{ type: 'spring', stiffness: 320, damping: 15 }}
         className="relative text-center px-9 py-7 rounded-2xl bg-[#1C1C1C] border-2 border-[#F59E0B]/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
       >
+        <button
+          onClick={onDone}
+          className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.92] transition-all duration-200 flex items-center justify-center text-white/60 hover:text-white/90 pointer-events-auto"
+          aria-label="Close"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         <motion.div
           className="text-5xl mb-1"
           animate={{ rotate: [0, -12, 12, -8, 0], scale: [1, 1.15, 1] }}
