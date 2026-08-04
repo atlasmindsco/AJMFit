@@ -110,7 +110,8 @@ export async function POST(request: Request) {
         if (pwErr) {
           return NextResponse.json({ error: 'Could not reset their access. Try again.' }, { status: 502 })
         }
-        await admin.from('users').update({ auth_id: existing.id }).eq('id', userId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (admin as any).from('users').update({ auth_id: existing.id }).eq('id', userId)
         const sent = await sendApprovalEmail(tempPassword)
         return sent
           ? NextResponse.json({ ok: true, resent: true })
@@ -121,7 +122,8 @@ export async function POST(request: Request) {
 
     if (authUser?.user?.id) {
       // Link the auth account to the user
-      await admin.from('users').update({ auth_id: authUser.user.id }).eq('id', userId)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any).from('users').update({ auth_id: authUser.user.id }).eq('id', userId)
 
       // Send approval email with credentials
       await sendApprovalEmail(tempPassword)
