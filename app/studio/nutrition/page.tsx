@@ -15,6 +15,7 @@ const BarcodeScanner = dynamic(() => import('@/components/studio/BarcodeScanner'
 
 import {
   fetchTargets,
+  fetchNutritionSetup,
   fetchMeals,
   fetchTodaysLogs,
   fetchDailyLog,
@@ -29,6 +30,7 @@ import {
   type FoodLogRow,
   type DailyCalories,
 } from '@/lib/nutrition'
+import { useRouter } from 'next/navigation'
 
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100
@@ -43,6 +45,7 @@ function formatTime(time: string | null) {
 }
 
 export default function NutritionPage() {
+  const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS)
@@ -64,6 +67,13 @@ export default function NutritionPage() {
         return
       }
       try {
+        // Check if nutrition setup is complete
+        const setup = await fetchNutritionSetup(id)
+        if (!setup.nutrition_goal_setup_complete) {
+          router.push('/studio/setup-nutrition')
+          return
+        }
+
         const [t, m, l, dl, w] = await Promise.all([
           fetchTargets(id),
           ensureDefaultMeals(id),
@@ -82,7 +92,7 @@ export default function NutritionPage() {
         setLoading(false)
       }
     })()
-  }, [])
+  }, [router])
 
   const totals = sumTotals(logs)
   const calPct = (totals.calories / targets.calories) * 100

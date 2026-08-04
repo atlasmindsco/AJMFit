@@ -49,19 +49,46 @@ const DEFAULT_MEALS: Array<{ name: string; time: string; order: number }> = [
   { name: 'Dinner', time: '19:00:00', order: 5 },
 ]
 
+export interface NutritionSetupData {
+  nutrition_goal_setup_complete: boolean
+  current_weight: number | null
+  goal_weight: number | null
+  height: number | null
+  age: number | null
+  sex: string | null
+  activity_level: string | null
+  nutrition_goal: string | null
+  custom_cal_target: number | null
+  custom_protein_target: number | null
+  custom_carb_target: number | null
+  custom_fat_target: number | null
+}
+
 export async function fetchTargets(userId: string): Promise<MacroTargets> {
   const { data, error } = await db
     .from('users')
-    .select('daily_cal_target, protein_target, carb_target, fat_target')
+    .select('daily_cal_target, protein_target, carb_target, fat_target, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
     .eq('id', userId)
     .single()
   if (error || !data) throw error ?? new Error('Failed to load targets')
+
+  // Use custom overrides if set, otherwise use calculated values
   return {
-    calories: data.daily_cal_target,
-    protein: data.protein_target,
-    carbs: data.carb_target,
-    fats: data.fat_target,
+    calories: data.custom_cal_target ?? data.daily_cal_target,
+    protein: data.custom_protein_target ?? data.protein_target,
+    carbs: data.custom_carb_target ?? data.carb_target,
+    fats: data.custom_fat_target ?? data.fat_target,
   }
+}
+
+export async function fetchNutritionSetup(userId: string): Promise<NutritionSetupData> {
+  const { data, error } = await db
+    .from('users')
+    .select('nutrition_goal_setup_complete, current_weight, goal_weight, height, age, sex, activity_level, nutrition_goal, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
+    .eq('id', userId)
+    .single()
+  if (error || !data) throw error ?? new Error('Failed to load nutrition setup')
+  return data as NutritionSetupData
 }
 
 export async function updateTargets(userId: string, targets: MacroTargets) {
