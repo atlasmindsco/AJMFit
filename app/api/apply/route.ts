@@ -170,9 +170,9 @@ export async function POST(request: Request) {
           email_confirm: true, // Confirm email immediately
         })
 
-        if (!authErr && authUser?.id) {
+        if (!authErr && authUser?.user?.id) {
           // Link the auth account to the user
-          await db.from('users').update({ auth_id: authUser.id }).eq('id', userId)
+          await db.from('users').update({ auth_id: authUser.user.id }).eq('id', userId)
 
           // Send them their login credentials (no expiring link)
           await sendMail({

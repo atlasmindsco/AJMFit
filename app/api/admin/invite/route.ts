@@ -64,9 +64,19 @@ export async function POST(request: Request) {
     }
   }
 
-  // If they already have an auth account, just send the approval email
+  // Existing auth account (this is the "Resend invite" path): an email with
+  // no credentials would leave them just as locked out, so set a FRESH
+  // temporary password and include it. Their old password stops working,
+  // which is exactly what someone who lost access needs.
   if (target.auth_id) {
-    const sent = await sendApprovalEmail()
+    const tempPassword = `AJM${Math.random().toString(36).substring(2, 11).toUpperCase()}`
+    const { error: pwErr } = await admin.auth.admin.updateUserById(target.auth_id, {
+      password: tempPassword,
+    })
+    if (pwErr) {
+      return NextResponse.json({ error: 'Could not reset their access. Try again.' }, { status: 502 })
+    }
+    const sent = await sendApprovalEmail(tempPassword)
     return sent
       ? NextResponse.json({ ok: true, resent: true })
       : NextResponse.json({ error: 'Could not send approval email. Try again.' }, { status: 502 })
@@ -83,9 +93,25 @@ export async function POST(request: Request) {
     })
 
     if (authErr) {
-      // Auth user exists but wasn't linked yet - just send approval with login reminder
+      // Auth user exists but wasn't linked yet: find them by email, set a
+      // fresh temp password, link, and send credentials (an email without a
+      // password would leave them locked out).
       if (/already/i.test(authErr.message)) {
-        const sent = await sendApprovalEmail()
+        const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        const existing = list?.users?.find(
+          (u: { email?: string }) => u.email?.toLowerCase() === target.email.toLowerCase()
+        )
+        if (!existing) {
+          return NextResponse.json({ error: 'Account exists but could not be found. Try again.' }, { status: 500 })
+        }
+        const { error: pwErr } = await admin.auth.admin.updateUserById(existing.id, {
+          password: tempPassword,
+        })
+        if (pwErr) {
+          return NextResponse.json({ error: 'Could not reset their access. Try again.' }, { status: 502 })
+        }
+        await admin.from('users').update({ auth_id: existing.id }).eq('id', userId)
+        const sent = await sendApprovalEmail(tempPassword)
         return sent
           ? NextResponse.json({ ok: true, resent: true })
           : NextResponse.json({ error: 'Could not send approval email. Try again.' }, { status: 502 })
@@ -93,9 +119,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: authErr.message }, { status: 500 })
     }
 
-    if (authUser?.id) {
+    if (authUser?.user?.id) {
       // Link the auth account to the user
-      await admin.from('users').update({ auth_id: authUser.id }).eq('id', userId)
+      await admin.from('users').update({ auth_id: authUser.user.id }).eq('id', userId)
 
       // Send approval email with credentials
       await sendApprovalEmail(tempPassword)
