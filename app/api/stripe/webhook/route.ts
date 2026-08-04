@@ -143,7 +143,7 @@ export async function POST(request: Request) {
                   try {
                     const origin = new URL(request.url).origin
                     await db.auth.admin.inviteUserByEmail(email, {
-                      redirectTo: `${origin}/auth/callback?next=/members/reset`,
+                      redirectTo: `${origin}/auth/callback`,
                     })
                   } catch (e) {
                     console.error('[stripe webhook] blueprint invite failed', e)

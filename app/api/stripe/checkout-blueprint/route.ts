@@ -26,7 +26,8 @@ export async function GET(request: Request) {
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: [{ price: price.id, quantity: 1 }],
-    // Lets customers enter a promo code (e.g. ZEROOUT for free access) at checkout.
+    // Shows the "Add promotion code" box at checkout. Codes are distributed
+    // privately by the coach; nothing on the site advertises them.
     allow_promotion_codes: true,
     subscription_data: {
       trial_period_days: 7,

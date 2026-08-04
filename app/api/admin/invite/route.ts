@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         email: target.email,
-        options: { redirect_to: `${origin}/auth/callback?next=/members/reset` },
+        options: { redirect_to: `${origin}/auth/callback` },
       }),
     })
     return res.ok
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
   const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
     target.email,
-    { redirectTo: `${origin}/auth/callback?next=/members/reset` }
+    { redirectTo: `${origin}/auth/callback` }
   )
 
   if (inviteErr) {
