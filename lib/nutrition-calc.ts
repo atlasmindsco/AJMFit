@@ -123,3 +123,41 @@ export function formatNutrition(value: number | undefined, decimals = 1): string
   if (value === undefined) return '—'
   return Number(value).toFixed(decimals)
 }
+
+/**
+ * Convert RecognizedFood (from API) to FoodNutrition for serving selector
+ * RecognizedFood comes with servingSize as text (e.g., "100g", "1 cup")
+ */
+export function recognizedFoodToFoodNutrition(
+  recognized: any,
+  barcode?: string,
+  brand?: string
+): FoodNutrition {
+  // Parse serving size string to extract grams
+  let baseWeight = 100 // default
+  const servingMatch = recognized.servingSize?.match(/(\d+(?:\.\d+)?)\s*g/)
+  if (servingMatch) {
+    baseWeight = parseFloat(servingMatch[1])
+  }
+
+  // Suggest units based on food type
+  const availableUnits = getSuggestedUnits(recognized.foodName)
+
+  return {
+    id: barcode,
+    name: recognized.foodName,
+    brand,
+    barcode,
+    baseWeight,
+    baseNutrition: {
+      calories: recognized.calories,
+      protein: recognized.protein,
+      carbs: recognized.carbs,
+      fats: recognized.fats,
+      fiber: recognized.fiber,
+      sugar: recognized.sugar,
+      sodium: recognized.sodium,
+    },
+    availableUnits,
+  }
+}
