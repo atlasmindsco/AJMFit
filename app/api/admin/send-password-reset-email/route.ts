@@ -20,10 +20,13 @@ export async function POST(request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any
 
-    // Generate a password reset link
+    // Generate a password reset link that redirects to password reset page (not apply form)
     const { data, error } = await admin.auth.admin.generateLink({
       type: 'recovery',
       email,
+      options: {
+        redirectTo: `https://ajmfit.com/members/reset`,
+      },
     })
 
     if (error) {
@@ -35,6 +38,11 @@ export async function POST(request: Request) {
     if (!resetLink) {
       return NextResponse.json({ error: 'Failed to generate reset link' }, { status: 500 })
     }
+
+    // Supabase sends verification links to /auth/v1/verify, but we need to redirect through our app
+    // The link format: https://xsmxenpynyusmiihtuex.supabase.co/auth/v1/verify?token=...&type=recovery&redirect_to=https://ajmfit.com/...
+    // We want: https://ajmfit.com/auth/callback?code=...
+    // So we'll send the direct Supabase link which they can click
 
     // Send email with the reset link
     await sendMail({
@@ -53,16 +61,16 @@ export async function POST(request: Request) {
               Click the button below to set your password and start your training journey:
             </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}" style="background: #3b82f6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+              <a href="${resetLink}" style="background: #3b82f6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
                 Set Your Password
               </a>
             </div>
             <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 30px 0 0;">
-              Or copy this link: <br/>
-              <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; word-break: break-all;">${resetLink}</code>
+              Or copy and paste this link in your browser: <br/>
+              <code style="background: #f3f4f6; padding: 8px; border-radius: 4px; word-break: break-all; display: block; margin-top: 8px; font-size: 12px;">${resetLink}</code>
             </p>
             <p style="color: #666; font-size: 12px; line-height: 1.6; margin: 20px 0 0;">
-              This link expires in 24 hours.
+              This link expires in 24 hours. If you didn't request this email, you can ignore it.
             </p>
           </div>
           <div style="text-align: center; color: #999; font-size: 12px; padding: 20px; border-top: 1px solid #e5e7eb;">
