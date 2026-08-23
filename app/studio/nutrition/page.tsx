@@ -73,24 +73,25 @@ export default function NutritionPage() {
         return
       }
       try {
-        // Check URL params first (passed from setup page)
-        let urlDebug = 'No URL params found'
+        // Check localStorage FIRST for saved nutrition goals
         if (typeof window !== 'undefined') {
-          const params = new URLSearchParams(window.location.search)
-          urlDebug = `URL: ${window.location.search} | Calories param: ${params.get('calories')}`
-          const urlCalories = params.get('calories')
-          if (urlCalories) {
-            const urlTargets = {
-              calories: parseInt(urlCalories),
-              protein: parseInt(params.get('protein') || '150'),
-              carbs: parseInt(params.get('carbs') || '250'),
-              fats: parseInt(params.get('fats') || '70'),
+          const stored = localStorage.getItem('ajmfit_nutrition_goals')
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored)
+              const savedTargets = {
+                calories: parsed.calories || 2000,
+                protein: parsed.protein || 150,
+                carbs: parsed.carbs || 250,
+                fats: parsed.fats || 70,
+              }
+              setDebugInfo(`✓ Loaded from storage: ${savedTargets.calories} cal`)
+              setTargets(savedTargets)
+            } catch (e) {
+              setDebugInfo('Error reading storage')
             }
-            console.log('[nutrition] Loaded from URL params:', urlTargets)
-            setDebugInfo(`✓ Got values from URL: ${urlTargets.calories}cal`)
-            setTargets(urlTargets)
           } else {
-            setDebugInfo('✗ ' + urlDebug)
+            setDebugInfo('No saved nutrition goals in storage')
           }
         }
 
@@ -102,32 +103,20 @@ export default function NutritionPage() {
           fetchWeeklyCalories(id),
         ])
 
-        // Use URL params if available, otherwise use database/localStorage
+        // Use localStorage if available, otherwise database
         let finalTargets = t
         if (typeof window !== 'undefined') {
-          const params = new URLSearchParams(window.location.search)
-          const urlCalories = params.get('calories')
-          if (urlCalories) {
-            finalTargets = {
-              calories: parseInt(urlCalories),
-              protein: parseInt(params.get('protein') || '150'),
-              carbs: parseInt(params.get('carbs') || '250'),
-              fats: parseInt(params.get('fats') || '70'),
-            }
-          } else {
-            // Fall back to localStorage
-            const stored = localStorage.getItem('nutrition_goals')
-            if (stored) {
-              try {
-                const parsed = JSON.parse(stored)
-                finalTargets = {
-                  calories: parsed.calories || 2000,
-                  protein: parsed.protein || 150,
-                  carbs: parsed.carbs || 250,
-                  fats: parsed.fats || 70,
-                }
-              } catch (e) {}
-            }
+          const stored = localStorage.getItem('ajmfit_nutrition_goals')
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored)
+              finalTargets = {
+                calories: parsed.calories || 2000,
+                protein: parsed.protein || 150,
+                carbs: parsed.carbs || 250,
+                fats: parsed.fats || 70,
+              }
+            } catch (e) {}
           }
         }
 

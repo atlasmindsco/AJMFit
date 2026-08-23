@@ -49,34 +49,19 @@ export default function SetupNutritionPage() {
     const calculated = calculateNutritionTargets(setup)
 
     try {
-      // Save to localStorage (GUARANTEED to work)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(
-          'nutrition_goals',
-          JSON.stringify({
-            calories: calculated.dailyCalories,
-            protein: calculated.proteinGrams,
-            carbs: calculated.carbGrams,
-            fats: calculated.fatGrams,
-          })
-        )
-      }
+      // Save ONLY to localStorage - simple and reliable
+      localStorage.setItem(
+        'ajmfit_nutrition_goals',
+        JSON.stringify({
+          calories: calculated.dailyCalories,
+          protein: calculated.proteinGrams,
+          carbs: calculated.carbGrams,
+          fats: calculated.fatGrams,
+        })
+      )
 
-      // Try to save to database (background, don't block user)
-      fetch('/api/nutrition/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(setup),
-      }).catch(() => {})
-
-      // Pass the calculated values through URL to nutrition page
-      const params = new URLSearchParams({
-        calories: calculated.dailyCalories.toString(),
-        protein: calculated.proteinGrams.toString(),
-        carbs: calculated.carbGrams.toString(),
-        fats: calculated.fatGrams.toString(),
-      })
-      router.push(`/studio/nutrition?${params.toString()}`)
+      // Navigate to nutrition page
+      router.push('/studio/nutrition')
     } catch (err: any) {
       setError(err.message)
       setLoading(false)
