@@ -36,14 +36,20 @@ export async function GET() {
       })
     }
 
-    console.log('[nutrition/targets] Fetched targets:', data)
+    console.log('[nutrition/targets] Fetched targets:', JSON.stringify(data, null, 2))
+    console.log('[nutrition/targets] custom_cal_target value:', data.custom_cal_target)
+    console.log('[nutrition/targets] custom_cal_target is null?', data.custom_cal_target === null)
+    console.log('[nutrition/targets] custom_cal_target is undefined?', data.custom_cal_target === undefined)
 
-    return NextResponse.json({
+    const response = {
       calories: data.custom_cal_target ?? 2000,
       protein: data.custom_protein_target ?? 150,
       carbs: data.custom_carb_target ?? 250,
       fats: data.custom_fat_target ?? 70,
-    })
+    }
+    console.log('[nutrition/targets] Returning:', JSON.stringify(response, null, 2))
+
+    return NextResponse.json(response)
   } catch (err) {
     console.error('[nutrition/targets] error:', err)
     return NextResponse.json({

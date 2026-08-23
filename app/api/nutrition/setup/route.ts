@@ -74,13 +74,24 @@ export async function POST(request: Request) {
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
       return NextResponse.json(
-        { error: updateError.message || 'Failed to save nutrition goals' },
+        { error: `Update error: ${updateError.message || 'Unknown error'}. Columns might not exist.` },
         { status: 500 }
       )
     }
 
-    console.log('[nutrition/setup] Save successful, returned data:', updateData)
-    return NextResponse.json({ ok: true, calculated, verified: updateData?.[0] })
+    console.log('[nutrition/setup] Update success')
+    console.log('[nutrition/setup] Returned data:', JSON.stringify(updateData, null, 2))
+
+    // Verify the data was actually saved by fetching it back
+    const { data: verify } = await admin
+      .from('users')
+      .select('custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
+      .eq('id', user.id)
+      .single()
+
+    console.log('[nutrition/setup] Verification fetch:', JSON.stringify(verify, null, 2))
+
+    return NextResponse.json({ ok: true, calculated, verified: updateData?.[0], verificationFetch: verify })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
     return NextResponse.json(
