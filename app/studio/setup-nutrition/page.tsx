@@ -62,7 +62,14 @@ export default function SetupNutritionPage() {
 
       // Save calculated values to localStorage as backup
       if (typeof window !== 'undefined') {
-        localStorage.setItem('nutrition_targets', JSON.stringify(calculated))
+        const backup = {
+          dailyCalories: calculated.dailyCalories,
+          proteinGrams: calculated.proteinGrams,
+          carbGrams: calculated.carbGrams,
+          fatGrams: calculated.fatGrams,
+        }
+        localStorage.setItem('nutrition_targets', JSON.stringify(backup))
+        console.log('[setup-nutrition] Saved to localStorage:', backup)
       }
       router.push('/studio/nutrition')
       router.refresh()
