@@ -114,42 +114,25 @@ export async function fetchMeals(userId: string): Promise<MealRow[]> {
   return (data ?? []) as MealRow[]
 }
 
-/** Creates default meals if the user has none. Returns the meals (new or existing). */
+/** Creates default meals by calling server API that uses admin client. */
 export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
-  console.log('[ensureDefaultMeals] Starting for user:', userId)
-
-  const existing = await fetchMeals(userId)
-  console.log('[ensureDefaultMeals] Found existing meals:', existing)
-
-  // Always delete all meals and recreate the defaults - this ensures clean state
-  if (existing.length > 0) {
-    console.log(`[ensureDefaultMeals] Deleting ${existing.length} existing meals`)
-    const { error: deleteError, data: deleteData } = await db.from('meals').delete().eq('user_id', userId).select()
-    if (deleteError) {
-      console.error('[ensureDefaultMeals] Error deleting meals:', deleteError)
-      throw deleteError
+  try {
+    console.log('[ensureDefaultMeals] Calling API to ensure meals')
+    const res = await fetch('/api/nutrition/ensure-meals', {
+      method: 'POST',
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || 'Failed to ensure meals')
     }
-    console.log('[ensureDefaultMeals] Delete response:', deleteData)
+    const { meals } = await res.json()
+    console.log('[ensureDefaultMeals] API returned meals:', meals)
+    return meals
+  } catch (err) {
+    console.error('[ensureDefaultMeals] Error:', err)
+    // Fallback: try to fetch existing meals
+    return fetchMeals(userId)
   }
-
-  // Always create the default meals
-  console.log('[ensureDefaultMeals] Creating default meals:', DEFAULT_MEALS)
-  const rows = DEFAULT_MEALS.map((m) => ({
-    user_id: userId,
-    name: m.name,
-    scheduled_time: m.time,
-    meal_order: m.order,
-  }))
-  const { error, data } = await db.from('meals').insert(rows).select()
-  if (error) {
-    console.error('[ensureDefaultMeals] Error creating meals:', error)
-    throw error
-  }
-  console.log('[ensureDefaultMeals] Created meals:', data)
-
-  const final = await fetchMeals(userId)
-  console.log('[ensureDefaultMeals] Final meals:', final)
-  return final
 }
 
 export async function fetchTodaysLogs(userId: string): Promise<FoodLogRow[]> {
