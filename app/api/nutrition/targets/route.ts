@@ -14,9 +14,26 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use authenticated client to fetch targets
     console.log('[nutrition/targets] Fetching targets for user:', user.id)
 
+    // First ensure user record exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+
+    if (!existingUser) {
+      console.log('[nutrition/targets] User record does not exist, creating')
+      await supabase.from('users').insert({
+        id: user.id,
+        email: user.email || '',
+        name: user.user_metadata?.full_name || 'User',
+        auth_id: user.id,
+      }).single()
+    }
+
+    // Now fetch the targets
     const { data, error } = await supabase
       .from('users')
       .select('daily_cal_target, protein_target, carb_target, fat_target')

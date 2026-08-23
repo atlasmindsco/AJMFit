@@ -23,6 +23,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // First, ensure the user has a record in public.users
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+
+    if (!existingUser && checkError?.code === 'PGRST116') {
+      // No user record exists, create one
+      console.log('[nutrition/setup] Creating user record for:', user.id)
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || 'User',
+          auth_id: user.id,
+        })
+      if (insertError) {
+        console.error('[nutrition/setup] Failed to create user record:', insertError)
+        return NextResponse.json({ error: 'Failed to create user record' }, { status: 500 })
+      }
+    }
+
     // 2. Parse and validate request body
     let body: unknown
     try {
