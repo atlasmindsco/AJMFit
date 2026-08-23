@@ -121,16 +121,23 @@ export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
   // Valid meal names from DEFAULT_MEALS
   const validNames = new Set(DEFAULT_MEALS.map((m) => m.name))
 
+  console.log('[nutrition] Existing meals:', existing.map((m) => m.name))
+  console.log('[nutrition] Valid meal names:', Array.from(validNames))
+
   // Remove any meals that are not in the current DEFAULT_MEALS
-  for (const meal of existing) {
-    if (!validNames.has(meal.name)) {
-      await db.from('meals').delete().eq('id', meal.id)
-    }
+  const mealsToDelete = existing.filter((m) => !validNames.has(m.name))
+  console.log('[nutrition] Meals to delete:', mealsToDelete.map((m) => m.name))
+
+  for (const meal of mealsToDelete) {
+    console.log(`[nutrition] Deleting meal: ${meal.name} (id: ${meal.id})`)
+    const { error } = await db.from('meals').delete().eq('id', meal.id)
+    if (error) console.error(`[nutrition] Failed to delete meal ${meal.id}:`, error)
   }
 
   // If user has no valid meals, create defaults
   const validMeals = existing.filter((m) => validNames.has(m.name))
   if (validMeals.length === 0) {
+    console.log('[nutrition] No valid meals found, creating defaults')
     const rows = DEFAULT_MEALS.map((m) => ({
       user_id: userId,
       name: m.name,
