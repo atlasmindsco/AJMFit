@@ -44,8 +44,8 @@ export default function NutritionPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  // TEST: Hardcoded values to verify display works
-  const [targets, setTargets] = useState<MacroTargets>({ calories: 2500, protein: 200, carbs: 300, fats: 85 })
+  const [debugInfo, setDebugInfo] = useState('')
+  const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS)
   const [meals, setMeals] = useState<MealRow[]>([])
   const [logs, setLogs] = useState<FoodLogRow[]>([])
   const [waterOz, setWaterOz] = useState(0)
@@ -74,8 +74,10 @@ export default function NutritionPage() {
       }
       try {
         // Check URL params first (passed from setup page)
+        let urlDebug = 'No URL params found'
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search)
+          urlDebug = `URL: ${window.location.search} | Calories param: ${params.get('calories')}`
           const urlCalories = params.get('calories')
           if (urlCalories) {
             const urlTargets = {
@@ -85,7 +87,10 @@ export default function NutritionPage() {
               fats: parseInt(params.get('fats') || '70'),
             }
             console.log('[nutrition] Loaded from URL params:', urlTargets)
+            setDebugInfo(`✓ Got values from URL: ${urlTargets.calories}cal`)
             setTargets(urlTargets)
+          } else {
+            setDebugInfo('✗ ' + urlDebug)
           }
         }
 
@@ -347,6 +352,11 @@ export default function NutritionPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      {debugInfo && (
+        <div style={{ padding: '10px', marginBottom: '20px', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+          <strong>DEBUG:</strong> {debugInfo}
+        </div>
+      )}
       {scanningMealId && (
         <BarcodeScanner onDetect={handleBarcodeDetected} onClose={() => setScanningMealId(null)} />
       )}
