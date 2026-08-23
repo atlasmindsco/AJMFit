@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       userId: user.id,
       dailyCalories: calculated.dailyCalories,
       protein: calculated.proteinGrams,
+      toColumns: ['custom_cal_target', 'custom_protein_target', 'custom_carb_target', 'custom_fat_target']
     })
 
     const { error: updateError, data: updateData } = await admin
