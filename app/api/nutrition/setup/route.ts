@@ -47,9 +47,9 @@ export async function POST(request: Request) {
       userId: user.id,
       dailyCalories: calculated.dailyCalories,
       protein: calculated.proteinGrams,
-      toColumns: ['custom_cal_target', 'custom_protein_target', 'custom_carb_target', 'custom_fat_target']
     })
 
+    // Update with both custom columns (if they exist) and original columns (fallback)
     const { error: updateError, data: updateData } = await admin
       .from('users')
       .update({
@@ -61,15 +61,20 @@ export async function POST(request: Request) {
         sex: setup.sex,
         activity_level: setup.activityLevel,
         nutrition_goal: setup.goal,
+        // Save to both custom and original columns
         custom_cal_target: calculated.dailyCalories,
         custom_protein_target: calculated.proteinGrams,
         custom_carb_target: calculated.carbGrams,
         custom_fat_target: calculated.fatGrams,
+        daily_cal_target: calculated.dailyCalories,
+        protein_target: calculated.proteinGrams,
+        carb_target: calculated.carbGrams,
+        fat_target: calculated.fatGrams,
         last_weight_update: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)
-      .select('custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
+      .select('custom_cal_target, daily_cal_target, custom_protein_target, protein_target')
 
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
