@@ -118,35 +118,25 @@ export async function fetchMeals(userId: string): Promise<MealRow[]> {
 export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
   const existing = await fetchMeals(userId)
 
-  // Valid meal names from DEFAULT_MEALS
-  const validNames = new Set(DEFAULT_MEALS.map((m) => m.name))
-
-  console.log('[nutrition] Existing meals:', existing.map((m) => m.name))
-  console.log('[nutrition] Valid meal names:', Array.from(validNames))
-
-  // Remove any meals that are not in the current DEFAULT_MEALS
-  const mealsToDelete = existing.filter((m) => !validNames.has(m.name))
-  console.log('[nutrition] Meals to delete:', mealsToDelete.map((m) => m.name))
-
-  for (const meal of mealsToDelete) {
-    console.log(`[nutrition] Deleting meal: ${meal.name} (id: ${meal.id})`)
-    const { error } = await db.from('meals').delete().eq('id', meal.id)
-    if (error) console.error(`[nutrition] Failed to delete meal ${meal.id}:`, error)
+  // Always delete all meals and recreate the defaults - this ensures clean state
+  if (existing.length > 0) {
+    console.log('[nutrition] Deleting all existing meals for user')
+    const { error: deleteError } = await db.from('meals').delete().eq('user_id', userId)
+    if (deleteError) {
+      console.error('[nutrition] Error deleting meals:', deleteError)
+      throw deleteError
+    }
   }
 
-  // If user has no valid meals, create defaults
-  const validMeals = existing.filter((m) => validNames.has(m.name))
-  if (validMeals.length === 0) {
-    console.log('[nutrition] No valid meals found, creating defaults')
-    const rows = DEFAULT_MEALS.map((m) => ({
-      user_id: userId,
-      name: m.name,
-      scheduled_time: m.time,
-      meal_order: m.order,
-    }))
-    const { error } = await db.from('meals').insert(rows)
-    if (error) throw error
-  }
+  // Always create the default meals
+  const rows = DEFAULT_MEALS.map((m) => ({
+    user_id: userId,
+    name: m.name,
+    scheduled_time: m.time,
+    meal_order: m.order,
+  }))
+  const { error } = await db.from('meals').insert(rows)
+  if (error) throw error
 
   return fetchMeals(userId)
 }
