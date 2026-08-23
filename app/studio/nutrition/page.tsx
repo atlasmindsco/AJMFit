@@ -44,7 +44,8 @@ export default function NutritionPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS)
+  // TEST: Hardcoded values to verify display works
+  const [targets, setTargets] = useState<MacroTargets>({ calories: 2500, protein: 200, carbs: 300, fats: 85 })
   const [meals, setMeals] = useState<MealRow[]>([])
   const [logs, setLogs] = useState<FoodLogRow[]>([])
   const [waterOz, setWaterOz] = useState(0)
