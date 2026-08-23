@@ -116,29 +116,40 @@ export async function fetchMeals(userId: string): Promise<MealRow[]> {
 
 /** Creates default meals if the user has none. Returns the meals (new or existing). */
 export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
+  console.log('[ensureDefaultMeals] Starting for user:', userId)
+
   const existing = await fetchMeals(userId)
+  console.log('[ensureDefaultMeals] Found existing meals:', existing)
 
   // Always delete all meals and recreate the defaults - this ensures clean state
   if (existing.length > 0) {
-    console.log('[nutrition] Deleting all existing meals for user')
-    const { error: deleteError } = await db.from('meals').delete().eq('user_id', userId)
+    console.log(`[ensureDefaultMeals] Deleting ${existing.length} existing meals`)
+    const { error: deleteError, data: deleteData } = await db.from('meals').delete().eq('user_id', userId).select()
     if (deleteError) {
-      console.error('[nutrition] Error deleting meals:', deleteError)
+      console.error('[ensureDefaultMeals] Error deleting meals:', deleteError)
       throw deleteError
     }
+    console.log('[ensureDefaultMeals] Delete response:', deleteData)
   }
 
   // Always create the default meals
+  console.log('[ensureDefaultMeals] Creating default meals:', DEFAULT_MEALS)
   const rows = DEFAULT_MEALS.map((m) => ({
     user_id: userId,
     name: m.name,
     scheduled_time: m.time,
     meal_order: m.order,
   }))
-  const { error } = await db.from('meals').insert(rows)
-  if (error) throw error
+  const { error, data } = await db.from('meals').insert(rows).select()
+  if (error) {
+    console.error('[ensureDefaultMeals] Error creating meals:', error)
+    throw error
+  }
+  console.log('[ensureDefaultMeals] Created meals:', data)
 
-  return fetchMeals(userId)
+  const final = await fetchMeals(userId)
+  console.log('[ensureDefaultMeals] Final meals:', final)
+  return final
 }
 
 export async function fetchTodaysLogs(userId: string): Promise<FoodLogRow[]> {
