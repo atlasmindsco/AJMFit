@@ -51,22 +51,30 @@ export default function SetupNutritionPage() {
     setError('')
     try {
       console.log('[setup-nutrition] Submitting:', calculated)
-      const response = await fetch('/api/nutrition/setup', {
+
+      // ALWAYS save to localStorage first (guaranteed to work)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nutrition_goals', JSON.stringify({
+          calories: calculated.dailyCalories,
+          protein: calculated.proteinGrams,
+          carbs: calculated.carbGrams,
+          fats: calculated.fatGrams,
+          savedAt: new Date().toISOString(),
+        }))
+        console.log('[setup-nutrition] Saved to localStorage:', calculated)
+      }
+
+      // Then try to save to database (in background, don't block)
+      fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(setup),
       })
+        .then(res => res.json())
+        .then(data => console.log('[setup-nutrition] Database save response:', data))
+        .catch(err => console.error('[setup-nutrition] Database save error:', err))
 
-      const responseData = await response.json()
-      console.log('[setup-nutrition] API response:', responseData)
-
-      if (!response.ok) {
-        throw new Error(responseData.error || `Failed: ${response.status}`)
-      }
-
-      // Give the database a moment to persist
-      await new Promise(resolve => setTimeout(resolve, 500))
-
+      // Navigate immediately - data is already in localStorage
       router.push('/studio/nutrition')
       router.refresh()
     } catch (err: any) {

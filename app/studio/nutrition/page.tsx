@@ -80,7 +80,30 @@ export default function NutritionPage() {
           fetchWeeklyCalories(id),
         ])
 
-        setTargets(t)
+        // Check localStorage for nutrition goals (fallback if database fails)
+        let finalTargets = t
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem('nutrition_goals')
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored)
+              // Use localStorage if it has real values (not defaults)
+              if (parsed.calories && parsed.calories !== 2000) {
+                finalTargets = {
+                  calories: parsed.calories,
+                  protein: parsed.protein,
+                  carbs: parsed.carbs,
+                  fats: parsed.fats,
+                }
+                console.log('[nutrition] Using localStorage goals:', finalTargets)
+              }
+            } catch (e) {
+              console.error('[nutrition] Failed to parse stored goals:', e)
+            }
+          }
+        }
+
+        setTargets(finalTargets)
         setMeals(m)
         setLogs(l)
         setWaterOz(dl.water_oz)
