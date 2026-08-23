@@ -72,6 +72,22 @@ export default function NutritionPage() {
         return
       }
       try {
+        // Check URL params first (passed from setup page)
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search)
+          const urlCalories = params.get('calories')
+          if (urlCalories) {
+            const urlTargets = {
+              calories: parseInt(urlCalories),
+              protein: parseInt(params.get('protein') || '150'),
+              carbs: parseInt(params.get('carbs') || '250'),
+              fats: parseInt(params.get('fats') || '70'),
+            }
+            console.log('[nutrition] Loaded from URL params:', urlTargets)
+            setTargets(urlTargets)
+          }
+        }
+
         const [t, m, l, dl, w] = await Promise.all([
           fetchTargets(id),
           ensureDefaultMeals(id),
@@ -80,23 +96,31 @@ export default function NutritionPage() {
           fetchWeeklyCalories(id),
         ])
 
-        // ALWAYS check localStorage first - this is the reliable source
+        // Use URL params if available, otherwise use database/localStorage
         let finalTargets = t
         if (typeof window !== 'undefined') {
-          const stored = localStorage.getItem('nutrition_goals')
-          if (stored) {
-            try {
-              const parsed = JSON.parse(stored)
-              // Use localStorage values if they exist
-              finalTargets = {
-                calories: parsed.calories || 2000,
-                protein: parsed.protein || 150,
-                carbs: parsed.carbs || 250,
-                fats: parsed.fats || 70,
-              }
-              console.log('[nutrition] Loaded from localStorage:', finalTargets)
-            } catch (e) {
-              console.error('[nutrition] Failed to parse stored goals, using database:', e)
+          const params = new URLSearchParams(window.location.search)
+          const urlCalories = params.get('calories')
+          if (urlCalories) {
+            finalTargets = {
+              calories: parseInt(urlCalories),
+              protein: parseInt(params.get('protein') || '150'),
+              carbs: parseInt(params.get('carbs') || '250'),
+              fats: parseInt(params.get('fats') || '70'),
+            }
+          } else {
+            // Fall back to localStorage
+            const stored = localStorage.getItem('nutrition_goals')
+            if (stored) {
+              try {
+                const parsed = JSON.parse(stored)
+                finalTargets = {
+                  calories: parsed.calories || 2000,
+                  protein: parsed.protein || 150,
+                  carbs: parsed.carbs || 250,
+                  fats: parsed.fats || 70,
+                }
+              } catch (e) {}
             }
           }
         }

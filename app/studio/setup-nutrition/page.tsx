@@ -69,8 +69,14 @@ export default function SetupNutritionPage() {
         body: JSON.stringify(setup),
       }).catch(() => {})
 
-      // Navigate to nutrition page
-      router.push('/studio/nutrition')
+      // Pass the calculated values through URL to nutrition page
+      const params = new URLSearchParams({
+        calories: calculated.dailyCalories.toString(),
+        protein: calculated.proteinGrams.toString(),
+        carbs: calculated.carbGrams.toString(),
+        fats: calculated.fatGrams.toString(),
+      })
+      router.push(`/studio/nutrition?${params.toString()}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message)
