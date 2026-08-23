@@ -43,7 +43,13 @@ export async function POST(request: Request) {
     // 4. Save to database
     const admin = createAdminClient() as any
 
-    const { error: updateError } = await admin
+    console.log('[nutrition/setup] Saving nutrition goals:', {
+      userId: user.id,
+      dailyCalories: calculated.dailyCalories,
+      protein: calculated.proteinGrams,
+    })
+
+    const { error: updateError, data: updateData } = await admin
       .from('users')
       .update({
         nutrition_goal_setup_complete: true,
@@ -66,11 +72,12 @@ export async function POST(request: Request) {
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
       return NextResponse.json(
-        { error: 'Failed to save nutrition goals' },
+        { error: updateError.message || 'Failed to save nutrition goals' },
         { status: 500 }
       )
     }
 
+    console.log('[nutrition/setup] Save successful')
     return NextResponse.json({ ok: true, calculated })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
