@@ -40,9 +40,7 @@ export async function POST(request: Request) {
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database
-    const admin = createAdminClient() as any
-
+    // 4. Save to database using user's authenticated session
     console.log('[nutrition/setup] Saving nutrition goals:', {
       userId: user.id,
       dailyCalories: calculated.dailyCalories,
@@ -50,7 +48,7 @@ export async function POST(request: Request) {
       toColumns: ['custom_cal_target', 'custom_protein_target', 'custom_carb_target', 'custom_fat_target']
     })
 
-    const { error: updateError, data: updateData } = await admin
+    const { error: updateError, data: updateData } = await supabase
       .from('users')
       .update({
         nutrition_goal_setup_complete: true,
