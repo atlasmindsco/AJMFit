@@ -69,6 +69,7 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)
+      .select('custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
 
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
