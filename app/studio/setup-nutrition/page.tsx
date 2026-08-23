@@ -50,8 +50,10 @@ export default function SetupNutritionPage() {
   const handleSubmit = async () => {
     setLoading(true)
     setError('')
+    setSuccess(false)
     try {
-      console.log('[setup-nutrition] Submitting:', calculated)
+      const message = `Saving: ${calculated.dailyCalories} calories, ${calculated.proteinGrams}g protein, ${calculated.carbGrams}g carbs, ${calculated.fatGrams}g fat`
+      alert('Step 1: ' + message)
 
       // ALWAYS save to localStorage first (guaranteed to work)
       if (typeof window !== 'undefined') {
@@ -63,7 +65,7 @@ export default function SetupNutritionPage() {
           savedAt: new Date().toISOString(),
         }
         localStorage.setItem('nutrition_goals', JSON.stringify(goalsToSave))
-        console.log('[setup-nutrition] ✓ Saved to localStorage:', goalsToSave)
+        alert('Step 2: Saved to your phone storage ✓')
         setSuccess(true)
       }
 
@@ -85,6 +87,7 @@ export default function SetupNutritionPage() {
     } catch (err: any) {
       const errorMsg = err.message || 'Something went wrong'
       console.error('[setup-nutrition] Error:', errorMsg)
+      alert('ERROR: ' + errorMsg)
       setError(errorMsg)
       setLoading(false)
     }
