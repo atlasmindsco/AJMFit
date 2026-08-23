@@ -40,34 +40,28 @@ export async function POST(request: Request) {
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database using authenticated client
-    console.log('[nutrition/setup] Saving nutrition goals:', {
-      userId: user.id,
-      dailyCalories: calculated.dailyCalories,
-      protein: calculated.proteinGrams,
-    })
+    // 4. Save to database - use simple direct update with minimal fields
+    console.log('[nutrition/setup] Saving nutrition goals for user:', user.id, 'calories:', calculated.dailyCalories)
 
-    // Update original columns that definitely exist
+    const updateObj = {
+      nutrition_goal_setup_complete: true,
+      daily_cal_target: calculated.dailyCalories,
+      protein_target: calculated.proteinGrams,
+      carb_target: calculated.carbGrams,
+      fat_target: calculated.fatGrams,
+      updated_at: new Date().toISOString(),
+    }
+
+    console.log('[nutrition/setup] Update object:', JSON.stringify(updateObj))
+
     const { error: updateError, data: updateData } = await supabase
       .from('users')
-      .update({
-        nutrition_goal_setup_complete: true,
-        current_weight: setup.currentWeight,
-        goal_weight: setup.goalWeight,
-        height: setup.height,
-        age: setup.age,
-        sex: setup.sex,
-        activity_level: setup.activityLevel,
-        nutrition_goal: setup.goal,
-        daily_cal_target: calculated.dailyCalories,
-        protein_target: calculated.proteinGrams,
-        carb_target: calculated.carbGrams,
-        fat_target: calculated.fatGrams,
-        last_weight_update: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateObj)
       .eq('id', user.id)
-      .select('daily_cal_target, protein_target, carb_target, fat_target')
+      .select()
+
+    console.log('[nutrition/setup] Update error:', updateError)
+    console.log('[nutrition/setup] Update data:', updateData)
 
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)

@@ -48,22 +48,31 @@ export default function SetupNutritionPage() {
 
   const handleSubmit = async () => {
     setLoading(true)
+    setError('')
     try {
+      console.log('[setup-nutrition] Submitting:', calculated)
       const response = await fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(setup),
       })
 
+      const responseData = await response.json()
+      console.log('[setup-nutrition] API response:', responseData)
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to save nutrition goals')
+        throw new Error(responseData.error || `Failed: ${response.status}`)
       }
+
+      // Give the database a moment to persist
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       router.push('/studio/nutrition')
       router.refresh()
     } catch (err: any) {
-      setError(err.message || 'Something went wrong')
+      const errorMsg = err.message || 'Something went wrong'
+      console.error('[setup-nutrition] Error:', errorMsg)
+      setError(errorMsg)
       setLoading(false)
     }
   }
