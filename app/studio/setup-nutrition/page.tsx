@@ -231,7 +231,10 @@ export default function SetupNutritionPage() {
 
                 <button
                   type="button"
-                  onClick={handleContinue}
+                  onClick={() => {
+                    alert('Button clicked! Testing...')
+                    handleContinue()
+                  }}
                   className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
                 >
                   Continue
