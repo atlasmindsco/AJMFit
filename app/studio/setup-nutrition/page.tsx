@@ -21,6 +21,7 @@ export default function SetupNutritionPage() {
   const [step, setStep] = useState<'form' | 'review'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const [setup, setSetup] = useState<NutritionGoalSetup>({
     currentWeight: 0,
@@ -54,14 +55,16 @@ export default function SetupNutritionPage() {
 
       // ALWAYS save to localStorage first (guaranteed to work)
       if (typeof window !== 'undefined') {
-        localStorage.setItem('nutrition_goals', JSON.stringify({
+        const goalsToSave = {
           calories: calculated.dailyCalories,
           protein: calculated.proteinGrams,
           carbs: calculated.carbGrams,
           fats: calculated.fatGrams,
           savedAt: new Date().toISOString(),
-        }))
-        console.log('[setup-nutrition] Saved to localStorage:', calculated)
+        }
+        localStorage.setItem('nutrition_goals', JSON.stringify(goalsToSave))
+        console.log('[setup-nutrition] ✓ Saved to localStorage:', goalsToSave)
+        setSuccess(true)
       }
 
       // Then try to save to database (in background, don't block)
@@ -74,9 +77,11 @@ export default function SetupNutritionPage() {
         .then(data => console.log('[setup-nutrition] Database save response:', data))
         .catch(err => console.error('[setup-nutrition] Database save error:', err))
 
-      // Navigate immediately - data is already in localStorage
-      router.push('/studio/nutrition')
-      router.refresh()
+      // Wait 1 second to show success message
+      setTimeout(() => {
+        router.push('/studio/nutrition')
+        router.refresh()
+      }, 1000)
     } catch (err: any) {
       const errorMsg = err.message || 'Something went wrong'
       console.error('[setup-nutrition] Error:', errorMsg)
@@ -292,10 +297,17 @@ export default function SetupNutritionPage() {
                 </div>
               </div>
 
+              {success && (
+                <div className="bg-green-100 border border-green-400 text-green-800 p-4 rounded mb-6">
+                  ✓ Your nutrition goals have been saved!
+                </div>
+              )}
+
               <div className="mt-8 flex gap-3">
                 <button
                   onClick={() => setStep('form')}
-                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-gray-300 transition-colors"
+                  disabled={loading}
+                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-gray-300 disabled:opacity-50 transition-colors"
                 >
                   Back
                 </button>
