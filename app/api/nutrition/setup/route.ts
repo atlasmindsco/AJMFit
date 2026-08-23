@@ -71,7 +71,22 @@ export async function POST(request: Request) {
       )
     }
 
-    return NextResponse.json({ ok: true, calculated })
+    // Verify the data was saved
+    const { data: verifyData, error: verifyError } = await admin
+      .from('users')
+      .select('daily_cal_target, protein_target, carb_target, fat_target, nutrition_goal_setup_complete')
+      .eq('id', user.id)
+      .single()
+
+    if (verifyError || !verifyData?.nutrition_goal_setup_complete) {
+      console.error('[nutrition/setup] verification failed:', verifyError)
+      return NextResponse.json(
+        { error: 'Failed to verify nutrition goals were saved' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ ok: true, calculated, verified: verifyData })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
     return NextResponse.json(

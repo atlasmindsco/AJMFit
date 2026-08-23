@@ -72,12 +72,12 @@ export async function fetchTargets(userId: string): Promise<MacroTargets> {
     .single()
   if (error || !data) throw error ?? new Error('Failed to load targets')
 
-  // Use custom overrides if set, otherwise use calculated values
+  // Use custom overrides if set, otherwise use calculated values, otherwise use defaults
   return {
-    calories: data.custom_cal_target ?? data.daily_cal_target,
-    protein: data.custom_protein_target ?? data.protein_target,
-    carbs: data.custom_carb_target ?? data.carb_target,
-    fats: data.custom_fat_target ?? data.fat_target,
+    calories: data.custom_cal_target ?? data.daily_cal_target ?? 2000,
+    protein: data.custom_protein_target ?? data.protein_target ?? 150,
+    carbs: data.custom_carb_target ?? data.carb_target ?? 250,
+    fats: data.custom_fat_target ?? data.fat_target ?? 70,
   }
 }
 
