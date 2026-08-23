@@ -117,16 +117,30 @@ export async function fetchMeals(userId: string): Promise<MealRow[]> {
 /** Creates default meals if the user has none. Returns the meals (new or existing). */
 export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
   const existing = await fetchMeals(userId)
-  if (existing.length > 0) return existing
 
-  const rows = DEFAULT_MEALS.map((m) => ({
-    user_id: userId,
-    name: m.name,
-    scheduled_time: m.time,
-    meal_order: m.order,
-  }))
-  const { error } = await db.from('meals').insert(rows)
-  if (error) throw error
+  // Valid meal names from DEFAULT_MEALS
+  const validNames = new Set(DEFAULT_MEALS.map((m) => m.name))
+
+  // Remove any meals that are not in the current DEFAULT_MEALS
+  for (const meal of existing) {
+    if (!validNames.has(meal.name)) {
+      await db.from('meals').delete().eq('id', meal.id)
+    }
+  }
+
+  // If user has no valid meals, create defaults
+  const validMeals = existing.filter((m) => validNames.has(m.name))
+  if (validMeals.length === 0) {
+    const rows = DEFAULT_MEALS.map((m) => ({
+      user_id: userId,
+      name: m.name,
+      scheduled_time: m.time,
+      meal_order: m.order,
+    }))
+    const { error } = await db.from('meals').insert(rows)
+    if (error) throw error
+  }
+
   return fetchMeals(userId)
 }
 
