@@ -23,30 +23,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // First, ensure the user has a record in public.users
-    const { data: existingUser, error: checkError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!existingUser && checkError?.code === 'PGRST116') {
-      // No user record exists, create one
-      console.log('[nutrition/setup] Creating user record for:', user.id)
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert({
-          id: user.id,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || 'User',
-          auth_id: user.id,
-        })
-      if (insertError) {
-        console.error('[nutrition/setup] Failed to create user record:', insertError)
-        return NextResponse.json({ error: 'Failed to create user record' }, { status: 500 })
-      }
-    }
-
     // 2. Parse and validate request body
     let body: unknown
     try {
@@ -64,10 +40,14 @@ export async function POST(request: Request) {
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database - use simple direct update with minimal fields
+    // 4. Save to database using UPSERT (insert or update)
     console.log('[nutrition/setup] Saving nutrition goals for user:', user.id, 'calories:', calculated.dailyCalories)
 
-    const updateObj = {
+    const upsertObj = {
+      id: user.id,
+      email: user.email || '',
+      name: user.user_metadata?.full_name || 'User',
+      auth_id: user.id,
       nutrition_goal_setup_complete: true,
       daily_cal_target: calculated.dailyCalories,
       protein_target: calculated.proteinGrams,
@@ -76,16 +56,15 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString(),
     }
 
-    console.log('[nutrition/setup] Update object:', JSON.stringify(updateObj))
+    console.log('[nutrition/setup] Upserting user record:', JSON.stringify(upsertObj))
 
     const { error: updateError, data: updateData } = await supabase
       .from('users')
-      .update(updateObj)
-      .eq('id', user.id)
+      .upsert(upsertObj, { onConflict: 'id' })
       .select()
 
-    console.log('[nutrition/setup] Update error:', updateError)
-    console.log('[nutrition/setup] Update data:', updateData)
+    console.log('[nutrition/setup] Upsert error:', updateError)
+    console.log('[nutrition/setup] Upsert data:', updateData)
 
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
