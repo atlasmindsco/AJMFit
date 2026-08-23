@@ -312,6 +312,19 @@ export default function NutritionPage() {
           onClose={() => setScanningMealId(null)}
         />
       )}
+      {/* Quick Setup Button */}
+      <div className="mb-4 flex items-center justify-end">
+        <a
+          href="/studio/setup-nutrition"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1A7BFF] to-[#0F5FE0] text-white rounded-lg font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-5.971m0 0V9.348m0 9.295h4.992m-9.992 2.964h9.987M2.985 9.348h16.338M21.984 19.644v2.986m0 0v-2.986m0 2.986H4.014M4.014 19.644h17.97m0 0h-9.987" />
+          </svg>
+          Recalculate Macros
+        </a>
+      </div>
+
       {/* Top Macro Summary */}
       <motion.div
         custom={0}

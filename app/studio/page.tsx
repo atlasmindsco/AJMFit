@@ -374,9 +374,15 @@ export default function ClientDashboard() {
           <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Nutrition Today</h2>
-              <Link href="/studio/nutrition" className="text-[#1A7BFF] text-xs font-body hover:underline">
-                Log →
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/studio/setup-nutrition" className="text-[#1A7BFF] text-xs font-body hover:underline">
+                  Macros →
+                </Link>
+                <span className="text-white/20">·</span>
+                <Link href="/studio/nutrition" className="text-[#1A7BFF] text-xs font-body hover:underline">
+                  Log →
+                </Link>
+              </div>
             </div>
             <div className="p-5">
               <div className="mb-6">
