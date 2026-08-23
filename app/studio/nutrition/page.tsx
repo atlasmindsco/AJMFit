@@ -71,12 +71,6 @@ export default function NutritionPage() {
         return
       }
       try {
-        const setup = await fetchNutritionSetup(id)
-        if (!setup.nutrition_goal_setup_complete) {
-          router.push('/studio/setup-nutrition')
-          return
-        }
-
         const [t, m, l, dl, w] = await Promise.all([
           fetchTargets(id),
           ensureDefaultMeals(id),
@@ -91,6 +85,10 @@ export default function NutritionPage() {
         setWeekly(w)
       } catch (err) {
         console.error('[Nutrition] Failed to load:', err)
+        if (err instanceof Error && err.message.includes('no rows')) {
+          router.push('/studio/setup-nutrition')
+          return
+        }
       } finally {
         setLoading(false)
       }
