@@ -67,26 +67,23 @@ export async function POST(request: Request) {
     console.log('[nutrition/setup] Upsert data:', updateData)
 
     if (updateError) {
-      console.error('[nutrition/setup] update error:', updateError)
+      console.error('[nutrition/setup] UPSERT error:', JSON.stringify(updateError, null, 2))
       return NextResponse.json(
-        { error: `Update error: ${updateError.message || 'Unknown error'}. Columns might not exist.` },
+        {
+          ok: false,
+          error: updateError.message || 'Upsert failed',
+          code: updateError.code,
+          details: updateError.details,
+          hint: updateError.hint,
+        },
         { status: 500 }
       )
     }
 
-    console.log('[nutrition/setup] Update success')
+    console.log('[nutrition/setup] UPSERT success')
     console.log('[nutrition/setup] Returned data:', JSON.stringify(updateData, null, 2))
 
-    // Verify the data was actually saved by fetching it back
-    const { data: verify } = await admin
-      .from('users')
-      .select('custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
-      .eq('id', user.id)
-      .single()
-
-    console.log('[nutrition/setup] Verification fetch:', JSON.stringify(verify, null, 2))
-
-    return NextResponse.json({ ok: true, calculated, verified: updateData?.[0], verificationFetch: verify })
+    return NextResponse.json({ ok: true, calculated, saved: updateData?.[0] })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
     return NextResponse.json(
