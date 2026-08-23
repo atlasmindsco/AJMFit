@@ -78,7 +78,27 @@ export default function NutritionPage() {
           fetchDailyLog(id),
           fetchWeeklyCalories(id),
         ])
-        setTargets(t)
+
+        // If targets are default (2000), try localStorage backup
+        let targets = t
+        if (targets.calories === 2000 && typeof window !== 'undefined') {
+          const stored = localStorage.getItem('nutrition_targets')
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored)
+              targets = {
+                calories: parsed.dailyCalories || 2000,
+                protein: parsed.proteinGrams || 150,
+                carbs: parsed.carbGrams || 250,
+                fats: parsed.fatGrams || 70,
+              }
+            } catch (e) {
+              // Fallback to fetched targets if parse fails
+            }
+          }
+        }
+
+        setTargets(targets)
         setMeals(m)
         setLogs(l)
         setWaterOz(dl.water_oz)

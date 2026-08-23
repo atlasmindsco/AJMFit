@@ -60,6 +60,10 @@ export default function SetupNutritionPage() {
         throw new Error(data.error || 'Failed to save nutrition goals')
       }
 
+      // Save calculated values to localStorage as backup
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nutrition_targets', JSON.stringify(calculated))
+      }
       router.push('/studio/nutrition')
       router.refresh()
     } catch (err: any) {
