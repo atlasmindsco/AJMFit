@@ -540,33 +540,6 @@ export default function NutritionPage() {
         })}
       </div>
 
-      {/* Water Tracker */}
-      <motion.div custom={meals.length} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-lg border border-gray-300 p-5 mt-6">
-        <h2 className="font-bold text-gray-900 mb-4">Hydration</h2>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex gap-2">
-            <button
-              onClick={() => adjustWater(-8)}
-              className="w-10 h-10 border border-gray-300 rounded font-bold hover:bg-gray-100"
-            >
-              −
-            </button>
-            <button
-              onClick={() => adjustWater(8)}
-              className="w-10 h-10 bg-blue-600 text-white rounded font-bold hover:bg-blue-700"
-            >
-              +
-            </button>
-          </div>
-          <span className="text-lg font-bold text-gray-900">
-            {waterOz} / {WATER_GOAL_OZ} oz
-          </span>
-        </div>
-        <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
-          <div className="h-full bg-blue-500" style={{ width: `${waterPct}%` }} />
-        </div>
-      </motion.div>
-
       {/* Disclaimer */}
       <p className="text-xs text-gray-500 italic text-center mt-8">
         Macro values are estimates. Always review entries to match what you actually ate.

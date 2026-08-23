@@ -43,10 +43,9 @@ export interface DailyLogRow {
 /** Default meals for new users, we seed these on first load. */
 const DEFAULT_MEALS: Array<{ name: string; time: string; order: number }> = [
   { name: 'Breakfast', time: '07:00:00', order: 1 },
-  { name: 'Snack', time: '10:00:00', order: 2 },
-  { name: 'Lunch', time: '12:30:00', order: 3 },
-  { name: 'Pre-Workout', time: '16:00:00', order: 4 },
-  { name: 'Dinner', time: '19:00:00', order: 5 },
+  { name: 'Lunch', time: '12:30:00', order: 2 },
+  { name: 'Dinner', time: '19:00:00', order: 3 },
+  { name: 'Snack', time: '21:00:00', order: 4 },
 ]
 
 export interface NutritionSetupData {
