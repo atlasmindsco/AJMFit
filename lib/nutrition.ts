@@ -64,19 +64,32 @@ export interface NutritionSetupData {
 }
 
 export async function fetchTargets(userId: string): Promise<MacroTargets> {
-  const { data, error } = await db
-    .from('users')
-    .select('daily_cal_target, protein_target, carb_target, fat_target, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
-    .eq('id', userId)
-    .single()
-  if (error || !data) throw error ?? new Error('Failed to load targets')
+  try {
+    // Call API that uses admin client to bypass RLS
+    const res = await fetch('/api/nutrition/targets')
+    if (!res.ok) {
+      throw new Error(`Failed to fetch targets: ${res.status}`)
+    }
+    const data = await res.json()
+    console.log('[fetchTargets] Got targets from API:', data)
+    return data
+  } catch (err) {
+    console.error('[fetchTargets] Error, falling back to direct query:', err)
+    // Fallback to direct query if API fails
+    const { data, error } = await db
+      .from('users')
+      .select('daily_cal_target, protein_target, carb_target, fat_target, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
+      .eq('id', userId)
+      .single()
+    if (error || !data) throw error ?? new Error('Failed to load targets')
 
-  // Use custom overrides if set, otherwise use calculated values, otherwise use defaults
-  return {
-    calories: data.custom_cal_target ?? data.daily_cal_target ?? 2000,
-    protein: data.custom_protein_target ?? data.protein_target ?? 150,
-    carbs: data.custom_carb_target ?? data.carb_target ?? 250,
-    fats: data.custom_fat_target ?? data.fat_target ?? 70,
+    // Use custom overrides if set, otherwise use calculated values, otherwise use defaults
+    return {
+      calories: data.custom_cal_target ?? data.daily_cal_target ?? 2000,
+      protein: data.custom_protein_target ?? data.protein_target ?? 150,
+      carbs: data.custom_carb_target ?? data.carb_target ?? 250,
+      fats: data.custom_fat_target ?? data.fat_target ?? 70,
+    }
   }
 }
 
