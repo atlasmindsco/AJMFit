@@ -29,6 +29,7 @@ import { useRouter } from 'next/navigation'
 
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100
+const VALID_MEAL_NAMES = new Set(['Breakfast', 'Lunch', 'Dinner', 'Snack'])
 
 function formatTime(time: string | null) {
   if (!time) return ''
@@ -365,7 +366,7 @@ export default function NutritionPage() {
 
       {/* Meals */}
       <div className="space-y-3">
-        {meals.map((meal) => {
+        {meals.filter((meal) => VALID_MEAL_NAMES.has(meal.name)).map((meal) => {
           const mealLogs = logsByMeal(meal.id)
           const mealCalories = mealLogs.reduce((sum, l) => sum + l.calories, 0)
           const isExpanded = expandedMeal === meal.id
