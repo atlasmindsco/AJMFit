@@ -79,8 +79,8 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log('[nutrition/setup] Save successful')
-    return NextResponse.json({ ok: true, calculated })
+    console.log('[nutrition/setup] Save successful, returned data:', updateData)
+    return NextResponse.json({ ok: true, calculated, verified: updateData?.[0] })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
     return NextResponse.json(
