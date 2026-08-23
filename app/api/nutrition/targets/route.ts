@@ -14,14 +14,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use admin client to fetch targets (bypass RLS)
-    const admin = createAdminClient() as any
-
+    // Use authenticated client to fetch targets
     console.log('[nutrition/targets] Fetching targets for user:', user.id)
 
-    const { data, error } = await admin
+    const { data, error } = await supabase
       .from('users')
-      .select('custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target, daily_cal_target, protein_target, carb_target, fat_target')
+      .select('daily_cal_target, protein_target, carb_target, fat_target')
       .eq('id', user.id)
       .single()
 
@@ -38,12 +36,11 @@ export async function GET() {
 
     console.log('[nutrition/targets] Fetched targets:', JSON.stringify(data, null, 2))
 
-    // Try custom columns first, fall back to daily columns, then defaults
     const response = {
-      calories: data.custom_cal_target ?? data.daily_cal_target ?? 2000,
-      protein: data.custom_protein_target ?? data.protein_target ?? 150,
-      carbs: data.custom_carb_target ?? data.carb_target ?? 250,
-      fats: data.custom_fat_target ?? data.fat_target ?? 70,
+      calories: data.daily_cal_target ?? 2000,
+      protein: data.protein_target ?? 150,
+      carbs: data.carb_target ?? 250,
+      fats: data.fat_target ?? 70,
     }
     console.log('[nutrition/targets] Returning:', JSON.stringify(response, null, 2))
 

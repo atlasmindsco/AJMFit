@@ -40,17 +40,15 @@ export async function POST(request: Request) {
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database using admin client (bypass RLS)
-    const admin = createAdminClient() as any
-
+    // 4. Save to database using authenticated client
     console.log('[nutrition/setup] Saving nutrition goals:', {
       userId: user.id,
       dailyCalories: calculated.dailyCalories,
       protein: calculated.proteinGrams,
     })
 
-    // Update with both custom columns (if they exist) and original columns (fallback)
-    const { error: updateError, data: updateData } = await admin
+    // Update original columns that definitely exist
+    const { error: updateError, data: updateData } = await supabase
       .from('users')
       .update({
         nutrition_goal_setup_complete: true,
@@ -61,11 +59,6 @@ export async function POST(request: Request) {
         sex: setup.sex,
         activity_level: setup.activityLevel,
         nutrition_goal: setup.goal,
-        // Save to both custom and original columns
-        custom_cal_target: calculated.dailyCalories,
-        custom_protein_target: calculated.proteinGrams,
-        custom_carb_target: calculated.carbGrams,
-        custom_fat_target: calculated.fatGrams,
         daily_cal_target: calculated.dailyCalories,
         protein_target: calculated.proteinGrams,
         carb_target: calculated.carbGrams,
@@ -74,7 +67,7 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)
-      .select('custom_cal_target, daily_cal_target, custom_protein_target, protein_target')
+      .select('daily_cal_target, protein_target, carb_target, fat_target')
 
     if (updateError) {
       console.error('[nutrition/setup] update error:', updateError)
