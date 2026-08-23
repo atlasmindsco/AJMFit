@@ -77,7 +77,6 @@ export default function SetupNutritionPage() {
         fats: calculated.fatGrams.toString(),
       })
       router.push(`/studio/nutrition?${params.toString()}`)
-      router.refresh()
     } catch (err: any) {
       setError(err.message)
       setLoading(false)
