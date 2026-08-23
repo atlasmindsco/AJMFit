@@ -309,9 +309,9 @@ export default function NutritionPage() {
           <h1 className="text-2xl font-bold text-gray-900">Nutrition</h1>
           <a
             href="/studio/setup-nutrition"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700 underline"
+            className="text-sm font-medium px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Adjust Goals
+            Update Goals
           </a>
         </div>
 
