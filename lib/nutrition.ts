@@ -43,9 +43,10 @@ export interface DailyLogRow {
 /** Default meals for new users, we seed these on first load. */
 const DEFAULT_MEALS: Array<{ name: string; time: string; order: number }> = [
   { name: 'Breakfast', time: '07:00:00', order: 1 },
-  { name: 'Lunch', time: '12:30:00', order: 2 },
-  { name: 'Dinner', time: '19:00:00', order: 3 },
-  { name: 'Snack', time: '21:00:00', order: 4 },
+  { name: 'Snack', time: '10:00:00', order: 2 },
+  { name: 'Lunch', time: '12:30:00', order: 3 },
+  { name: 'Pre-Workout', time: '16:00:00', order: 4 },
+  { name: 'Dinner', time: '19:00:00', order: 5 },
 ]
 
 export interface NutritionSetupData {
@@ -64,32 +65,19 @@ export interface NutritionSetupData {
 }
 
 export async function fetchTargets(userId: string): Promise<MacroTargets> {
-  try {
-    // Call API that uses admin client to bypass RLS
-    const res = await fetch('/api/nutrition/targets')
-    if (!res.ok) {
-      throw new Error(`Failed to fetch targets: ${res.status}`)
-    }
-    const data = await res.json()
-    console.log('[fetchTargets] Got targets from API:', data)
-    return data
-  } catch (err) {
-    console.error('[fetchTargets] Error, falling back to direct query:', err)
-    // Fallback to direct query if API fails
-    const { data, error } = await db
-      .from('users')
-      .select('daily_cal_target, protein_target, carb_target, fat_target, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
-      .eq('id', userId)
-      .single()
-    if (error || !data) throw error ?? new Error('Failed to load targets')
+  const { data, error } = await db
+    .from('users')
+    .select('daily_cal_target, protein_target, carb_target, fat_target, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
+    .eq('id', userId)
+    .single()
+  if (error || !data) throw error ?? new Error('Failed to load targets')
 
-    // Use custom overrides if set, otherwise use calculated values, otherwise use defaults
-    return {
-      calories: data.custom_cal_target ?? data.daily_cal_target ?? 2000,
-      protein: data.custom_protein_target ?? data.protein_target ?? 150,
-      carbs: data.custom_carb_target ?? data.carb_target ?? 250,
-      fats: data.custom_fat_target ?? data.fat_target ?? 70,
-    }
+  // Use custom overrides if set, otherwise use calculated values
+  return {
+    calories: data.custom_cal_target ?? data.daily_cal_target,
+    protein: data.custom_protein_target ?? data.protein_target,
+    carbs: data.custom_carb_target ?? data.carb_target,
+    fats: data.custom_fat_target ?? data.fat_target,
   }
 }
 
@@ -127,25 +115,20 @@ export async function fetchMeals(userId: string): Promise<MealRow[]> {
   return (data ?? []) as MealRow[]
 }
 
-/** Creates default meals by calling server API that uses admin client. */
+/** Creates default meals if the user has none. Returns the meals (new or existing). */
 export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
-  try {
-    console.log('[ensureDefaultMeals] Calling API to ensure meals')
-    const res = await fetch('/api/nutrition/ensure-meals', {
-      method: 'POST',
-    })
-    if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err.error || 'Failed to ensure meals')
-    }
-    const { meals } = await res.json()
-    console.log('[ensureDefaultMeals] API returned meals:', meals)
-    return meals
-  } catch (err) {
-    console.error('[ensureDefaultMeals] Error:', err)
-    // Fallback: try to fetch existing meals
-    return fetchMeals(userId)
-  }
+  const existing = await fetchMeals(userId)
+  if (existing.length > 0) return existing
+
+  const rows = DEFAULT_MEALS.map((m) => ({
+    user_id: userId,
+    name: m.name,
+    scheduled_time: m.time,
+    meal_order: m.order,
+  }))
+  const { error } = await db.from('meals').insert(rows)
+  if (error) throw error
+  return fetchMeals(userId)
 }
 
 export async function fetchTodaysLogs(userId: string): Promise<FoodLogRow[]> {
