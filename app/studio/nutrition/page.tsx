@@ -9,6 +9,7 @@ import MacroRing from '@/components/ui/MacroRing'
 import { fadeIn } from '@/lib/animations'
 
 const BarcodeScanner = dynamic(() => import('@/components/studio/BarcodeScanner'), { ssr: false })
+const FoodSearchSheet = dynamic(() => import('@/components/studio/FoodSearchSheet'), { ssr: false })
 import {
   fetchTargets,
   fetchNutritionSetup,
@@ -51,6 +52,7 @@ export default function NutritionPage() {
   const [weekly, setWeekly] = useState<DailyCalories[]>([])
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [addingToMeal, setAddingToMeal] = useState<string | null>(null)
+  const [searchMealId, setSearchMealId] = useState<string | null>(null)
   const [addForm, setAddForm] = useState({ name: '', calories: '', protein: '', carbs: '', fats: '', serving: '' })
   const [submitting, setSubmitting] = useState(false)
   const [analyzing, setAnalyzing] = useState<string | null>(null) // mealId being analyzed
@@ -312,11 +314,23 @@ export default function NutritionPage() {
           onClose={() => setScanningMealId(null)}
         />
       )}
+      {searchMealId && userId && (() => {
+        const searchMeal = meals.find((m) => m.id === searchMealId)
+        if (!searchMeal) return null
+        return (
+          <FoodSearchSheet
+            meal={searchMeal}
+            userId={userId}
+            onClose={() => setSearchMealId(null)}
+            onAdded={(log) => setLogs((prev) => [...prev, log])}
+          />
+        )
+      })()}
       {/* Quick Setup Button */}
       <div className="mb-4 flex items-center justify-end">
         <a
           href="/studio/setup-nutrition"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1A7BFF] to-[#0F5FE0] text-white rounded-lg font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1A7BFF] to-[#0F5FE0] text-white rounded-lg font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A7BFF] transition-[transform,box-shadow] duration-200"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-5.971m0 0V9.348m0 9.295h4.992m-9.992 2.964h9.987M2.985 9.348h16.338M21.984 19.644v2.986m0 0v-2.986m0 2.986H4.014M4.014 19.644h17.97m0 0h-9.987" />
@@ -650,7 +664,17 @@ export default function NutritionPage() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="mt-3 grid grid-cols-3 gap-2">
+                              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button
+                                  onClick={() => setSearchMealId(meal.id)}
+                                  disabled={analyzing !== null}
+                                  className="py-2 bg-[#1A7BFF] rounded-lg text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-[#0F5FE0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A7BFF] active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                  </svg>
+                                  Search
+                                </button>
                                 <label className="cursor-pointer py-2 border border-dashed border-[#F76B16]/30 rounded-lg text-[#F76B16] text-xs font-display font-bold uppercase tracking-wide hover:bg-[#F76B16]/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5">
                                   {analyzing === meal.id ? (
                                     <>

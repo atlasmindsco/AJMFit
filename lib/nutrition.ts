@@ -177,6 +177,36 @@ export async function deleteFoodLog(id: string) {
   if (error) throw error
 }
 
+export interface RecentFood {
+  food_name: string
+  calories: number
+  protein: number
+  carbs: number
+  fats: number
+  serving_size: string | null
+}
+
+/** Most recently logged foods, deduped by name, for one-tap re-logging. */
+export async function fetchRecentFoods(userId: string, limit = 12): Promise<RecentFood[]> {
+  const { data, error } = await db
+    .from('food_logs')
+    .select('food_name, calories, protein, carbs, fats, serving_size')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(60)
+  if (error) throw error
+  const seen = new Set<string>()
+  const out: RecentFood[] = []
+  for (const row of (data ?? []) as RecentFood[]) {
+    const key = row.food_name.trim().toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(row)
+    if (out.length >= limit) break
+  }
+  return out
+}
+
 export async function fetchDailyLog(userId: string): Promise<DailyLogRow> {
   const today = new Date().toISOString().slice(0, 10)
   const { data, error } = await db
