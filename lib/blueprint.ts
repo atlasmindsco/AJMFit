@@ -29,6 +29,7 @@ export const LOCATION_LABELS: Record<BlueprintLocation, string> = {
 
 /** Days/week → the recommended split key (matches seeded programs.split_key). */
 export const DAYS_TO_SPLIT: Record<number, string> = {
+  2: '3day_fullbody', // Uses 3-day structure but recommend 2 sessions (A+B)
   3: '3day_fullbody',
   4: '4day_ul',
   5: '5day_ulppl',
@@ -43,6 +44,7 @@ export const SPLIT_CHOICE_TO_KEY: Record<string, string> = {
 
 /** Short human label for each day-count's recommended split. */
 export const SPLIT_LABEL: Record<number, string> = {
+  2: 'Full Body (2-day)',
   3: 'Full Body (all 3 days)',
   4: 'Upper / Lower / Upper / Lower',
   5: 'Upper / Lower / Push / Pull / Legs',

@@ -32,7 +32,7 @@ export default function BlueprintPicker({
 
   const goals: BlueprintGoal[] = ['muscle', 'strength', 'lean_out']
   const locations: BlueprintLocation[] = ['home', 'gym']
-  const dayChoices = [3, 4, 5, 6]
+  const dayChoices = [2, 3, 4, 5, 6]
 
   const start = async () => {
     if (!goal || !location || !days) return
@@ -163,7 +163,7 @@ export default function BlueprintPicker({
           {step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-4">How many days a week?</h2>
-              <div className="grid grid-cols-4 gap-2.5 mb-5">
+              <div className="grid grid-cols-5 gap-2 mb-5">
                 {dayChoices.map((d) => (
                   <button
                     key={d}
