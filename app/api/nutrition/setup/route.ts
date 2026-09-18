@@ -50,24 +50,73 @@ export async function POST(request: Request) {
     // 4. Save to database
     const admin = createAdminClient() as any
 
-    // First, verify the user exists in public.users
+    // First, check if user exists and has auth_id linked
     const { data: existingUser, error: selectError } = await admin
       .from('users')
-      .select('id, auth_id')
+      .select('id, auth_id, email')
       .eq('auth_id', user.id)
       .maybeSingle()
 
-    if (selectError) {
+    if (selectError && selectError.code !== 'PGRST116') {
       console.error('[nutrition/setup] select error:', selectError)
       return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
     }
 
-    if (!existingUser) {
-      console.error('[nutrition/setup] no user row found for auth_id:', user.id)
-      return NextResponse.json({ error: 'User account not found. Please contact support.' }, { status: 404 })
-    }
+    let userId: string
 
-    console.log('[nutrition/setup] found user row:', existingUser.id)
+    if (!existingUser) {
+      // User row doesn't exist or auth_id not linked. Try to find by email and link it.
+      console.log('[nutrition/setup] No user found with auth_id, checking by email:', user.email)
+
+      const { data: userByEmail, error: emailError } = await admin
+        .from('users')
+        .select('id, auth_id')
+        .eq('email', user.email)
+        .maybeSingle()
+
+      if (emailError && emailError.code !== 'PGRST116') {
+        console.error('[nutrition/setup] email lookup error:', emailError)
+        return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
+      }
+
+      if (userByEmail) {
+        // Found user by email, but auth_id not set. Link it.
+        console.log('[nutrition/setup] found user by email, linking auth_id')
+        userId = userByEmail.id
+
+        const { error: linkError } = await admin
+          .from('users')
+          .update({ auth_id: user.id, updated_at: new Date().toISOString() })
+          .eq('id', userId)
+
+        if (linkError) {
+          console.error('[nutrition/setup] link auth_id error:', linkError)
+          return NextResponse.json({ error: 'Failed to link account' }, { status: 500 })
+        }
+      } else {
+        // No user row exists at all. Create one with auth_id.
+        console.log('[nutrition/setup] creating new user row with auth_id')
+
+        const { data: newUser, error: createError } = await admin
+          .from('users')
+          .insert({
+            auth_id: user.id,
+            email: user.email,
+            name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+          })
+          .select('id')
+          .single()
+
+        if (createError || !newUser) {
+          console.error('[nutrition/setup] create user error:', createError)
+          return NextResponse.json({ error: 'Failed to create account' }, { status: 500 })
+        }
+        userId = newUser.id
+      }
+    } else {
+      userId = existingUser.id
+      console.log('[nutrition/setup] found user row:', userId)
+    }
 
     // Now update the user with nutrition data
     const { error: updateError, data: updated } = await admin
@@ -88,7 +137,7 @@ export async function POST(request: Request) {
         last_weight_update: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq('auth_id', user.id)
+      .eq('id', userId)
       .select('id, daily_cal_target, protein_target')
 
     if (updateError) {
