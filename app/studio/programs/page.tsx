@@ -20,6 +20,7 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
+import EmphasisPicker from '@/components/studio/EmphasisPicker'
 import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
 import { fetchMyTier } from '@/lib/scheduling'
 import { fetchMyProgram } from '@/lib/programs'
@@ -354,6 +355,7 @@ export default function ProgramsPage() {
   const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(SAMPLE_WEEKLY_PLAN)
   const [currentProgram, setCurrentProgram] = useState<PlanProgram>(SAMPLE_PROGRAM)
   const [showPicker, setShowPicker] = useState(false)
+  const [showEmphasisPicker, setShowEmphasisPicker] = useState(false)
   const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
   const [hasAssigned, setHasAssigned] = useState(false)
 
@@ -379,6 +381,7 @@ export default function ProgramsPage() {
   const handlePickerDone = useCallback(async (programId: string) => {
     await applyLoadedProgram(programId)
     setShowPicker(false)
+    setShowEmphasisPicker(true)
   }, [applyLoadedProgram])
 
   // On load: render the client's assigned program; if a Blueprint member has
@@ -632,6 +635,18 @@ export default function ProgramsPage() {
     return (
       <div className="py-8">
         <BlueprintPicker onDone={handlePickerDone} />
+      </div>
+    )
+  }
+
+  // Show emphasis customization after program pick
+  if (showEmphasisPicker) {
+    return (
+      <div className="py-8">
+        <EmphasisPicker
+          onDone={() => setShowEmphasisPicker(false)}
+          onSkip={() => setShowEmphasisPicker(false)}
+        />
       </div>
     )
   }
