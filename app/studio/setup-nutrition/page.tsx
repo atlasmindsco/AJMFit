@@ -31,6 +31,8 @@ export default function SetupNutritionPage() {
     activityLevel: 'moderate',
     goal: 'maintain',
   })
+  const [heightFeet, setHeightFeet] = useState(0)
+  const [heightInches, setHeightInches] = useState(0)
 
   const handleChange = (field: keyof NutritionGoalSetup, value: any) => {
     setSetup((prev) => ({ ...prev, [field]: value }))
@@ -126,15 +128,41 @@ export default function SetupNutritionPage() {
                 {/* Height */}
                 <div>
                   <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
-                    Height (inches)
+                    Height
                   </label>
-                  <input
-                    type="number"
-                    value={setup.height || ''}
-                    onChange={(e) => handleChange('height', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
-                    placeholder="72"
-                  />
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        value={heightFeet || ''}
+                        onChange={(e) => {
+                          const feet = parseInt(e.target.value) || 0
+                          setHeightFeet(feet)
+                          handleChange('height', feet * 12 + (heightInches || 0))
+                        }}
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        placeholder="5"
+                        min="0"
+                      />
+                      <p className="text-xs text-brand-navy/40 mt-1 font-body">Feet</p>
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        value={heightInches || ''}
+                        onChange={(e) => {
+                          const inches = parseInt(e.target.value) || 0
+                          setHeightInches(inches)
+                          handleChange('height', (heightFeet || 0) * 12 + inches)
+                        }}
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        placeholder="10"
+                        min="0"
+                        max="11"
+                      />
+                      <p className="text-xs text-brand-navy/40 mt-1 font-body">Inches</p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Age */}
