@@ -353,7 +353,15 @@ export default function NutritionPage() {
           {/* Calorie bar */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">Today&apos;s Nutrition</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">Today&apos;s Nutrition</h1>
+                <a
+                  href="/studio/setup-nutrition?edit=true"
+                  className="px-3 py-1 text-xs font-display font-semibold uppercase tracking-wide rounded bg-[#1B2D50]/[0.08] text-[#1B2D50] hover:bg-[#1B2D50]/[0.12] transition-colors"
+                >
+                  Edit
+                </a>
+              </div>
               <span className="text-[#1B2D50] text-sm font-body font-semibold">
                 {totals.calories.toLocaleString()} / {targets.calories.toLocaleString()} kcal
               </span>

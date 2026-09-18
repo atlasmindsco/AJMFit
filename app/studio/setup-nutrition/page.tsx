@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -18,9 +18,13 @@ import {
 
 export default function SetupNutritionPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isEditing = searchParams.get('edit') === 'true'
+
   const [step, setStep] = useState<'form' | 'review'>('form')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(isEditing)
   const [error, setError] = useState('')
+  const [pageLoading, setPageLoading] = useState(isEditing)
 
   const [setup, setSetup] = useState<NutritionGoalSetup>({
     currentWeight: 0,
@@ -33,6 +37,43 @@ export default function SetupNutritionPage() {
   })
   const [heightFeet, setHeightFeet] = useState(0)
   const [heightInches, setHeightInches] = useState(0)
+
+  // Load existing setup if editing
+  useEffect(() => {
+    if (!isEditing) {
+      setPageLoading(false)
+      return
+    }
+
+    ;(async () => {
+      try {
+        const res = await fetch('/api/nutrition/get-setup')
+        if (!res.ok) throw new Error('Failed to load setup')
+
+        const data = await res.json()
+        const heightInchesTotal = data.height || 0
+        const feet = Math.floor(heightInchesTotal / 12)
+        const inches = heightInchesTotal % 12
+
+        setSetup({
+          currentWeight: data.currentWeight || 0,
+          goalWeight: data.goalWeight || 0,
+          height: heightInchesTotal,
+          age: data.age || 0,
+          sex: data.sex || 'male',
+          activityLevel: data.activityLevel || 'moderate',
+          goal: data.goal || 'maintain',
+        })
+        setHeightFeet(feet)
+        setHeightInches(inches)
+      } catch (err) {
+        console.error('Failed to load setup:', err)
+        setError('Could not load your nutrition setup')
+      } finally {
+        setPageLoading(false)
+      }
+    })()
+  }, [isEditing])
 
   const handleChange = (field: keyof NutritionGoalSetup, value: any) => {
     setSetup((prev) => ({ ...prev, [field]: value }))
@@ -60,7 +101,7 @@ export default function SetupNutritionPage() {
         savedAt: new Date().toISOString(),
       }))
 
-      // Try to save to database
+      // Save to database
       const response = await fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,6 +113,7 @@ export default function SetupNutritionPage() {
         throw new Error(data.error || 'Failed to save nutrition goals')
       }
 
+      // If editing, just go back to nutrition page; if new, same destination
       router.push('/studio/nutrition')
       router.refresh()
     } catch (err: any) {
@@ -81,6 +123,14 @@ export default function SetupNutritionPage() {
   }
 
   const calculated = calculateNutritionTargets(setup)
+
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-brand-offwhite flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-brand-navy/10 border-t-brand-navy/40 rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-brand-offwhite flex flex-col items-center justify-center px-6 py-20">
@@ -100,7 +150,7 @@ export default function SetupNutritionPage() {
           {step === 'form' ? (
             <>
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
-                Nutrition Setup
+                {isEditing ? 'Update Nutrition' : 'Nutrition Setup'}
               </h1>
               <p className="text-center text-sm font-body text-brand-slate mt-2">
                 Let's calculate your personalized macro targets
@@ -325,7 +375,7 @@ export default function SetupNutritionPage() {
                   disabled={loading}
                   className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] disabled:opacity-60 transition-all"
                 >
-                  {loading ? 'Saving...' : 'Confirm & Continue'}
+                  {loading ? 'Saving...' : isEditing ? 'Update & Continue' : 'Confirm & Continue'}
                 </button>
               </div>
             </>
