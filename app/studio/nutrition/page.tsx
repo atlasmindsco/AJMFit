@@ -353,7 +353,7 @@ export default function NutritionPage() {
           {/* Calorie bar */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <h1 className="font-display font-extrabold text-xl text-[#1B2D50] tracking-tight">Today&apos;s Nutrition</h1>
                 <a
                   href="/studio/setup-nutrition?edit=true"
@@ -361,6 +361,25 @@ export default function NutritionPage() {
                 >
                   Edit
                 </a>
+                <button
+                  onClick={async () => {
+                    if (!confirm('Delete all nutrition goals and start over? This cannot be undone.')) return
+                    try {
+                      const res = await fetch('/api/nutrition/delete-setup', { method: 'POST' })
+                      if (res.ok) {
+                        localStorage.removeItem('ajmfit_nutrition_setup')
+                        router.push('/studio/setup-nutrition')
+                      } else {
+                        alert('Failed to delete nutrition setup')
+                      }
+                    } catch (err) {
+                      alert('Error deleting nutrition setup')
+                    }
+                  }}
+                  className="px-3 py-1 text-xs font-display font-semibold uppercase tracking-wide rounded bg-red-500/[0.1] text-red-600 hover:bg-red-500/[0.15] transition-colors"
+                >
+                  Delete
+                </button>
               </div>
               <span className="text-[#1B2D50] text-sm font-body font-semibold">
                 {totals.calories.toLocaleString()} / {targets.calories.toLocaleString()} kcal
