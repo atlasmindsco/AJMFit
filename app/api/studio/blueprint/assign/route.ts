@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { DAYS_TO_SPLIT, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
+import { DAYS_TO_SPLIT, SPLIT_CHOICE_TO_KEY, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
 
 export const runtime = 'nodejs'
 
@@ -24,16 +24,25 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // 2. Validate input.
-  let goal: string, location: string, days: number
+  let goal: string, location: string, days: number, splitChoice: string | undefined
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitChoice?: string }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
+    splitChoice = body.splitChoice
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
-  const split = DAYS_TO_SPLIT[days]
+
+  // Resolve split key: for 5-day users, use splitChoice if provided; otherwise use defaults
+  let split: string | undefined
+  if (days === 5 && splitChoice) {
+    split = SPLIT_CHOICE_TO_KEY[splitChoice]
+  } else {
+    split = DAYS_TO_SPLIT[days]
+  }
+
   if (!GOALS.includes(goal as BlueprintGoal) || !LOCATIONS.includes(location as BlueprintLocation) || !split) {
     return NextResponse.json({ error: 'Invalid choices' }, { status: 400 })
   }
@@ -79,10 +88,11 @@ export async function POST(request: Request) {
 
   // 5. Assign it — end any current assignment, then open the new one.
   await admin.from('program_assignments').update({ ended_at: new Date().toISOString() }).eq('user_id', dbUser.id).is('ended_at', null)
+  const splitLabel = days === 5 && splitChoice ? `${days}d-${splitChoice}` : split
   const { error: aErr } = await admin.from('program_assignments').insert({
     user_id: dbUser.id,
     program_id: program.id,
-    notes: `Blueprint self-select: ${goal} / ${split} / ${location}`,
+    notes: `Blueprint self-select: ${goal} / ${splitLabel} / ${location}`,
   })
   if (aErr) return NextResponse.json({ error: aErr.message }, { status: 500 })
 

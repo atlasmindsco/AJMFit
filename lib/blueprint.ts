@@ -35,6 +35,12 @@ export const DAYS_TO_SPLIT: Record<number, string> = {
   6: '6day_ppl_arnold',
 }
 
+/** For 5-day users, allow split choice. */
+export const SPLIT_CHOICE_TO_KEY: Record<string, string> = {
+  ulppl: '5day_ulppl',
+  bro: '5day_bro',
+}
+
 /** Short human label for each day-count's recommended split. */
 export const SPLIT_LABEL: Record<number, string> = {
   3: 'Full Body (all 3 days)',

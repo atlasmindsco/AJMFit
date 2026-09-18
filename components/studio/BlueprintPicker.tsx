@@ -12,8 +12,8 @@ import {
 
 /**
  * Blueprint self-serve program picker. Shown on /studio/programs when a
- * Blueprint client has no assigned program. Three quick taps — goal → location
- * → days — then assigns the matching pre-made program and calls onDone.
+ * Blueprint client has no assigned program. Goal → location → days (→ split choice
+ * if 5-day) — then assigns the matching pre-made program and calls onDone.
  */
 export default function BlueprintPicker({
   firstName,
@@ -26,6 +26,7 @@ export default function BlueprintPicker({
   const [goal, setGoal] = useState<BlueprintGoal | null>(null)
   const [location, setLocation] = useState<BlueprintLocation | null>(null)
   const [days, setDays] = useState<number | null>(null)
+  const [splitChoice, setSplitChoice] = useState<'ulppl' | 'bro' | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -35,13 +36,14 @@ export default function BlueprintPicker({
 
   const start = async () => {
     if (!goal || !location || !days) return
+    if (days === 5 && !splitChoice) return
     setSubmitting(true)
     setError('')
     try {
       const res = await fetch('/api/studio/blueprint/assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, location, days }),
+        body: JSON.stringify({ goal, location, days, splitChoice: days === 5 ? splitChoice : undefined }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
       if (!res.ok || !data.ok || !data.programId) throw new Error(data.error || 'Could not set up your program.')
@@ -76,7 +78,8 @@ export default function BlueprintPicker({
     </button>
   )
 
-  const steps = ['Goal', 'Location', 'Days']
+  const needsSplitChoice = days === 5
+  const steps = needsSplitChoice ? ['Goal', 'Location', 'Days', 'Choose Split'] : ['Goal', 'Location', 'Days']
 
   return (
     <div className="max-w-xl mx-auto">
@@ -156,7 +159,7 @@ export default function BlueprintPicker({
             </motion.div>
           )}
 
-          {/* STEP 2 — days + confirm */}
+          {/* STEP 2 — days */}
           {step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-4">How many days a week?</h2>
@@ -164,7 +167,13 @@ export default function BlueprintPicker({
                 {dayChoices.map((d) => (
                   <button
                     key={d}
-                    onClick={() => setDays(d)}
+                    onClick={() => {
+                      setDays(d)
+                      setSplitChoice(null)
+                      if (d === 5) {
+                        setStep(3)
+                      }
+                    }}
                     className={`py-4 rounded-xl border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
                         ? 'bg-[#1A7BFF]/[0.12] border-[#1A7BFF]/50 text-white'
@@ -176,10 +185,55 @@ export default function BlueprintPicker({
                 ))}
               </div>
 
-              {days && (
+              {days && days !== 5 && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
-                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your recommended split</p>
+                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your split</p>
                   <p className="text-white font-display font-bold text-base mt-1">{SPLIT_LABEL[days]}</p>
+                  <p className="text-white/40 text-xs font-body mt-1">
+                    {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
+                  </p>
+                </motion.div>
+              )}
+
+              {error && <p className="text-red-400 text-sm font-body mb-3">{error}</p>}
+
+              {days && days !== 5 && (
+                <button
+                  onClick={start}
+                  disabled={submitting}
+                  className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                >
+                  {submitting ? 'Setting up…' : 'Start Training'}
+                </button>
+              )}
+            </motion.div>
+          )}
+
+          {/* STEP 3 — split choice (5-day only) */}
+          {step === 3 && days === 5 && (
+            <motion.div key="split" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <h2 className="font-display font-bold text-white text-lg mb-4">Which 5-day split?</h2>
+              <div className="space-y-2.5 mb-5">
+                <Option
+                  active={splitChoice === 'ulppl'}
+                  onClick={() => setSplitChoice('ulppl')}
+                  title="Upper / Lower / PPL"
+                  sub="Balanced. Each muscle hit twice per week, varied stimulus."
+                />
+                <Option
+                  active={splitChoice === 'bro'}
+                  onClick={() => setSplitChoice('bro')}
+                  title="Bodybuilding Split"
+                  sub="Higher volume. Each muscle once per week, specialization focus."
+                />
+              </div>
+
+              {splitChoice && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
+                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
+                  <p className="text-white font-display font-bold text-base mt-1">
+                    {splitChoice === 'ulppl' ? 'Upper/Lower/PPL' : 'Bodybuilding'} Split
+                  </p>
                   <p className="text-white/40 text-xs font-body mt-1">
                     {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
                   </p>
@@ -190,7 +244,7 @@ export default function BlueprintPicker({
 
               <button
                 onClick={start}
-                disabled={!days || submitting}
+                disabled={!splitChoice || submitting}
                 className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
               >
                 {submitting ? 'Setting up…' : 'Start Training'}
@@ -202,7 +256,14 @@ export default function BlueprintPicker({
         {/* Back */}
         {step > 0 && !submitting && (
           <button
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            onClick={() => {
+              if (step === 3) {
+                setStep(2)
+                setSplitChoice(null)
+              } else {
+                setStep((s) => Math.max(0, s - 1))
+              }
+            }}
             className="mt-4 flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors duration-200"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
