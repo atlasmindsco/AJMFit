@@ -20,8 +20,10 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
+import BeginnerPicker from '@/components/studio/BeginnerPicker'
 import EmphasisPicker from '@/components/studio/EmphasisPicker'
 import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
+import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import { fetchMyProgram } from '@/lib/programs'
 
@@ -356,6 +358,7 @@ export default function ProgramsPage() {
   const [currentProgram, setCurrentProgram] = useState<PlanProgram>(SAMPLE_PROGRAM)
   const [showPicker, setShowPicker] = useState(false)
   const [showEmphasisPicker, setShowEmphasisPicker] = useState(false)
+  const [isBeginnerFlow, setIsBeginnerFlow] = useState(false)
   const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
   const [hasAssigned, setHasAssigned] = useState(false)
 
@@ -385,16 +388,28 @@ export default function ProgramsPage() {
   }, [applyLoadedProgram])
 
   // On load: render the client's assigned program; if a Blueprint member has
-  // none yet, show the pick-your-program flow.
+  // none yet, show the pick-your-program flow (simplified for beginners).
   useEffect(() => {
     let active = true
     ;(async () => {
       const id = await getCurrentUserId()
       if (!active || !id) return
-      const [tier, program] = await Promise.all([fetchMyTier(id), fetchMyProgram(id)])
+      const [tier, program, onboarding] = await Promise.all([
+        fetchMyTier(id),
+        fetchMyProgram(id),
+        fetchMyOnboarding(id),
+      ])
       if (!active) return
-      if (program) await applyLoadedProgram(program.id)
-      else if (tier === 'blueprint') setShowPicker(true)
+      if (program) {
+        await applyLoadedProgram(program.id)
+      } else if (tier === 'blueprint') {
+        // Detect if beginner: 0-1 years of experience or 'new' status
+        const yearsTraining = onboarding?.answers?.yearsTraining
+        const experience = onboarding?.answers?.experience
+        const isNewUser = experience === 'new' || yearsTraining === 0 || yearsTraining === '0'
+        setIsBeginnerFlow(isNewUser)
+        setShowPicker(true)
+      }
     })()
     return () => { active = false }
   }, [applyLoadedProgram])
@@ -634,7 +649,11 @@ export default function ProgramsPage() {
   if (showPicker) {
     return (
       <div className="py-8">
-        <BlueprintPicker onDone={handlePickerDone} />
+        {isBeginnerFlow ? (
+          <BeginnerPicker onDone={handlePickerDone} />
+        ) : (
+          <BlueprintPicker onDone={handlePickerDone} />
+        )}
       </div>
     )
   }
