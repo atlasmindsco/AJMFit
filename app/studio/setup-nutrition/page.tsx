@@ -50,7 +50,17 @@ export default function SetupNutritionPage() {
 
   const handleSubmit = async () => {
     setLoading(true)
+    setError('')
     try {
+      // Always save to localStorage as a backup
+      const calculated = calculateNutritionTargets(setup)
+      localStorage.setItem('ajmfit_nutrition_setup', JSON.stringify({
+        setup,
+        calculated,
+        savedAt: new Date().toISOString(),
+      }))
+
+      // Try to save to database
       const response = await fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

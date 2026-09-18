@@ -72,12 +72,38 @@ export async function fetchTargets(userId: string): Promise<MacroTargets> {
   if (error || !data) throw error ?? new Error('Failed to load targets')
 
   // Use custom overrides if set, otherwise use calculated values
-  return {
+  const targets = {
     calories: data.custom_cal_target ?? data.daily_cal_target,
     protein: data.custom_protein_target ?? data.protein_target,
     carbs: data.custom_carb_target ?? data.carb_target,
     fats: data.custom_fat_target ?? data.fat_target,
   }
+
+  // If we got default values (2000 cal, etc), check localStorage for recently-saved values
+  // This handles cases where the database save failed but localStorage succeeded
+  if (targets.calories === 2000 && typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('ajmfit_nutrition_setup')
+      if (stored) {
+        const { calculated, savedAt } = JSON.parse(stored)
+        // Use localStorage if it was saved within the last 24 hours
+        const savedTime = new Date(savedAt).getTime()
+        const now = new Date().getTime()
+        if (now - savedTime < 24 * 60 * 60 * 1000) {
+          return {
+            calories: calculated.dailyCalories,
+            protein: calculated.proteinGrams,
+            carbs: calculated.carbGrams,
+            fats: calculated.fatGrams,
+          }
+        }
+      }
+    } catch (e) {
+      // Silently ignore localStorage errors
+    }
+  }
+
+  return targets
 }
 
 export async function fetchNutritionSetup(userId: string): Promise<NutritionSetupData> {
