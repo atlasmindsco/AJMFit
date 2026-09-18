@@ -43,7 +43,9 @@ export async function POST(request: Request) {
     // 4. Save to database (clear custom overrides when user updates)
     const admin = createAdminClient() as any
 
-    const { error: updateError } = await admin
+    // user.id is the AUTH id; public.users is keyed by its own id with the
+    // auth id in auth_id. Matching on id silently updates zero rows.
+    const { error: updateError, data: updated } = await admin
       .from('users')
       .update({
         current_weight: setup.currentWeight,
@@ -65,10 +67,11 @@ export async function POST(request: Request) {
         last_weight_update: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
+      .eq('auth_id', user.id)
+      .select('id')
 
-    if (updateError) {
-      console.error('[nutrition/update] update error:', updateError)
+    if (updateError || !updated?.length) {
+      console.error('[nutrition/update] update error:', updateError ?? 'no matching users row')
       return NextResponse.json(
         { error: 'Failed to save nutrition goals' },
         { status: 500 }

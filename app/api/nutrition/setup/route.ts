@@ -40,50 +40,41 @@ export async function POST(request: Request) {
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database using UPSERT (insert or update)
-    console.log('[nutrition/setup] Saving nutrition goals for user:', user.id, 'calories:', calculated.dailyCalories)
+    // 4. Save to database
+    const admin = createAdminClient() as any
 
-    const upsertObj = {
-      id: user.id,
-      email: user.email || '',
-      name: user.user_metadata?.full_name || 'User',
-      auth_id: user.id,
-      nutrition_goal_setup_complete: true,
-      daily_cal_target: calculated.dailyCalories,
-      protein_target: calculated.proteinGrams,
-      carb_target: calculated.carbGrams,
-      fat_target: calculated.fatGrams,
-      updated_at: new Date().toISOString(),
-    }
-
-    console.log('[nutrition/setup] Upserting user record:', JSON.stringify(upsertObj))
-
-    const { error: updateError, data: updateData } = await supabase
+    // user.id is the AUTH id; public.users is keyed by its own id with the
+    // auth id in auth_id. Matching on id silently updates zero rows.
+    const { error: updateError, data: updated } = await admin
       .from('users')
-      .upsert(upsertObj, { onConflict: 'id' })
-      .select()
+      .update({
+        nutrition_goal_setup_complete: true,
+        current_weight: setup.currentWeight,
+        goal_weight: setup.goalWeight,
+        height: setup.height,
+        age: setup.age,
+        sex: setup.sex,
+        activity_level: setup.activityLevel,
+        nutrition_goal: setup.goal,
+        daily_cal_target: calculated.dailyCalories,
+        protein_target: calculated.proteinGrams,
+        carb_target: calculated.carbGrams,
+        fat_target: calculated.fatGrams,
+        last_weight_update: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('auth_id', user.id)
+      .select('id')
 
-    console.log('[nutrition/setup] Upsert error:', updateError)
-    console.log('[nutrition/setup] Upsert data:', updateData)
-
-    if (updateError) {
-      console.error('[nutrition/setup] UPSERT error:', JSON.stringify(updateError, null, 2))
+    if (updateError || !updated?.length) {
+      console.error('[nutrition/setup] update error:', updateError ?? 'no matching users row')
       return NextResponse.json(
-        {
-          ok: false,
-          error: updateError.message || 'Upsert failed',
-          code: updateError.code,
-          details: updateError.details,
-          hint: updateError.hint,
-        },
+        { error: 'Failed to save nutrition goals' },
         { status: 500 }
       )
     }
 
-    console.log('[nutrition/setup] UPSERT success')
-    console.log('[nutrition/setup] Returned data:', JSON.stringify(updateData, null, 2))
-
-    return NextResponse.json({ ok: true, calculated, saved: updateData?.[0] })
+    return NextResponse.json({ ok: true, calculated })
   } catch (err) {
     console.error('[nutrition/setup] error:', err)
     return NextResponse.json(
