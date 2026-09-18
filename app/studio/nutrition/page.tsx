@@ -52,8 +52,10 @@ export default function NutritionPage() {
   const [weekly, setWeekly] = useState<DailyCalories[]>([])
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [addingToMeal, setAddingToMeal] = useState<string | null>(null)
-  const [addForm, setAddForm] = useState({ name: '', calories: '', protein: '', carbs: '', fats: '', serving: '' })
+  const [addForm, setAddForm] = useState({ name: '', calories: '', protein: '', carbs: '', fats: '', serving: '', quantity: '1' })
   const [submitting, setSubmitting] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({ quantity: '1', calories: '', protein: '', carbs: '', fats: '' })
   const [analyzing, setAnalyzing] = useState<string | null>(null)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [analysisSource, setAnalysisSource] = useState<'usda' | 'mixed' | 'gpt' | 'off' | null>(null)
@@ -143,7 +145,7 @@ export default function NutritionPage() {
   const logsByMeal = (mealId: string) => logs.filter((l) => l.meal_id === mealId)
 
   const resetAddState = () => {
-    setAddForm({ name: '', calories: '', protein: '', carbs: '', fats: '', serving: '' })
+    setAddForm({ name: '', calories: '', protein: '', carbs: '', fats: '', serving: '', quantity: '1' })
     setAddingToMeal(null)
     setAnalysisSource(null)
     setAnalysisError(null)
@@ -457,22 +459,77 @@ export default function NutritionPage() {
                         {mealLogs.length > 0 ? (
                           <div className="space-y-2">
                             {mealLogs.map((log) => (
-                              <div key={log.id} className="flex items-center justify-between bg-white p-3 rounded text-sm">
-                                <div className="flex-1">
-                                  <p className="font-medium text-gray-900">{log.food_name}</p>
-                                  {log.serving_size && <p className="text-xs text-gray-500">{log.serving_size}</p>}
-                                </div>
-                                <div className="flex items-center gap-3">
-                                  <span className="font-bold text-gray-900 text-right min-w-12">{log.calories}</span>
-                                  <button
-                                    onClick={() => handleDeleteFood(log.id)}
-                                    className="text-gray-400 hover:text-red-600"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                  </button>
-                                </div>
+                              <div key={log.id}>
+                                {editingId === log.id ? (
+                                  // Edit Mode
+                                  <div className="bg-blue-50 p-3 rounded border border-blue-300 space-y-2">
+                                    <p className="font-medium text-gray-900">{log.food_name}</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Portion (e.g. 10 oz)"
+                                        value={editForm.quantity}
+                                        onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
+                                        className="px-2 py-1 border border-gray-300 rounded text-sm"
+                                      />
+                                      <input
+                                        type="number"
+                                        placeholder="Calories"
+                                        value={editForm.calories}
+                                        onChange={(e) => setEditForm({ ...editForm, calories: e.target.value })}
+                                        className="px-2 py-1 border border-gray-300 rounded text-sm"
+                                      />
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={async () => {
+                                          await handleDeleteFood(log.id)
+                                          setEditingId(null)
+                                        }}
+                                        className="flex-1 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                                      >
+                                        Delete
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingId(null)}
+                                        className="flex-1 px-2 py-1 bg-gray-300 text-gray-800 text-xs rounded hover:bg-gray-400"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  // Display Mode
+                                  <div className="flex items-center justify-between bg-white p-3 rounded text-sm hover:bg-gray-50">
+                                    <div className="flex-1 cursor-pointer" onClick={() => {
+                                      setEditingId(log.id)
+                                      setEditForm({ quantity: log.serving_size || '', calories: log.calories.toString(), protein: log.protein.toString(), carbs: log.carbs.toString(), fats: log.fats.toString() })
+                                    }}>
+                                      <p className="font-medium text-gray-900">{log.food_name}</p>
+                                      {log.serving_size && <p className="text-xs text-gray-500">{log.serving_size}</p>}
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <span className="font-bold text-gray-900 text-right min-w-12">{log.calories}</span>
+                                      <button
+                                        onClick={() => {
+                                          setEditingId(log.id)
+                                          setEditForm({ quantity: log.serving_size || '', calories: log.calories.toString(), protein: log.protein.toString(), carbs: log.carbs.toString(), fats: log.fats.toString() })
+                                        }}
+                                        className="text-blue-500 hover:text-blue-700 px-2 py-1 rounded hover:bg-blue-50"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteFood(log.id)}
+                                        className="text-gray-400 hover:text-red-600"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -499,6 +556,30 @@ export default function NutritionPage() {
                               }}
                               className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                             />
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-xs text-gray-600 block mb-1">Quantity</label>
+                                <input
+                                  type="number"
+                                  placeholder="Qty"
+                                  value={addForm.quantity}
+                                  onChange={(e) => setAddForm({ ...addForm, quantity: e.target.value })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                  step="0.5"
+                                  min="0.1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-600 block mb-1">Portion Size</label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. 10 oz, 1 cup"
+                                  value={addForm.serving}
+                                  onChange={(e) => setAddForm({ ...addForm, serving: e.target.value })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                />
+                              </div>
+                            </div>
                             <input
                               type="number"
                               placeholder="Calories"
