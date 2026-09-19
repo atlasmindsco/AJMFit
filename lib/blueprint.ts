@@ -42,6 +42,13 @@ export const SPLIT_CHOICE_TO_KEY: Record<string, string> = {
   bro: '5day_bro',
 }
 
+/** For 4-day users, allow emphasis choice. */
+export const EMPHASIS_CHOICE_TO_KEY: Record<string, string> = {
+  balanced: '4day_ul',
+  chest_back: '4day_ul_chest_back',
+  legs_shoulders: '4day_ul_legs_shoulders',
+}
+
 /** Short human label for each day-count's recommended split. */
 export const SPLIT_LABEL: Record<number, string> = {
   2: 'Full Body (2-day)',

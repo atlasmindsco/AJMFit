@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { DAYS_TO_SPLIT, SPLIT_CHOICE_TO_KEY, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
+import { DAYS_TO_SPLIT, SPLIT_CHOICE_TO_KEY, EMPHASIS_CHOICE_TO_KEY, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
 
 export const runtime = 'nodejs'
 
@@ -24,21 +24,24 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // 2. Validate input.
-  let goal: string, location: string, days: number, splitChoice: string | undefined
+  let goal: string, location: string, days: number, splitChoice: string | undefined, emphasisChoice: string | undefined
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitChoice?: string }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitChoice?: string; emphasisChoice?: string }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
     splitChoice = body.splitChoice
+    emphasisChoice = body.emphasisChoice
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  // Resolve split key: for 5-day users, use splitChoice if provided; otherwise use defaults
+  // Resolve split key: for 5-day users, use splitChoice; for 4-day users, use emphasisChoice; otherwise use defaults
   let split: string | undefined
   if (days === 5 && splitChoice) {
     split = SPLIT_CHOICE_TO_KEY[splitChoice]
+  } else if (days === 4 && emphasisChoice) {
+    split = EMPHASIS_CHOICE_TO_KEY[emphasisChoice]
   } else {
     split = DAYS_TO_SPLIT[days]
   }
@@ -88,7 +91,12 @@ export async function POST(request: Request) {
 
   // 5. Assign it — end any current assignment, then open the new one.
   await admin.from('program_assignments').update({ ended_at: new Date().toISOString() }).eq('user_id', dbUser.id).is('ended_at', null)
-  const splitLabel = days === 5 && splitChoice ? `${days}d-${splitChoice}` : split
+  let splitLabel = split
+  if (days === 5 && splitChoice) {
+    splitLabel = `${days}d-${splitChoice}`
+  } else if (days === 4 && emphasisChoice) {
+    splitLabel = `${days}d-${emphasisChoice}`
+  }
   const { error: aErr } = await admin.from('program_assignments').insert({
     user_id: dbUser.id,
     program_id: program.id,

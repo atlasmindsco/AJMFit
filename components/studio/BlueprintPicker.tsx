@@ -27,6 +27,7 @@ export default function BlueprintPicker({
   const [location, setLocation] = useState<BlueprintLocation | null>(null)
   const [days, setDays] = useState<number | null>(null)
   const [splitChoice, setSplitChoice] = useState<'ulppl' | 'bro' | null>(null)
+  const [emphasiscChoice, setEmphasisChoice] = useState<'balanced' | 'chest_back' | 'legs_shoulders' | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,13 +38,20 @@ export default function BlueprintPicker({
   const start = async () => {
     if (!goal || !location || !days) return
     if (days === 5 && !splitChoice) return
+    if (days === 4 && !emphasiscChoice) return
     setSubmitting(true)
     setError('')
     try {
       const res = await fetch('/api/studio/blueprint/assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, location, days, splitChoice: days === 5 ? splitChoice : undefined }),
+        body: JSON.stringify({
+          goal,
+          location,
+          days,
+          splitChoice: days === 5 ? splitChoice : undefined,
+          emphasisChoice: days === 4 ? emphasiscChoice : undefined,
+        }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
       if (!res.ok || !data.ok || !data.programId) throw new Error(data.error || 'Could not set up your program.')
@@ -79,7 +87,12 @@ export default function BlueprintPicker({
   )
 
   const needsSplitChoice = days === 5
-  const steps = needsSplitChoice ? ['Goal', 'Location', 'Days', 'Choose Split'] : ['Goal', 'Location', 'Days']
+  const needsEmphasisChoice = days === 4
+  const steps = needsSplitChoice
+    ? ['Goal', 'Location', 'Days', 'Choose Split']
+    : needsEmphasisChoice
+    ? ['Goal', 'Location', 'Days', 'Choose Emphasis']
+    : ['Goal', 'Location', 'Days']
 
   return (
     <div className="max-w-xl mx-auto">
@@ -170,7 +183,8 @@ export default function BlueprintPicker({
                     onClick={() => {
                       setDays(d)
                       setSplitChoice(null)
-                      if (d === 5) {
+                      setEmphasisChoice(null)
+                      if (d === 5 || d === 4) {
                         setStep(3)
                       }
                     }}
@@ -206,6 +220,55 @@ export default function BlueprintPicker({
                   {submitting ? 'Setting up…' : 'Start Training'}
                 </button>
               )}
+            </motion.div>
+          )}
+
+          {/* STEP 3 — emphasis choice (4-day only) */}
+          {step === 3 && days === 4 && (
+            <motion.div key="emphasis" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <h2 className="font-display font-bold text-white text-lg mb-4">Body part emphasis?</h2>
+              <div className="space-y-2.5 mb-5">
+                <Option
+                  active={emphasiscChoice === 'balanced'}
+                  onClick={() => setEmphasisChoice('balanced')}
+                  title="Balanced"
+                  sub="Equal attention to all muscle groups."
+                />
+                <Option
+                  active={emphasiscChoice === 'chest_back'}
+                  onClick={() => setEmphasisChoice('chest_back')}
+                  title="Chest & Back Focus"
+                  sub="Extra volume for upper body development."
+                />
+                <Option
+                  active={emphasiscChoice === 'legs_shoulders'}
+                  onClick={() => setEmphasisChoice('legs_shoulders')}
+                  title="Legs & Shoulders Focus"
+                  sub="Emphasize lower body and overhead pressing."
+                />
+              </div>
+
+              {emphasiscChoice && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
+                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
+                  <p className="text-white font-display font-bold text-base mt-1">
+                    {emphasiscChoice === 'balanced' ? 'Balanced Upper/Lower' : emphasiscChoice === 'chest_back' ? 'Chest & Back Focus' : 'Legs & Shoulders Focus'}
+                  </p>
+                  <p className="text-white/40 text-xs font-body mt-1">
+                    {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
+                  </p>
+                </motion.div>
+              )}
+
+              {error && <p className="text-red-400 text-sm font-body mb-3">{error}</p>}
+
+              <button
+                onClick={start}
+                disabled={!emphasiscChoice || submitting}
+                className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+              >
+                {submitting ? 'Setting up…' : 'Start Training'}
+              </button>
             </motion.div>
           )}
 
@@ -260,6 +323,7 @@ export default function BlueprintPicker({
               if (step === 3) {
                 setStep(2)
                 setSplitChoice(null)
+                setEmphasisChoice(null)
               } else {
                 setStep((s) => Math.max(0, s - 1))
               }
