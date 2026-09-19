@@ -203,6 +203,32 @@ export async function deleteFoodLog(id: string) {
   if (error) throw error
 }
 
+export interface UpdateFoodInput {
+  id: string
+  calories: number
+  protein: number
+  carbs: number
+  fats: number
+  servingSize?: string
+}
+
+export async function updateFoodLog(input: UpdateFoodInput): Promise<FoodLogRow> {
+  const { data, error } = await db
+    .from('food_logs')
+    .update({
+      calories: input.calories,
+      protein: input.protein,
+      carbs: input.carbs,
+      fats: input.fats,
+      serving_size: input.servingSize ?? null,
+    })
+    .eq('id', input.id)
+    .select('id, meal_id, food_name, calories, protein, carbs, fats, serving_size')
+    .single()
+  if (error || !data) throw error ?? new Error('Failed to update food')
+  return data as FoodLogRow
+}
+
 export interface RecentFood {
   food_name: string
   calories: number
