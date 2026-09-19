@@ -166,6 +166,23 @@ export default function NutritionPage() {
     }
   }
 
+  const applyQuantityMultiplier = (log: FoodLogRow, multiplier: number) => {
+    const updated = {
+      ...log,
+      calories: Math.round(log.calories * multiplier),
+      protein: Math.round(log.protein * multiplier * 10) / 10,
+      carbs: Math.round(log.carbs * multiplier * 10) / 10,
+      fats: Math.round(log.fats * multiplier * 10) / 10,
+    }
+    setEditForm({
+      quantity: log.serving_size || '',
+      calories: updated.calories.toString(),
+      protein: updated.protein.toString(),
+      carbs: updated.carbs.toString(),
+      fats: updated.fats.toString(),
+    })
+  }
+
   const handleDeleteFood = async (id: string) => {
     const prevLogs = logs
     setLogs(logs.filter((l) => l.id !== id))
@@ -517,13 +534,41 @@ export default function NutritionPage() {
                                       <tr key={item.id} className="group">
                                         <td className="px-3 py-2 text-[#1B2D50] font-medium">
                                           {editingId === item.id ? (
-                                            <input
-                                              type="text"
-                                              value={editForm.quantity}
-                                              onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
-                                              placeholder="Portion size"
-                                              className="px-2 py-1 border border-[#1A7BFF]/30 rounded text-xs bg-white"
-                                            />
+                                            <div className="space-y-2">
+                                              <input
+                                                type="text"
+                                                value={editForm.quantity}
+                                                onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
+                                                placeholder="Portion size (e.g. 10 oz)"
+                                                className="px-2 py-1 border border-[#1A7BFF]/30 rounded text-xs bg-white w-full"
+                                              />
+                                              <div className="flex gap-1">
+                                                <button
+                                                  onClick={() => applyQuantityMultiplier(item, 0.5)}
+                                                  className="px-2 py-1 text-xs bg-[#1A7BFF]/10 text-[#1A7BFF] rounded hover:bg-[#1A7BFF]/20 font-semibold"
+                                                >
+                                                  0.5x
+                                                </button>
+                                                <button
+                                                  onClick={() => applyQuantityMultiplier(item, 1)}
+                                                  className="px-2 py-1 text-xs bg-[#1A7BFF]/10 text-[#1A7BFF] rounded hover:bg-[#1A7BFF]/20 font-semibold"
+                                                >
+                                                  1x
+                                                </button>
+                                                <button
+                                                  onClick={() => applyQuantityMultiplier(item, 1.5)}
+                                                  className="px-2 py-1 text-xs bg-[#1A7BFF]/10 text-[#1A7BFF] rounded hover:bg-[#1A7BFF]/20 font-semibold"
+                                                >
+                                                  1.5x
+                                                </button>
+                                                <button
+                                                  onClick={() => applyQuantityMultiplier(item, 2)}
+                                                  className="px-2 py-1 text-xs bg-[#1A7BFF]/10 text-[#1A7BFF] rounded hover:bg-[#1A7BFF]/20 font-semibold"
+                                                >
+                                                  2x
+                                                </button>
+                                              </div>
+                                            </div>
                                           ) : (
                                             <>
                                               {item.food_name}
@@ -714,6 +759,20 @@ export default function NutritionPage() {
                                     />
                                   </label>
                                 </div>
+                                {addForm.serving && (
+                                  <div className="mb-2 flex gap-1 flex-wrap">
+                                    <span className="text-[10px] font-display font-bold uppercase tracking-wide text-[#64748B]">Quick sizes:</span>
+                                    {['8 oz', '10 oz', '12 oz', '1 cup', '2 cups', '1 tbsp'].map((size) => (
+                                      <button
+                                        key={size}
+                                        onClick={() => setAddForm({ ...addForm, serving: size })}
+                                        className="px-2 py-1 text-[10px] bg-[#1A7BFF]/10 text-[#1A7BFF] rounded hover:bg-[#1A7BFF]/20 font-semibold transition-colors"
+                                      >
+                                        {size}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
                                 <div className="grid grid-cols-3 gap-2 mb-2">
                                   <label className="block">
                                     <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-[#1A7BFF] mb-1">Protein (g)</span>
