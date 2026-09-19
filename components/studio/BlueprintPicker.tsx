@@ -105,7 +105,10 @@ export default function BlueprintPicker({
           {firstName ? `Let's get you set up, ${firstName}` : "Let's set up your program"}
         </h1>
         <p className="text-white/40 text-sm font-body mt-1">
-          Three quick questions and you&rsquo;re training — no waiting.
+          Answer 3 questions to get your personalized program
+        </p>
+        <p className="text-white/30 text-xs font-body mt-2.5">
+          Available: 2-6 day programs • Full Body, Upper/Lower, Push/Pull/Legs, Bro Split • Customizable for your goals & equipment
         </p>
       </div>
 
@@ -175,7 +178,10 @@ export default function BlueprintPicker({
           {/* STEP 2 — days */}
           {step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <h2 className="font-display font-bold text-white text-lg mb-4">How many days a week?</h2>
+              <h2 className="font-display font-bold text-white text-lg mb-2">How many days a week?</h2>
+              <p className="text-white/40 text-xs font-body mb-4">
+                2-3: Full Body • 4: Upper/Lower • 5-6: Upper/Lower/Push/Pull/Legs variants
+              </p>
               <div className="grid grid-cols-5 gap-2 mb-5">
                 {dayChoices.map((d) => (
                   <button
@@ -199,7 +205,7 @@ export default function BlueprintPicker({
                 ))}
               </div>
 
-              {days && days !== 5 && (
+              {days && days !== 5 && days !== 4 && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
                   <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your split</p>
                   <p className="text-white font-display font-bold text-base mt-1">{SPLIT_LABEL[days]}</p>
