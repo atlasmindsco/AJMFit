@@ -254,8 +254,10 @@ Accurate as of the last update to this file. Verify before relying on any of it.
 
 - The toolkit foundation, [tools/ops/_lib.mjs](tools/ops/_lib.mjs) — service-role client, argument parsing, the confirm gate, and `logAction`. Every new ops script builds on it, and dry run is the default: a script only writes when run with `--confirm`.
 
-**Partly done:**
-- The action log table is defined in [supabase/migrations/20260919_ops_action_log.sql](supabase/migrations/20260919_ops_action_log.sql) but **the migration has not been applied to the database**. Until it is, `logAction` warns and continues rather than failing — so writes are currently happening without an audit trail. Apply it before running anything that writes.
+- The action log. `public.ops_action_log` is live and already holds history — `logAction` writes to it and the trainer can read it. It is append-only: UPDATE, DELETE and TRUNCATE are revoked from every role including `service_role`, so it cannot be rewritten or erased. [supabase/migrations/20260919_ops_action_log.sql](supabase/migrations/20260919_ops_action_log.sql) transcribes the table's real shape for fresh databases; it did not create it.
+
+**Previously built, then lost:**
+- An earlier ops toolkit ran against production on **2026-07-12** under the actor name `cowork`. The action log records it seeding the Blueprint templates, creating the `ZEROOUT` promo code, resetting the trainer password twice, and correcting a client's email and password. **None of those scripts were ever committed** — only `seed-blueprint-programs.mjs` survives, and its `_lib.mjs` dependency did not. This is exactly the failure the spec's portability rule warns about, and it means production contains state (the 30 seeded programs, the promo code) whose creating code no longer exists. Read the action log before assuming something was never done.
 
 **Not built:**
 - The operation scripts themselves: `approve-application`, `invite-client`, `build-program`, and the multi-system reports. Everything marked [toolkit] in §5 still has to be done by hand in `/luffy`.

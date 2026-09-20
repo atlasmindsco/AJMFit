@@ -91,13 +91,17 @@ export function requireConfirm(args, description) {
 }
 
 /**
- * Append to the operations action log.
+ * Append to the operations action log (public.ops_action_log).
+ *
+ * `actor` defaults to 'cowork' to match the column default and the rows the
+ * earlier ops toolkit already wrote — a second actor name would fragment the
+ * audit trail.
  *
  * Best-effort by design: it runs after a write has already succeeded, so a
  * logging failure must not fail the script or imply the operation was rolled
  * back. It warns loudly instead.
  */
-export async function logAction({ action, target = null, summary, detail = null, actor = 'ops-toolkit' }) {
+export async function logAction({ action, target = null, summary, detail = null, actor = 'cowork' }) {
   console.log(`[log] ${action}${target ? ` · ${target}` : ''} — ${summary}`)
   try {
     const { error } = await supa()
@@ -105,10 +109,6 @@ export async function logAction({ action, target = null, summary, detail = null,
       .insert({ action, target, summary, detail, actor })
     if (error) throw new Error(error.message)
   } catch (e) {
-    console.warn(
-      `⚠ Action log not written: ${e.message}\n` +
-        `  The operation itself succeeded. If the table is missing, apply ` +
-        `supabase/migrations/20260919_ops_action_log.sql.`
-    )
+    console.warn(`⚠ Action log not written: ${e.message}\n  The operation itself succeeded.`)
   }
 }
