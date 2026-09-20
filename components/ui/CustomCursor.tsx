@@ -17,17 +17,25 @@ export default function CustomCursor() {
 
     setSupported(true)
 
-    // Hide native cursor via CSS when custom cursor is supported
-    document.documentElement.style.cursor = 'none'
-    const style = document.createElement('style')
-    style.id = 'custom-cursor-hide'
-    style.textContent = '*, *::before, *::after { cursor: none !important; }'
-    document.head.appendChild(style)
+    // Hide the native cursor only once the replacement actually has a position
+    // to render at. Hiding it on mount left no cursor at all until the first
+    // mouse move, and none ever if the component failed to render.
+    const hideNativeCursor = () => {
+      if (document.getElementById('custom-cursor-hide')) return
+      document.documentElement.style.cursor = 'none'
+      const style = document.createElement('style')
+      style.id = 'custom-cursor-hide'
+      style.textContent = '*, *::before, *::after { cursor: none !important; }'
+      document.head.appendChild(style)
+    }
 
     const move = (e: MouseEvent) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
-      if (!visible) setVisible(true)
+      if (!visible) {
+        hideNativeCursor()
+        setVisible(true)
+      }
     }
 
     const handleOver = (e: MouseEvent) => {

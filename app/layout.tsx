@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Barlow, Barlow_Condensed } from 'next/font/google'
-import CustomCursor from '@/components/ui/CustomCursor'
 import AuthErrorCatcher from '@/components/auth/AuthErrorCatcher'
 import './globals.css'
 
@@ -57,7 +56,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable}`}>
       <body className="bg-brand-white text-brand-navy font-body">
-        <CustomCursor />
         <AuthErrorCatcher />
         {children}
       </body>

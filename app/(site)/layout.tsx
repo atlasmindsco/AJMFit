@@ -1,5 +1,6 @@
 import Navbar from '@/components/ui/Navbar'
 import Footer from '@/components/ui/Footer'
+import CustomCursor from '@/components/ui/CustomCursor'
 import { SITE_URL } from '@/lib/blog'
 
 // Entity-level structured data, tells search + answer engines who AJM Fit is.
@@ -32,6 +33,7 @@ export default function SiteLayout({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
+      <CustomCursor />
       <Navbar />
       <main>{children}</main>
       <Footer />

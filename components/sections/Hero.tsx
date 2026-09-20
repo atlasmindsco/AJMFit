@@ -4,15 +4,6 @@ import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.15 + i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
-
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isMuted, setIsMuted] = useState(true)
@@ -86,24 +77,18 @@ export default function Hero() {
         )}
       </motion.button>
 
-      {/* Content */}
-      <div className="relative z-20 max-w-6xl mx-auto px-6 lg:px-8 text-center pt-28 pb-20">
-        <motion.p
-          custom={0}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="font-display font-semibold text-sm uppercase tracking-[0.3em] text-brand-blue mb-8"
+      {/* Content — CSS-animated, not JS-gated, so it paints immediately. */}
+      <div className="relative z-20 max-w-6xl mx-auto px-6 lg:px-8 text-center pt-40 sm:pt-32 md:pt-28 pb-20">
+        <p
+          style={{ animationDelay: '0.05s' }}
+          className="animate-fade-up font-display font-semibold text-sm uppercase tracking-[0.3em] text-brand-blue mb-8"
         >
           ISSA Certified Personal Training
-        </motion.p>
+        </p>
 
-        <motion.h1
-          custom={1}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="font-display font-extrabold uppercase leading-[0.9] tracking-[-0.03em]"
+        <h1
+          style={{ animationDelay: '0.14s' }}
+          className="animate-fade-up font-display font-extrabold uppercase leading-[0.9] tracking-[-0.03em]"
         >
           <span className="block text-[clamp(3rem,10vw,8rem)] text-brand-navy">
             Stop Wasting
@@ -111,26 +96,20 @@ export default function Hero() {
           <span className="block text-[clamp(3rem,10vw,8rem)] text-outline italic">
             Your Potential
           </span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          custom={2}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="mt-8 text-lg md:text-xl text-brand-slate font-body max-w-2xl mx-auto leading-relaxed"
+        <p
+          style={{ animationDelay: '0.23s' }}
+          className="animate-fade-up mt-8 text-lg md:text-xl text-brand-slate font-body max-w-2xl mx-auto leading-relaxed"
         >
-          You&rsquo;re already showing up. Let&rsquo;s make it count.
+          You&rsquo;re already showing up. Let&rsquo;s make it count.{' '}
           <br className="hidden md:block" />
           Custom programs, real accountability, and results that stick.
-        </motion.p>
+        </p>
 
-        <motion.div
-          custom={3}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
+        <div
+          style={{ animationDelay: '0.32s' }}
+          className="animate-fade-up mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Button href="/apply" variant="primary">
             Apply for Coaching
@@ -138,7 +117,7 @@ export default function Hero() {
           <Button href="/work-with-me" variant="secondary">
             See Programs
           </Button>
-        </motion.div>
+        </div>
       </div>
 
       {/* Scroll indicator */}

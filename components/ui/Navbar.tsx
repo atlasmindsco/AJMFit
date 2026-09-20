@@ -65,7 +65,9 @@ export default function Navbar() {
         className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
             ? 'top-0 bg-white/90 backdrop-blur-md shadow-[0_2px_24px_rgba(27,45,80,0.08)]'
-            : 'top-9 bg-transparent'
+            : // Opaque on mobile: there is no vertical room for a transparent bar
+              // over the hero, so the headline rendered underneath the logo.
+              'top-9 bg-white/90 backdrop-blur-md md:bg-transparent md:backdrop-blur-none'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-20">
