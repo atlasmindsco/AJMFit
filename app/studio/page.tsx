@@ -17,7 +17,7 @@ import {
   type MacroTargets,
   type NutritionTotals,
 } from '@/lib/nutrition'
-import { fetchPRs, fetchWorkoutsThisWeek, type PRRow } from '@/lib/workout'
+import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, type PRRow } from '@/lib/workout'
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
@@ -63,6 +63,9 @@ export default function ClientDashboard() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
   const [tier, setTier] = useState<string | null>(null)
+  // Whether this client has ever logged a workout. Defaults to true so the
+  // first-run nudge never flashes at an established client while data loads.
+  const [hasEverTrained, setHasEverTrained] = useState(true)
 
   useEffect(() => {
     let active = true
@@ -73,18 +76,20 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier] = await Promise.all([
-          fetchTargets(id),
-          fetchTodaysLogs(id),
-          fetchDailyLog(id),
-          fetchWeeklyCalories(id),
-          fetchWorkoutsThisWeek(id),
-          fetchPRs(id),
-          fetchMyProgram(id),
-          fetchMySessions(id),
-          fetchMyOnboarding(id),
-          fetchMyTier(id),
-        ])
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history] =
+          await Promise.all([
+            fetchTargets(id),
+            fetchTodaysLogs(id),
+            fetchDailyLog(id),
+            fetchWeeklyCalories(id),
+            fetchWorkoutsThisWeek(id),
+            fetchPRs(id),
+            fetchMyProgram(id),
+            fetchMySessions(id),
+            fetchMyOnboarding(id),
+            fetchMyTier(id),
+            fetchWorkoutHistory(id, 1),
+          ])
         if (!active) return
         setTargets(t)
         setTotals(sumTotals(logs))
@@ -96,6 +101,7 @@ export default function ClientDashboard() {
         setSessions(mySessions)
         setNeedsOnboarding(!onboarding)
         setTier(myTier)
+        setHasEverTrained(history.length > 0)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -206,6 +212,33 @@ export default function ClientDashboard() {
           </div>
           <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
             Choose →
+          </span>
+        </Link>
+      )}
+
+      {/* First-run nudge. A client who has a program but has never logged a
+          session lands on a dashboard of zeros with nothing telling them what
+          to do — which is where most of the ones who never started got stuck. */}
+      {!loading && myProgram && !hasEverTrained && (
+        <Link
+          href="/studio/programs"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-brand-orange/10 border border-brand-orange/30 hover:bg-brand-orange/15 transition-colors duration-200"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-brand-orange/15 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="font-display font-bold text-sm text-white">Start your first workout</p>
+              <p className="text-white/45 text-xs font-body mt-0.5">
+                Your program is ready. Open it, pick today&rsquo;s session, and log your first set — that&rsquo;s the whole thing.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 text-brand-orange font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+            Start →
           </span>
         </Link>
       )}

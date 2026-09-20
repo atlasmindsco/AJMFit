@@ -17,6 +17,8 @@ import {
   fetchInProgressWorkout as dbFetchInProgressWorkout,
   fetchWorkoutHistory as dbFetchWorkoutHistory,
   autoCloseStaleWorkouts as dbAutoCloseStaleWorkouts,
+  fetchLastSets as dbFetchLastSets,
+  type LastSet,
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
@@ -279,10 +281,21 @@ export default function ProgramsPage() {
   // Gates the whole page. Without this the placeholder program rendered while
   // the real one was still in flight.
   const [loading, setLoading] = useState(true)
+  // What this client did last time on each exercise, shown while they log.
+  const [lastSets, setLastSets] = useState<Record<string, LastSet[]>>({})
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
   const [prCelebration, setPrCelebration] = useState<{ name: string; weight: number } | null>(null)
+  // Shown after End Workout. Finishing a session used to clear the screen with
+  // no acknowledgement at all — the one behaviour the product most wants to
+  // reinforce got less feedback than logging a single set.
+  const [workoutSummary, setWorkoutSummary] = useState<{
+    dayName: string
+    seconds: number
+    sets: number
+    volume: number
+  } | null>(null)
   const loadHistory = useCallback((uid: string) => {
     dbFetchWorkoutHistory(uid, 12)
       .then(setHistory)
@@ -426,6 +439,10 @@ export default function ProgramsPage() {
 
     // Close any session left open from a previous day, then load history.
     dbAutoCloseStaleWorkouts(id).finally(() => loadHistory(id))
+
+    dbFetchLastSets(id)
+      .then(setLastSets)
+      .catch((err) => console.error('[Last sets] Failed to load:', err))
 
     dbFetchPRs(id)
       .then((rows) => {
@@ -613,6 +630,11 @@ export default function ProgramsPage() {
             weight={prCelebration.weight}
             onDone={() => setPrCelebration(null)}
           />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {workoutSummary && (
+          <WorkoutComplete summary={workoutSummary} onDone={() => setWorkoutSummary(null)} />
         )}
       </AnimatePresence>
       {/* MAIN CONTENT */}
@@ -1187,6 +1209,15 @@ export default function ProgramsPage() {
                                           }
                                         }
 
+                                        // What they did on this set last session. Shown as the
+                                        // placeholder rather than prefilled: a set counts as
+                                        // complete once both fields are non-empty, so prefilling
+                                        // would mark every set done on load and fire the rest
+                                        // timer and the DB write.
+                                        const prev = lastSets[displayName]?.[si]
+                                        const prevWeight = prev?.weight != null ? String(Number(prev.weight)) : null
+                                        const prevReps = prev?.reps != null ? String(prev.reps) : null
+
                                         return (
                                           <div key={si}>
                                             <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
@@ -1194,18 +1225,18 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder="lbs"
+                                                placeholder={prevWeight ?? 'lbs'}
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder="reps"
+                                                placeholder={prevReps ?? 'reps'}
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -1536,6 +1567,28 @@ export default function ProgramsPage() {
                           if (selectedDay === null) return
                           const elapsed = workoutElapsed
                           const workoutId = workoutIds[selectedDay]
+
+                          // Tally the session before the logs are cleared.
+                          let doneSets = 0
+                          let volume = 0
+                          for (const ex of selected?.exercises ?? []) {
+                            const rows = setLogs[`${selectedDay}-${ex.name}`] ?? []
+                            for (const row of rows) {
+                              const w = Number(row.weight)
+                              const r = Number(row.reps)
+                              if (row.weight !== '' && row.reps !== '' && !isNaN(w) && !isNaN(r)) {
+                                doneSets++
+                                volume += w * r
+                              }
+                            }
+                          }
+                          setWorkoutSummary({
+                            dayName: selected?.name ?? 'Session',
+                            seconds: elapsed,
+                            sets: doneSets,
+                            volume: Math.round(volume),
+                          })
+
                           setWorkoutStartTime((prev) => {
                             const next = { ...prev }
                             delete next[selectedDay]
@@ -1909,6 +1962,60 @@ function SetupCard({ icon, label, value }: { icon: string; label: string; value:
         <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-wide">{label}</p>
         <p className="text-white text-xs font-body font-semibold capitalize mt-0.5">{value}</p>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Shown when a client finishes a session. Deliberately quieter than
+ * PRCelebration — confetti should stay special to a record — but showing up
+ * is the habit worth reinforcing, and it previously got no acknowledgement at
+ * all.
+ */
+function WorkoutComplete({
+  summary,
+  onDone,
+}: {
+  summary: { dayName: string; seconds: number; sets: number; volume: number }
+  onDone: () => void
+}) {
+  const mins = Math.max(1, Math.round(summary.seconds / 60))
+  const stat = (value: string, label: string) => (
+    <div className="flex-1">
+      <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
+      <p className="text-white/35 text-[10px] font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
+    </div>
+  )
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/70">
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0, y: 16 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+        className="w-full max-w-sm text-center px-7 py-8 rounded-2xl bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
+      >
+        <p className="font-display font-bold text-[11px] uppercase tracking-[0.25em] text-brand-orange">
+          Session complete
+        </p>
+        <h2 className="font-display font-extrabold text-3xl text-white tracking-tight mt-2">
+          {summary.dayName}
+        </h2>
+
+        <div className="flex items-start gap-3 mt-6 mb-7">
+          {stat(`${mins}`, mins === 1 ? 'Minute' : 'Minutes')}
+          {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
+          {stat(summary.volume.toLocaleString(), 'Lbs Lifted')}
+        </div>
+
+        <button
+          onClick={onDone}
+          className="w-full py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+        >
+          Done
+        </button>
+      </motion.div>
     </div>
   )
 }

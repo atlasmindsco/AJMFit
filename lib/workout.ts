@@ -328,3 +328,49 @@ export async function fetchSwaps(userId: string): Promise<SwapRow[]> {
   if (error) throw error
   return (data ?? []) as SwapRow[]
 }
+
+export interface LastSet {
+  weight: number | null
+  reps: number | null
+}
+
+/**
+ * The sets this client logged the last time they trained each exercise, keyed
+ * by exercise name. Used to show what they did last session while they are
+ * logging the next one, so the numbers are in front of them instead of in
+ * their memory.
+ *
+ * Only completed, non-intensity sets count — an abandoned or partial set is
+ * not what they want to beat.
+ */
+export async function fetchLastSets(userId: string): Promise<Record<string, LastSet[]>> {
+  const { data, error } = await db
+    .from('workout_sets')
+    .select('exercise_name, set_number, weight, reps, workout_id, logged_at')
+    .eq('user_id', userId)
+    .eq('completed', true)
+    .eq('is_intensity_set', false)
+    .order('logged_at', { ascending: false })
+    .limit(600)
+  if (error) return {}
+
+  const out: Record<string, LastSet[]> = {}
+  // Rows arrive newest-first, so the first workout_id seen for an exercise is
+  // that exercise's most recent session; later workouts for it are ignored.
+  const mostRecentWorkout: Record<string, string> = {}
+  for (const row of (data ?? []) as Array<{
+    exercise_name: string
+    set_number: number
+    weight: number | null
+    reps: number | null
+    workout_id: string
+  }>) {
+    const name = row.exercise_name
+    if (!(name in mostRecentWorkout)) mostRecentWorkout[name] = row.workout_id
+    if (row.workout_id !== mostRecentWorkout[name]) continue
+    if (!out[name]) out[name] = []
+    const idx = Math.max(0, row.set_number - 1)
+    out[name][idx] = { weight: row.weight, reps: row.reps }
+  }
+  return out
+}
