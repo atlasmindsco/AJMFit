@@ -87,6 +87,7 @@ export interface LoadedProgram {
   program: PlanProgram
   weeklyPlan: PlanDay[]
   location: BlueprintLocation | null
+  goal: BlueprintGoal | null
 }
 
 interface DayRow { id: string; day_index: number; name: string; focus: string | null; notes: string | null }
@@ -104,7 +105,7 @@ function shortName(dayName: string): string {
 export async function loadAssignedProgram(programId: string): Promise<LoadedProgram | null> {
   const { data: prog } = await db
     .from('programs')
-    .select('id, name, level, split, location')
+    .select('id, name, level, split, location, goal')
     .eq('id', programId)
     .maybeSingle()
   if (!prog) return null
@@ -164,5 +165,6 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
     },
     weeklyPlan,
     location: (prog.location as BlueprintLocation) ?? null,
+    goal: (prog.goal as BlueprintGoal) ?? null,
   }
 }

@@ -23,7 +23,8 @@ import {
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
-import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
+import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
+import { PROGRESSION, nextTarget, type ProgressionGoal } from '@/lib/progression'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import { fetchMyProgram } from '@/lib/programs'
@@ -311,6 +312,7 @@ export default function ProgramsPage() {
   const [showPicker, setShowPicker] = useState(false)
   const [isBeginnerFlow, setIsBeginnerFlow] = useState(false)
   const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
+  const [programGoal, setProgramGoal] = useState<BlueprintGoal | null>(null)
   const [hasAssigned, setHasAssigned] = useState(false)
   // Gates the whole page. Without this the placeholder program rendered while
   // the real one was still in flight.
@@ -342,6 +344,7 @@ export default function ProgramsPage() {
       setWeeklyPlan(loaded.weeklyPlan)
       setCurrentProgram(loaded.program)
       setProgramLocation(loaded.location)
+      setProgramGoal(loaded.goal)
       setHasAssigned(true)
     }
   }, [])
@@ -707,9 +710,7 @@ export default function ProgramsPage() {
                 </span>
               </div>
               <p className="text-white/40 text-sm font-body mt-1 max-w-md">
-                {hasAssigned
-                  ? 'Your program. Train and log against it. Swap any exercise you can’t do.'
-                  : 'Sample routine to train and log against. Your personalized program is being built, message Coach Anthony anytime.'}
+                Your program. Train and log against it. Swap any exercise you can&rsquo;t do.
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -727,6 +728,26 @@ export default function ProgramsPage() {
             </div>
           </div>
         </div>
+
+        {/* How to progress. The library prescribes sets and reps but never said
+            how this week should differ from last week, which is the difference
+            between a program and a list of workouts. */}
+        {(() => {
+          const p = PROGRESSION[(programGoal ?? 'muscle') as ProgressionGoal]
+          const item = (label: string, body: string) => (
+            <div>
+              <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">{label}</p>
+              <p className="text-white/60 text-xs font-body mt-1 leading-relaxed">{body}</p>
+            </div>
+          )
+          return (
+            <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {item('How to progress', p.rule)}
+              {item('How hard to push', p.effort)}
+              {item('Backing off', p.deload)}
+            </div>
+          )
+        })()}
 
         {/* View Content */}
         <AnimatePresence mode="wait">
@@ -1179,6 +1200,30 @@ export default function ProgramsPage() {
                                                 </svg>
                                               </button>
                                             )}
+                                          </div>
+                                        )
+                                      })()}
+
+                                      {/* Today's target, derived from last session. The library
+                                          prescribes sets and reps but never said what to do
+                                          differently from one week to the next. */}
+                                      {(() => {
+                                        const t = nextTarget(
+                                          displayName,
+                                          exercise.reps,
+                                          (programGoal ?? 'muscle') as ProgressionGoal,
+                                          lastSets[displayName]
+                                        )
+                                        if (!t) return null
+                                        return (
+                                          <div
+                                            className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
+                                              t.addLoad
+                                                ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
+                                                : 'bg-white/[0.03] border-white/[0.08] text-white/55'
+                                            }`}
+                                          >
+                                            {t.text}
                                           </div>
                                         )
                                       })()}
