@@ -374,3 +374,46 @@ export async function fetchLastSets(userId: string): Promise<Record<string, Last
   }
   return out
 }
+
+/**
+ * Consecutive weeks in which this client logged at least one workout.
+ *
+ * Weeks rather than days on purpose: programs here run 2-6 days a week, so a
+ * day streak would break on a scheduled rest day and punish people for
+ * following their own plan. A week is the unit the training actually uses.
+ *
+ * The current week counts only if it already has a workout; if it does not,
+ * the streak is measured to last week and stays alive until the week ends,
+ * so nobody watches it reset on a Monday morning.
+ */
+export async function fetchWeekStreak(userId: string): Promise<number> {
+  const { data, error } = await db
+    .from('workouts')
+    .select('date')
+    .eq('user_id', userId)
+    .order('date', { ascending: false })
+    .limit(400)
+  if (error || !data?.length) return 0
+
+  // Monday-start week index, so all dates in one week share a key.
+  const weekKey = (d: Date) => {
+    const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+    const day = (t.getUTCDay() + 6) % 7
+    t.setUTCDate(t.getUTCDate() - day)
+    return Math.floor(t.getTime() / 604800000)
+  }
+
+  const trained = new Set<number>()
+  for (const row of data as Array<{ date: string }>) {
+    trained.add(weekKey(new Date(row.date + 'T00:00:00Z')))
+  }
+
+  const thisWeek = weekKey(new Date())
+  let cursor = trained.has(thisWeek) ? thisWeek : thisWeek - 1
+  let streak = 0
+  while (trained.has(cursor)) {
+    streak++
+    cursor--
+  }
+  return streak
+}

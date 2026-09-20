@@ -17,7 +17,7 @@ import {
   type MacroTargets,
   type NutritionTotals,
 } from '@/lib/nutrition'
-import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, type PRRow } from '@/lib/workout'
+import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, type PRRow } from '@/lib/workout'
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
@@ -66,6 +66,7 @@ export default function ClientDashboard() {
   // Whether this client has ever logged a workout. Defaults to true so the
   // first-run nudge never flashes at an established client while data loads.
   const [hasEverTrained, setHasEverTrained] = useState(true)
+  const [weekStreak, setWeekStreak] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -76,7 +77,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history] =
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak] =
           await Promise.all([
             fetchTargets(id),
             fetchTodaysLogs(id),
@@ -89,6 +90,7 @@ export default function ClientDashboard() {
             fetchMyOnboarding(id),
             fetchMyTier(id),
             fetchWorkoutHistory(id, 1),
+            fetchWeekStreak(id),
           ])
         if (!active) return
         setTargets(t)
@@ -102,6 +104,7 @@ export default function ClientDashboard() {
         setNeedsOnboarding(!onboarding)
         setTier(myTier)
         setHasEverTrained(history.length > 0)
+        setWeekStreak(streak)
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -130,7 +133,7 @@ export default function ClientDashboard() {
     }
   }, [])
 
-  const val = (v: string | number) => (loading ? ', ' : v)
+  const val = (v: string | number) => (loading ? '—' : v)
   const caloriesMax = Math.max(targets.calories, ...weekCals.map((d) => d.calories), 1)
   const recentPRs = [...prs].sort((a, b) => +new Date(b.set_at) - +new Date(a.set_at)).slice(0, 5)
   const upcomingSessions = [...sessions]
@@ -184,12 +187,27 @@ export default function ClientDashboard() {
 
   return (
     <div>
-      {/* Greeting */}
-      <div className="mb-6">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
-          Welcome back{firstName ? `, ${firstName}` : ''}
-        </h1>
-        <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
+      {/* Greeting. The streak sits here rather than in the stat row because it
+          is status, not a metric — and it carries the marketing hero's outline
+          numerals into the studio, which is the one piece of the brand that
+          previously stopped at the login screen. */}
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+            Welcome back{firstName ? `, ${firstName}` : ''}
+          </h1>
+          <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
+        </div>
+        {!loading && weekStreak > 0 && (
+          <div className="shrink-0 text-right">
+            <span className="font-display font-extrabold text-4xl sm:text-5xl leading-none text-outline-light tabular-nums">
+              {weekStreak}
+            </span>
+            <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-[0.18em] mt-1">
+              {weekStreak === 1 ? 'Week streak' : 'Weeks straight'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Blueprint is self-serve: no onboarding form, no call. Point them

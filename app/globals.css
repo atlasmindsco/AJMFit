@@ -100,6 +100,14 @@ body {
   color: transparent;
 }
 
+/* Light variant for the dark studio. The marketing hero's outline type is the
+   most recognisable thing the brand owns, and none of it previously survived
+   past the login screen. */
+.text-outline-light {
+  -webkit-text-stroke: 1.5px var(--white);
+  color: transparent;
+}
+
 @media (min-width: 768px) {
   .text-outline {
     -webkit-text-stroke: 3px var(--navy);

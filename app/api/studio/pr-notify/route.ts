@@ -42,6 +42,30 @@ export async function POST(request: Request) {
   const name = (u?.name as string) || 'A client'
   const clientEmail = (u?.email as string) || ''
 
+  // Tell the client too. They see an animation at the moment it happens, but
+  // nothing afterwards — and a personal record is the single best reason to
+  // pull someone back into the app later.
+  if (clientEmail) {
+    const firstName = name.trim().split(/\s+/)[0]
+    try {
+      await sendMail({
+        to: clientEmail,
+        replyTo: COACH_EMAIL,
+        subject: `New personal record: ${exerciseName} ${weight} lbs`,
+        text: `${firstName}, you just hit a personal record on ${exerciseName}: ${weight} lbs${reps ? ` for ${reps} reps` : ''}.`,
+        html: `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1B2D50">
+          <p style="font-size:20px;margin:0 0 6px"><strong>${firstName}, that is a new personal record.</strong></p>
+          <p style="font-size:18px;margin:0 0 12px">${exerciseName} — ${weight} lbs${reps ? ` × ${reps}` : ''}${
+            previousWeight ? ` <span style="color:#64748B">(your previous best was ${previousWeight} lbs)</span>` : ''
+          }</p>
+          <p style="color:#64748B;margin:0">Logged in your training studio. Keep it going.</p>
+        </div>`,
+      })
+    } catch (e) {
+      console.error('[pr-notify] client email failed', e)
+    }
+  }
+
   try {
     await sendMail({
       to: COACH_EMAIL,

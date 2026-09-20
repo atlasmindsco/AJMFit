@@ -155,7 +155,7 @@ export default function BeginnerPicker({
               <button
                 onClick={start}
                 disabled={!days || submitting}
-                className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
               >
                 {submitting ? 'Setting up…' : 'Start Training'}
               </button>
