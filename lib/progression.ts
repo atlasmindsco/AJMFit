@@ -86,6 +86,9 @@ export function nextTarget(
   goal: ProgressionGoal,
   lastSets: LastSet[] | undefined
 ): NextTarget | null {
+  // Conditioning and mobility slots are prescribed in minutes, not reps, and
+  // have no load to add — there is nothing to progress here.
+  if (/min|sec|hour|km|mile/i.test(String(reps ?? ''))) return null
   const range = parseRepRange(reps)
   const done = (lastSets ?? []).filter((s) => s && s.reps != null && s.weight != null)
   if (!range || done.length === 0) return null

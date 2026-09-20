@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   // trusted. The old shape mapped two separate choice vocabularies onto
   // hardcoded day numbers, which is how the 4-day emphasis options ended up
   // pointing at split keys that had never been seeded.
-  const split = splitKey && isValidSplitForDays(days, splitKey) ? splitKey : DAYS_TO_SPLIT[days]
+  const split = splitKey && isValidSplitForDays(days, splitKey, goal as BlueprintGoal) ? splitKey : DAYS_TO_SPLIT[days]
 
   if (!GOALS.includes(goal as BlueprintGoal) || !LOCATIONS.includes(location as BlueprintLocation) || !split) {
     return NextResponse.json({ error: 'Invalid choices' }, { status: 400 })

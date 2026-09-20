@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   GOAL_LABELS,
   LOCATION_LABELS,
-  SPLIT_OPTIONS,
+  splitsFor,
   type BlueprintGoal,
   type BlueprintLocation,
 } from '@/lib/blueprint'
@@ -48,7 +48,7 @@ export default function BlueprintPicker({
   const locations: BlueprintLocation[] = ['home', 'gym']
   const dayChoices = beginner ? [3, 4] : [2, 3, 4, 5, 6]
 
-  const splitsForDays = days ? SPLIT_OPTIONS[days] ?? [] : []
+  const splitsForDays = days ? splitsFor(days, goal, beginner) : []
   const needsSplitChoice = splitsForDays.length > 1
   const chosenSplit = splitKey ?? splitsForDays[0]?.key ?? null
 
@@ -145,7 +145,7 @@ export default function BlueprintPicker({
         <p className="text-white/30 text-xs font-body mt-2.5">
           {beginner
             ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
-            : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split • Gym or dumbbells at home'}
+            : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split, plus hybrid tracks with running and conditioning • Gym or dumbbells at home'}
         </p>
       </div>
 
@@ -226,7 +226,7 @@ export default function BlueprintPicker({
                     onClick={() => {
                       setDays(d)
                       setSplitKey(null)
-                      if ((SPLIT_OPTIONS[d] ?? []).length > 1) setStep(3)
+                      if (splitsFor(d, goal, beginner).length > 1) setStep(3)
                     }}
                     className={`py-4 rounded-card border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d

@@ -36,6 +36,11 @@ const LOCATIONS = [
 const plan = []
 for (const [goalKey, goal] of Object.entries(goals)) {
   for (const [splitKey, split] of Object.entries(splits)) {
+    // A split may restrict which goals it makes sense under. The hybrid tracks
+    // use this: a lean-out scheme with its conditioning finisher bolted onto a
+    // program that already runs three times a week is just more fatigue, and a
+    // hypertrophy rep scheme applied to a sprint drill defeats the drill.
+    if (Array.isArray(split.goals) && !split.goals.includes(goalKey)) continue
     for (const loc of LOCATIONS) {
       const days = split.days.map((d, di) => {
         const notes = [
@@ -87,7 +92,11 @@ const totalEx = plan.reduce((n, p) => n + p.days.reduce((m, d) => m + d.exercise
 console.log(`\nBlueprint program library → ${plan.length} programs, ${totalDays} days, ${totalEx} exercises.`)
 console.log(`Goals: ${Object.keys(goals).length} · Splits: ${Object.keys(splits).length} · Locations: 2\n`)
 for (const [splitKey, split] of Object.entries(splits)) {
-  console.log(`  ${split.recommended ? '✅' : '  '} ${split.label}  (${split.days_per_week}d) — 6 programs (3 goals × gym/home)`)
+  const gs = Array.isArray(split.goals) ? split.goals : Object.keys(goals)
+  console.log(
+    `  ${split.recommended ? '✅' : '  '} ${split.label}  (${split.days_per_week}d) — ` +
+      `${gs.length * 2} programs (${gs.join('/')} × gym/home)`
+  )
 }
 
 requireConfirm(
