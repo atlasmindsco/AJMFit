@@ -53,7 +53,7 @@ export default function FeedbackButton() {
       </button>
 
       {open && (
-        <div className="fixed bottom-20 left-6 z-50 w-[320px] rounded-xl border border-white/[0.12] bg-[#1A1A1A] shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4">
+        <div className="fixed bottom-20 left-6 z-50 w-[320px] rounded-xl border border-white/[0.12] bg-surface-overlay shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4">
           {done ? (
             <p className="text-emerald-400 text-sm font-body py-6 text-center">Thanks! Feedback sent. 🙌</p>
           ) : (
@@ -65,11 +65,11 @@ export default function FeedbackButton() {
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
                 placeholder="What's on your mind?"
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white font-body resize-none focus:outline-none focus:border-[#F76B16]/40"
+                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white font-body resize-none focus:outline-none focus:border-brand-orange/40"
               />
               <div className="flex justify-end gap-2 mt-3">
                 <button onClick={() => setOpen(false)} className="px-3 py-1.5 text-white/40 text-xs font-body hover:text-white/70">Cancel</button>
-                <button onClick={send} disabled={sending || !message.trim()} className="px-4 py-1.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">{sending ? 'Sending…' : 'Send'}</button>
+                <button onClick={send} disabled={sending || !message.trim()} className="px-4 py-1.5 bg-brand-orange text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">{sending ? 'Sending…' : 'Send'}</button>
               </div>
             </>
           )}

@@ -98,7 +98,7 @@ export default function MuscleMap({
             defaultStroke={defaultStroke}
             defaultStrokeWidth={0.8}
           />
-          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.15em] mt-1 ${dark ? 'text-white/30' : 'text-[#1B2D50]/40'}`}>
+          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.15em] mt-1 ${dark ? 'text-white/30' : 'text-brand-navy/40'}`}>
             Front
           </span>
         </div>
@@ -113,7 +113,7 @@ export default function MuscleMap({
             defaultStroke={defaultStroke}
             defaultStrokeWidth={0.8}
           />
-          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.15em] mt-1 ${dark ? 'text-white/30' : 'text-[#1B2D50]/40'}`}>
+          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.15em] mt-1 ${dark ? 'text-white/30' : 'text-brand-navy/40'}`}>
             Back
           </span>
         </div>
@@ -123,13 +123,13 @@ export default function MuscleMap({
       <div className="flex items-center gap-3 mt-1">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: PRIMARY }} />
-          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-[#1B2D50]/50'}`}>
+          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-brand-navy/50'}`}>
             Primary
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: SECONDARY }} />
-          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-[#1B2D50]/50'}`}>
+          <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-brand-navy/50'}`}>
             Secondary
           </span>
         </div>

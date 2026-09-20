@@ -9,7 +9,7 @@ import { fetchCoachSettings, saveCoachSettings, DEFAULT_COACH_SETTINGS, type Coa
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30'
+  'w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30'
 const labelCls = 'text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
@@ -67,7 +67,7 @@ export default function SettingsPage() {
   const SaveBar = (
     <div className="mt-6 flex items-center justify-end gap-3">
       {saved && <span className="text-emerald-400 text-xs font-body">Saved ✓</span>}
-      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
+      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
         {saving ? 'Saving…' : 'Save Changes'}
       </button>
     </div>
@@ -79,7 +79,7 @@ export default function SettingsPage() {
         <p className="text-white font-body font-semibold text-sm">{label}</p>
         <p className="text-white/25 text-xs font-body">{description}</p>
       </div>
-      <button onClick={() => set(key, !s[key] as never)} className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${s[key] ? 'bg-[#F76B16]' : 'bg-white/[0.08]'}`}>
+      <button onClick={() => set(key, !s[key] as never)} className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${s[key] ? 'bg-brand-orange' : 'bg-white/[0.08]'}`}>
         <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200 ${s[key] ? 'left-[22px]' : 'left-0.5'}`} />
       </button>
     </div>
@@ -95,7 +95,7 @@ export default function SettingsPage() {
 
       <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1.5">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-[#F76B16] text-white' : 'text-white/30 hover:text-white/60'}`}>
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-white/30 hover:text-white/60'}`}>
             {tab.label}
           </button>
         ))}
@@ -136,7 +136,7 @@ export default function SettingsPage() {
               {TIERS.map((tier) => (
                 <div key={tier.name} className="flex items-center justify-between p-4 rounded-lg bg-white/[0.02] border border-white/[0.04]">
                   <div><p className="text-white font-body font-semibold text-sm">{tier.name}</p><p className="text-white/25 text-xs font-body">{tier.features}</p></div>
-                  <span className="text-[#F76B16] font-display font-bold text-lg">{tier.price}</span>
+                  <span className="text-brand-orange font-display font-bold text-lg">{tier.price}</span>
                 </div>
               ))}
             </div>
@@ -161,7 +161,7 @@ export default function SettingsPage() {
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Revenue</h2>
             <div className="flex items-baseline gap-3">
-              <p className="font-display font-extrabold text-3xl text-[#F76B16]">
+              <p className="font-display font-extrabold text-3xl text-brand-orange">
                 {revenue === null ? ', ' : `$${(revenue / 100).toLocaleString()}`}
               </p>
               <span className="text-white/30 text-xs font-display uppercase tracking-wide">this month</span>

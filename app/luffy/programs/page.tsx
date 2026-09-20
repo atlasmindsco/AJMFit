@@ -104,7 +104,7 @@ export default function ProgramsPage() {
           <button
             onClick={() => setActiveTab('programs')}
             className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
-              activeTab === 'programs' ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+              activeTab === 'programs' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
             }`}
           >
             Programs
@@ -112,7 +112,7 @@ export default function ProgramsPage() {
           <button
             onClick={() => setActiveTab('library')}
             className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
-              activeTab === 'library' ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+              activeTab === 'library' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
             }`}
           >
             Exercise Library
@@ -137,7 +137,7 @@ export default function ProgramsPage() {
                 placeholder="Search 873 exercises..."
                 value={libSearch}
                 onChange={(e) => setLibSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg font-body text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#F76B16]/40 transition-colors duration-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg font-body text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-brand-orange/40 transition-colors duration-200"
               />
             </div>
 
@@ -151,7 +151,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibMuscle(m)}
                     className={`px-2.5 py-1 rounded-md text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libMuscle === m
-                        ? 'bg-[#F76B16] text-white'
+                        ? 'bg-brand-orange text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -171,7 +171,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibEquipment(e)}
                     className={`px-2.5 py-1 rounded-md text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
-                        ? 'bg-[#1A7BFF] text-white'
+                        ? 'bg-brand-blue text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
                     }`}
                   >
@@ -187,7 +187,7 @@ export default function ProgramsPage() {
           {/* Loading */}
           {libLoading && (
             <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 border-2 border-white/10 border-t-[#F76B16] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-white/10 border-t-brand-orange rounded-full animate-spin" />
             </div>
           )}
 
@@ -215,14 +215,14 @@ export default function ProgramsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-body font-semibold text-sm truncate group-hover:text-[#F76B16] transition-colors duration-150">
+                    <p className="text-white font-body font-semibold text-sm truncate group-hover:text-brand-orange transition-colors duration-150">
                       {ex.name}
                     </p>
                     <p className="text-white/30 text-[11px] font-body capitalize truncate">
                       {ex.primaryMuscles.join(', ')}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-[#F76B16]/70 bg-[#F76B16]/10 px-1.5 py-0.5 rounded">
+                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-brand-orange/70 bg-brand-orange/10 px-1.5 py-0.5 rounded">
                         {ex.level}
                       </span>
                       <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-white/25 bg-white/[0.04] px-1.5 py-0.5 rounded capitalize">
@@ -256,11 +256,11 @@ export default function ProgramsPage() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 20, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  className="bg-[#1B2D50] border border-white/[0.08] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] w-full max-w-lg max-h-[90vh] overflow-y-auto"
+                  className="bg-brand-navy border border-white/[0.08] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] w-full max-w-lg max-h-[90vh] overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Header */}
-                  <div className="sticky top-0 bg-[#1B2D50]/95 backdrop-blur-sm border-b border-white/[0.06] px-5 py-3.5 flex items-center justify-between z-10">
+                  <div className="sticky top-0 bg-brand-navy/95 backdrop-blur-sm border-b border-white/[0.06] px-5 py-3.5 flex items-center justify-between z-10">
                     <h2 className="font-display font-extrabold text-base text-white capitalize leading-tight pr-4">
                       {selectedExercise.name}
                     </h2>
@@ -312,10 +312,10 @@ export default function ProgramsPage() {
                   <div className="px-6 pb-6 space-y-5">
                     {/* Badges */}
                     <div className="flex flex-wrap gap-1.5">
-                      <span className="px-2 py-1 bg-[#F76B16]/15 text-[#F76B16] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
+                      <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-[#1A7BFF]/15 text-[#1A7BFF] font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
+                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
                         {selectedExercise.category}
                       </span>
                       <span className="px-2 py-1 bg-white/[0.06] text-white/40 font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-md">
@@ -327,7 +327,7 @@ export default function ProgramsPage() {
                     <div className="flex items-start gap-5">
                       <div className="flex-1">
                         <p className="text-[10px] font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Primary</p>
-                        <p className="font-display font-bold text-sm text-[#F76B16] capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
+                        <p className="font-display font-bold text-sm text-brand-orange capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
                       </div>
                       {selectedExercise.secondaryMuscles.length > 0 && (
                         <div className="flex-1">
@@ -344,7 +344,7 @@ export default function ProgramsPage() {
                         <ol className="space-y-2.5">
                           {selectedExercise.instructions.map((step, i) => (
                             <li key={i} className="flex gap-3">
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-[#F76B16]/15 text-[#F76B16] flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                              <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
                                 {i + 1}
                               </span>
                               <p className="font-body text-[13px] text-white/60 leading-relaxed">{step}</p>

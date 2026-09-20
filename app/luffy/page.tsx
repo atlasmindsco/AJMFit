@@ -15,8 +15,8 @@ interface Stats {
 }
 
 function getTierColor(tier: string) {
-  if (tier.includes('Full')) return 'text-[#F76B16]'
-  if (tier.includes('Accelerator')) return 'text-[#1A7BFF]'
+  if (tier.includes('Full')) return 'text-brand-orange'
+  if (tier.includes('Accelerator')) return 'text-brand-blue'
   return 'text-white/50'
 }
 
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
         <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="xl:col-span-2 bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
           <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Clients</h2>
-            <Link href="/luffy/clients" className="text-xs text-[#F76B16] font-body hover:underline">View all →</Link>
+            <Link href="/luffy/clients" className="text-xs text-brand-orange font-body hover:underline">View all →</Link>
           </div>
           <div className="overflow-x-auto">
             {loading ? (
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Pending Applications</h2>
             {pending.length > 0 && (
-              <span className="w-5 h-5 rounded-full bg-[#F76B16] flex items-center justify-center text-white text-[10px] font-display font-bold">{pending.length}</span>
+              <span className="w-5 h-5 rounded-full bg-brand-orange flex items-center justify-center text-white text-[10px] font-display font-bold">{pending.length}</span>
             )}
           </div>
           <div className="p-4 space-y-2">
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
             ) : (
               pending.map((c) => (
                 <Link key={c.id} href="/luffy/clients" className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/[0.02] transition-colors duration-150">
-                  <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-[#F76B16]" />
+                  <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-brand-orange" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white/80 text-sm font-body leading-snug">{c.name}</p>
                     <span className="text-[10px] font-display uppercase tracking-[0.15em] text-white/30 mt-1 inline-block">

@@ -33,7 +33,7 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
 
   if (variant === 'band') {
     return (
-      <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-brand-blue to-[#0f5fe0] text-white p-9 lg:p-11 grain-overlay">
+      <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-brand-blue to-brand-bluedark text-white p-9 lg:p-11 grain-overlay">
         <div className="absolute -top-10 -right-8 w-52 h-52 rounded-full bg-white/10 blur-2xl" />
         <div className="absolute -bottom-12 left-10 w-44 h-44 rounded-full bg-brand-orange/20 blur-2xl" />
         <div className="relative grid lg:grid-cols-2 gap-8 items-center">

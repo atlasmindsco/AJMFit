@@ -108,33 +108,33 @@ export default function SchedulePage() {
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 h-fit">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-5">Schedule a Session</h2>
           <div className="space-y-3">
-            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30">
+            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30">
               <option value="">Select client…</option>
               {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <div className="grid grid-cols-2 gap-3">
-              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30 [color-scheme:dark]" />
-              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30 [color-scheme:dark]" />
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
+              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
             </div>
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30">
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30">
               {SESSION_TYPES.map((t) => <option key={t}>{t}</option>)}
             </select>
             <div className="flex items-center gap-2">
-              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-[#F76B16]/30" />
+              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30" />
               <span className="text-white/40 text-xs font-body">minutes</span>
             </div>
             <label className="flex items-center gap-2.5 px-1 py-1 cursor-pointer select-none">
-              <input type="checkbox" checked={form.zoom} onChange={(e) => setForm({ ...form, zoom: e.target.checked })} className="w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-[#F76B16] cursor-pointer" />
+              <input type="checkbox" checked={form.zoom} onChange={(e) => setForm({ ...form, zoom: e.target.checked })} className="w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-brand-orange cursor-pointer" />
               <span className="text-white/60 text-xs font-body">Generate a Zoom link for this session</span>
             </label>
             {error && <p className="text-red-400/80 text-xs font-body">{error}</p>}
-            <button onClick={add} disabled={creating || !form.user_id || !form.date || !form.time} className="w-full py-2.5 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] active:scale-[0.98] transition-all duration-200 disabled:opacity-40">
+            <button onClick={add} disabled={creating || !form.user_id || !form.date || !form.time} className="w-full py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40">
               {creating ? (form.zoom ? 'Creating Zoom link…' : 'Adding…') : 'Add Session'}
             </button>
           </div>
 
           {CALENDLY && (
-            <a href={CALENDLY} target="_blank" rel="noreferrer" className="block mt-4 text-center text-[#1A7BFF] text-xs font-body hover:underline">Open Calendly booking →</a>
+            <a href={CALENDLY} target="_blank" rel="noreferrer" className="block mt-4 text-center text-brand-blue text-xs font-body hover:underline">Open Calendly booking →</a>
           )}
         </motion.div>
 
@@ -147,14 +147,14 @@ export default function SchedulePage() {
                 : upcoming.length === 0 ? <p className="px-2 py-3 text-white/40 text-sm font-body">No upcoming sessions. Schedule one on the left.</p>
                 : upcoming.map((s) => (
                   <div key={s.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.02]">
-                    <div className="w-10 h-10 rounded-lg bg-[#F76B16]/10 flex items-center justify-center shrink-0">
-                      <svg className="w-4 h-4 text-[#F76B16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                    <div className="w-10 h-10 rounded-lg bg-brand-orange/10 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-body font-medium truncate">{s.clientName}</p>
                       <p className="text-white/30 text-xs font-body">{s.type} · {s.duration_min} min · {fmt(s.starts_at)}</p>
                       {s.join_url && (
-                        <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-[#1A7BFF] text-xs font-body hover:underline">
+                        <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-brand-blue text-xs font-body hover:underline">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                           Join Zoom
                         </a>

@@ -16,8 +16,8 @@ import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type OnboardingForm } from '@/lib/onboarding'
 
 function getTierColor(tier: string) {
-  if (tier.includes('Full')) return 'bg-[#F76B16]/15 text-[#F76B16]'
-  if (tier.includes('Accelerator')) return 'bg-[#1A7BFF]/15 text-[#1A7BFF]'
+  if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
+  if (tier.includes('Accelerator')) return 'bg-brand-blue/15 text-brand-blue'
   return 'bg-white/[0.06] text-white/50'
 }
 
@@ -180,7 +180,7 @@ export default function ClientsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${
-                filter === f ? 'bg-[#F76B16] text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                filter === f ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
               }`}
             >
               {f}
@@ -216,7 +216,7 @@ export default function ClientsPage() {
                   animate="visible"
                   onClick={() => setSelectedClient(isExpanded ? null : client.id)}
                   className={`bg-white/[0.03] border rounded-xl p-5 cursor-pointer transition-all duration-200 ${
-                    isExpanded ? 'border-[#F76B16]/30 bg-white/[0.05]' : 'border-white/[0.06] hover:border-white/[0.12]'
+                    isExpanded ? 'border-brand-orange/30 bg-white/[0.05]' : 'border-white/[0.06] hover:border-white/[0.12]'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-4">
@@ -224,7 +224,7 @@ export default function ClientsPage() {
                       <div
                         className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${
                           client.status === 'active'
-                            ? 'bg-gradient-to-br from-[#F76B16] to-[#D8590C]'
+                            ? 'bg-gradient-to-br from-brand-orange to-brand-orangedark'
                             : client.status === 'pending'
                             ? 'bg-gradient-to-br from-amber-500 to-amber-600'
                             : 'bg-white/[0.06]'
@@ -279,7 +279,7 @@ export default function ClientsPage() {
                               }}
                               disabled={processing === client.id}
                               title="Send them a fresh set-password link"
-                              className="px-2.5 py-1.5 rounded-lg bg-[#1A7BFF]/15 border border-[#1A7BFF]/25 text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide hover:bg-[#1A7BFF]/25 transition-colors duration-200 disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-lg bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
                             >
                               {processing === client.id ? '...' : 'Resend invite'}
                             </button>
@@ -294,7 +294,7 @@ export default function ClientsPage() {
                             title="Beta testers get free studio access (no payment)"
                             className={`px-2.5 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
                               client.is_beta
-                                ? 'bg-[#F76B16]/15 border border-[#F76B16]/25 text-[#F76B16]'
+                                ? 'bg-brand-orange/15 border border-brand-orange/25 text-brand-orange'
                                 : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
                             }`}
                           >
@@ -372,7 +372,7 @@ export default function ClientsPage() {
 
                       {/* Onboarding form answers (pre-call questionnaire) */}
                       <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-                        <p className="text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+                        <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide mb-2">
                           Onboarding form
                         </p>
                         {onboardingMap.get(client.id) ? (
@@ -474,7 +474,7 @@ export default function ClientsPage() {
                           setFilter('pending')
                           setSelectedClient(client.id)
                         }}
-                        className="px-3 py-1.5 bg-[#F76B16] text-white text-[10px] font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C] transition-colors duration-200"
+                        className="px-3 py-1.5 bg-brand-orange text-white text-[10px] font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark transition-colors duration-200"
                       >
                         Review
                       </button>
@@ -504,11 +504,11 @@ export default function ClientsPage() {
                   onClick={() => setDeclineReason(r.key)}
                   className={`w-full text-left px-3.5 py-2.5 rounded-lg border transition-colors duration-150 ${
                     declineReason === r.key
-                      ? 'bg-[#F76B16]/10 border-[#F76B16]/40'
+                      ? 'bg-brand-orange/10 border-brand-orange/40'
                       : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.16]'
                   }`}
                 >
-                  <span className={`block text-sm font-body font-semibold ${declineReason === r.key ? 'text-[#F76B16]' : 'text-white/80'}`}>
+                  <span className={`block text-sm font-body font-semibold ${declineReason === r.key ? 'text-brand-orange' : 'text-white/80'}`}>
                     {r.label}
                   </span>
                   <span className="block text-white/35 text-xs font-body mt-0.5">{r.hint}</span>
@@ -520,7 +520,7 @@ export default function ClientsPage() {
               onChange={(e) => setDeclineNote(e.target.value)}
               placeholder="Optional personal note (included in the email, in your words)"
               rows={2}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-[#1A7BFF]/50 resize-none"
+              className="w-full px-3.5 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50 resize-none"
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
@@ -533,7 +533,7 @@ export default function ClientsPage() {
               <button
                 onClick={submitDecline}
                 disabled={processing !== null}
-                className="px-4 py-2 rounded-lg bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-[#D8590C] transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark transition-colors disabled:opacity-50"
               >
                 {processing !== null ? 'Sending…' : 'Decline & send email'}
               </button>

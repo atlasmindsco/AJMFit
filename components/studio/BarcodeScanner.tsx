@@ -132,13 +132,13 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
           {/* Reticle overlay */}
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
             <div className="relative w-3/4 h-1/3 max-w-xs">
-              <div className="absolute -top-px -left-px w-6 h-6 border-t-2 border-l-2 border-[#F76B16] rounded-tl-lg" />
-              <div className="absolute -top-px -right-px w-6 h-6 border-t-2 border-r-2 border-[#F76B16] rounded-tr-lg" />
-              <div className="absolute -bottom-px -left-px w-6 h-6 border-b-2 border-l-2 border-[#F76B16] rounded-bl-lg" />
-              <div className="absolute -bottom-px -right-px w-6 h-6 border-b-2 border-r-2 border-[#F76B16] rounded-br-lg" />
+              <div className="absolute -top-px -left-px w-6 h-6 border-t-2 border-l-2 border-brand-orange rounded-tl-lg" />
+              <div className="absolute -top-px -right-px w-6 h-6 border-t-2 border-r-2 border-brand-orange rounded-tr-lg" />
+              <div className="absolute -bottom-px -left-px w-6 h-6 border-b-2 border-l-2 border-brand-orange rounded-bl-lg" />
+              <div className="absolute -bottom-px -right-px w-6 h-6 border-b-2 border-r-2 border-brand-orange rounded-br-lg" />
               {/* Scanning line */}
               {status === 'scanning' && (
-                <div className="absolute left-0 right-0 top-1/2 h-px bg-[#F76B16] shadow-[0_0_8px_#F76B16] animate-pulse" />
+                <div className="absolute left-0 right-0 top-1/2 h-px bg-brand-orange shadow-[0_0_8px_#F76B16] animate-pulse" />
               )}
             </div>
           </div>

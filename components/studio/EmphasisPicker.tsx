@@ -78,7 +78,7 @@ export default function EmphasisPicker({
             onClick={() => setSelected(opt.key)}
             className={`text-left px-5 py-4 rounded-xl border transition-all duration-200 active:scale-[0.99] ${
               selected === opt.key
-                ? 'bg-[#1A7BFF]/[0.12] border-[#1A7BFF]/50'
+                ? 'bg-brand-blue/[0.12] border-brand-blue/50'
                 : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14]'
             }`}
           >
@@ -109,7 +109,7 @@ export default function EmphasisPicker({
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="flex-1 py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+          className="flex-1 py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
         >
           {submitting ? 'Saving…' : selected ? 'Continue' : 'No emphasis'}
         </button>

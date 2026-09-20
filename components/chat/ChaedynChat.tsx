@@ -150,13 +150,13 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
 
   return (
     <div className={`flex flex-col h-full rounded-xl border overflow-hidden ${
-      isDark ? 'bg-white/[0.03] border-white/[0.06]' : 'bg-white border-[#1B2D50]/[0.06]'
+      isDark ? 'bg-white/[0.03] border-white/[0.06]' : 'bg-white border-brand-navy/[0.06]'
     }`}>
       {/* Header */}
       <div className={`px-4 py-3 border-b flex items-center gap-3 shrink-0 ${
-        isDark ? 'border-white/[0.06]' : 'border-[#1B2D50]/[0.06]'
+        isDark ? 'border-white/[0.06]' : 'border-brand-navy/[0.06]'
       }`}>
-        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-[#1A7BFF]">
+        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-brand-blue">
           <Image
             src="/chea-avatar.jpg"
             alt="Chea"
@@ -166,12 +166,12 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
           />
         </div>
         <div className="flex-1">
-          <h2 className={`font-display font-bold text-sm ${isDark ? 'text-white' : 'text-[#1B2D50]'}`}>
+          <h2 className={`font-display font-bold text-sm ${isDark ? 'text-white' : 'text-brand-navy'}`}>
             Chea
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className={`text-[10px] font-body ${isDark ? 'text-white/30' : 'text-[#64748B]'}`}>Online now</span>
+            <span className={`text-[10px] font-body ${isDark ? 'text-white/30' : 'text-brand-slate'}`}>Online now</span>
           </div>
         </div>
       </div>
@@ -196,7 +196,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
               >
                 {/* Avatar */}
                 {!isUser && (
-                  <div className={`relative w-7 h-7 rounded-full overflow-hidden shrink-0 bg-[#1A7BFF] ${showAvatar ? 'visible' : 'invisible'}`}>
+                  <div className={`relative w-7 h-7 rounded-full overflow-hidden shrink-0 bg-brand-blue ${showAvatar ? 'visible' : 'invisible'}`}>
                     <Image
                       src="/chea-avatar.jpg"
                       alt=""
@@ -211,10 +211,10 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
                 <div className="max-w-[75%]">
                   <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed whitespace-pre-wrap ${
                     isUser
-                      ? 'bg-[#1A7BFF] text-white rounded-2xl rounded-br-md'
+                      ? 'bg-brand-blue text-white rounded-2xl rounded-br-md'
                       : isDark
                         ? 'bg-white/[0.08] text-white/85 rounded-2xl rounded-bl-md'
-                        : 'bg-white text-[#1B2D50] rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
+                        : 'bg-white text-brand-navy rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                   }`}>
                     {displayText || (
                       <span className="flex items-center gap-1 py-0.5">
@@ -235,7 +235,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
                             router.push(l.route)
                             onNavigate?.()
                           }}
-                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-[#1A7BFF] text-white text-[12px] font-body font-semibold hover:bg-[#0F5FE0] active:scale-95 transition-all duration-200"
+                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-brand-blue text-white text-[12px] font-body font-semibold hover:bg-brand-bluedark active:scale-95 transition-all duration-200"
                         >
                           {l.label}
                           <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -248,7 +248,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
 
                   <p className={`text-[9px] font-body mt-0.5 px-1 ${
                     isUser ? 'text-right' : ''
-                  } ${isDark ? 'text-white/15' : 'text-[#64748B]/40'}`}>
+                  } ${isDark ? 'text-white/15' : 'text-brand-slate/40'}`}>
                     {formatTime(msg.timestamp)}
                   </p>
                 </div>
@@ -261,7 +261,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
 
       {/* Input */}
       <div className={`px-3 py-2.5 border-t shrink-0 ${
-        isDark ? 'border-white/[0.06]' : 'border-[#1B2D50]/[0.06]'
+        isDark ? 'border-white/[0.06]' : 'border-brand-navy/[0.06]'
       }`}>
         <div className="flex items-center gap-2">
           <input
@@ -275,13 +275,13 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
             className={`flex-1 rounded-full px-4 py-2 text-sm font-body focus:outline-none transition-colors duration-200 ${
               isDark
                 ? 'bg-white/[0.06] text-white/70 placeholder:text-white/20 focus:bg-white/[0.08]'
-                : 'bg-[#F5F6F8] text-[#1B2D50] placeholder:text-[#64748B]/50 focus:bg-[#ECEEF2]'
+                : 'bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:bg-[#ECEEF2]'
             }`}
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isStreaming}
-            className="w-9 h-9 rounded-full bg-[#1A7BFF] flex items-center justify-center hover:bg-[#0F5FE0] active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
+            className="w-9 h-9 rounded-full bg-brand-blue flex items-center justify-center hover:bg-brand-bluedark active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
           >
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />

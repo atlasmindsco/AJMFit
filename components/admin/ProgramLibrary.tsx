@@ -54,19 +54,19 @@ export default function ProgramLibrary() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-white/40 text-sm font-body">{programs.length} program{programs.length === 1 ? '' : 's'} in your library</p>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 bg-[#F76B16] text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-[#D8590C]">{showNew ? 'Close' : 'New Program'}</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark">{showNew ? 'Close' : 'New Program'}</button>
       </div>
 
       {showNew && (
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 space-y-3">
-          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white font-body focus:outline-none focus:border-[#F76B16]/30" />
-          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white font-body resize-none focus:outline-none focus:border-[#F76B16]/30" />
+          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white font-body focus:outline-none focus:border-brand-orange/30" />
+          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white font-body resize-none focus:outline-none focus:border-brand-orange/30" />
           <div className="grid grid-cols-3 gap-3">
             <select value={draft.level} onChange={(e) => setDraft({ ...draft, level: e.target.value })} className="bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body">{LEVELS.map((l) => <option key={l}>{l}</option>)}</select>
             <input type="number" value={draft.days_per_week} onChange={(e) => setDraft({ ...draft, days_per_week: Number(e.target.value) })} placeholder="Days/wk" className="bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body" />
             <input value={draft.split} onChange={(e) => setDraft({ ...draft, split: e.target.value })} placeholder="Split (PPL)" className="bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white/80 font-body" />
           </div>
-          <div className="flex justify-end"><button onClick={add} disabled={busy || !draft.name.trim()} className="px-5 py-2 bg-[#F76B16] text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">{busy ? 'Saving…' : 'Create'}</button></div>
+          <div className="flex justify-end"><button onClick={add} disabled={busy || !draft.name.trim()} className="px-5 py-2 bg-brand-orange text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">{busy ? 'Saving…' : 'Create'}</button></div>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function ProgramLibrary() {
                   <h3 className="text-white font-display font-bold text-sm">{p.name}</h3>
                   {p.description && <p className="text-white/50 text-sm font-body mt-0.5">{p.description}</p>}
                   <div className="flex gap-2 mt-2 flex-wrap">
-                    {p.level && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-[#1A7BFF]/10 text-[#1A7BFF]">{p.level}</span>}
+                    {p.level && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-brand-blue/10 text-brand-blue">{p.level}</span>}
                     {p.days_per_week && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.days_per_week} days/wk</span>}
                     {p.split && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.split}</span>}
                   </div>
@@ -106,7 +106,7 @@ export default function ProgramLibrary() {
                   <option value="">Assign to client…</option>
                   {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-[#1A7BFF] text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">Assign</button>
+                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-brand-blue text-white text-xs font-display font-bold uppercase rounded-lg disabled:opacity-40">Assign</button>
               </div>
             </div>
           )

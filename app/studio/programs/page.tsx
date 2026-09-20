@@ -684,7 +684,7 @@ export default function ProgramsPage() {
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8">
         {/* Program Header */}
-        <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] p-6 mb-4">
+        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -710,7 +710,7 @@ export default function ProgramsPage() {
                   Change Program
                 </button>
               )}
-              <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-[#F76B16]/15 text-[#F76B16] uppercase tracking-wide">
+              <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
               </span>
             </div>
@@ -722,14 +722,14 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 1: PROGRAM PREVIEW ════════ */}
           {view === 'preview' && (
             <motion.div key="preview" {...slideBack}>
-              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Overview / Program toggle */}
                 <div className="flex items-center border-b border-white/[0.10]">
                   <button
                     onClick={() => setPreviewTab('overview')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'overview'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1A7BFF]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -739,7 +739,7 @@ export default function ProgramsPage() {
                     onClick={() => setPreviewTab('program')}
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'program'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-[#1A7BFF]'
+                        ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -765,7 +765,7 @@ export default function ProgramsPage() {
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
                       </div>
                       <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
-                        <p className="text-[#22C55E] font-display font-extrabold text-2xl tracking-tight">
+                        <p className="text-state-success font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Completed</p>
@@ -800,10 +800,10 @@ export default function ProgramsPage() {
                             className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
                           >
                             <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
-                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-[#1A7BFF] transition-colors duration-200">{day.name}</span>
+                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-brand-blue transition-colors duration-200">{day.name}</span>
                             <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
                             {day.completed ? (
-                              <div className="w-5 h-5 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
+                              <div className="w-5 h-5 rounded-full bg-state-success flex items-center justify-center shrink-0">
                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                 </svg>
@@ -821,7 +821,7 @@ export default function ProgramsPage() {
                     {/* CTA to view program */}
                     <button
                       onClick={() => setPreviewTab('program')}
-                      className="w-full py-3.5 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                     >
                       View Program
                     </button>
@@ -855,7 +855,7 @@ export default function ProgramsPage() {
                             }}
                             className={`w-full flex items-center gap-4 p-3 rounded-xl text-left group ${
                               isRest
-                                ? 'bg-[#1A1A1A] border border-white/[0.06] cursor-default'
+                                ? 'bg-surface-overlay border border-white/[0.06] cursor-default'
                                 : 'bg-[#222] border border-white/[0.10] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
                             }`}
                           >
@@ -889,7 +889,7 @@ export default function ProgramsPage() {
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-[#1A7BFF]'} transition-colors duration-200`}>
+                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
                                 {day.name}
                               </p>
                               <p className="text-white/30 text-xs font-body">
@@ -899,7 +899,7 @@ export default function ProgramsPage() {
 
                             {/* Status */}
                             {day.completed ? (
-                              <div className="w-7 h-7 rounded-full bg-[#22C55E] flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-full bg-state-success flex items-center justify-center shrink-0">
                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                 </svg>
@@ -921,7 +921,7 @@ export default function ProgramsPage() {
                       return (
                         <button
                           onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                          className="w-full mt-4 py-3.5 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
+                          className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                         >
                           Continue, {weeklyPlan[todayIndex].name}
                         </button>
@@ -936,7 +936,7 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 2: WORKOUT OVERVIEW ════════ */}
           {view === 'workout' && selected && (
             <motion.div key="workout" {...slideIn}>
-              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
@@ -962,7 +962,7 @@ export default function ProgramsPage() {
                           {group.label}
                         </p>
                         {group.isSuperset && (
-                          <span className="text-[#22C55E] text-[10px] font-display font-bold uppercase tracking-wide">
+                          <span className="text-state-success text-[10px] font-display font-bold uppercase tracking-wide">
                             Superset
                           </span>
                         )}
@@ -1040,11 +1040,11 @@ export default function ProgramsPage() {
                                 >
                                   <div className="flex items-center gap-1.5">
                                     {group.isSuperset && (
-                                      <span className="text-[#22C55E] text-[10px] font-display font-bold">{seriesPrefix}</span>
+                                      <span className="text-state-success text-[10px] font-display font-bold">{seriesPrefix}</span>
                                     )}
                                     <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
                                     {isSwapped && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#1A7BFF]/15 text-[#1A7BFF] shrink-0">
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
                                         Swapped
                                       </span>
                                     )}
@@ -1062,7 +1062,7 @@ export default function ProgramsPage() {
                                       Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
                                     </p>
                                     {pr && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B] flex items-center gap-0.5">
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-state-warning/15 text-state-warning flex items-center gap-0.5">
                                         <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
                                           <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                         </svg>
@@ -1077,7 +1077,7 @@ export default function ProgramsPage() {
                                   onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                   className="text-right shrink-0 flex flex-col items-end"
                                 >
-                                  <p className="text-[#F76B16] text-xs font-display font-bold">
+                                  <p className="text-brand-orange text-xs font-display font-bold">
                                     {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
                                   </p>
                                   <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1099,13 +1099,13 @@ export default function ProgramsPage() {
                                     <div className="px-3 pb-3 pt-1 border-t border-white/[0.06]">
                                       {/* PR banner */}
                                       {pr && (
-                                        <div className={`flex items-center justify-between rounded-lg px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-[#F59E0B]/15 border border-[#F59E0B]/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
+                                        <div className={`flex items-center justify-between rounded-lg px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-state-warning/15 border border-state-warning/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
                                           <div className="flex items-center gap-2">
-                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-[#F59E0B]' : 'text-white/30'}`} viewBox="0 0 24 24" fill="currentColor">
+                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-state-warning' : 'text-white/30'}`} viewBox="0 0 24 24" fill="currentColor">
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                             </svg>
                                             {isNewPR ? (
-                                              <span className="text-[#F59E0B] text-[11px] font-display font-bold uppercase tracking-wide">
+                                              <span className="text-state-warning text-[11px] font-display font-bold uppercase tracking-wide">
                                                 New PR!
                                               </span>
                                             ) : (
@@ -1115,7 +1115,7 @@ export default function ProgramsPage() {
                                             )}
                                           </div>
                                           <div className="text-right">
-                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-[#F59E0B]' : 'text-white/60'}`}>
+                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-white/60'}`}>
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
                                             <span className="text-white/20 text-[10px] font-body ml-2">{pr.date}</span>
@@ -1149,7 +1149,7 @@ export default function ProgramsPage() {
                                                     }}
                                                     className={`px-2 py-1 rounded text-[10px] font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
-                                                        ? 'bg-[#1A7BFF] text-white'
+                                                        ? 'bg-brand-blue text-white'
                                                         : 'bg-white/[0.04] text-white/40 hover:text-white/70'
                                                     }`}
                                                   >
@@ -1255,15 +1255,15 @@ export default function ProgramsPage() {
 
                                         return (
                                           <div key={si}>
-                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-[#F59E0B]/[0.06]' : ''}`}>
-                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-[#F59E0B]' : 'text-white/30'}`}>{si + 1}</span>
+                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
+                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
                                                 placeholder=", "
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <input
                                                 type="number"
@@ -1271,18 +1271,18 @@ export default function ProgramsPage() {
                                                 placeholder=", "
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-[#1A7BFF]/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
-                                                  <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
-                                                    <svg className="w-3.5 h-3.5 text-[#F59E0B]" viewBox="0 0 24 24" fill="currentColor">
+                                                  <div className="w-6 h-6 rounded-full bg-state-warning/20 flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-state-warning" viewBox="0 0 24 24" fill="currentColor">
                                                       <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                                     </svg>
                                                   </div>
                                                 ) : filled ? (
-                                                  <div className="w-6 h-6 rounded-full bg-[#22C55E]/20 flex items-center justify-center">
-                                                    <svg className="w-3.5 h-3.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                  <div className="w-6 h-6 rounded-full bg-state-success/20 flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-state-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                     </svg>
                                                   </div>
@@ -1296,7 +1296,7 @@ export default function ProgramsPage() {
                                             {filled && !isLastSet && (
                                               <div className="ml-8 mr-10 my-1.5">
                                                 {timerActive && activeTimer ? (
-                                                  <div className="flex items-center gap-2 rounded-lg bg-[#1A7BFF]/10 border border-[#1A7BFF]/20 px-3 py-2">
+                                                  <div className="flex items-center gap-2 rounded-lg bg-brand-blue/10 border border-brand-blue/20 px-3 py-2">
                                                     {/* Progress ring */}
                                                     <div className="relative w-8 h-8 shrink-0">
                                                       <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
@@ -1310,12 +1310,12 @@ export default function ProgramsPage() {
                                                           className="transition-[stroke-dasharray] duration-1000 ease-linear"
                                                         />
                                                       </svg>
-                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-[#1A7BFF]">
+                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-brand-blue">
                                                         {activeTimer.remaining}
                                                       </span>
                                                     </div>
                                                     <div className="flex-1">
-                                                      <p className="text-[#1A7BFF] text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
+                                                      <p className="text-brand-blue text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
                                                       <p className="text-white/25 text-[9px] font-body">
                                                         {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
                                                       </p>
@@ -1365,7 +1365,7 @@ export default function ProgramsPage() {
                                             aria-checked={intensityEnabled}
                                             aria-label="Toggle intensity technique"
                                             className={`relative inline-flex shrink-0 h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                                              intensityEnabled ? 'bg-[#F76B16]' : 'bg-white/15'
+                                              intensityEnabled ? 'bg-brand-orange' : 'bg-white/15'
                                             }`}
                                           >
                                             <span
@@ -1515,7 +1515,7 @@ export default function ProgramsPage() {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -4 }}
                                                 transition={{ duration: 0.15 }}
-                                                className="absolute bottom-full left-0 right-0 mb-1 bg-[#1A1A1A] border border-white/[0.10] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
+                                                className="absolute bottom-full left-0 right-0 mb-1 bg-surface-overlay border border-white/[0.10] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
                                               >
                                                 <div className="px-3 py-2 border-b border-white/[0.06]">
                                                   <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-[0.15em]">
@@ -1538,7 +1538,7 @@ export default function ProgramsPage() {
                                                   >
                                                     <span className="text-white/70 text-sm font-body">{alt}</span>
                                                     {displayName === alt && (
-                                                      <svg className="w-4 h-4 text-[#1A7BFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                      <svg className="w-4 h-4 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                       </svg>
                                                     )}
@@ -1559,7 +1559,7 @@ export default function ProgramsPage() {
                                                     }}
                                                     className="w-full px-3 py-2.5 text-left border-t border-white/[0.06] hover:bg-white/[0.04] transition-colors duration-150"
                                                   >
-                                                    <span className="text-[#F76B16] text-sm font-body font-semibold">Reset to Original</span>
+                                                    <span className="text-brand-orange text-sm font-body font-semibold">Reset to Original</span>
                                                   </button>
                                                 )}
                                               </motion.div>
@@ -1583,15 +1583,15 @@ export default function ProgramsPage() {
                 <div className="p-4 pt-0">
                   {selectedDay !== null && workoutStartTime[selectedDay] ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20 px-4 py-3">
+                      <div className="flex items-center justify-between rounded-xl bg-state-success/10 border border-state-success/20 px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
                           </span>
-                          <span className="text-[#22C55E] text-[11px] font-display font-bold uppercase tracking-wide">Workout Active</span>
+                          <span className="text-state-success text-[11px] font-display font-bold uppercase tracking-wide">Workout Active</span>
                         </div>
-                        <span className="text-[#22C55E] text-sm font-display font-bold tabular-nums">
+                        <span className="text-state-success text-sm font-display font-bold tabular-nums">
                           {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
                           {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
                           {(workoutElapsed % 60).toString().padStart(2, '0')}
@@ -1653,7 +1653,7 @@ export default function ProgramsPage() {
                           }
                         }
                       }}
-                      className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                     >
                       Start Workout
                     </button>
@@ -1666,7 +1666,7 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 3: EXERCISE DETAIL ════════ */}
           {view === 'exercise' && selectedExerciseData && (
             <motion.div key="exercise" {...slideIn}>
-              <div className="bg-[#1C1C1C] rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
@@ -1686,12 +1686,12 @@ export default function ProgramsPage() {
                   {selectedExerciseDB && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {selectedExerciseDB.primaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#F76B16]/15 text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-brand-orange/15 text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-[#1A7BFF]/15 text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-md bg-brand-blue/15 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -1733,23 +1733,23 @@ export default function ProgramsPage() {
                         <div className="flex-1 space-y-3">
                           {selectedExerciseDB.primaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-[#F76B16]/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-[#F76B16]" />
+                              <div className="w-10 h-10 rounded-lg bg-brand-orange/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-brand-orange" />
                               </div>
                               <div>
                                 <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-[#F76B16] text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
+                                <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
                               </div>
                             </div>
                           ))}
                           {selectedExerciseDB.secondaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-[#1A7BFF]/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-[#1A7BFF]" />
+                              <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-sm bg-brand-blue" />
                               </div>
                               <div>
                                 <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-[#1A7BFF] text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
+                                <p className="text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
                           ))}
@@ -1765,7 +1765,7 @@ export default function ProgramsPage() {
                       <ol className="space-y-3">
                         {selectedExerciseDB.instructions.map((step, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="shrink-0 w-6 h-6 rounded-full bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                            <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
                               {i + 1}
                             </span>
                             <p className="text-white/60 text-sm font-body leading-relaxed">{step}</p>
@@ -1784,7 +1784,7 @@ export default function ProgramsPage() {
       {/* SIDEBAR */}
       <div className="lg:col-span-4 space-y-4">
         {/* Recent Workout Logs */}
-        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
             {history.length > 0 && (
@@ -1813,11 +1813,11 @@ export default function ProgramsPage() {
                       </p>
                     </div>
                     {w.ended_at ? (
-                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-[#22C55E] bg-[#22C55E]/10 px-2 py-0.5 rounded-full">
+                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-state-success bg-state-success/10 px-2 py-0.5 rounded-full">
                         Done
                       </span>
                     ) : (
-                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-0.5 rounded-full">
+                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-state-warning bg-state-warning/10 px-2 py-0.5 rounded-full">
                         Active
                       </span>
                     )}
@@ -1829,7 +1829,7 @@ export default function ProgramsPage() {
         </motion.div>
 
         {/* Your Coach */}
-        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-[#1C1C1C] rounded-xl border border-white/[0.10]">
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Your Coach</h2>
           </div>
@@ -1839,7 +1839,7 @@ export default function ProgramsPage() {
             </p>
             <a
               href="/studio/messages"
-              className="mt-4 inline-block text-[#1A7BFF] text-sm font-display font-bold uppercase tracking-wide hover:underline"
+              className="mt-4 inline-block text-brand-blue text-sm font-display font-bold uppercase tracking-wide hover:underline"
             >
               Message Coach →
             </a>
@@ -1892,7 +1892,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 15 }}
-        className="relative text-center px-9 py-7 rounded-2xl bg-[#1C1C1C] border-2 border-[#F59E0B]/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
+        className="relative text-center px-9 py-7 rounded-2xl bg-surface-raised border-2 border-state-warning/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
       >
         <button
           onClick={onDone}
@@ -1910,7 +1910,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         >
           🏆
         </motion.div>
-        <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-[#F59E0B]">New PR!</p>
+        <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-state-warning">New PR!</p>
         <p className="text-white font-body font-semibold text-sm mt-1">{name}</p>
         <p className="text-white/60 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
       </motion.div>

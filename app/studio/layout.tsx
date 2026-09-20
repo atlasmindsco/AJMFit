@@ -95,7 +95,7 @@ export default function ClientPortalLayout({
   // Avoid flashing the portal before we know status
   if (gate === 'checking') {
     return (
-      <div className="min-h-screen bg-[#111] flex items-center justify-center">
+      <div className="min-h-screen bg-surface-base flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
       </div>
     )
@@ -109,7 +109,7 @@ export default function ClientPortalLayout({
   // Fallback prompt (middleware should have redirected already)
   if (gate === 'out') {
     return (
-      <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-4">
         <div className="flex items-center gap-2.5 mb-8">
           <Image src="/AJMfit.png" alt="AJMFit" width={40} height={40} className="w-10 h-10 object-contain" />
           <span className="font-display font-bold text-white text-lg uppercase tracking-[0.15em]">AJM Fit</span>
@@ -120,9 +120,9 @@ export default function ClientPortalLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#111]">
+    <div className="min-h-screen bg-surface-base">
       {/* Top Navbar */}
-      <nav className="bg-[#111111] border-b border-white/[0.06] sticky top-0 z-50">
+      <nav className="bg-surface-base border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left: Logo + Nav */}
@@ -165,7 +165,7 @@ export default function ClientPortalLayout({
             <div className="flex items-center gap-4">
               {/* Client identity */}
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F76B16] to-[#D8590C] flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
                   <span className="text-white text-[10px] font-display font-bold">
                     {initials || '·'}
                   </span>
@@ -243,7 +243,7 @@ export default function ClientPortalLayout({
       {/* Chaedyn FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1A7BFF] flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
         aria-label={chatOpen ? 'Close Chea' : 'Chat with Chea'}
       >
         {chatOpen ? (

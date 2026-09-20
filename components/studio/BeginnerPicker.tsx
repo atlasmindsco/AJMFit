@@ -60,7 +60,7 @@ export default function BeginnerPicker({
       onClick={onClick}
       className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 active:scale-[0.99] ${
         active
-          ? 'bg-[#1A7BFF]/[0.12] border-[#1A7BFF]/50'
+          ? 'bg-brand-blue/[0.12] border-brand-blue/50'
           : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14]'
       }`}
     >
@@ -90,14 +90,14 @@ export default function BeginnerPicker({
           <div key={label} className="flex items-center gap-2">
             <div
               className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                i < step ? 'bg-emerald-500' : i === step ? 'bg-[#1A7BFF]' : 'bg-white/15'
+                i < step ? 'bg-emerald-500' : i === step ? 'bg-brand-blue' : 'bg-white/15'
               }`}
             />
           </div>
         ))}
       </div>
 
-      <div className="bg-[#1C1C1C] rounded-2xl border border-white/[0.10] p-6">
+      <div className="bg-surface-raised rounded-2xl border border-white/[0.10] p-6">
         <AnimatePresence mode="wait">
           {/* STEP 0 — location */}
           {step === 0 && (
@@ -131,7 +131,7 @@ export default function BeginnerPicker({
                     onClick={() => setDays(d)}
                     className={`py-4 rounded-xl border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
-                        ? 'bg-[#1A7BFF]/[0.12] border-[#1A7BFF]/50 text-white'
+                        ? 'bg-brand-blue/[0.12] border-brand-blue/50 text-white'
                         : 'bg-white/[0.03] border-white/[0.08] text-white/70 hover:bg-white/[0.06]'
                     }`}
                   >
@@ -155,7 +155,7 @@ export default function BeginnerPicker({
               <button
                 onClick={start}
                 disabled={!days || submitting}
-                className="w-full py-4 bg-[#1A7BFF] text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-[#0F5FE0] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
               >
                 {submitting ? 'Setting up…' : 'Start Training'}
               </button>

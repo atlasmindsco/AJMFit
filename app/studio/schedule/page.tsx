@@ -217,7 +217,7 @@ export default function SchedulePage() {
                     href={s.join_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-body font-semibold text-[#F76B16] hover:text-[#ff7d2e] transition-colors"
+                    className="text-xs font-body font-semibold text-brand-orange hover:text-[#ff7d2e] transition-colors"
                   >
                     Join →
                   </a>
