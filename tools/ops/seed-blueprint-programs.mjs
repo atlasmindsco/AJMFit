@@ -10,11 +10,12 @@
  * Requires migration 0010 (adds programs.goal/location/split_key/recommended).
  *
  *   node tools/ops/seed-blueprint-programs.mjs            # DRY RUN — prints the plan
- *   node tools/ops/seed-blueprint-programs.mjs --confirm  # wipe & reseed blueprint templates
+ *   node tools/ops/seed-blueprint-programs.mjs --confirm  # upsert the templates
  *
- * Idempotent: --confirm deletes existing source='blueprint' programs first, then
- * reinserts. (A reseed drops any current blueprint self-assignments via cascade —
- * fine pre-launch; revisit once clients are actively on these.)
+ * Idempotent: --confirm upserts on (goal, split_key, location), so programs.id
+ * is stable and live client assignments survive. It no longer deletes and
+ * reinserts, which used to cascade through program_assignments and strip every
+ * client's program.
  */
 import { readFileSync } from 'node:fs'
 import { supa, parseArgs, requireConfirm, logAction, fail } from './_lib.mjs'
@@ -89,24 +90,56 @@ for (const [splitKey, split] of Object.entries(splits)) {
   console.log(`  ${split.recommended ? '✅' : '  '} ${split.label}  (${split.days_per_week}d) — 6 programs (3 goals × gym/home)`)
 }
 
-requireConfirm(args, `Replace all source='blueprint' programs with ${plan.length} freshly-seeded templates`)
+requireConfirm(
+  args,
+  `Upsert ${plan.length} Blueprint templates in place (existing client assignments preserved)`
+)
 
-// ---- wipe existing blueprint templates (cascade clears their days/exercises) ----
-const { error: delErr } = await sb.from('programs').delete().eq('source', 'blueprint')
-if (delErr) fail(`Could not clear existing blueprint programs: ${delErr.message}`)
-
-// ---- insert ----
-let nP = 0, nD = 0, nE = 0
+// ---- upsert in place ----
+//
+// This used to delete every source='blueprint' program and reinsert. That
+// cascaded through program_assignments and silently dropped every client's
+// assigned program — there are live clients on these templates now, so a
+// reseed would have wiped their programs.
+//
+// Programs are matched on the (goal, split_key, location) unique index and
+// updated in place, so programs.id is stable and assignments survive. Only the
+// day/exercise content underneath is replaced.
+let nP = 0, nD = 0, nE = 0, nNew = 0
 for (const item of plan) {
-  const { data: prog, error: pErr } = await sb.from('programs').insert(item.program).select('id').single()
-  if (pErr) {
-    fail(`Insert failed for "${item.program.name}": ${pErr.message}` +
-      (/column .* does not exist/i.test(pErr.message) ? '\n  → Did you apply migration 0010 first?' : ''))
+  const { goal, split_key, location } = item.program
+
+  const { data: existing, error: findErr } = await sb
+    .from('programs')
+    .select('id')
+    .eq('source', 'blueprint')
+    .eq('goal', goal)
+    .eq('split_key', split_key)
+    .eq('location', location)
+    .maybeSingle()
+  if (findErr) fail(`Lookup failed for "${item.program.name}": ${findErr.message}`)
+
+  let programId
+  if (existing) {
+    const { error: uErr } = await sb.from('programs').update(item.program).eq('id', existing.id)
+    if (uErr) fail(`Update failed for "${item.program.name}": ${uErr.message}`)
+    programId = existing.id
+    // Replacing the days cascades to their exercises.
+    const { error: dDelErr } = await sb.from('program_days').delete().eq('program_id', programId)
+    if (dDelErr) fail(`Could not clear days for "${item.program.name}": ${dDelErr.message}`)
+  } else {
+    const { data: prog, error: pErr } = await sb.from('programs').insert(item.program).select('id').single()
+    if (pErr) {
+      fail(`Insert failed for "${item.program.name}": ${pErr.message}` +
+        (/column .* does not exist/i.test(pErr.message) ? '\n  → Did you apply migration 0010 first?' : ''))
+    }
+    programId = prog.id
+    nNew++
   }
   nP++
 
   const dayRows = item.days.map((d) => ({
-    program_id: prog.id, day_index: d.day_index, name: d.name, focus: d.focus, notes: d.notes,
+    program_id: programId, day_index: d.day_index, name: d.name, focus: d.focus, notes: d.notes,
   }))
   const { data: insertedDays, error: dErr } = await sb.from('program_days').insert(dayRows).select('id, day_index')
   if (dErr) fail(`Days failed for "${item.program.name}": ${dErr.message}`)
@@ -125,12 +158,34 @@ for (const item of plan) {
   }
 }
 
+// Templates that no longer exist in the library are left alone when a client is
+// still assigned to one. Orphaning a live client is worse than a stale row.
+const planKeys = new Set(plan.map((p) => `${p.program.goal}|${p.program.split_key}|${p.program.location}`))
+const { data: allBp } = await sb.from('programs').select('id, name, goal, split_key, location').eq('source', 'blueprint')
+const stale = (allBp ?? []).filter((p) => !planKeys.has(`${p.goal}|${p.split_key}|${p.location}`))
+let nRetired = 0
+for (const s of stale) {
+  const { data: open } = await sb
+    .from('program_assignments')
+    .select('id')
+    .eq('program_id', s.id)
+    .is('ended_at', null)
+    .limit(1)
+  if (open && open.length) {
+    console.log(`  ⚠ keeping "${s.name}" — a client is still assigned to it`)
+    continue
+  }
+  await sb.from('programs').delete().eq('id', s.id)
+  nRetired++
+}
+
 await logAction({
   action: 'seed-blueprint-programs',
   target: 'blueprint',
-  summary: `Seeded ${nP} Blueprint program templates (${nD} days, ${nE} exercises)`,
-  detail: { programs: nP, days: nD, exercises: nE },
+  summary: `Upserted ${nP} Blueprint templates (${nNew} new, ${nD} days, ${nE} exercises, ${nRetired} retired)`,
+  detail: { programs: nP, created: nNew, days: nD, exercises: nE, retired: nRetired },
 })
 
-console.log(`\n✅ Seeded ${nP} programs, ${nD} days, ${nE} exercises. Blueprint clients can now be shown the picker.`)
+console.log(`\n✅ ${nP} programs upserted (${nNew} new, ${nRetired} retired), ${nD} days, ${nE} exercises.`)
+console.log('   Existing client assignments were preserved.')
 process.exit(0)

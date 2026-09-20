@@ -39,6 +39,10 @@ interface ExerciseDB {
   level: string
   category: string
   images: string[]
+  // Present on every record in exercises.json and what keeps a substitution
+  // faithful to the movement it replaces.
+  force?: string | null
+  mechanic?: string | null
 }
 
 interface ProgramExercise {
@@ -118,27 +122,58 @@ interface PRRecord {
 /* Real PRs come from the DB (dbPRs); no demo PRs are shown to clients. */
 
 /* ── Exercise Alternatives (same muscle group substitutions) ── */
+/**
+ * Curated swaps, keyed by the exact names the program library prescribes.
+ *
+ * The previous version keyed on names the library never uses — 'Barbell Bench
+ * Press' where it prescribes 'Barbell Bench Press - Medium Grip', 'Overhead
+ * Press' where it prescribes 'Standing Military Press'. Only 4 of 65
+ * prescribed exercises matched, so almost every swap fell through to the
+ * algorithm. 46 of the alternatives it named did not exist in
+ * exercises.json either, so they could not resolve to a demo or an image.
+ *
+ * Every name below is verified against public/exercises/exercises.json. This
+ * map only needs to cover cases where judgement beats the scored fallback —
+ * mostly where one muscle tag covers two different jobs (lateral vs rear delt).
+ */
 const exerciseAlternatives: Record<string, string[]> = {
-  'Barbell Bench Press':    ['Dumbbell Bench Press', 'Machine Chest Press', 'Push-Ups'],
-  'Incline Dumbbell Press': ['Incline Barbell Press', 'Incline Machine Press', 'Low Cable Fly'],
-  'Overhead Press':         ['Dumbbell Shoulder Press', 'Machine Shoulder Press', 'Landmine Press'],
-  'Lateral Raises':         ['Cable Lateral Raise', 'Machine Lateral Raise', 'Resistance Band Lateral Raise'],
-  'Tricep Pushdowns':       ['Overhead Tricep Extension', 'Dumbbell Kickbacks', 'Close-Grip Push-Ups'],
-  'Barbell Squat':          ['Goblet Squat', 'Leg Press', 'Smith Machine Squat'],
-  'Romanian Deadlift':      ['Dumbbell Romanian Deadlift', 'Good Mornings', 'Cable Pull-Through'],
-  'Leg Press':              ['Hack Squat', 'Bulgarian Split Squat', 'Goblet Squat'],
-  'Walking Lunges':         ['Reverse Lunges', 'Step-Ups', 'Split Squat'],
-  'Calf Raises':            ['Seated Calf Raise', 'Leg Press Calf Raise', 'Single-Leg Calf Raise'],
-  'Pull-Ups (Weighted)':    ['Lat Pulldown', 'Assisted Pull-Up Machine', 'Resistance Band Pull-Ups'],
-  'Barbell Row':            ['Dumbbell Row', 'T-Bar Row', 'Cable Row'],
-  'Seated Cable Row':       ['Dumbbell Row', 'Machine Row', 'Resistance Band Row'],
-  'Face Pulls':             ['Reverse Pec Deck', 'Band Pull-Aparts', 'Rear Delt Fly'],
-  'Barbell Curls':          ['Dumbbell Curls', 'Cable Curls', 'Hammer Curls'],
-  'Hip Thrusts':            ['Glute Bridge', 'Cable Pull-Through', 'Machine Hip Extension'],
-  'Front Squat':            ['Goblet Squat', 'Zercher Squat', 'Leg Press (High Foot)'],
-  'Leg Curl':               ['Nordic Curl', 'Dumbbell Leg Curl', 'Stability Ball Curl'],
-  'Cable Woodchops':        ['Dumbbell Woodchops', 'Medicine Ball Rotations', 'Pallof Press'],
-  'Plank Hold':             ['Dead Bug', 'Ab Wheel Rollout', 'Hollow Body Hold'],
+  // Presses — keep a loadable compound, never drop to a fly
+  'Barbell Bench Press - Medium Grip': ['Dumbbell Bench Press', 'Barbell Incline Bench Press - Medium Grip', 'Decline Dumbbell Bench Press'],
+  'Barbell Incline Bench Press - Medium Grip': ['Incline Dumbbell Press', 'Dumbbell Bench Press', 'Barbell Bench Press - Medium Grip'],
+  'Incline Dumbbell Press': ['Barbell Incline Bench Press - Medium Grip', 'Dumbbell Bench Press', 'Arnold Dumbbell Press'],
+  'Dumbbell Bench Press': ['Incline Dumbbell Press', 'Decline Dumbbell Bench Press', 'Dumbbell Flyes'],
+  'Standing Military Press': ['Dumbbell Shoulder Press', 'Arnold Dumbbell Press', 'Dumbbell One-Arm Shoulder Press'],
+  'Dumbbell Shoulder Press': ['Arnold Dumbbell Press', 'Dumbbell One-Arm Shoulder Press', 'Standing Military Press'],
+  // Delts — muscle tag alone cannot tell lateral from rear, so these are pinned
+  'Cable Seated Lateral Raise': ['Side Lateral Raise', 'Dumbbell Raise', 'Side Laterals to Front Raise'],
+  'Dumbbell Raise': ['Side Lateral Raise', 'Side Laterals to Front Raise', 'Arnold Dumbbell Press'],
+  'Face Pull': ['Bent Over Dumbbell Rear Delt Raise With Head On Bench', 'Dumbbell Lying Rear Lateral Raise', 'Seated Cable Rows'],
+  // Pulls
+  'Bent Over Barbell Row': ['One-Arm Dumbbell Row', 'Bent Over Two-Dumbbell Row', 'Seated Cable Rows'],
+  'Seated Cable Rows': ['One-Arm Dumbbell Row', 'Bent Over Two-Dumbbell Row', 'Bent Over Barbell Row'],
+  'One-Arm Dumbbell Row': ['Bent Over Two-Dumbbell Row', 'Seated Cable Rows', 'Dumbbell Incline Row'],
+  'Wide-Grip Lat Pulldown': ['Pullups', 'Chin-Up', 'Close-Grip Front Lat Pulldown'],
+  'Pullups': ['Chin-Up', 'Wide-Grip Lat Pulldown', 'V-Bar Pullup'],
+  'Chin-Up': ['Pullups', 'Wide-Grip Lat Pulldown', 'Close-Grip Front Lat Pulldown'],
+  // Lower
+  'Barbell Squat': ['Leg Press', 'Dumbbell Squat', 'Barbell Full Squat'],
+  'Dumbbell Squat': ['Split Squat with Dumbbells', 'Dumbbell Lunges', 'Bodyweight Squat'],
+  'Leg Press': ['Barbell Squat', 'Barbell Hack Squat', 'Dumbbell Lunges'],
+  'Romanian Deadlift': ['Stiff-Legged Dumbbell Deadlift', 'Good Morning', 'Barbell Deadlift'],
+  'Barbell Deadlift': ['Romanian Deadlift', 'Stiff-Legged Dumbbell Deadlift', 'Barbell Hip Thrust'],
+  'Stiff-Legged Dumbbell Deadlift': ['Romanian Deadlift', 'Floor Glute-Ham Raise', 'Good Morning'],
+  'Barbell Hip Thrust': ['Butt Lift (Bridge)', 'Single Leg Glute Bridge', 'Romanian Deadlift'],
+  'Lying Leg Curls': ['Seated Leg Curl', 'Floor Glute-Ham Raise', 'Single Leg Glute Bridge'],
+  'Seated Leg Curl': ['Lying Leg Curls', 'Floor Glute-Ham Raise', 'Stiff-Legged Dumbbell Deadlift'],
+  'Standing Calf Raises': ['Seated Calf Raise', 'Standing Dumbbell Calf Raise', 'Calf Raise On A Dumbbell'],
+  'Seated Calf Raise': ['Standing Calf Raises', 'Standing Dumbbell Calf Raise', 'Calf Raise On A Dumbbell'],
+  // Arms
+  'Barbell Curl': ['Dumbbell Bicep Curl', 'EZ-Bar Curl', 'Hammer Curls'],
+  'Dumbbell Bicep Curl': ['Hammer Curls', 'Barbell Curl', 'Concentration Curls'],
+  'Triceps Pushdown': ['EZ-Bar Skullcrusher', 'Decline Dumbbell Triceps Extension', 'Dumbbell One-Arm Triceps Extension'],
+  'EZ-Bar Skullcrusher': ['Triceps Pushdown', 'Decline Dumbbell Triceps Extension', 'Dumbbell One-Arm Triceps Extension'],
+  // Core
+  'Plank': ['Air Bike', 'Dead Bug', 'Standing Cable Wood Chop'],
 }
 
 /* ── Fuzzy name matching ── */
@@ -353,19 +388,44 @@ export default function ProgramsPage() {
   const getAlternatives = useCallback((name: string): string[] => {
     const hard = exerciseAlternatives[name]
     if (hard && hard.length) return hard
-    const match = findExerciseMatch(name, exerciseDB)
-    const primary = match?.primaryMuscles?.[0]
-    if (!primary) return []
+
+    const src = findExerciseMatch(name, exerciseDB)
+    const primary = src?.primaryMuscles?.[0]
+    if (!src || !primary) return []
+
     const homeEq = new Set(['dumbbell', 'body only'])
-    return exerciseDB
-      .filter(
-        (e) =>
-          e.primaryMuscles?.includes(primary) &&
-          normalizeExName(e.name) !== normalizeExName(name) &&
-          (programLocation !== 'home' || homeEq.has(e.equipment))
-      )
-      .slice(0, 6)
-      .map((e) => e.name)
+    const commonEq = new Set(['dumbbell', 'barbell', 'body only', 'cable', 'machine'])
+    // A swap has to keep doing the job of the slot it replaces. Matching on
+    // primary muscle alone offered Cable Crossover in place of Barbell Bench —
+    // same muscle, but an isolation movement standing in for the loadable
+    // compound the program is built around. force and mechanic keep the
+    // movement pattern; category keeps a plyometric out of a strength slot.
+    const srcCategory = src.category === 'strength' || src.category === 'powerlifting' ? null : src.category
+    const srcSecondary = new Set(src.secondaryMuscles ?? [])
+
+    const scored = exerciseDB
+      .filter((e) => {
+        if (normalizeExName(e.name) === normalizeExName(name)) return false
+        if (e.primaryMuscles?.[0] !== primary) return false
+        if (src.force && e.force !== src.force) return false
+        if (src.mechanic && e.mechanic !== src.mechanic) return false
+        if (srcCategory ? e.category !== srcCategory : !(e.category === 'strength' || e.category === 'powerlifting'))
+          return false
+        if (programLocation === 'home' && !homeEq.has(e.equipment)) return false
+        return true
+      })
+      .map((e) => {
+        let score = 0
+        if (e.equipment === src.equipment) score += 3
+        if (commonEq.has(e.equipment)) score += 2
+        if (e.level === src.level) score += 2
+        if (e.level === 'expert' && src.level !== 'expert') score -= 5
+        for (const m of e.secondaryMuscles ?? []) if (srcSecondary.has(m)) score += 1
+        return { name: e.name, score }
+      })
+      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+
+    return scored.slice(0, 6).map((e) => e.name)
   }, [exerciseDB, programLocation])
 
   const parseRestSeconds = (rest: string): number => {
