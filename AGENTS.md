@@ -128,7 +128,15 @@ Unread from a client = `from_trainer = false and read_at is null`.
 
 ## 5. Operations
 
-Operations marked **[toolkit]** require the `tools/ops/` script toolkit, which is **not built yet** (see §8). Until it exists, those operations must be done by Anthony in the trainer portal at `/luffy`. Do not attempt to reproduce them by writing directly to the database — the invite flow in particular has auth-account side effects that a plain insert will not reproduce.
+Read-only reporting runs through [tools/ops/report.mjs](tools/ops/report.mjs):
+
+```
+node tools/ops/report.mjs clients | applications | behind [--days=7] | unread | log
+```
+
+Operations marked **[toolkit]** are deliberately **not** scripted. They already exist as trainer-only API routes behind `/luffy`, and the invite flow in particular creates auth accounts, generates temporary passwords, and sends branded email — reimplementing that in a script would duplicate logic that must not drift out of sync with the app. Anthony does those in the portal; you prepare the decision, not the write.
+
+Never reproduce a [toolkit] operation by writing directly to the database. A plain insert skips the auth-account and email side effects and leaves the client in a broken half-state.
 
 ### Clients
 
@@ -259,8 +267,11 @@ Accurate as of the last update to this file. Verify before relying on any of it.
 **Previously built, then lost:**
 - An earlier ops toolkit ran against production on **2026-07-12** under the actor name `cowork`. The action log records it seeding the Blueprint templates, creating the `ZEROOUT` promo code, resetting the trainer password twice, and correcting a client's email and password. **None of those scripts were ever committed** — only `seed-blueprint-programs.mjs` survives, and its `_lib.mjs` dependency did not. This is exactly the failure the spec's portability rule warns about, and it means production contains state (the 30 seeded programs, the promo code) whose creating code no longer exists. Read the action log before assuming something was never done.
 
-**Not built:**
-- The operation scripts themselves: `approve-application`, `invite-client`, `build-program`, and the multi-system reports. Everything marked [toolkit] in §5 still has to be done by hand in `/luffy`.
+- Read-only reporting, [tools/ops/report.mjs](tools/ops/report.mjs) — clients, pending applications, who is behind on training, who is waiting on a reply, and the action log. Verified against production.
+
+**Deliberately not built:**
+- `approve-application`, `invite-client`, `decline`. The spec lists these as toolkit scripts, but they already exist as trainer-only API routes and duplicating their auth-account and email side effects in a second implementation invites drift. They stay in `/luffy`.
+- `build-program`. The drafting half is the agent's job, not a script's — you draft conversationally and Anthony reviews. Only persistence would be worth scripting, and only once the review loop is settled.
 
 **Known broken:**
 - Two of the three 4-day emphasis options in the Blueprint picker (`chest_back`, `legs_shoulders` in `lib/blueprint.ts`) map to split keys that do not exist in the database, so clients who choose them get "That program is not available yet." Only `balanced` works. Do not tell a Blueprint client to use those options.
