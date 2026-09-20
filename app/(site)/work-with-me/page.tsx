@@ -113,7 +113,7 @@ export default function WorkWithMePage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: '-60px' }}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-sm overflow-hidden ${
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-control overflow-hidden ${
                 tier.featured
                   ? 'ring-2 ring-brand-orange/30 shadow-[0_8px_60px_rgba(240,139,30,0.1)]'
                   : 'border border-brand-navy/[0.08]'
@@ -126,7 +126,7 @@ export default function WorkWithMePage() {
                 }`}
               >
                 {tier.featured && (
-                  <span className="self-start bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6">
+                  <span className="self-start bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-control mb-6">
                     Most Popular
                   </span>
                 )}
@@ -162,7 +162,7 @@ export default function WorkWithMePage() {
                 </p>
                 <div className="mt-6">
                   <span
-                    className={`inline-block text-xs font-display font-semibold uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm ${
+                    className={`inline-block text-xs font-display font-semibold uppercase tracking-[0.15em] px-3 py-1.5 rounded-control ${
                       tier.featured
                         ? 'bg-white/10 text-white/60'
                         : 'bg-brand-navy/5 text-brand-slate'
@@ -198,7 +198,7 @@ export default function WorkWithMePage() {
                     // Self-serve: straight to Stripe Checkout, no application.
                     <a
                       href="/api/stripe/checkout-blueprint"
-                      className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
+                      className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
                     >
                       Start Now
                     </a>
@@ -243,7 +243,7 @@ export default function WorkWithMePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="bg-brand-offwhite border border-brand-navy/[0.06] rounded-sm p-8"
+              className="bg-brand-offwhite border border-brand-navy/[0.06] rounded-control p-8"
             >
               <h3 className="font-display font-bold text-lg uppercase tracking-tight text-brand-navy mb-3">
                 {faq.q}

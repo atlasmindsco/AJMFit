@@ -23,7 +23,6 @@ import {
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
-import BeginnerPicker from '@/components/studio/BeginnerPicker'
 import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
@@ -596,11 +595,7 @@ export default function ProgramsPage() {
   if (showPicker) {
     return (
       <div className="py-8">
-        {isBeginnerFlow ? (
-          <BeginnerPicker onDone={handlePickerDone} />
-        ) : (
-          <BlueprintPicker onDone={handlePickerDone} />
-        )}
+        <BlueprintPicker onDone={handlePickerDone} beginner={isBeginnerFlow} />
       </div>
     )
   }
@@ -640,7 +635,7 @@ export default function ProgramsPage() {
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8">
         {/* Program Header */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 mb-4">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -678,7 +673,7 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 1: PROGRAM PREVIEW ════════ */}
           {view === 'preview' && (
             <motion.div key="preview" {...slideBack}>
-              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 {/* Overview / Program toggle */}
                 <div className="flex items-center border-b border-white/[0.10]">
                   <button
@@ -708,19 +703,19 @@ export default function ProgramsPage() {
                   <div className="p-5 space-y-5">
                     {/* Quick stats */}
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
                       </div>
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
                         </p>
                         <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
                       </div>
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl p-4 text-center">
+                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-state-success font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
@@ -753,7 +748,7 @@ export default function ProgramsPage() {
                           <button
                             key={day.day}
                             onClick={() => { setSelectedDay(dayIndex); setView('workout') }}
-                            className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
+                            className="w-full flex items-center gap-3 py-2.5 px-3 rounded-control bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
                           >
                             <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
                             <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-brand-blue transition-colors duration-200">{day.name}</span>
@@ -777,7 +772,7 @@ export default function ProgramsPage() {
                     {/* CTA to view program */}
                     <button
                       onClick={() => setPreviewTab('program')}
-                      className="w-full py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                     >
                       View Program
                     </button>
@@ -809,7 +804,7 @@ export default function ProgramsPage() {
                                 setView('workout')
                               }
                             }}
-                            className={`w-full flex items-center gap-4 p-3 rounded-xl text-left group ${
+                            className={`w-full flex items-center gap-4 p-3 rounded-card text-left group ${
                               isRest
                                 ? 'bg-surface-overlay border border-white/[0.06] cursor-default'
                                 : 'bg-[#222] border border-white/[0.10] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
@@ -817,13 +812,13 @@ export default function ProgramsPage() {
                           >
                             {/* Thumbnail or rest icon */}
                             {isRest ? (
-                              <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
+                              <div className="w-14 h-14 rounded-control bg-white/[0.04] flex items-center justify-center shrink-0">
                                 <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                                 </svg>
                               </div>
                             ) : (
-                              <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0">
+                              <div className="relative w-14 h-14 rounded-control overflow-hidden bg-[#0A0A0A] shrink-0">
                                 {thumb ? (
                                   <>
                                     <img src={thumb} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -877,7 +872,7 @@ export default function ProgramsPage() {
                       return (
                         <button
                           onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                          className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                          className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                         >
                           Continue, {weeklyPlan[todayIndex].name}
                         </button>
@@ -892,7 +887,7 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 2: WORKOUT OVERVIEW ════════ */}
           {view === 'workout' && selected && (
             <motion.div key="workout" {...slideIn}>
-              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
@@ -952,7 +947,7 @@ export default function ProgramsPage() {
                           const isNewPR = pr ? bestEnteredWeight > pr.weight : bestEnteredWeight > 0
 
                           return (
-                            <div key={exercise.name} className="rounded-xl bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
+                            <div key={exercise.name} className="rounded-card bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
                               {/* Exercise row */}
                               <div className="flex items-center gap-3 p-3">
                                 {/* Thumbnail, tap for exercise detail */}
@@ -963,7 +958,7 @@ export default function ProgramsPage() {
                                       setView('exercise')
                                     }
                                   }}
-                                  className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#0A0A0A] shrink-0"
+                                  className="relative w-14 h-14 rounded-control overflow-hidden bg-[#0A0A0A] shrink-0"
                                 >
                                   {dbMatch?.images[0] ? (
                                     <>
@@ -1055,7 +1050,7 @@ export default function ProgramsPage() {
                                     <div className="px-3 pb-3 pt-1 border-t border-white/[0.06]">
                                       {/* PR banner */}
                                       {pr && (
-                                        <div className={`flex items-center justify-between rounded-lg px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-state-warning/15 border border-state-warning/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
+                                        <div className={`flex items-center justify-between rounded-control px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-state-warning/15 border border-state-warning/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
                                           <div className="flex items-center gap-2">
                                             <svg className={`w-4 h-4 ${isNewPR ? 'text-state-warning' : 'text-white/30'}`} viewBox="0 0 24 24" fill="currentColor">
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
@@ -1087,7 +1082,7 @@ export default function ProgramsPage() {
                                         const isEditingThis = editingRest === exercise.name
 
                                         return (
-                                          <div className="flex items-center justify-between rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2 mt-2 mb-3">
+                                          <div className="flex items-center justify-between rounded-control bg-white/[0.03] border border-white/[0.06] px-3 py-2 mt-2 mb-3">
                                             <div className="flex items-center gap-2">
                                               <svg className="w-3.5 h-3.5 text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -1220,7 +1215,7 @@ export default function ProgramsPage() {
 
                                         return (
                                           <div key={si}>
-                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
+                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
                                               <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
                                               <input
                                                 type="number"
@@ -1228,7 +1223,7 @@ export default function ProgramsPage() {
                                                 placeholder={prevWeight ?? 'lbs'}
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <input
                                                 type="number"
@@ -1236,7 +1231,7 @@ export default function ProgramsPage() {
                                                 placeholder={prevReps ?? 'reps'}
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -1261,7 +1256,7 @@ export default function ProgramsPage() {
                                             {filled && !isLastSet && (
                                               <div className="ml-8 mr-10 my-1.5">
                                                 {timerActive && activeTimer ? (
-                                                  <div className="flex items-center gap-2 rounded-lg bg-brand-blue/10 border border-brand-blue/20 px-3 py-2">
+                                                  <div className="flex items-center gap-2 rounded-control bg-brand-blue/10 border border-brand-blue/20 px-3 py-2">
                                                     {/* Progress ring */}
                                                     <div className="relative w-8 h-8 shrink-0">
                                                       <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
@@ -1287,7 +1282,7 @@ export default function ProgramsPage() {
                                                     </div>
                                                     <button
                                                       onClick={stopRestTimer}
-                                                      className="px-2.5 py-1 rounded-md bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
+                                                      className="px-2.5 py-1 rounded-control bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
                                                     >
                                                       Skip
                                                     </button>
@@ -1311,7 +1306,7 @@ export default function ProgramsPage() {
                                       })}
 
                                       {/* Intensity Technique toggle */}
-                                      <div className="mt-3 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
+                                      <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
                                             <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1352,7 +1347,7 @@ export default function ProgramsPage() {
                                                 <button
                                                   key={key}
                                                   onClick={() => setIntensityChoice((prev) => ({ ...prev, [logKey]: key }))}
-                                                  className={`py-2 px-2 rounded-lg text-[10px] font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
+                                                  className={`py-2 px-2 rounded-control text-[10px] font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
                                                     isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/[0.05]'
                                                   }`}
                                                   style={
@@ -1407,7 +1402,7 @@ export default function ProgramsPage() {
                                               return (
                                                 <div
                                                   key={idx}
-                                                  className={`grid grid-cols-[32px_1fr_40px] gap-2 mb-1 items-center rounded-lg px-1 py-0.5`}
+                                                  className={`grid grid-cols-[32px_1fr_40px] gap-2 mb-1 items-center rounded-control px-1 py-0.5`}
                                                   style={iLog.done ? { backgroundColor: `${meta.color}15` } : undefined}
                                                 >
                                                   <span
@@ -1422,13 +1417,13 @@ export default function ProgramsPage() {
                                                     placeholder="lbs"
                                                     value={iLog.weight}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
-                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     style={{ borderColor: iLog.done ? `${meta.color}55` : undefined }}
                                                   />
                                                   <div className="flex items-center justify-center">
                                                     <button
                                                       onClick={() => handleIntensityChange('done', !iLog.done)}
-                                                      className="w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-150"
+                                                      className="w-6 h-6 rounded-control border flex items-center justify-center transition-all duration-150"
                                                       style={{
                                                         borderColor: iLog.done ? meta.color : 'rgba(255,255,255,0.1)',
                                                         backgroundColor: iLog.done ? `${meta.color}33` : 'rgba(255,255,255,0.04)',
@@ -1462,7 +1457,7 @@ export default function ProgramsPage() {
                                         <div className="mt-3 relative">
                                           <button
                                             onClick={() => setSwapMenuOpen(showSwapMenu ? null : exercise.name)}
-                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
                                           >
                                             <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
@@ -1480,7 +1475,7 @@ export default function ProgramsPage() {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -4 }}
                                                 transition={{ duration: 0.15 }}
-                                                className="absolute bottom-full left-0 right-0 mb-1 bg-surface-overlay border border-white/[0.10] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
+                                                className="absolute bottom-full left-0 right-0 mb-1 bg-surface-overlay border border-white/[0.10] rounded-card shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
                                               >
                                                 <div className="px-3 py-2 border-b border-white/[0.06]">
                                                   <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-[0.15em]">
@@ -1548,7 +1543,7 @@ export default function ProgramsPage() {
                 <div className="p-4 pt-0">
                   {selectedDay !== null && workoutStartTime[selectedDay] ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between rounded-xl bg-state-success/10 border border-state-success/20 px-4 py-3">
+                      <div className="flex items-center justify-between rounded-card bg-state-success/10 border border-state-success/20 px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
@@ -1611,7 +1606,7 @@ export default function ProgramsPage() {
                             }
                           }
                         }}
-                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
+                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
                       >
                         End Workout
                       </button>
@@ -1640,7 +1635,7 @@ export default function ProgramsPage() {
                           }
                         }
                       }}
-                      className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                     >
                       Start Workout
                     </button>
@@ -1653,7 +1648,7 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 3: EXERCISE DETAIL ════════ */}
           {view === 'exercise' && selectedExerciseData && (
             <motion.div key="exercise" {...slideIn}>
-              <div className="bg-surface-raised rounded-xl border border-white/[0.10] overflow-hidden">
+              <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
@@ -1673,12 +1668,12 @@ export default function ProgramsPage() {
                   {selectedExerciseDB && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {selectedExerciseDB.primaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-brand-orange/15 text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-orange/15 text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-md bg-brand-blue/15 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -1720,8 +1715,8 @@ export default function ProgramsPage() {
                         <div className="flex-1 space-y-3">
                           {selectedExerciseDB.primaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-brand-orange/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-brand-orange" />
+                              <div className="w-10 h-10 rounded-control bg-brand-orange/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-control bg-brand-orange" />
                               </div>
                               <div>
                                 <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
@@ -1731,8 +1726,8 @@ export default function ProgramsPage() {
                           ))}
                           {selectedExerciseDB.secondaryMuscles.map((m) => (
                             <div key={m} className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-brand-blue/10 flex items-center justify-center shrink-0">
-                                <div className="w-4 h-4 rounded-sm bg-brand-blue" />
+                              <div className="w-10 h-10 rounded-control bg-brand-blue/10 flex items-center justify-center shrink-0">
+                                <div className="w-4 h-4 rounded-control bg-brand-blue" />
                               </div>
                               <div>
                                 <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
@@ -1771,7 +1766,7 @@ export default function ProgramsPage() {
       {/* SIDEBAR */}
       <div className="lg:col-span-4 space-y-4">
         {/* Recent Workout Logs */}
-        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+        <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
             {history.length > 0 && (
@@ -1790,7 +1785,7 @@ export default function ProgramsPage() {
                 {history.map((w) => (
                   <li
                     key={w.id}
-                    className="flex items-center justify-between gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
+                    className="flex items-center justify-between gap-3 rounded-control bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
                   >
                     <div className="min-w-0">
                       <p className="text-white text-sm font-body font-semibold truncate">{w.day_name}</p>
@@ -1816,7 +1811,7 @@ export default function ProgramsPage() {
         </motion.div>
 
         {/* Your Coach */}
-        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10]">
             <h2 className="font-display font-bold text-sm text-white">Your Coach</h2>
           </div>
@@ -1879,11 +1874,11 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 15 }}
-        className="relative text-center px-9 py-7 rounded-2xl bg-surface-raised border-2 border-state-warning/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
+        className="relative text-center px-9 py-7 rounded-card bg-surface-raised border-2 border-state-warning/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
       >
         <button
           onClick={onDone}
-          className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.92] transition-all duration-200 flex items-center justify-center text-white/60 hover:text-white/90 pointer-events-auto"
+          className="absolute top-3 right-3 w-8 h-8 rounded-control bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.92] transition-all duration-200 flex items-center justify-center text-white/60 hover:text-white/90 pointer-events-auto"
           aria-label="Close"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -1915,7 +1910,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
   }, [images])
 
   return (
-    <div className="relative w-full h-56 rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/[0.10]">
+    <div className="relative w-full h-56 rounded-card overflow-hidden bg-[#0A0A0A] border border-white/[0.10]">
       <img
         src={images[0]}
         alt={`${name}, start`}
@@ -1930,7 +1925,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
           style={{ opacity: showEnd ? 1 : 0 }}
         />
       )}
-      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-md text-[9px] font-display font-semibold text-white/70 uppercase tracking-wide backdrop-blur-sm">
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-control text-[9px] font-display font-semibold text-white/70 uppercase tracking-wide backdrop-blur-sm">
         {showEnd && images[1] ? 'End' : 'Start'}
       </div>
     </div>
@@ -1939,8 +1934,8 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
 
 function SetupCard({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.06] border border-white/[0.10]">
-      <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center">
+    <div className="flex flex-col items-center gap-2 p-3 rounded-card bg-white/[0.06] border border-white/[0.10]">
+      <div className="w-10 h-10 rounded-control bg-white/[0.06] flex items-center justify-center">
         {icon === 'equipment' && (
           <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
@@ -1994,7 +1989,7 @@ function WorkoutComplete({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="w-full max-w-sm text-center px-7 py-8 rounded-2xl bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
+        className="w-full max-w-sm text-center px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
       >
         <p className="font-display font-bold text-[11px] uppercase tracking-[0.25em] text-brand-orange">
           Session complete

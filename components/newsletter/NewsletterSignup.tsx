@@ -33,7 +33,7 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
 
   if (variant === 'band') {
     return (
-      <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-brand-blue to-brand-bluedark text-white p-9 lg:p-11 grain-overlay">
+      <div className="relative overflow-hidden rounded-control bg-gradient-to-br from-brand-blue to-brand-bluedark text-white p-9 lg:p-11 grain-overlay">
         <div className="absolute -top-10 -right-8 w-52 h-52 rounded-full bg-white/10 blur-2xl" />
         <div className="absolute -bottom-12 left-10 w-44 h-44 rounded-full bg-brand-orange/20 blur-2xl" />
         <div className="relative grid lg:grid-cols-2 gap-8 items-center">
@@ -59,7 +59,7 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="First name"
-                  className="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
+                  className="flex-1 px-5 py-4 rounded-control bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
                 />
                 <input
                   type="email"
@@ -67,13 +67,13 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="flex-1 px-5 py-4 rounded-sm bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
+                  className="flex-1 px-5 py-4 rounded-control bg-white text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:ring-2 focus:ring-white/60"
                 />
               </div>
               <button
                 type="submit"
                 disabled={state === 'loading'}
-                className="w-full px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)] whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
+                className="w-full px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control shadow-[0_4px_24px_rgba(247,107,22,0.35)] whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
               >
                 {state === 'loading' ? 'Subscribing…' : 'Subscribe'}
               </button>
@@ -86,7 +86,7 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
   }
 
   return (
-    <div className="rounded-md border border-brand-navy/10 bg-white p-8 text-center shadow-[0_8px_30px_rgba(27,45,80,0.05)]">
+    <div className="rounded-control border border-brand-navy/10 bg-white p-8 text-center shadow-[0_8px_30px_rgba(27,45,80,0.05)]">
       <span className="font-display font-semibold text-xs uppercase tracking-[0.3em] text-brand-blue">Brains &amp; Gains</span>
       <h3 className="font-display font-extrabold text-2xl uppercase tracking-tight mt-2 text-brand-navy">
         Don&rsquo;t Miss the Next Issue
@@ -104,7 +104,7 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First name"
-                className="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
+                className="flex-1 px-5 py-3.5 rounded-control bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
               />
               <input
                 type="email"
@@ -112,13 +112,13 @@ export default function NewsletterSignup({ variant = 'card' }: { variant?: Varia
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="flex-1 px-5 py-3.5 rounded-sm bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
+                className="flex-1 px-5 py-3.5 rounded-control bg-brand-offwhite border border-brand-navy/10 text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:border-brand-blue/50 transition"
               />
             </div>
             <button
               type="submit"
               disabled={state === 'loading'}
-              className="w-full px-7 py-3.5 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
+              className="w-full px-7 py-3.5 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control whitespace-nowrap hover:bg-orange-600 active:scale-95 transition disabled:opacity-60"
             >
               {state === 'loading' ? 'Subscribing…' : 'Subscribe'}
             </button>

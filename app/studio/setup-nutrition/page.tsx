@@ -146,7 +146,7 @@ export default function SetupNutritionPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-sm border border-brand-navy/[0.08] shadow-[0_4px_40px_rgba(27,45,80,0.06)] p-8 md:p-10">
+        <div className="bg-white rounded-control border border-brand-navy/[0.08] shadow-[0_4px_40px_rgba(27,45,80,0.06)] p-8 md:p-10">
           {step === 'form' ? (
             <>
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
@@ -166,7 +166,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.currentWeight || ''}
                     onChange={(e) => handleChange('currentWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="180"
                   />
                 </div>
@@ -180,7 +180,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.goalWeight || ''}
                     onChange={(e) => handleChange('goalWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="170"
                   />
                 </div>
@@ -200,7 +200,7 @@ export default function SetupNutritionPage() {
                           setHeightFeet(feet)
                           handleChange('height', feet * 12 + (heightInches || 0))
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="5"
                         min="0"
                       />
@@ -215,7 +215,7 @@ export default function SetupNutritionPage() {
                           setHeightInches(inches)
                           handleChange('height', (heightFeet || 0) * 12 + inches)
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="10"
                         min="0"
                         max="11"
@@ -234,7 +234,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.age || ''}
                     onChange={(e) => handleChange('age', parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="25"
                   />
                 </div>
@@ -247,7 +247,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.sex}
                     onChange={(e) => handleChange('sex', e.target.value as Sex)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -263,7 +263,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.activityLevel}
                     onChange={(e) => handleChange('activityLevel', e.target.value as ActivityLevel)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="sedentary">Sedentary (little exercise)</option>
                     <option value="light">Light (1-3 days/week)</option>
@@ -281,7 +281,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.goal}
                     onChange={(e) => handleChange('goal', e.target.value as FitnessGoal)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="lose_fat">Lose Fat</option>
                     <option value="build_muscle">Build Muscle</option>
@@ -295,7 +295,7 @@ export default function SetupNutritionPage() {
                 <button
                   type="button"
                   onClick={handleContinue}
-                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
                 >
                   Continue
                 </button>
@@ -312,7 +312,7 @@ export default function SetupNutritionPage() {
 
               <div className="mt-8 space-y-4">
                 {/* Summary */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-control p-4">
                   <p className="text-sm font-body text-brand-navy">
                     <strong>Goal:</strong> {getGoalLabel(setup.goal)}
                   </p>
@@ -325,7 +325,7 @@ export default function SetupNutritionPage() {
                 </div>
 
                 {/* Calories */}
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-5 text-white">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-control p-5 text-white">
                   <p className="text-sm font-display uppercase tracking-[0.1em] opacity-90">Daily Calories</p>
                   <p className="text-4xl font-display font-bold mt-2">{calculated.dailyCalories}</p>
                   {calculated.calorieDeficitOrSurplus !== 0 && (
@@ -339,17 +339,17 @@ export default function SetupNutritionPage() {
 
                 {/* Macros */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-4">
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-control p-4">
                     <p className="text-xs font-display uppercase tracking-[0.1em] text-orange-900">Protein</p>
                     <p className="text-2xl font-display font-bold text-orange-700 mt-1">{calculated.proteinGrams}g</p>
                     <p className="text-xs text-orange-600 mt-1">{Math.round(calculated.proteinGrams * 4)} cal</p>
                   </div>
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-control p-4">
                     <p className="text-xs font-display uppercase tracking-[0.1em] text-green-900">Carbs</p>
                     <p className="text-2xl font-display font-bold text-green-700 mt-1">{calculated.carbGrams}g</p>
                     <p className="text-xs text-green-600 mt-1">{Math.round(calculated.carbGrams * 4)} cal</p>
                   </div>
-                  <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-control p-4">
                     <p className="text-xs font-display uppercase tracking-[0.1em] text-yellow-900">Fat</p>
                     <p className="text-2xl font-display font-bold text-yellow-700 mt-1">{calculated.fatGrams}g</p>
                     <p className="text-xs text-yellow-600 mt-1">{Math.round(calculated.fatGrams * 9)} cal</p>
@@ -366,14 +366,14 @@ export default function SetupNutritionPage() {
               <div className="mt-8 flex gap-3">
                 <button
                   onClick={() => setStep('form')}
-                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-gray-300 transition-colors"
+                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] disabled:opacity-60 transition-all"
+                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] disabled:opacity-60 transition-all"
                 >
                   {loading ? 'Saving...' : isEditing ? 'Update & Continue' : 'Confirm & Continue'}
                 </button>

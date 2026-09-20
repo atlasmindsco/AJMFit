@@ -371,7 +371,7 @@ export default function NutritionPage() {
       <div className="mb-4 flex items-center justify-end">
         <a
           href="/studio/setup-nutrition"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-blue to-brand-bluedark text-white rounded-lg font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue transition-[transform,box-shadow] duration-200"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-blue to-brand-bluedark text-white rounded-control font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue transition-[transform,box-shadow] duration-200"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-5.971m0 0V9.348m0 9.295h4.992m-9.992 2.964h9.987M2.985 9.348h16.338M21.984 19.644v2.986m0 0v-2.986m0 2.986H4.014M4.014 19.644h17.97m0 0h-9.987" />
@@ -385,7 +385,7 @@ export default function NutritionPage() {
         variants={fadeIn}
         initial="hidden"
         animate="visible"
-        className="bg-white rounded-xl border border-brand-navy/[0.06] p-6 mb-6"
+        className="bg-white rounded-card border border-brand-navy/[0.06] p-6 mb-6"
       >
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
           <div className="flex-1">
@@ -463,7 +463,7 @@ export default function NutritionPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8 space-y-4">
-          <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-brand-navy/[0.06]">
+          <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06] flex items-center justify-between">
               <h2 className="font-display font-bold text-sm text-brand-navy">Meal Plan</h2>
               <span className="text-brand-slate text-xs font-body">
@@ -484,7 +484,7 @@ export default function NutritionPage() {
                       className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFBFD] transition-colors duration-200"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isLogged ? 'bg-emerald-500/10' : 'bg-brand-navy/[0.04]'}`}>
+                        <div className={`w-8 h-8 rounded-control flex items-center justify-center shrink-0 ${isLogged ? 'bg-emerald-500/10' : 'bg-brand-navy/[0.04]'}`}>
                           {isLogged ? (
                             <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -519,7 +519,7 @@ export default function NutritionPage() {
                         >
                           <div className="px-5 pb-4">
                             {mealLogs.length > 0 ? (
-                              <div className="bg-[#FAFBFD] rounded-lg border border-brand-navy/[0.04] overflow-hidden">
+                              <div className="bg-[#FAFBFD] rounded-control border border-brand-navy/[0.04] overflow-hidden">
                                 <table className="w-full text-xs font-body">
                                   <thead>
                                     <tr className="text-brand-slate uppercase tracking-wide">
@@ -687,7 +687,7 @@ export default function NutritionPage() {
                             )}
 
                             {isAdding ? (
-                              <div className="mt-3 bg-[#FAFBFD] rounded-lg border border-brand-blue/20 p-3">
+                              <div className="mt-3 bg-[#FAFBFD] rounded-control border border-brand-blue/20 p-3">
                                 {analysisSource && (
                                   <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-2">
                                     <div className="flex items-center gap-2 text-[10px] font-display font-bold uppercase tracking-wide text-emerald-700">
@@ -729,7 +729,7 @@ export default function NutritionPage() {
                                           setAddForm({ ...addForm, name: next })
                                           runTypedLookup(next)
                                         }}
-                                        className="w-full px-3 py-2 pr-9 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                        className="w-full px-3 py-2 pr-9 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                       />
                                       {typedLookupActive && (
                                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-brand-blue/20 border-t-brand-blue rounded-full animate-spin" />
@@ -743,7 +743,7 @@ export default function NutritionPage() {
                                       placeholder="optional"
                                       value={addForm.serving}
                                       onChange={(e) => setAddForm({ ...addForm, serving: e.target.value })}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                   <label className="block">
@@ -757,7 +757,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm({ ...addForm, calories: e.target.value })
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                 </div>
@@ -787,7 +787,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm({ ...addForm, protein: e.target.value })
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                   <label className="block">
@@ -801,7 +801,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm({ ...addForm, carbs: e.target.value })
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                   <label className="block">
@@ -815,7 +815,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm({ ...addForm, fats: e.target.value })
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-md font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                 </div>
@@ -823,13 +823,13 @@ export default function NutritionPage() {
                                   <button
                                     onClick={() => handleAddFood(meal.id)}
                                     disabled={submitting || !addForm.name.trim()}
-                                    className="px-4 py-2 bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide rounded-md hover:bg-brand-bluedark disabled:opacity-50 transition-colors duration-200"
+                                    className="px-4 py-2 bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-bluedark disabled:opacity-50 transition-colors duration-200"
                                   >
                                     {submitting ? 'Adding...' : 'Add Food'}
                                   </button>
                                   <button
                                     onClick={resetAddState}
-                                    className="px-4 py-2 bg-white border border-brand-navy/10 text-brand-slate text-xs font-display font-bold uppercase tracking-wide rounded-md hover:bg-[#FAFBFD] transition-colors duration-200"
+                                    className="px-4 py-2 bg-white border border-brand-navy/10 text-brand-slate text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-[#FAFBFD] transition-colors duration-200"
                                   >
                                     Cancel
                                   </button>
@@ -840,14 +840,14 @@ export default function NutritionPage() {
                                 <button
                                   onClick={() => setSearchMealId(meal.id)}
                                   disabled={analyzing !== null}
-                                  className="py-2 bg-brand-blue rounded-lg text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 bg-brand-blue rounded-control text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                   </svg>
                                   Search
                                 </button>
-                                <label className="cursor-pointer py-2 border border-dashed border-brand-orange/30 rounded-lg text-brand-orange text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orange/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5">
+                                <label className="cursor-pointer py-2 border border-dashed border-brand-orange/30 rounded-control text-brand-orange text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orange/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5">
                                   {analyzing === meal.id ? (
                                     <>
                                       <span className="w-3 h-3 border-2 border-brand-orange/30 border-t-brand-orange rounded-full animate-spin" />
@@ -881,7 +881,7 @@ export default function NutritionPage() {
                                     setScanningMealId(meal.id)
                                   }}
                                   disabled={analyzing !== null}
-                                  className="py-2 border border-dashed border-brand-blue/30 rounded-lg text-brand-blue text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 border border-dashed border-brand-blue/30 rounded-control text-brand-blue text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.5v15m3-15v15m3-15v15m3-15v15m3-15v15m3-15v15M21 4.5v15" />
@@ -893,7 +893,7 @@ export default function NutritionPage() {
                                     macroFieldsTouchedRef.current = false
                                     setAddingToMeal(meal.id)
                                   }}
-                                  className="py-2 border border-dashed border-brand-navy/15 rounded-lg text-brand-slate text-xs font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blue transition-colors duration-200"
+                                  className="py-2 border border-dashed border-brand-navy/15 rounded-control text-brand-slate text-xs font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blue transition-colors duration-200"
                                 >
                                   + Manual
                                 </button>
@@ -909,7 +909,7 @@ export default function NutritionPage() {
             </div>
           </motion.div>
 
-          <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-brand-navy/[0.06]">
+          <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
               <h2 className="font-display font-bold text-sm text-brand-navy">Weekly Calorie Trend</h2>
             </div>
@@ -942,7 +942,7 @@ export default function NutritionPage() {
         </div>
 
         <div className="lg:col-span-4 space-y-4">
-          <motion.div custom={3} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-brand-navy/[0.06]">
+          <motion.div custom={3} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
               <h2 className="font-display font-bold text-sm text-brand-navy">Hydration</h2>
             </div>
@@ -979,12 +979,12 @@ export default function NutritionPage() {
             </div>
           </motion.div>
 
-          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-xl border border-brand-navy/[0.06]">
+          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
               <h2 className="font-display font-bold text-sm text-brand-navy">Nutrition Tip</h2>
             </div>
             <div className="p-5">
-              <div className="p-3 rounded-lg bg-brand-orange/[0.04] border border-brand-orange/10">
+              <div className="p-3 rounded-control bg-brand-orange/[0.04] border border-brand-orange/10">
                 <p className="text-brand-navy text-sm font-body leading-relaxed">
                   &ldquo;Try to get 30-40g of protein within 30 minutes post-workout. Your shake + a banana is a solid combo.&rdquo;
                 </p>

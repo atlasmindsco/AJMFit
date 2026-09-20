@@ -56,7 +56,7 @@ export default function VideoManager({ exerciseName, onSave }: VideoManagerProps
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3"
+      className="bg-gray-50 border border-gray-200 rounded-control p-4 space-y-3"
     >
       <h3 className="font-semibold text-sm text-gray-800">Add YouTube Demo</h3>
 
@@ -69,7 +69,7 @@ export default function VideoManager({ exerciseName, onSave }: VideoManagerProps
             setError(null)
           }}
           placeholder="Paste YouTube URL (e.g., https://youtube.com/watch?v=...)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-control text-sm focus:outline-none focus:border-blue-500"
         />
 
         <p className="text-xs text-gray-600">
@@ -100,7 +100,7 @@ export default function VideoManager({ exerciseName, onSave }: VideoManagerProps
       <button
         onClick={handleSaveVideo}
         disabled={loading || !youtubeUrl.trim()}
-        className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-semibold rounded-lg transition-colors"
+        className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-semibold rounded-control transition-colors"
       >
         {loading ? 'Saving...' : 'Save Video Demo'}
       </button>

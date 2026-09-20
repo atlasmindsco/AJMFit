@@ -41,7 +41,7 @@ export default function ExerciseVideoDemo({
       <div
         className={`${
           compact ? 'h-32' : 'h-64'
-        } bg-gray-100 rounded-lg flex items-center justify-center animate-pulse`}
+        } bg-gray-100 rounded-control flex items-center justify-center animate-pulse`}
       >
         <span className="text-gray-500">Loading demonstration...</span>
       </div>
@@ -51,7 +51,7 @@ export default function ExerciseVideoDemo({
   if (error || !video) {
     return (
       <div
-        className={`${compact ? 'h-32' : 'h-64'} bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center p-4 text-center`}
+        className={`${compact ? 'h-32' : 'h-64'} bg-gray-50 border border-gray-200 rounded-control flex flex-col items-center justify-center p-4 text-center`}
       >
         <p className="text-sm text-gray-500">No demonstration video available</p>
         <p className="text-xs text-gray-400 mt-1">Try searching YouTube for "{exerciseName}"</p>
@@ -70,7 +70,7 @@ export default function ExerciseVideoDemo({
       className="space-y-2"
     >
       {/* Video Container */}
-      <div className={`bg-gray-900 rounded-lg overflow-hidden shadow-lg ${compact ? 'h-32' : 'h-64'}`}>
+      <div className={`bg-gray-900 rounded-control overflow-hidden shadow-lg ${compact ? 'h-32' : 'h-64'}`}>
         {isYouTube ? (
           // YouTube Embed
           <iframe

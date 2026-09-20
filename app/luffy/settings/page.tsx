@@ -9,7 +9,7 @@ import { fetchCoachSettings, saveCoachSettings, DEFAULT_COACH_SETTINGS, type Coa
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30'
+  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30'
 const labelCls = 'text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
@@ -67,14 +67,14 @@ export default function SettingsPage() {
   const SaveBar = (
     <div className="mt-6 flex items-center justify-end gap-3">
       {saved && <span className="text-emerald-400 text-xs font-body">Saved ✓</span>}
-      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
+      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
         {saving ? 'Saving…' : 'Save Changes'}
       </button>
     </div>
   )
 
   const toggle = (label: string, description: string, key: keyof CoachSettings) => (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+    <div className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
       <div>
         <p className="text-white font-body font-semibold text-sm">{label}</p>
         <p className="text-white/25 text-xs font-body">{description}</p>
@@ -93,16 +93,16 @@ export default function SettingsPage() {
         </motion.h1>
       </div>
 
-      <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1.5">
+      <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-card p-1.5">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-white/30 hover:text-white/60'}`}>
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-white/30 hover:text-white/60'}`}>
             {tab.label}
           </button>
         ))}
       </motion.div>
 
       {activeTab === 'profile' && (
-        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Coach Profile</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className={labelCls}>Full Name</label><input className={inputCls} value={s.full_name} onChange={(e) => set('full_name', e.target.value)} /></div>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
 
       {activeTab === 'business' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Business Settings</h2>
             <div className="space-y-4">
               <div><label className={labelCls}>Business Name</label><input className={inputCls} value={s.business_name} onChange={(e) => set('business_name', e.target.value)} /></div>
@@ -130,11 +130,11 @@ export default function SettingsPage() {
             </div>
             {SaveBar}
           </div>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Pricing Tiers</h2>
             <div className="space-y-3">
               {TIERS.map((tier) => (
-                <div key={tier.name} className="flex items-center justify-between p-4 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                <div key={tier.name} className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
                   <div><p className="text-white font-body font-semibold text-sm">{tier.name}</p><p className="text-white/25 text-xs font-body">{tier.features}</p></div>
                   <span className="text-brand-orange font-display font-bold text-lg">{tier.price}</span>
                 </div>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
       )}
 
       {activeTab === 'notifications' && (
-        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+        <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Notification Preferences</h2>
           <div className="space-y-4">
             {toggle('New client applications', 'When someone applies for coaching', 'notify_new_application')}
@@ -158,7 +158,7 @@ export default function SettingsPage() {
 
       {activeTab === 'billing' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Revenue</h2>
             <div className="flex items-baseline gap-3">
               <p className="font-display font-extrabold text-3xl text-brand-orange">
@@ -166,7 +166,7 @@ export default function SettingsPage() {
               </p>
               <span className="text-white/30 text-xs font-display uppercase tracking-wide">this month</span>
             </div>
-            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-white/80 text-xs font-display font-bold uppercase tracking-wide rounded-lg hover:bg-white/[0.1] transition-colors duration-200">
+            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-white/80 text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.1] transition-colors duration-200">
               Manage payments in Stripe →
             </a>
           </div>

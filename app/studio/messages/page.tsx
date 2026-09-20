@@ -86,7 +86,7 @@ export default function ClientMessagesPage() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-white rounded-xl border border-brand-navy/[0.06] overflow-hidden"
+      className="bg-white rounded-card border border-brand-navy/[0.06] overflow-hidden"
       style={{ height: 'calc(100vh - 130px)' }}
     >
       <div className="flex flex-col h-full">
@@ -126,8 +126,8 @@ export default function ClientMessagesPage() {
                   <div className="max-w-[75%]">
                     <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed ${
                       isClient
-                        ? 'bg-brand-blue text-white rounded-2xl rounded-br-md'
-                        : 'bg-white text-brand-navy rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
+                        ? 'bg-brand-blue text-white rounded-card rounded-br-md'
+                        : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                     }`}>
                       {msg.body}
                     </div>

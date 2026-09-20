@@ -194,7 +194,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
         initial={{ y: 48, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 380, damping: 34 }}
-        className="relative w-full h-full sm:h-[85vh] sm:max-w-md bg-white sm:rounded-2xl shadow-2xl shadow-brand-navy/20 flex flex-col overflow-hidden"
+        className="relative w-full h-full sm:h-[85vh] sm:max-w-md bg-white sm:rounded-card shadow-2xl shadow-brand-navy/20 flex flex-col overflow-hidden"
         role="dialog"
         aria-label={`Add food to ${meal.name}`}
       >
@@ -228,7 +228,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search foods, e.g. chicken noodle soup"
-                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-lg text-sm font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
                 aria-label="Search foods"
               />
               {query && (
@@ -253,7 +253,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mx-4 mt-3 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 shrink-0"
+              className="mx-4 mt-3 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-control flex items-center gap-2 shrink-0"
             >
               <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -283,7 +283,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <select
                     value={servingIdx}
                     onChange={(e) => setServingIdx(Number(e.target.value))}
-                    className="mt-1.5 w-full px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-lg text-sm font-body text-brand-navy focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                    className="mt-1.5 w-full px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
                   >
                     {selected.servings.map((s, i) => (
                       <option key={i} value={i}>
@@ -298,7 +298,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <div className="mt-1.5 flex items-center gap-2">
                     <button
                       onClick={() => stepQty(-0.5)}
-                      className="w-10 h-10 rounded-lg border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
+                      className="w-10 h-10 rounded-control border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
                       aria-label="Decrease servings"
                     >
                       −
@@ -310,12 +310,12 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                       step="0.25"
                       value={qtyText}
                       onChange={(e) => setQtyText(e.target.value)}
-                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-lg text-sm font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
                       aria-label="Number of servings"
                     />
                     <button
                       onClick={() => stepQty(0.5)}
-                      className="w-10 h-10 rounded-lg border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
+                      className="w-10 h-10 rounded-control border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
                       aria-label="Increase servings"
                     >
                       +
@@ -325,7 +325,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               </div>
 
               {preview && (
-                <div className="bg-[#FAFBFD] rounded-xl border border-brand-navy/[0.06] p-4">
+                <div className="bg-[#FAFBFD] rounded-card border border-brand-navy/[0.06] p-4">
                   <div className="flex items-baseline justify-center gap-1.5 mb-4">
                     <span className="font-display font-bold text-3xl text-brand-navy">{preview.calories}</span>
                     <span className="text-brand-slate text-sm font-body">kcal</span>
@@ -350,7 +350,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               <button
                 onClick={handleAdd}
                 disabled={saving || qty <= 0}
-                className="w-full py-3 bg-brand-blue text-white font-display font-bold text-sm uppercase tracking-wide rounded-lg hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
+                className="w-full py-3 bg-brand-blue text-white font-display font-bold text-sm uppercase tracking-wide rounded-control hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
               >
                 {saving ? 'Adding…' : `Add to ${meal.name}`}
               </button>
@@ -377,7 +377,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <li key={hit.id}>
                     <button
                       onClick={() => pick(hit)}
-                      className="w-full py-3 flex items-center justify-between gap-3 text-left hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue rounded-md px-2 -mx-2 transition-colors duration-150"
+                      className="w-full py-3 flex items-center justify-between gap-3 text-left hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue rounded-control px-2 -mx-2 transition-colors duration-150"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">

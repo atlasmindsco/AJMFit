@@ -53,7 +53,7 @@ export default async function BlogIndex() {
       {issues.length === 0 ? (
         /* Empty state */
         <section className="max-w-2xl mx-auto px-6 lg:px-8">
-          <div className="rounded-md border border-brand-navy/[0.08] bg-white p-12 text-center mb-12">
+          <div className="rounded-control border border-brand-navy/[0.08] bg-white p-12 text-center mb-12">
             <h2 className="font-display font-extrabold text-2xl uppercase tracking-tight text-brand-navy">Posts Coming Soon</h2>
             <p className="text-brand-slate mt-3">The first issue lands shortly. Subscribe below and you&rsquo;ll be the first to read it.</p>
           </div>
@@ -64,14 +64,14 @@ export default async function BlogIndex() {
           {/* Featured (latest) */}
           <section className="max-w-5xl mx-auto px-6 lg:px-8 mb-16">
             <Link href={`/blog/${featured.slug}`} className="group block">
-              <div className="grid md:grid-cols-2 gap-0 rounded-md overflow-hidden border border-brand-navy/[0.07] bg-white shadow-[0_10px_40px_rgba(27,45,80,0.06)] hover:shadow-[0_18px_60px_rgba(247,107,22,0.12)] transition-all duration-300">
+              <div className="grid md:grid-cols-2 gap-0 rounded-control overflow-hidden border border-brand-navy/[0.07] bg-white shadow-[0_10px_40px_rgba(27,45,80,0.06)] hover:shadow-[0_18px_60px_rgba(247,107,22,0.12)] transition-all duration-300">
                 <div className="relative bg-brand-navy overflow-hidden min-h-[280px] flex items-center justify-center p-10 grain-overlay">
                   <div className="absolute inset-0 bg-gradient-to-br from-brand-navy via-brand-navy to-[#0f1d38]" />
                   <div className="absolute -bottom-10 -right-6 w-56 h-56 rounded-full bg-brand-orange/20 blur-2xl" />
                   {featured.thumbnailUrl ? (
                     // Kit thumbnails are remote URLs; plain img avoids next/image domain config.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={featured.thumbnailUrl} alt="" className="relative rounded-sm object-cover max-w-full" />
+                    <img src={featured.thumbnailUrl} alt="" className="relative rounded-control object-cover max-w-full" />
                   ) : (
                     <div className="relative text-center">
                       <Image src="/AJMfit.png" alt="" width={80} height={80} className="w-20 h-20 object-contain mx-auto mb-4 drop-shadow-[0_6px_20px_rgba(0,0,0,0.4)]" />
@@ -81,7 +81,7 @@ export default async function BlogIndex() {
                 </div>
                 <div className="p-9 lg:p-10 flex flex-col justify-center">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-sm">Latest</span>
+                    <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-control">Latest</span>
                     <span className="text-brand-slate text-xs">{formatIssueDate(featured.date)}</span>
                   </div>
                   <h2 className="font-display font-extrabold text-4xl uppercase tracking-[-0.02em] leading-[0.95] text-brand-navy group-hover:text-brand-orange transition-colors duration-200">
@@ -104,7 +104,7 @@ export default async function BlogIndex() {
                 alt="Brains & Gains Newsletter"
                 width={400}
                 height={225}
-                className="rounded-sm w-full max-w-sm mx-auto lg:mx-0 shadow-[0_10px_40px_rgba(27,45,80,0.10)]"
+                className="rounded-control w-full max-w-sm mx-auto lg:mx-0 shadow-[0_10px_40px_rgba(27,45,80,0.10)]"
               />
               <div>
                 <h2 className="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight text-brand-navy">
@@ -134,7 +134,7 @@ export default async function BlogIndex() {
                   <Link
                     key={issue.id}
                     href={`/blog/${issue.slug}`}
-                    className="group bg-white border border-brand-navy/[0.06] rounded-md p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col"
+                    className="group bg-white border border-brand-navy/[0.06] rounded-control p-7 hover:border-brand-orange/30 hover:shadow-[0_10px_36px_rgba(247,107,22,0.08)] transition-all duration-300 flex flex-col"
                   >
                     <span className="text-brand-slate/70 text-xs font-display uppercase tracking-[0.15em]">{formatIssueDate(issue.date)}</span>
                     <h4 className="font-display font-bold text-xl uppercase tracking-tight mt-2 leading-tight text-brand-navy group-hover:text-brand-orange transition-colors">

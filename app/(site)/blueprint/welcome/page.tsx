@@ -51,7 +51,7 @@ export default async function BlueprintWelcome({
           {paid ? 'Payment confirmed. Your login is on its way:' : 'One step left:'}
         </p>
 
-        <div className="mt-8 bg-brand-offwhite border-l-4 border-brand-orange rounded-sm p-6 text-left">
+        <div className="mt-8 bg-brand-offwhite border-l-4 border-brand-orange rounded-control p-6 text-left">
           <ol className="space-y-3 text-brand-navy font-body text-[15px] leading-relaxed">
             <li>
               <strong>1.</strong>{' '}
@@ -82,7 +82,7 @@ export default async function BlueprintWelcome({
         <div className="mt-8">
           <Link
             href="/members"
-            className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.3)] hover:bg-orange-600 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control shadow-[0_4px_24px_rgba(247,107,22,0.3)] hover:bg-orange-600 transition-colors"
           >
             Go to sign in
           </Link>

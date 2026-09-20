@@ -9,7 +9,7 @@ import { fetchMyOnboarding, saveMyOnboarding, type OnboardingAnswers } from '@/l
 import { fetchMyTier } from '@/lib/scheduling'
 
 const inputCls =
-  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-lg text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/60 transition-colors'
+  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/60 transition-colors'
 const labelCls = 'block text-white/60 text-xs font-display font-bold uppercase tracking-[0.12em] mb-2'
 
 /** Segmented picker for short option sets. */
@@ -29,7 +29,7 @@ function Segmented({
           key={o.key}
           type="button"
           onClick={() => onChange(o.key)}
-          className={`px-3.5 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide border transition-colors duration-150 ${
+          className={`px-3.5 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors duration-150 ${
             value === o.key
               ? 'bg-brand-blue/15 border-brand-blue/50 text-brand-blue'
               : 'bg-white/[0.03] border-white/[0.10] text-white/40 hover:text-white/70'
@@ -134,13 +134,13 @@ export default function OnboardingFormPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <button
             onClick={() => router.push('/studio/schedule')}
-            className="px-6 py-3 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-brand-orangedark active:scale-[0.98] transition"
+            className="px-6 py-3 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition"
           >
             Book your onboarding call
           </button>
           <button
             onClick={() => router.push('/studio')}
-            className="px-6 py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-white/[0.10] active:scale-[0.98] transition"
+            className="px-6 py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition"
           >
             Go to dashboard
           </button>
@@ -162,7 +162,7 @@ export default function OnboardingFormPage() {
 
       <form onSubmit={submit} className="space-y-6">
         {/* Basics */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
           <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">The basics</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -185,7 +185,7 @@ export default function OnboardingFormPage() {
         </div>
 
         {/* Training background */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
           <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Training background</h2>
           <div>
             <label className={labelCls}>Where are you right now?</label>
@@ -224,7 +224,7 @@ export default function OnboardingFormPage() {
         </div>
 
         {/* Health */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
           <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Health</h2>
           <div>
             <label className={labelCls}>Injuries, pain, or movements that bother you</label>
@@ -259,7 +259,7 @@ export default function OnboardingFormPage() {
         </div>
 
         {/* Nutrition */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
           <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Nutrition</h2>
           <div>
             <label className={labelCls}>How do you eat right now?</label>
@@ -272,7 +272,7 @@ export default function OnboardingFormPage() {
         </div>
 
         {/* Goals */}
-        <div className="bg-surface-raised rounded-xl border border-white/[0.10] p-6 space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
           <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Your goal</h2>
           <div>
             <label className={labelCls}>90 days from now, what does success look like?</label>
@@ -289,7 +289,7 @@ export default function OnboardingFormPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-60"
+          className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-60"
         >
           {saving ? 'Saving…' : alreadyFilled ? 'Update my answers' : 'Send to Coach Anthony'}
         </button>

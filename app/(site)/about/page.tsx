@@ -38,7 +38,7 @@ export default function AboutPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="relative aspect-[4/5] bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm overflow-hidden"
+            className="relative aspect-[4/5] bg-brand-offwhite border border-brand-navy/[0.08] rounded-control overflow-hidden"
           >
             <Image
               src="/about-photo.jpg"
@@ -117,9 +117,9 @@ export default function AboutPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm p-10 md:p-14 flex flex-col md:flex-row items-center gap-10"
+          className="bg-brand-offwhite border border-brand-navy/[0.08] rounded-control p-10 md:p-14 flex flex-col md:flex-row items-center gap-10"
         >
-          <div className="shrink-0 w-24 h-24 bg-brand-blue/10 rounded-sm flex items-center justify-center">
+          <div className="shrink-0 w-24 h-24 bg-brand-blue/10 rounded-control flex items-center justify-center">
             <span className="font-display font-extrabold text-3xl text-brand-blue">ISSA</span>
           </div>
           <div>
@@ -158,7 +158,7 @@ export default function AboutPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="relative bg-brand-offwhite border border-brand-blue/10 rounded-sm p-10 md:p-16 text-center"
+          className="relative bg-brand-offwhite border border-brand-blue/10 rounded-control p-10 md:p-16 text-center"
         >
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(46,106,176,0.04),transparent)]" />
           <div className="relative z-10">

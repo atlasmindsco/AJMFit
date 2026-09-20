@@ -101,7 +101,7 @@ export default function CoachNutritionOverride({
   return (
     <div className="space-y-3">
       {hasOverrides && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-control p-3">
           <p className="text-xs font-display uppercase tracking-[0.1em] text-amber-900 font-semibold">
             Coach Override Active
           </p>
@@ -114,7 +114,7 @@ export default function CoachNutritionOverride({
 
       <button
         onClick={() => setOpen(!open)}
-        className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-display font-semibold text-sm uppercase tracking-[0.1em] rounded-lg transition-all"
+        className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-display font-semibold text-sm uppercase tracking-[0.1em] rounded-control transition-all"
       >
         {open ? 'Close Override' : hasOverrides ? 'Edit Override' : 'Set Custom Targets'}
       </button>
@@ -123,7 +123,7 @@ export default function CoachNutritionOverride({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-50 border border-gray-200 rounded-lg p-5 space-y-4"
+          className="bg-gray-50 border border-gray-200 rounded-control p-5 space-y-4"
         >
           <p className="text-sm text-gray-600 font-body">
             Calculated values: {currentTargets.calories} cal | {currentTargets.protein}g P |{' '}

@@ -59,7 +59,7 @@ export default function Newsletter() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mt-10 p-8 bg-brand-orange/10 border border-brand-orange/20 rounded-sm"
+            className="mt-10 p-8 bg-brand-orange/10 border border-brand-orange/20 rounded-control"
           >
             <p className="font-display font-bold text-lg text-brand-navy uppercase">
               You&rsquo;re In.
@@ -80,7 +80,7 @@ export default function Newsletter() {
                 placeholder="First name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
+                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-control text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
               />
               <input
                 type="email"
@@ -88,7 +88,7 @@ export default function Newsletter() {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
+                className="flex-1 px-5 py-4 bg-white border border-brand-navy/10 rounded-control text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200"
               />
             </div>
             <Button type="submit" variant="primary" fullWidth disabled={loading}>

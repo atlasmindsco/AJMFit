@@ -10,14 +10,14 @@ import Link from 'next/link'
 export default function ResumeSession({ title = 'Sign in to continue' }: { title?: string }) {
   return (
     <div className="p-8 max-w-md mx-auto">
-      <div className="bg-white rounded-xl border border-brand-navy/[0.06] p-8 text-center">
+      <div className="bg-white rounded-card border border-brand-navy/[0.06] p-8 text-center">
         <h1 className="font-display font-extrabold text-2xl text-brand-navy mb-2">{title}</h1>
         <p className="text-brand-slate text-sm font-body mb-6">
           Please log in to access your studio.
         </p>
         <Link
           href="/members"
-          className="inline-block w-full py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-md hover:bg-brand-bluedark transition-colors duration-200"
+          className="inline-block w-full py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-bluedark transition-colors duration-200"
         >
           Go to Login
         </Link>

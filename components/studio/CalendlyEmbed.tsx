@@ -65,7 +65,7 @@ export default function CalendlyEmbed({
   return (
     <div
       ref={ref}
-      className="rounded-xl overflow-hidden bg-white/[0.02] border border-white/[0.06]"
+      className="rounded-card overflow-hidden bg-white/[0.02] border border-white/[0.06]"
       style={{ minWidth: 320, height }}
     />
   )

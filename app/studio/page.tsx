@@ -215,10 +215,10 @@ export default function ClientDashboard() {
       {!loading && tier === 'blueprint' && !myProgram && (
         <Link
           href="/studio/programs"
-          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-brand-blue/10 border border-brand-blue/25 hover:bg-brand-blue/15 transition-colors duration-200"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-card bg-brand-blue/10 border border-brand-blue/25 hover:bg-brand-blue/15 transition-colors duration-200"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-brand-blue/15 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-control bg-brand-blue/15 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
               </svg>
@@ -240,10 +240,10 @@ export default function ClientDashboard() {
       {!loading && myProgram && !hasEverTrained && (
         <Link
           href="/studio/programs"
-          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-brand-orange/10 border border-brand-orange/30 hover:bg-brand-orange/15 transition-colors duration-200"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-card bg-brand-orange/10 border border-brand-orange/30 hover:bg-brand-orange/15 transition-colors duration-200"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-brand-orange/15 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-control bg-brand-orange/15 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3" />
               </svg>
@@ -266,10 +266,10 @@ export default function ClientDashboard() {
       {!loading && needsOnboarding && tier !== 'blueprint' && (
         <Link
           href="/studio/onboarding"
-          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-xl bg-brand-orange/10 border border-brand-orange/25 hover:bg-brand-orange/15 transition-colors duration-200"
+          className="group flex items-center justify-between gap-4 mb-6 px-5 py-4 rounded-card bg-brand-orange/10 border border-brand-orange/25 hover:bg-brand-orange/15 transition-colors duration-200"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-brand-orange/15 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-control bg-brand-orange/15 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
@@ -294,9 +294,9 @@ export default function ClientDashboard() {
             variants={fadeIn}
             initial="hidden"
             animate="visible"
-            className="bg-surface-raised rounded-xl border border-white/[0.10] p-5 flex items-center gap-4"
+            className="bg-surface-raised rounded-card border border-white/[0.10] p-5 flex items-center gap-4"
           >
-            <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center shrink-0 ${stat.iconColor}`}>
+            <div className={`w-12 h-12 rounded-card ${stat.iconBg} flex items-center justify-center shrink-0 ${stat.iconColor}`}>
               {stat.icon}
             </div>
             <div>
@@ -315,7 +315,7 @@ export default function ClientDashboard() {
         {/* LEFT: chart + PRs */}
         <div className="lg:col-span-8 space-y-4">
           {/* Calories This Week */}
-          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Calories This Week</h2>
               <span className="text-white/30 text-xs font-body">target {targets.calories.toLocaleString()}</span>
@@ -333,9 +333,9 @@ export default function ClientDashboard() {
                     return (
                       <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
                         <span className="text-white/50 text-[10px] font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
-                        <div className="w-full bg-white/[0.04] rounded-md flex items-end h-full">
+                        <div className="w-full bg-white/[0.04] rounded-control flex items-end h-full">
                           <div
-                            className={`w-full rounded-md ${onTarget ? 'bg-brand-blue' : 'bg-brand-orange'}`}
+                            className={`w-full rounded-control ${onTarget ? 'bg-brand-blue' : 'bg-brand-orange'}`}
                             style={{ height: `${Math.max(h, d.calories > 0 ? 4 : 0)}%` }}
                           />
                         </div>
@@ -349,7 +349,7 @@ export default function ClientDashboard() {
           </motion.div>
 
           {/* Recent PRs */}
-          <motion.div custom={5} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+          <motion.div custom={5} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Recent PRs</h2>
               <Link href="/studio/programs" className="text-brand-blue text-xs font-body hover:underline">
@@ -391,7 +391,7 @@ export default function ClientDashboard() {
         {/* RIGHT: nutrition + today's workout */}
         <div className="lg:col-span-4 space-y-4">
           {/* Upcoming Sessions */}
-          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Upcoming Sessions</h2>
             </div>
@@ -408,8 +408,8 @@ export default function ClientDashboard() {
               ) : (
                 <div className="space-y-2.5">
                   {upcomingSessions.map((s) => (
-                    <div key={s.id} className="flex items-center gap-3 rounded-lg bg-white/[0.03] p-3">
-                      <div className="w-9 h-9 rounded-lg bg-brand-orange/10 flex items-center justify-center shrink-0">
+                    <div key={s.id} className="flex items-center gap-3 rounded-control bg-white/[0.03] p-3">
+                      <div className="w-9 h-9 rounded-control bg-brand-orange/10 flex items-center justify-center shrink-0">
                         <svg className="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -419,7 +419,7 @@ export default function ClientDashboard() {
                         </p>
                       </div>
                       {s.join_url && (
-                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-md bg-brand-orange text-white text-[11px] font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
+                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-control bg-brand-orange text-white text-[11px] font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
                           Join
                         </a>
                       )}
@@ -431,7 +431,7 @@ export default function ClientDashboard() {
           </motion.div>
 
           {/* Nutrition Today */}
-          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10]">
+          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Nutrition Today</h2>
               <div className="flex items-center gap-2">
@@ -475,7 +475,7 @@ export default function ClientDashboard() {
           </motion.div>
 
           {/* Today's Workout CTA */}
-          <motion.div custom={7} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-xl border border-white/[0.10] p-5">
+          <motion.div custom={7} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
             <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
             {loading ? (
               <p className="text-white/30 text-sm font-body mt-1 mb-4">Loading…</p>
@@ -484,13 +484,13 @@ export default function ClientDashboard() {
                 <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
                 <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
                   {myProgram.split && (
-                    <span className="px-2 py-0.5 rounded-md bg-brand-blue/10 text-brand-blue text-[11px] font-body font-semibold">{myProgram.split}</span>
+                    <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-[11px] font-body font-semibold">{myProgram.split}</span>
                   )}
                   {myProgram.days_per_week != null && (
-                    <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold">{myProgram.days_per_week}× / week</span>
+                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold">{myProgram.days_per_week}× / week</span>
                   )}
                   {myProgram.level && (
-                    <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold capitalize">{myProgram.level}</span>
+                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold capitalize">{myProgram.level}</span>
                   )}
                 </div>
                 {myProgram.description && (
@@ -498,7 +498,7 @@ export default function ClientDashboard() {
                 )}
                 <Link
                   href="/studio/programs"
-                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                 >
                   Start Training
                 </Link>
@@ -510,7 +510,7 @@ export default function ClientDashboard() {
                 </p>
                 <Link
                   href="/studio/programs"
-                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                 >
                   Pick Your Program
                 </Link>
@@ -522,7 +522,7 @@ export default function ClientDashboard() {
                 </p>
                 <Link
                   href="/studio/programs"
-                  className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-lg hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
+                  className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
                 >
                   Browse Exercises
                 </Link>

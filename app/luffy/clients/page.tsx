@@ -179,7 +179,7 @@ export default function ClientsPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${
                 filter === f ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
               }`}
             >
@@ -195,7 +195,7 @@ export default function ClientsPage() {
           <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
         </div>
       ) : clients.length === 0 ? (
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-12 text-center">
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-12 text-center">
           <p className="text-white/40 font-body">No clients yet. Applications will appear here when submitted.</p>
         </div>
       ) : (
@@ -215,7 +215,7 @@ export default function ClientsPage() {
                   initial="hidden"
                   animate="visible"
                   onClick={() => setSelectedClient(isExpanded ? null : client.id)}
-                  className={`bg-white/[0.03] border rounded-xl p-5 cursor-pointer transition-all duration-200 ${
+                  className={`bg-white/[0.03] border rounded-card p-5 cursor-pointer transition-all duration-200 ${
                     isExpanded ? 'border-brand-orange/30 bg-white/[0.05]' : 'border-white/[0.06] hover:border-white/[0.12]'
                   }`}
                 >
@@ -255,14 +255,14 @@ export default function ClientsPage() {
                           <button
                             onClick={() => handleAccept(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[10px] font-display font-bold uppercase tracking-wide rounded-lg hover:bg-emerald-500/25 transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-emerald-500/25 transition-colors duration-200 disabled:opacity-50"
                           >
                             {processing === client.id ? '...' : 'Accept'}
                           </button>
                           <button
                             onClick={() => handleDecline(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-[10px] font-display font-bold uppercase tracking-wide rounded-lg hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
                           >
                             Decline
                           </button>
@@ -279,7 +279,7 @@ export default function ClientsPage() {
                               }}
                               disabled={processing === client.id}
                               title="Send them a fresh set-password link"
-                              className="px-2.5 py-1.5 rounded-lg bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-control bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
                             >
                               {processing === client.id ? '...' : 'Resend invite'}
                             </button>
@@ -292,7 +292,7 @@ export default function ClientsPage() {
                             }}
                             disabled={processing === client.id}
                             title="Beta testers get free studio access (no payment)"
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
+                            className={`px-2.5 py-1.5 rounded-control text-[10px] font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
                               client.is_beta
                                 ? 'bg-brand-orange/15 border border-brand-orange/25 text-brand-orange'
                                 : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
@@ -399,7 +399,7 @@ export default function ClientsPage() {
             })}
 
             {filtered.length === 0 && (
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 text-center">
+              <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-8 text-center">
                 <p className="text-white/40 font-body text-sm">No {filter} clients.</p>
               </div>
             )}
@@ -408,7 +408,7 @@ export default function ClientsPage() {
           {/* Right Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             {/* Tier Breakdown */}
-            <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl">
+            <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card">
               <div className="px-6 py-5 border-b border-white/[0.06]">
                 <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Tier Breakdown</h2>
               </div>
@@ -435,7 +435,7 @@ export default function ClientsPage() {
                 ].map((t) => (
                   <div key={t.tier} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: t.color }} />
+                      <div className="w-3 h-3 rounded-control" style={{ backgroundColor: t.color }} />
                       <div>
                         <p className="text-white/70 text-sm font-body">{t.tier}</p>
                         <p className="text-white/25 text-xs font-body">{t.price} each</p>
@@ -448,7 +448,7 @@ export default function ClientsPage() {
             </motion.div>
 
             {/* Pending Applications */}
-            <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl">
+            <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card">
               <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
                 <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">New Applications</h2>
                 {pendingApplications.length > 0 && (
@@ -462,7 +462,7 @@ export default function ClientsPage() {
                   <p className="text-white/30 text-xs font-body text-center py-2">No pending applications</p>
                 ) : (
                   pendingApplications.slice(0, 5).map((client) => (
-                    <div key={client.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02]">
+                    <div key={client.id} className="flex items-center justify-between p-3 rounded-control bg-white/[0.02]">
                       <div className="min-w-0">
                         <p className="text-white text-sm font-body font-medium truncate">{client.name}</p>
                         <p className="text-white/30 text-xs font-body">
@@ -474,7 +474,7 @@ export default function ClientsPage() {
                           setFilter('pending')
                           setSelectedClient(client.id)
                         }}
-                        className="px-3 py-1.5 bg-brand-orange text-white text-[10px] font-display font-bold uppercase tracking-wide rounded-lg hover:bg-brand-orangedark transition-colors duration-200"
+                        className="px-3 py-1.5 bg-brand-orange text-white text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark transition-colors duration-200"
                       >
                         Review
                       </button>
@@ -490,7 +490,7 @@ export default function ClientsPage() {
       {/* Decline modal: reason drives the applicant's polite email */}
       {declineTarget && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => processing === null && setDeclineTarget(null)}>
-          <div className="w-full max-w-md bg-[#161616] border border-white/[0.10] rounded-xl p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md bg-[#161616] border border-white/[0.10] rounded-card p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-display font-extrabold text-lg text-white tracking-tight">
               Decline {declineTarget.name.split(' ')[0]}&rsquo;s application
             </h2>
@@ -502,7 +502,7 @@ export default function ClientsPage() {
                 <button
                   key={r.key}
                   onClick={() => setDeclineReason(r.key)}
-                  className={`w-full text-left px-3.5 py-2.5 rounded-lg border transition-colors duration-150 ${
+                  className={`w-full text-left px-3.5 py-2.5 rounded-control border transition-colors duration-150 ${
                     declineReason === r.key
                       ? 'bg-brand-orange/10 border-brand-orange/40'
                       : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.16]'
@@ -520,20 +520,20 @@ export default function ClientsPage() {
               onChange={(e) => setDeclineNote(e.target.value)}
               placeholder="Optional personal note (included in the email, in your words)"
               rows={2}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50 resize-none"
+              className="w-full px-3.5 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50 resize-none"
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setDeclineTarget(null)}
                 disabled={processing !== null}
-                className="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.08] transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={submitDecline}
                 disabled={processing !== null}
-                className="px-4 py-2 rounded-lg bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark transition-colors disabled:opacity-50"
               >
                 {processing !== null ? 'Sending…' : 'Decline & send email'}
               </button>

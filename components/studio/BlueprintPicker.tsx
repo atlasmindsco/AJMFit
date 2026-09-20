@@ -27,12 +27,21 @@ const EMPHASIS_ENABLED = false
 export default function BlueprintPicker({
   firstName,
   onDone,
+  beginner = false,
 }: {
   firstName?: string
   onDone: (programId: string) => void
+  /**
+   * First-timer flow: skips the goal question (muscle is the right default
+   * when starting out) and caps the week at 3-4 days. This used to be a
+   * separate BeginnerPicker component that duplicated the whole location and
+   * days flow, which meant every fix had to be made twice.
+   */
+  beginner?: boolean
 }) {
-  const [step, setStep] = useState(0)
-  const [goal, setGoal] = useState<BlueprintGoal | null>(null)
+  // Beginners start on Location because Goal is decided for them.
+  const [step, setStep] = useState(beginner ? 1 : 0)
+  const [goal, setGoal] = useState<BlueprintGoal | null>(beginner ? 'muscle' : null)
   const [location, setLocation] = useState<BlueprintLocation | null>(null)
   const [days, setDays] = useState<number | null>(null)
   const [splitChoice, setSplitChoice] = useState<'ulppl' | 'bro' | null>(null)
@@ -42,7 +51,7 @@ export default function BlueprintPicker({
 
   const goals: BlueprintGoal[] = ['muscle', 'strength', 'lean_out']
   const locations: BlueprintLocation[] = ['home', 'gym']
-  const dayChoices = [2, 3, 4, 5, 6]
+  const dayChoices = beginner ? [3, 4] : [2, 3, 4, 5, 6]
 
   const start = async () => {
     if (!goal || !location || !days) return
@@ -84,7 +93,7 @@ export default function BlueprintPicker({
   }) => (
     <button
       onClick={onClick}
-      className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 active:scale-[0.99] ${
+      className={`w-full text-left px-5 py-4 rounded-card border transition-all duration-200 active:scale-[0.99] ${
         active
           ? 'bg-brand-blue/[0.12] border-brand-blue/50'
           : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14]'
@@ -97,11 +106,15 @@ export default function BlueprintPicker({
 
   const needsSplitChoice = days === 5
   const needsEmphasisChoice = EMPHASIS_ENABLED && days === 4
-  const steps = needsSplitChoice
-    ? ['Goal', 'Location', 'Days', 'Choose Split']
-    : needsEmphasisChoice
-    ? ['Goal', 'Location', 'Days', 'Choose Emphasis']
-    : ['Goal', 'Location', 'Days']
+  // Beginners never see the Goal step, so both the labels and the progress
+  // dots shift by one.
+  const firstStep = beginner ? 1 : 0
+  const steps = [
+    ...(beginner ? [] : ['Goal']),
+    'Location',
+    'Days',
+    ...(needsSplitChoice ? ['Choose Split'] : needsEmphasisChoice ? ['Choose Emphasis'] : []),
+  ]
 
   return (
     <div className="max-w-xl mx-auto">
@@ -114,10 +127,12 @@ export default function BlueprintPicker({
           {firstName ? `Let's get you set up, ${firstName}` : "Let's set up your program"}
         </h1>
         <p className="text-white/40 text-sm font-body mt-1">
-          Answer 3 questions to get your personalized program
+          Answer {beginner ? 'two' : 'three'} questions to get your program
         </p>
         <p className="text-white/30 text-xs font-body mt-2.5">
-          Available: 2-6 day programs • Full Body, Upper/Lower, Push/Pull/Legs, Bro Split • Customizable for your goals & equipment
+          {beginner
+            ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
+            : 'Available: 2-6 day programs • Full Body, Upper/Lower, Push/Pull/Legs, Bro Split • Customizable for your goals & equipment'}
         </p>
       </div>
 
@@ -127,14 +142,14 @@ export default function BlueprintPicker({
           <div key={label} className="flex items-center gap-2">
             <div
               className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                i < step ? 'bg-state-success' : i === step ? 'bg-brand-blue' : 'bg-white/15'
+                i < step - firstStep ? 'bg-state-success' : i === step - firstStep ? 'bg-brand-blue' : 'bg-white/15'
               }`}
             />
           </div>
         ))}
       </div>
 
-      <div className="bg-surface-raised rounded-2xl border border-white/[0.10] p-6">
+      <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
         <AnimatePresence mode="wait">
           {/* STEP 0 — goal */}
           {step === 0 && (
@@ -203,7 +218,7 @@ export default function BlueprintPicker({
                         setStep(3)
                       }
                     }}
-                    className={`py-4 rounded-xl border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
+                    className={`py-4 rounded-card border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
                         ? 'bg-brand-blue/[0.12] border-brand-blue/50 text-white'
                         : 'bg-white/[0.03] border-white/[0.08] text-white/70 hover:bg-white/[0.06]'
@@ -215,7 +230,7 @@ export default function BlueprintPicker({
               </div>
 
               {days && days !== 5 && !needsEmphasisChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
                   <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your split</p>
                   <p className="text-white font-display font-bold text-base mt-1">{SPLIT_LABEL[days]}</p>
                   <p className="text-white/40 text-xs font-body mt-1">
@@ -230,7 +245,7 @@ export default function BlueprintPicker({
                 <button
                   onClick={start}
                   disabled={submitting}
-                  className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                  className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
                 >
                   {submitting ? 'Setting up…' : 'Start Training'}
                 </button>
@@ -264,7 +279,7 @@ export default function BlueprintPicker({
               </div>
 
               {emphasiscChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
                   <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
                   <p className="text-white font-display font-bold text-base mt-1">
                     {emphasiscChoice === 'balanced' ? 'Balanced Upper/Lower' : emphasiscChoice === 'chest_back' ? 'Chest & Back Focus' : 'Legs & Shoulders Focus'}
@@ -280,7 +295,7 @@ export default function BlueprintPicker({
               <button
                 onClick={start}
                 disabled={!emphasiscChoice || submitting}
-                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
               >
                 {submitting ? 'Setting up…' : 'Start Training'}
               </button>
@@ -307,7 +322,7 @@ export default function BlueprintPicker({
               </div>
 
               {splitChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
                   <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
                   <p className="text-white font-display font-bold text-base mt-1">
                     {splitChoice === 'ulppl' ? 'Upper/Lower/PPL' : 'Bodybuilding'} Split
@@ -323,7 +338,7 @@ export default function BlueprintPicker({
               <button
                 onClick={start}
                 disabled={!splitChoice || submitting}
-                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-xl hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
               >
                 {submitting ? 'Setting up…' : 'Start Training'}
               </button>
@@ -332,7 +347,7 @@ export default function BlueprintPicker({
         </AnimatePresence>
 
         {/* Back */}
-        {step > 0 && !submitting && (
+        {step > firstStep && !submitting && (
           <button
             onClick={() => {
               if (step === 3) {
@@ -340,7 +355,7 @@ export default function BlueprintPicker({
                 setSplitChoice(null)
                 setEmphasisChoice(null)
               } else {
-                setStep((s) => Math.max(0, s - 1))
+                setStep((s) => Math.max(firstStep, s - 1))
               }
             }}
             className="mt-4 flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors duration-200"

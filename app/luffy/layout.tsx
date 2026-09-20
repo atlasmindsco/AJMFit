@@ -125,7 +125,7 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-body font-medium transition-all duration-200 group ${
+                className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-control text-sm font-body font-medium transition-all duration-200 group ${
                   isActive
                     ? 'bg-brand-orange/10 text-brand-orange'
                     : 'text-white/40 hover:text-white/80 hover:bg-white/[0.04]'

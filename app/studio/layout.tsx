@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import ChaedynChat from '@/components/chat/ChaedynChat'
+import CheaChat from '@/components/chat/CheaChat'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MembershipPaywall from '@/components/studio/MembershipPaywall'
 import FeedbackButton from '@/components/studio/FeedbackButton'
@@ -163,7 +163,7 @@ export default function ClientPortalLayout({
                     <Link
                       key={tab.href}
                       href={tab.href}
-                      className={`px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${
+                      className={`px-4 py-2 rounded-control text-sm font-body font-medium transition-all duration-200 ${
                         isActive
                           ? 'bg-white/[0.10] text-white'
                           : 'text-white/40 hover:text-white/70 hover:bg-white/[0.06]'
@@ -283,14 +283,14 @@ export default function ClientPortalLayout({
 
       <FeedbackButton />
 
-      {/* Floating Chaedyn Chat Widget */}
+      {/* Floating Chea Chat Widget */}
       {chatOpen && (
         <div className="fixed bottom-[calc(160px+env(safe-area-inset-bottom))] md:bottom-20 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[460px] md:h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-card overflow-hidden">
-          <ChaedynChat portal="client" onNavigate={() => setChatOpen(false)} />
+          <CheaChat portal="client" onNavigate={() => setChatOpen(false)} />
         </div>
       )}
 
-      {/* Chaedyn FAB */}
+      {/* Chea FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
         className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"

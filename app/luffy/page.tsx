@@ -77,7 +77,7 @@ export default function AdminDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
         {cards.map((stat, i) => (
-          <motion.div key={stat.label} custom={i} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
+          <motion.div key={stat.label} custom={i} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
             <p className="text-white/40 text-[11px] font-display uppercase tracking-[0.15em]">{stat.label}</p>
             <p className="font-display font-extrabold text-3xl text-white tracking-tight mt-1">{stat.value}</p>
           </motion.div>
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Clients */}
-        <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="xl:col-span-2 bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
+        <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="xl:col-span-2 bg-white/[0.03] border border-white/[0.06] rounded-card overflow-hidden">
           <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Clients</h2>
             <Link href="/luffy/clients" className="text-xs text-brand-orange font-body hover:underline">View all →</Link>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4"><span className={`text-xs font-body ${getTierColor(tier)}`}>{tier}</span></td>
                         <td className="px-6 py-4"><span className="text-white/40 text-xs font-body">{relativeTime(client.last_workout_at)}</span></td>
                         <td className="px-6 py-4">
-                          <span className={`inline-block text-[10px] font-display uppercase tracking-[0.15em] font-semibold px-2.5 py-1 rounded-md ${
+                          <span className={`inline-block text-[10px] font-display uppercase tracking-[0.15em] font-semibold px-2.5 py-1 rounded-control ${
                             client.status === 'active' ? 'bg-emerald-500/10 text-emerald-400'
                               : client.status === 'pending' ? 'bg-amber-500/10 text-amber-400'
                               : 'bg-white/[0.06] text-white/30'
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Pending applications */}
-        <motion.div custom={5} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-xl">
+        <motion.div custom={5} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card">
           <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Pending Applications</h2>
             {pending.length > 0 && (
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
               <p className="px-2 py-3 text-white/40 text-sm font-body">No applications waiting. You&rsquo;re all caught up.</p>
             ) : (
               pending.map((c) => (
-                <Link key={c.id} href="/luffy/clients" className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/[0.02] transition-colors duration-150">
+                <Link key={c.id} href="/luffy/clients" className="flex items-start gap-3 p-3 rounded-control hover:bg-white/[0.02] transition-colors duration-150">
                   <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-brand-orange" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white/80 text-sm font-body leading-snug">{c.name}</p>
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Beta feedback */}
-      <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+      <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-card">
         <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Beta Feedback</h2>
           {feedback.length > 0 && <span className="text-xs text-white/30 font-body">{feedback.length}</span>}
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
             <p className="px-2 py-3 text-white/40 text-sm font-body">No feedback yet.</p>
           ) : (
             feedback.slice(0, 12).map((f) => (
-              <div key={f.id} className="p-3 rounded-lg bg-white/[0.02]">
+              <div key={f.id} className="p-3 rounded-control bg-white/[0.02]">
                 <p className="text-white/80 text-sm font-body">{f.message}</p>
                 <p className="text-white/30 text-[11px] font-body mt-1">
                   {f.name || 'Member'}{f.page ? ` · ${f.page}` : ''} · {new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}

@@ -43,7 +43,7 @@ export default function MembershipPaywall() {
           <span className="font-display font-bold text-white text-lg uppercase tracking-[0.15em]">AJM Fit</span>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-transparent p-8 sm:p-10">
+        <div className="rounded-card border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-transparent p-8 sm:p-10">
           <span className="inline-block rounded-full bg-brand-orange/15 px-3 py-1 font-display font-bold text-[10px] uppercase tracking-[0.2em] text-brand-orange">
             Application approved
           </span>
@@ -61,7 +61,7 @@ export default function MembershipPaywall() {
           <button
             onClick={start}
             disabled={loading}
-            className="mt-7 w-full py-4 rounded-lg bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-60"
+            className="mt-7 w-full py-4 rounded-control bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-60"
           >
             {loading ? 'Starting…' : 'Start 7-day free trial'}
           </button>

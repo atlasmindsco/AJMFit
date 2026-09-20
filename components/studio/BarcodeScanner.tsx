@@ -108,7 +108,7 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-      <div className="relative w-full max-w-md bg-[#0F1729] rounded-2xl overflow-hidden border border-white/10">
+      <div className="relative w-full max-w-md bg-[#0F1729] rounded-card overflow-hidden border border-white/10">
         <div className="px-5 py-3 flex items-center justify-between border-b border-white/10">
           <h3 className="font-display font-bold text-sm text-white tracking-tight">Scan Barcode</h3>
           <button

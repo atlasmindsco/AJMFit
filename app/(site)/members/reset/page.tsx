@@ -75,7 +75,7 @@ export default function SetPasswordPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-sm border border-brand-navy/[0.08] shadow-[0_4px_40px_rgba(27,45,80,0.06)] p-8 md:p-10">
+        <div className="bg-white rounded-control border border-brand-navy/[0.08] shadow-[0_4px_40px_rgba(27,45,80,0.06)] p-8 md:p-10">
           <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
             Set Your Password
           </h1>
@@ -93,7 +93,7 @@ export default function SetPasswordPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors duration-200"
+                className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors duration-200"
                 placeholder="At least 8 characters"
                 autoComplete="new-password"
                 disabled={!ready}
@@ -109,7 +109,7 @@ export default function SetPasswordPage() {
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-sm font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors duration-200"
+                className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors duration-200"
                 placeholder="Re-enter your password"
                 autoComplete="new-password"
                 disabled={!ready}
@@ -121,7 +121,7 @@ export default function SetPasswordPage() {
             <button
               type="submit"
               disabled={loading || !ready}
-              className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-sm hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200 disabled:opacity-60"
+              className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200 disabled:opacity-60"
             >
               {loading ? 'Saving…' : 'Set Password & Continue'}
             </button>

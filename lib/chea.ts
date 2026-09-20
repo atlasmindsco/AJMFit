@@ -1,5 +1,5 @@
 /**
- * Chaedyn, AJM Fit AI Assistant
+ * Chea, AJM Fit AI Assistant
  * Simple keyword-based retrieval from ISSA knowledge base chunks.
  */
 import knowledgeBase from './knowledge-base.json'

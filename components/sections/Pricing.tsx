@@ -109,10 +109,10 @@ export default function Pricing() {
           <p className="font-display font-semibold text-xs uppercase tracking-[0.25em] text-brand-slate mb-5">
             Payment Plans Available
           </p>
-          <div className="relative inline-flex items-center bg-brand-offwhite rounded-sm border border-brand-navy/[0.08] p-1">
+          <div className="relative inline-flex items-center bg-brand-offwhite rounded-control border border-brand-navy/[0.08] p-1">
             {/* Sliding indicator */}
             <motion.div
-              className="absolute top-1 bottom-1 rounded-sm bg-brand-navy"
+              className="absolute top-1 bottom-1 rounded-control bg-brand-navy"
               layout
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               style={{
@@ -164,7 +164,7 @@ export default function Pricing() {
               <motion.div
                 key={tier.name}
                 variants={cardVariants}
-                className={`relative flex flex-col rounded-sm overflow-hidden ${
+                className={`relative flex flex-col rounded-control overflow-hidden ${
                   tier.featured
                     ? 'bg-brand-navy text-white lg:scale-105 shadow-[0_8px_60px_rgba(27,45,80,0.2)]'
                     : 'bg-brand-offwhite border border-brand-navy/[0.08] text-brand-navy'
@@ -247,7 +247,7 @@ export default function Pricing() {
                       // Plain <a> so the checkout route is never prefetched.
                       <a
                         href="/api/stripe/checkout-blueprint"
-                        className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
+                        className="inline-flex w-full items-center justify-center gap-2 px-8 py-4 font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control transition-colors duration-200 bg-transparent text-brand-navy border-2 border-brand-navy/30 hover:border-brand-navy hover:bg-brand-navy/5 active:bg-brand-navy/10"
                       >
                         Start Now
                       </a>

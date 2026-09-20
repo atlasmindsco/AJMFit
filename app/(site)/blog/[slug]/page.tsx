@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: Params) {
             All posts
           </Link>
           <div className="flex items-center gap-3 mb-5">
-            <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-white bg-brand-orange px-2.5 py-1 rounded-sm">
+            <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-white bg-brand-orange px-2.5 py-1 rounded-control">
               Brains &amp; Gains
             </span>
             <span className="text-white/50 text-xs">{formatIssueDate(post.date)} · {mins} min read</span>
@@ -135,16 +135,16 @@ export default async function BlogPostPage({ params }: Params) {
 
       {/* Apply CTA */}
       <div className="max-w-2xl mx-auto px-6 lg:px-8 mt-8">
-        <div className="relative overflow-hidden rounded-md bg-brand-navy text-white p-10 text-center grain-overlay">
+        <div className="relative overflow-hidden rounded-control bg-brand-navy text-white p-10 text-center grain-overlay">
           <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-brand-orange/20 blur-2xl" />
           <div className="relative">
             <h3 className="font-display font-extrabold text-3xl uppercase tracking-tight">Ready to Start?</h3>
             <p className="text-white/60 mt-3 mb-7 max-w-md mx-auto">Applications are open. Let&rsquo;s build the plan that actually fits your life.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_24px_rgba(247,107,22,0.35)] hover:bg-orange-600 active:scale-95 transition">
+              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control shadow-[0_4px_24px_rgba(247,107,22,0.35)] hover:bg-orange-600 active:scale-95 transition">
                 Apply Now
               </Link>
-              <Link href="/work-with-me" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white/25 text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-sm hover:bg-white/5 active:scale-95 transition">
+              <Link href="/work-with-me" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white/25 text-white font-display font-bold text-sm uppercase tracking-[0.15em] rounded-control hover:bg-white/5 active:scale-95 transition">
                 Explore Programs
               </Link>
             </div>

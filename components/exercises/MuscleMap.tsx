@@ -122,13 +122,13 @@ export default function MuscleMap({
       {/* Legend */}
       <div className="flex items-center gap-3 mt-1">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: PRIMARY }} />
+          <span className="w-2.5 h-2.5 rounded-control" style={{ backgroundColor: PRIMARY }} />
           <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-brand-navy/50'}`}>
             Primary
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: SECONDARY }} />
+          <span className="w-2.5 h-2.5 rounded-control" style={{ backgroundColor: SECONDARY }} />
           <span className={`text-[9px] font-display font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/40' : 'text-brand-navy/50'}`}>
             Secondary
           </span>

@@ -12,7 +12,7 @@ type Message = {
   timestamp: Date
 }
 
-type ChaedynChatProps = {
+type CheaChatProps = {
   portal: 'client' | 'admin'
   onNavigate?: () => void
 }
@@ -46,7 +46,7 @@ function parseAssistant(content: string): { text: string; links: Array<{ route: 
   return { text, links }
 }
 
-export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
+export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -149,7 +149,7 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
   const isDark = portal === 'admin'
 
   return (
-    <div className={`flex flex-col h-full rounded-xl border overflow-hidden ${
+    <div className={`flex flex-col h-full rounded-card border overflow-hidden ${
       isDark ? 'bg-white/[0.03] border-white/[0.06]' : 'bg-white border-brand-navy/[0.06]'
     }`}>
       {/* Header */}
@@ -211,10 +211,10 @@ export default function ChaedynChat({ portal, onNavigate }: ChaedynChatProps) {
                 <div className="max-w-[75%]">
                   <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed whitespace-pre-wrap ${
                     isUser
-                      ? 'bg-brand-blue text-white rounded-2xl rounded-br-md'
+                      ? 'bg-brand-blue text-white rounded-card rounded-br-md'
                       : isDark
-                        ? 'bg-white/[0.08] text-white/85 rounded-2xl rounded-bl-md'
-                        : 'bg-white text-brand-navy rounded-2xl rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
+                        ? 'bg-white/[0.08] text-white/85 rounded-card rounded-bl-md'
+                        : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                   }`}>
                     {displayText || (
                       <span className="flex items-center gap-1 py-0.5">

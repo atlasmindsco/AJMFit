@@ -91,7 +91,7 @@ const tierOptions = [
 // ---- Styles ----
 
 const inputBase =
-  'w-full px-5 py-4 bg-brand-offwhite border border-brand-navy/10 rounded-sm text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200'
+  'w-full px-5 py-4 bg-brand-offwhite border border-brand-navy/10 rounded-control text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200'
 const labelBase = 'block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/70 mb-2'
 const errorBase = 'text-red-600 text-xs font-body mt-1'
 
@@ -285,7 +285,7 @@ export default function IntakeForm() {
                       key={opt.value}
                       type="button"
                       onClick={() => toggleEquipment(opt.value)}
-                      className={`px-4 py-3 rounded-sm text-sm font-display font-semibold uppercase tracking-wide border transition-colors duration-200 text-center ${
+                      className={`px-4 py-3 rounded-control text-sm font-display font-semibold uppercase tracking-wide border transition-colors duration-200 text-center ${
                         currentEquipment.includes(opt.value)
                           ? 'bg-brand-orange border-brand-orange text-white'
                           : 'bg-transparent border-brand-navy/15 text-brand-slate hover:border-brand-navy/30'
@@ -336,9 +336,9 @@ export default function IntakeForm() {
 
                 {/* Billing cycle toggle */}
                 <div className="flex items-center justify-center gap-1 mb-4">
-                  <div className="relative inline-flex items-center bg-brand-offwhite rounded-sm border border-brand-navy/[0.08] p-0.5">
+                  <div className="relative inline-flex items-center bg-brand-offwhite rounded-control border border-brand-navy/[0.08] p-0.5">
                     <div
-                      className="absolute top-0.5 bottom-0.5 rounded-sm bg-brand-navy transition-all duration-200"
+                      className="absolute top-0.5 bottom-0.5 rounded-control bg-brand-navy transition-all duration-200"
                       style={{
                         left: watch('billingCycle') === 'monthly' ? 2 : '50%',
                         width: 'calc(50% - 2px)',
@@ -381,7 +381,7 @@ export default function IntakeForm() {
                         onMouseEnter={() => setHoveredTier(opt.value)}
                         onMouseLeave={() => setHoveredTier(null)}
                         onTouchStart={() => setHoveredTier(isExpanded ? null : opt.value)}
-                        className={`relative rounded-sm border overflow-hidden transition-all duration-200 ${
+                        className={`relative rounded-control border overflow-hidden transition-all duration-200 ${
                           isSelected
                             ? 'border-brand-orange bg-brand-orange/5 shadow-[0_2px_16px_rgba(240,139,30,0.1)]'
                             : 'border-brand-navy/10 bg-brand-offwhite hover:border-brand-navy/20'
@@ -467,7 +467,7 @@ export default function IntakeForm() {
 
         {/* Submission error */}
         {submitError && (
-          <div className="mt-6 rounded-sm bg-red-50 border border-red-200 px-4 py-3">
+          <div className="mt-6 rounded-control bg-red-50 border border-red-200 px-4 py-3">
             <p className="text-red-700 text-sm font-body">{submitError}</p>
           </div>
         )}

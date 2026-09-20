@@ -104,7 +104,7 @@ export default function SchedulePage() {
 
       {/* Plans without live calls (Blueprint) */}
       {!hasAnyCalls && (
-        <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
           <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide mb-1">
             Coaching calls
           </h2>
@@ -118,7 +118,7 @@ export default function SchedulePage() {
 
       {/* Onboarding / welcome call */}
       {config?.onboardingSlug && (
-        <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
           <div className="flex items-center justify-between mb-1">
             <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide">
               Welcome call
@@ -154,7 +154,7 @@ export default function SchedulePage() {
         return (
           <section
             key={wc.key}
-            className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6"
+            className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6"
           >
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide">
@@ -199,7 +199,7 @@ export default function SchedulePage() {
             {upcoming.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3"
+                className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-card px-4 py-3"
               >
                 <div>
                   <p className="text-white text-sm font-body font-medium">

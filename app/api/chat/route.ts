@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import { buildContext, CHAEDYN_SYSTEM_PROMPT } from '@/lib/chaedyn'
+import { buildContext, CHAEDYN_SYSTEM_PROMPT } from '@/lib/chea'
 import { clientAppMapPrompt } from '@/lib/app-map'
 
 const openai = new OpenAI({

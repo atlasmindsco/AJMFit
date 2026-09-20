@@ -77,7 +77,7 @@ export default function PainSection() {
             <motion.div
               key={point.number}
               variants={cardVariants}
-              className="group relative bg-brand-offwhite border border-brand-navy/[0.06] rounded-sm p-8 md:p-10 hover:border-brand-orange/30 hover:shadow-[0_4px_24px_rgba(240,139,30,0.08)] transition-all duration-300"
+              className="group relative bg-brand-offwhite border border-brand-navy/[0.06] rounded-control p-8 md:p-10 hover:border-brand-orange/30 hover:shadow-[0_4px_24px_rgba(240,139,30,0.08)] transition-all duration-300"
             >
               <span className="font-display font-bold text-6xl text-brand-blue/10 absolute top-6 right-8 group-hover:text-brand-blue/20 transition-colors duration-300">
                 {point.number}
@@ -98,7 +98,7 @@ export default function PainSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-6 bg-brand-orange/10 border border-brand-orange/20 rounded-sm p-8 text-center"
+          className="mt-6 bg-brand-orange/10 border border-brand-orange/20 rounded-control p-8 text-center"
         >
           <p className="font-display font-bold text-lg md:text-xl uppercase tracking-wide text-brand-navy">
             It&rsquo;s not about working harder, {' '}
