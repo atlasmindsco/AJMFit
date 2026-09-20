@@ -63,6 +63,7 @@ export default function ClientMessagesPage() {
     setMessages((prev) => [...prev, optimistic])
     try {
       await dbSendMessage(userId, body, false)
+      fetch('/api/studio/message-notify', { method: 'POST' }).catch(() => {})
       await load(userId)
     } catch {
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id))
