@@ -11,6 +11,15 @@ import {
 } from '@/lib/blueprint'
 
 /**
+ * Two of the three 4-day emphasis options (chest_back, legs_shoulders) map to
+ * split keys with no seeded programs, so picking them dead-ends on "That
+ * program is not available yet." Hidden until the 12 missing templates are
+ * authored in program-library/blueprint-library.json and seeded; 4-day then
+ * assigns the balanced 4day_ul directly. Flip to true to restore the step.
+ */
+const EMPHASIS_ENABLED = false
+
+/**
  * Blueprint self-serve program picker. Shown on /studio/programs when a
  * Blueprint client has no assigned program. Goal → location → days (→ split choice
  * if 5-day) — then assigns the matching pre-made program and calls onDone.
@@ -38,7 +47,7 @@ export default function BlueprintPicker({
   const start = async () => {
     if (!goal || !location || !days) return
     if (days === 5 && !splitChoice) return
-    if (days === 4 && !emphasiscChoice) return
+    if (EMPHASIS_ENABLED && days === 4 && !emphasiscChoice) return
     setSubmitting(true)
     setError('')
     try {
@@ -87,7 +96,7 @@ export default function BlueprintPicker({
   )
 
   const needsSplitChoice = days === 5
-  const needsEmphasisChoice = days === 4
+  const needsEmphasisChoice = EMPHASIS_ENABLED && days === 4
   const steps = needsSplitChoice
     ? ['Goal', 'Location', 'Days', 'Choose Split']
     : needsEmphasisChoice
@@ -190,7 +199,7 @@ export default function BlueprintPicker({
                       setDays(d)
                       setSplitChoice(null)
                       setEmphasisChoice(null)
-                      if (d === 5 || d === 4) {
+                      if (d === 5 || (EMPHASIS_ENABLED && d === 4)) {
                         setStep(3)
                       }
                     }}
@@ -205,7 +214,7 @@ export default function BlueprintPicker({
                 ))}
               </div>
 
-              {days && days !== 5 && days !== 4 && (
+              {days && days !== 5 && !needsEmphasisChoice && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
                   <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your split</p>
                   <p className="text-white font-display font-bold text-base mt-1">{SPLIT_LABEL[days]}</p>
