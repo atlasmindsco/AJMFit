@@ -252,8 +252,15 @@ Accurate as of the last update to this file. Verify before relying on any of it.
 - The trainer portal at `/luffy` — every operation in §5 can be done there by hand today.
 - The Blueprint self-serve picker.
 
+- The toolkit foundation, [tools/ops/_lib.mjs](tools/ops/_lib.mjs) — service-role client, argument parsing, the confirm gate, and `logAction`. Every new ops script builds on it, and dry run is the default: a script only writes when run with `--confirm`.
+
+**Partly done:**
+- The action log table is defined in [supabase/migrations/20260919_ops_action_log.sql](supabase/migrations/20260919_ops_action_log.sql) but **the migration has not been applied to the database**. Until it is, `logAction` warns and continues rather than failing — so writes are currently happening without an audit trail. Apply it before running anything that writes.
+
 **Not built:**
-- The `tools/ops/` script toolkit. Only `seed-blueprint-programs.mjs` exists, and it imports a shared `./_lib.mjs` that is not in the repo — so it cannot currently run. That shared module is the foundation the rest of the toolkit needs: a service-role client, argument parsing, the confirm gate, and the action log.
-- The action log itself (§2) has nowhere to write until that module exists.
+- The operation scripts themselves: `approve-application`, `invite-client`, `build-program`, and the multi-system reports. Everything marked [toolkit] in §5 still has to be done by hand in `/luffy`.
+
+**Known broken:**
+- Two of the three 4-day emphasis options in the Blueprint picker (`chest_back`, `legs_shoulders` in `lib/blueprint.ts`) map to split keys that do not exist in the database, so clients who choose them get "That program is not available yet." Only `balanced` works. Do not tell a Blueprint client to use those options.
 
 **Blocked on account access:** Vercel team transfer, Supabase org membership, Hostinger/DNS ownership, and the OpenAI billing swap. See [ANTHONY_HANDOFF.md](ANTHONY_HANDOFF.md).
