@@ -5,24 +5,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   GOAL_LABELS,
   LOCATION_LABELS,
-  SPLIT_LABEL,
+  SPLIT_OPTIONS,
   type BlueprintGoal,
   type BlueprintLocation,
 } from '@/lib/blueprint'
 
 /**
- * Two of the three 4-day emphasis options (chest_back, legs_shoulders) map to
- * split keys with no seeded programs, so picking them dead-ends on "That
- * program is not available yet." Hidden until the 12 missing templates are
- * authored in program-library/blueprint-library.json and seeded; 4-day then
- * assigns the balanced 4day_ul directly. Flip to true to restore the step.
- */
-const EMPHASIS_ENABLED = false
-
-/**
  * Blueprint self-serve program picker. Shown on /studio/programs when a
- * Blueprint client has no assigned program. Goal → location → days (→ split choice
- * if 5-day) — then assigns the matching pre-made program and calls onDone.
+ * Blueprint client has no assigned program. Goal → location → days, then a
+ * split choice at any day count that offers more than one.
+ *
+ * The split step used to be hardcoded to 5 days, with a separate "emphasis"
+ * step for 4 days whose options pointed at programs that were never seeded.
+ * Both are gone; the step is now driven by SPLIT_OPTIONS, so a day count with
+ * two real splits offers them and one with a single split skips the question.
  */
 export default function BlueprintPicker({
   firstName,
@@ -44,8 +40,7 @@ export default function BlueprintPicker({
   const [goal, setGoal] = useState<BlueprintGoal | null>(beginner ? 'muscle' : null)
   const [location, setLocation] = useState<BlueprintLocation | null>(null)
   const [days, setDays] = useState<number | null>(null)
-  const [splitChoice, setSplitChoice] = useState<'ulppl' | 'bro' | null>(null)
-  const [emphasiscChoice, setEmphasisChoice] = useState<'balanced' | 'chest_back' | 'legs_shoulders' | null>(null)
+  const [splitKey, setSplitKey] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -53,23 +48,20 @@ export default function BlueprintPicker({
   const locations: BlueprintLocation[] = ['home', 'gym']
   const dayChoices = beginner ? [3, 4] : [2, 3, 4, 5, 6]
 
+  const splitsForDays = days ? SPLIT_OPTIONS[days] ?? [] : []
+  const needsSplitChoice = splitsForDays.length > 1
+  const chosenSplit = splitKey ?? splitsForDays[0]?.key ?? null
+
   const start = async () => {
     if (!goal || !location || !days) return
-    if (days === 5 && !splitChoice) return
-    if (EMPHASIS_ENABLED && days === 4 && !emphasiscChoice) return
+    if (needsSplitChoice && !splitKey) return
     setSubmitting(true)
     setError('')
     try {
       const res = await fetch('/api/studio/blueprint/assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          goal,
-          location,
-          days,
-          splitChoice: days === 5 ? splitChoice : undefined,
-          emphasisChoice: days === 4 ? emphasiscChoice : undefined,
-        }),
+        body: JSON.stringify({ goal, location, days, splitKey: chosenSplit }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
       if (!res.ok || !data.ok || !data.programId) throw new Error(data.error || 'Could not set up your program.')
@@ -104,17 +96,38 @@ export default function BlueprintPicker({
     </button>
   )
 
-  const needsSplitChoice = days === 5
-  const needsEmphasisChoice = EMPHASIS_ENABLED && days === 4
-  // Beginners never see the Goal step, so both the labels and the progress
-  // dots shift by one.
+  // Beginners never see the Goal step, so labels and dots shift by one.
   const firstStep = beginner ? 1 : 0
   const steps = [
     ...(beginner ? [] : ['Goal']),
     'Location',
     'Days',
-    ...(needsSplitChoice ? ['Choose Split'] : needsEmphasisChoice ? ['Choose Emphasis'] : []),
+    ...(needsSplitChoice ? ['Choose Split'] : []),
   ]
+
+  const summary = (title: string) => (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5"
+    >
+      <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your program</p>
+      <p className="text-white font-display font-bold text-base mt-1">{title}</p>
+      <p className="text-white/40 text-xs font-body mt-1">
+        {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()} · {days} days a week
+      </p>
+    </motion.div>
+  )
+
+  const startButton = (disabled: boolean) => (
+    <button
+      onClick={start}
+      disabled={disabled || submitting}
+      className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+    >
+      {submitting ? 'Setting up…' : 'Start Training'}
+    </button>
+  )
 
   return (
     <div className="max-w-xl mx-auto">
@@ -132,7 +145,7 @@ export default function BlueprintPicker({
         <p className="text-white/30 text-xs font-body mt-2.5">
           {beginner
             ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
-            : 'Available: 2-6 day programs • Full Body, Upper/Lower, Push/Pull/Legs, Bro Split • Customizable for your goals & equipment'}
+            : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split • Gym or dumbbells at home'}
         </p>
       </div>
 
@@ -204,19 +217,16 @@ export default function BlueprintPicker({
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-2">How many days a week?</h2>
               <p className="text-white/40 text-xs font-body mb-4">
-                2-3: Full Body • 4: Upper/Lower • 5-6: Upper/Lower/Push/Pull/Legs variants
+                Pick what you can actually keep to. Consistency beats the perfect split.
               </p>
-              <div className="grid grid-cols-5 gap-2 mb-5">
+              <div className={`grid gap-2 mb-5 ${beginner ? 'grid-cols-2' : 'grid-cols-5'}`}>
                 {dayChoices.map((d) => (
                   <button
                     key={d}
                     onClick={() => {
                       setDays(d)
-                      setSplitChoice(null)
-                      setEmphasisChoice(null)
-                      if (d === 5 || (EMPHASIS_ENABLED && d === 4)) {
-                        setStep(3)
-                      }
+                      setSplitKey(null)
+                      if ((SPLIT_OPTIONS[d] ?? []).length > 1) setStep(3)
                     }}
                     className={`py-4 rounded-card border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
@@ -229,119 +239,31 @@ export default function BlueprintPicker({
                 ))}
               </div>
 
-              {days && days !== 5 && !needsEmphasisChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
-                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your split</p>
-                  <p className="text-white font-display font-bold text-base mt-1">{SPLIT_LABEL[days]}</p>
-                  <p className="text-white/40 text-xs font-body mt-1">
-                    {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
-                  </p>
-                </motion.div>
-              )}
-
-              {error && <p className="text-red-400 text-sm font-body mb-3">{error}</p>}
-
-              {days && days !== 5 && (
-                <button
-                  onClick={start}
-                  disabled={submitting}
-                  className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-                >
-                  {submitting ? 'Setting up…' : 'Start Training'}
-                </button>
-              )}
+              {days !== null && !needsSplitChoice && summary(splitsForDays[0]?.label ?? '')}
+              {error && <p className="text-state-danger text-sm font-body mb-3">{error}</p>}
+              {days !== null && !needsSplitChoice && startButton(false)}
             </motion.div>
           )}
 
-          {/* STEP 3 — emphasis choice (4-day only) */}
-          {step === 3 && days === 4 && (
-            <motion.div key="emphasis" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <h2 className="font-display font-bold text-white text-lg mb-4">Body part emphasis?</h2>
-              <div className="space-y-2.5 mb-5">
-                <Option
-                  active={emphasiscChoice === 'balanced'}
-                  onClick={() => setEmphasisChoice('balanced')}
-                  title="Balanced"
-                  sub="Equal attention to all muscle groups."
-                />
-                <Option
-                  active={emphasiscChoice === 'chest_back'}
-                  onClick={() => setEmphasisChoice('chest_back')}
-                  title="Chest & Back Focus"
-                  sub="Extra volume for upper body development."
-                />
-                <Option
-                  active={emphasiscChoice === 'legs_shoulders'}
-                  onClick={() => setEmphasisChoice('legs_shoulders')}
-                  title="Legs & Shoulders Focus"
-                  sub="Emphasize lower body and overhead pressing."
-                />
-              </div>
-
-              {emphasiscChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
-                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
-                  <p className="text-white font-display font-bold text-base mt-1">
-                    {emphasiscChoice === 'balanced' ? 'Balanced Upper/Lower' : emphasiscChoice === 'chest_back' ? 'Chest & Back Focus' : 'Legs & Shoulders Focus'}
-                  </p>
-                  <p className="text-white/40 text-xs font-body mt-1">
-                    {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
-                  </p>
-                </motion.div>
-              )}
-
-              {error && <p className="text-red-400 text-sm font-body mb-3">{error}</p>}
-
-              <button
-                onClick={start}
-                disabled={!emphasiscChoice || submitting}
-                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-              >
-                {submitting ? 'Setting up…' : 'Start Training'}
-              </button>
-            </motion.div>
-          )}
-
-          {/* STEP 3 — split choice (5-day only) */}
-          {step === 3 && days === 5 && (
+          {/* STEP 3 — split choice, at any day count with more than one */}
+          {step === 3 && needsSplitChoice && (
             <motion.div key="split" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <h2 className="font-display font-bold text-white text-lg mb-4">Which 5-day split?</h2>
+              <h2 className="font-display font-bold text-white text-lg mb-4">Which {days}-day split?</h2>
               <div className="space-y-2.5 mb-5">
-                <Option
-                  active={splitChoice === 'ulppl'}
-                  onClick={() => setSplitChoice('ulppl')}
-                  title="Upper / Lower / PPL"
-                  sub="Balanced. Each muscle hit twice per week, varied stimulus."
-                />
-                <Option
-                  active={splitChoice === 'bro'}
-                  onClick={() => setSplitChoice('bro')}
-                  title="Bodybuilding Split"
-                  sub="Higher volume. Each muscle once per week, specialization focus."
-                />
+                {splitsForDays.map((opt) => (
+                  <Option
+                    key={opt.key}
+                    active={splitKey === opt.key}
+                    onClick={() => setSplitKey(opt.key)}
+                    title={opt.label}
+                    sub={opt.sub}
+                  />
+                ))}
               </div>
 
-              {splitChoice && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5">
-                  <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your setup</p>
-                  <p className="text-white font-display font-bold text-base mt-1">
-                    {splitChoice === 'ulppl' ? 'Upper/Lower/PPL' : 'Bodybuilding'} Split
-                  </p>
-                  <p className="text-white/40 text-xs font-body mt-1">
-                    {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()}
-                  </p>
-                </motion.div>
-              )}
-
-              {error && <p className="text-red-400 text-sm font-body mb-3">{error}</p>}
-
-              <button
-                onClick={start}
-                disabled={!splitChoice || submitting}
-                className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-              >
-                {submitting ? 'Setting up…' : 'Start Training'}
-              </button>
+              {splitKey && summary(splitsForDays.find((o) => o.key === splitKey)?.label ?? '')}
+              {error && <p className="text-state-danger text-sm font-body mb-3">{error}</p>}
+              {startButton(!splitKey)}
             </motion.div>
           )}
         </AnimatePresence>
@@ -352,8 +274,7 @@ export default function BlueprintPicker({
             onClick={() => {
               if (step === 3) {
                 setStep(2)
-                setSplitChoice(null)
-                setEmphasisChoice(null)
+                setSplitKey(null)
               } else {
                 setStep((s) => Math.max(firstStep, s - 1))
               }

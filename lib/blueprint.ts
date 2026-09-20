@@ -27,35 +27,45 @@ export const LOCATION_LABELS: Record<BlueprintLocation, string> = {
   home: 'At home',
 }
 
+export interface SplitOption {
+  /** Matches programs.split_key. */
+  key: string
+  label: string
+  sub: string
+}
+
+/**
+ * Every split available at each day count, recommended one first.
+ *
+ * Two days used to map to the 3-day full-body program — a 2-day client was
+ * handed a 3-day plan and left to work out which sessions to skip. Four and
+ * six days offered exactly one split each.
+ */
+export const SPLIT_OPTIONS: Record<number, SplitOption[]> = {
+  2: [{ key: '2day_fullbody', label: 'Full Body', sub: 'Two sessions, whole body each time.' }],
+  3: [{ key: '3day_fullbody', label: 'Full Body', sub: 'Three sessions, whole body each time.' }],
+  4: [
+    { key: '4day_ul', label: 'Upper / Lower', sub: 'Two upper days, two lower days. Everything twice a week.' },
+    { key: '4day_torso_limbs', label: 'Torso / Limbs', sub: 'Chest, back and delts together; legs and arms together.' },
+  ],
+  5: [
+    { key: '5day_ulppl', label: 'Upper / Lower / Push / Pull / Legs', sub: 'Balanced. Most muscles twice a week, varied stimulus.' },
+    { key: '5day_bro', label: 'Bodybuilding Split', sub: 'One muscle group per day. Higher volume, once a week each.' },
+  ],
+  6: [
+    { key: '6day_ppl', label: 'Push / Pull / Legs ×2', sub: 'The classic. Each rotation twice a week with different lifts.' },
+    { key: '6day_ppl_arnold', label: 'Arnold-Style Split', sub: 'Split horizontal and vertical pulls, two lower days, two push days.' },
+  ],
+}
+
 /** Days/week → the recommended split key (matches seeded programs.split_key). */
-export const DAYS_TO_SPLIT: Record<number, string> = {
-  2: '3day_fullbody', // Uses 3-day structure but recommend 2 sessions (A+B)
-  3: '3day_fullbody',
-  4: '4day_ul',
-  5: '5day_ulppl',
-  6: '6day_ppl_arnold',
-}
+export const DAYS_TO_SPLIT: Record<number, string> = Object.fromEntries(
+  Object.entries(SPLIT_OPTIONS).map(([days, opts]) => [Number(days), opts[0].key])
+)
 
-/** For 5-day users, allow split choice. */
-export const SPLIT_CHOICE_TO_KEY: Record<string, string> = {
-  ulppl: '5day_ulppl',
-  bro: '5day_bro',
-}
-
-/** For 4-day users, allow emphasis choice. */
-export const EMPHASIS_CHOICE_TO_KEY: Record<string, string> = {
-  balanced: '4day_ul',
-  chest_back: '4day_ul_chest_back',
-  legs_shoulders: '4day_ul_legs_shoulders',
-}
-
-/** Short human label for each day-count's recommended split. */
-export const SPLIT_LABEL: Record<number, string> = {
-  2: 'Full Body (2-day)',
-  3: 'Full Body (all 3 days)',
-  4: 'Upper / Lower / Upper / Lower',
-  5: 'Upper / Lower / Push / Pull / Legs',
-  6: 'Push / Pull / Legs (6-day)',
+/** Is this split key a legitimate choice for that day count? */
+export function isValidSplitForDays(days: number, splitKey: string): boolean {
+  return (SPLIT_OPTIONS[days] ?? []).some((o) => o.key === splitKey)
 }
 
 /* ── Shapes the Programs page consumes ── */

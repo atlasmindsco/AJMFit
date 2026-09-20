@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { DAYS_TO_SPLIT, SPLIT_CHOICE_TO_KEY, EMPHASIS_CHOICE_TO_KEY, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
+import { DAYS_TO_SPLIT, isValidSplitForDays, type BlueprintGoal, type BlueprintLocation } from '@/lib/blueprint'
 
 export const runtime = 'nodejs'
 
@@ -24,27 +24,23 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // 2. Validate input.
-  let goal: string, location: string, days: number, splitChoice: string | undefined, emphasisChoice: string | undefined
+  let goal: string, location: string, days: number, splitKey: string | undefined
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitChoice?: string; emphasisChoice?: string }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
-    splitChoice = body.splitChoice
-    emphasisChoice = body.emphasisChoice
+    splitKey = body.splitKey
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  // Resolve split key: for 5-day users, use splitChoice; for 4-day users, use emphasisChoice; otherwise use defaults
-  let split: string | undefined
-  if (days === 5 && splitChoice) {
-    split = SPLIT_CHOICE_TO_KEY[splitChoice]
-  } else if (days === 4 && emphasisChoice) {
-    split = EMPHASIS_CHOICE_TO_KEY[emphasisChoice]
-  } else {
-    split = DAYS_TO_SPLIT[days]
-  }
+  // The client sends the split it picked; anything that is not a real option
+  // for that day count falls back to the recommended one rather than being
+  // trusted. The old shape mapped two separate choice vocabularies onto
+  // hardcoded day numbers, which is how the 4-day emphasis options ended up
+  // pointing at split keys that had never been seeded.
+  const split = splitKey && isValidSplitForDays(days, splitKey) ? splitKey : DAYS_TO_SPLIT[days]
 
   if (!GOALS.includes(goal as BlueprintGoal) || !LOCATIONS.includes(location as BlueprintLocation) || !split) {
     return NextResponse.json({ error: 'Invalid choices' }, { status: 400 })
@@ -91,16 +87,10 @@ export async function POST(request: Request) {
 
   // 5. Assign it — end any current assignment, then open the new one.
   await admin.from('program_assignments').update({ ended_at: new Date().toISOString() }).eq('user_id', dbUser.id).is('ended_at', null)
-  let splitLabel = split
-  if (days === 5 && splitChoice) {
-    splitLabel = `${days}d-${splitChoice}`
-  } else if (days === 4 && emphasisChoice) {
-    splitLabel = `${days}d-${emphasisChoice}`
-  }
   const { error: aErr } = await admin.from('program_assignments').insert({
     user_id: dbUser.id,
     program_id: program.id,
-    notes: `Blueprint self-select: ${goal} / ${splitLabel} / ${location}`,
+    notes: `Blueprint self-select: ${goal} / ${days}d ${split} / ${location}`,
   })
   if (aErr) return NextResponse.json({ error: aErr.message }, { status: 500 })
 
