@@ -43,7 +43,6 @@ docs/High%20Res_CPT.pdf
 docs/*.pdf
 assets/Intro video*
 assets/hero_video.mp4
-public/hero-video.mp4
 .gstack/
 
 .vercel

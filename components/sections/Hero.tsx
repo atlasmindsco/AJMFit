@@ -1,81 +1,18 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
 export default function Hero() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isMuted, setIsMuted] = useState(true)
-
-  // Sync video to real-time clock so every visitor sees the same frame
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const syncToRealTime = () => {
-      if (video.duration && video.duration > 0) {
-        const now = Date.now() / 1000 // current time in seconds
-        video.currentTime = now % video.duration
-      }
-    }
-
-    // Sync once metadata is loaded (we know the duration)
-    if (video.readyState >= 1) {
-      syncToRealTime()
-    } else {
-      video.addEventListener('loadedmetadata', syncToRealTime, { once: true })
-    }
-  }, [])
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted
-      setIsMuted(videoRef.current.muted)
-    }
-  }
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden grain-overlay bg-brand-offwhite">
-      {/* Background video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover object-[center_20%] opacity-[0.65]"
-      >
-        <source src="/hero-video.mp4" type="video/mp4" />
-      </video>
-      {/* Overlay gradients on top of video */}
+      {/* Layered gradient backdrop. There was a <video src="/hero-video.mp4">
+          here, but that file does not exist in the repo or in production — the
+          request returned the 404 page — so it only ever cost a wasted fetch,
+          and its mute button did nothing when clicked. */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-offwhite/70 via-white/50 to-blue-50/40" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(46,106,176,0.08),transparent)]" />
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white to-transparent" />
-
-      {/* Sound toggle */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-        onClick={toggleMute}
-        className="absolute bottom-10 right-6 md:right-10 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-brand-navy/20 backdrop-blur-sm border border-brand-navy/10 hover:bg-brand-navy/30 transition-colors duration-200"
-        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-      >
-        {isMuted ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B2D50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <line x1="23" y1="9" x2="17" y2="15" />
-            <line x1="17" y1="9" x2="23" y2="15" />
-          </svg>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B2D50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
-        )}
-      </motion.button>
 
       {/* Content — CSS-animated, not JS-gated, so it paints immediately. */}
       <div className="relative z-20 max-w-6xl mx-auto px-6 lg:px-8 text-center pt-40 sm:pt-32 md:pt-28 pb-20">
