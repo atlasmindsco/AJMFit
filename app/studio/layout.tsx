@@ -11,12 +11,19 @@ import FeedbackButton from '@/components/studio/FeedbackButton'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
+/**
+ * One list for both navigations. Desktop and the mobile tab bar previously had
+ * separate arrays, which drifted immediately — the same four screens were
+ * called Dashboard/Programs/Nutrition/Messages on desktop and
+ * Home/Train/Food/Coach on a phone. Entries carrying an icon (`d`) also earn a
+ * thumb-reachable slot on mobile; the rest live behind More.
+ */
 const navTabs = [
-  { label: 'Dashboard', href: '/studio' },
-  { label: 'Programs', href: '/studio/programs' },
-  { label: 'Nutrition', href: '/studio/nutrition' },
+  { label: 'Home', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
+  { label: 'Train', href: '/studio/programs', d: 'M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3' },
+  { label: 'Food', href: '/studio/nutrition', d: 'M6.75 3v8.25a2.25 2.25 0 0 0 4.5 0V3m-2.25 8.25V21M15.75 3c-1.243 1.5-1.5 3.75-1.5 5.25 0 1.243.757 2.25 1.5 2.25V21' },
+  { label: 'Coach', href: '/studio/messages', d: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155' },
   { label: 'Schedule', href: '/studio/schedule' },
-  { label: 'Messages', href: '/studio/messages' },
   { label: 'Community', href: '/studio/community' },
 ]
 
@@ -26,13 +33,7 @@ const icon = (d: string) => (
   </svg>
 )
 
-/** The four destinations that get a thumb-reachable slot on mobile. */
-const primaryTabs = [
-  { label: 'Home', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
-  { label: 'Train', href: '/studio/programs', d: 'M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3' },
-  { label: 'Food', href: '/studio/nutrition', d: 'M6.75 3v8.25a2.25 2.25 0 0 0 4.5 0V3m-2.25 8.25V21M15.75 3c-1.243 1.5-1.5 3.75-1.5 5.25 0 1.243.757 2.25 1.5 2.25V21' },
-  { label: 'Coach', href: '/studio/messages', d: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155' },
-]
+const primaryTabs = navTabs.filter((t): t is typeof t & { d: string } => Boolean(t.d))
 
 export default function ClientPortalLayout({
   children,

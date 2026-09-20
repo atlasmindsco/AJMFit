@@ -20,8 +20,8 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
+import EmptyState from '@/components/ui/EmptyState'
 import BeginnerPicker from '@/components/studio/BeginnerPicker'
-import EmphasisPicker from '@/components/studio/EmphasisPicker'
 import { loadAssignedProgram, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
@@ -86,109 +86,25 @@ type ProgramView = 'preview' | 'workout' | 'exercise'
  * Self-guided sample routine. A personalized program is generated for each
  * client later (AI builder, trainer-assisted). Until then this is a labeled
  * starter routine to train + log against, not presented as a coach-assigned plan. */
-const SAMPLE_PROGRAM = {
-  name: 'Self-Guided Training',
-  level: 'All Levels',
-  phase: 'Sample routine',
+/**
+ * Placeholder shape held until the client's real program resolves.
+ *
+ * This deliberately contains no exercises. It previously held a complete fake
+ * program — "Self-Guided Training", Barbell Bench Press, Barbell Squat — which
+ * rendered immediately on mount because the page had no loading state, so every
+ * client saw a program that was not theirs before their own arrived, and a
+ * coached client with nothing assigned never saw anything else.
+ */
+const EMPTY_PROGRAM = {
+  name: '',
+  level: '',
+  phase: '',
   weeks: { current: 1, total: 1 },
-  startDate: ', ',
-  coach: 'Self-guided',
+  startDate: '',
+  coach: '',
 }
 
-/* ── Weekly Split (fallback sample; replaced by the client's assigned program) ── */
-const SAMPLE_WEEKLY_PLAN = [
-  {
-    day: 'Monday',
-    name: 'Chest',
-    muscles: 'Chest, Shoulders, Triceps',
-    primaryMuscle: 'chest',
-    duration: '~55 min',
-    completed: false,
-    exercises: [
-      { name: 'Barbell Bench Press', sets: 3, reps: '8-10', rest: '90s', series: 'A' },
-      { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: '75s', series: 'B' },
-      { name: 'Overhead Press', sets: 3, reps: '8-10', rest: '90s', series: 'C' },
-      { name: 'Lateral Raises', sets: 3, reps: '12-15', rest: '60s', series: 'D1' },
-      { name: 'Tricep Pushdowns', sets: 3, reps: '12-15', rest: '60s', series: 'D2' },
-    ],
-  },
-  {
-    day: 'Tuesday',
-    name: 'Legs',
-    muscles: 'Quads, Hamstrings, Glutes, Calves',
-    primaryMuscle: 'quadriceps',
-    duration: '~60 min',
-    completed: false,
-    exercises: [
-      { name: 'Barbell Squat', sets: 3, reps: '6-8', rest: '120s', series: 'A' },
-      { name: 'Romanian Deadlift', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
-      { name: 'Leg Press', sets: 3, reps: '10-12', rest: '90s', series: 'C' },
-      { name: 'Walking Lunges', sets: 3, reps: '12 each', rest: '75s', series: 'D' },
-      { name: 'Calf Raises', sets: 3, reps: '15-20', rest: '45s', series: 'E' },
-    ],
-  },
-  {
-    day: 'Wednesday',
-    name: 'Active Recovery',
-    muscles: 'Mobility & Cardio',
-    primaryMuscle: '',
-    duration: '~40 min',
-    completed: false,
-    exercises: [
-      { name: 'Foam Rolling', sets: 1, reps: '10 min', rest: '--', series: 'A' },
-      { name: 'Dynamic Stretching', sets: 1, reps: '10 min', rest: '--', series: 'B' },
-      { name: 'Light Cardio (Walk/Bike)', sets: 1, reps: '20-30 min', rest: '--', series: 'C' },
-    ],
-  },
-  {
-    day: 'Thursday',
-    name: 'Back',
-    muscles: 'Back, Biceps, Rear Delts',
-    primaryMuscle: 'lats',
-    duration: '~55 min',
-    completed: false,
-    exercises: [
-      { name: 'Pull-Ups (Weighted)', sets: 3, reps: '6-8', rest: '90s', series: 'A' },
-      { name: 'Barbell Row', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
-      { name: 'Seated Cable Row', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
-      { name: 'Face Pulls', sets: 3, reps: '15-20', rest: '60s', series: 'D1' },
-      { name: 'Barbell Curls', sets: 3, reps: '10-12', rest: '60s', series: 'D2' },
-    ],
-  },
-  {
-    day: 'Friday',
-    name: 'Shoulders',
-    muscles: 'Glutes, Hamstrings, Abs',
-    primaryMuscle: 'delts',
-    duration: '~50 min',
-    completed: false,
-    exercises: [
-      { name: 'Hip Thrusts', sets: 3, reps: '8-10', rest: '90s', series: 'A' },
-      { name: 'Front Squat', sets: 3, reps: '8-10', rest: '90s', series: 'B' },
-      { name: 'Leg Curl', sets: 3, reps: '10-12', rest: '75s', series: 'C' },
-      { name: 'Cable Woodchops', sets: 3, reps: '12 each', rest: '60s', series: 'D1' },
-      { name: 'Plank Hold', sets: 3, reps: '45-60s', rest: '45s', series: 'D2' },
-    ],
-  },
-  {
-    day: 'Saturday',
-    name: 'Rest Day',
-    muscles: 'Recovery',
-    primaryMuscle: '',
-    duration: '',
-    completed: false,
-    exercises: [],
-  },
-  {
-    day: 'Sunday',
-    name: 'Rest Day',
-    muscles: 'Recovery',
-    primaryMuscle: '',
-    duration: '',
-    completed: false,
-    exercises: [],
-  },
-]
+const EMPTY_WEEKLY_PLAN: PlanDay[] = []
 
 /* ── Personal Records (per exercise) ── */
 interface PRRecord {
@@ -354,13 +270,15 @@ export default function ProgramsPage() {
   const [dbPRs, setDbPRs] = useState<Record<string, PRRecord>>({}) // overrides hardcoded demo PRs when present
 
   // ── Assigned program + Blueprint self-serve picker ──
-  const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(SAMPLE_WEEKLY_PLAN)
-  const [currentProgram, setCurrentProgram] = useState<PlanProgram>(SAMPLE_PROGRAM)
+  const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(EMPTY_WEEKLY_PLAN)
+  const [currentProgram, setCurrentProgram] = useState<PlanProgram>(EMPTY_PROGRAM)
   const [showPicker, setShowPicker] = useState(false)
-  const [showEmphasisPicker, setShowEmphasisPicker] = useState(false)
   const [isBeginnerFlow, setIsBeginnerFlow] = useState(false)
   const [programLocation, setProgramLocation] = useState<BlueprintLocation | null>(null)
   const [hasAssigned, setHasAssigned] = useState(false)
+  // Gates the whole page. Without this the placeholder program rendered while
+  // the real one was still in flight.
+  const [loading, setLoading] = useState(true)
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
@@ -384,7 +302,6 @@ export default function ProgramsPage() {
   const handlePickerDone = useCallback(async (programId: string) => {
     await applyLoadedProgram(programId)
     setShowPicker(false)
-    setShowEmphasisPicker(true)
   }, [applyLoadedProgram])
 
   // On load: render the client's assigned program; if a Blueprint member has
@@ -392,23 +309,27 @@ export default function ProgramsPage() {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const id = await getCurrentUserId()
-      if (!active || !id) return
-      const [tier, program, onboarding] = await Promise.all([
-        fetchMyTier(id),
-        fetchMyProgram(id),
-        fetchMyOnboarding(id),
-      ])
-      if (!active) return
-      if (program) {
-        await applyLoadedProgram(program.id)
-      } else if (tier === 'blueprint') {
-        // Detect if beginner: 0-1 years of experience or 'new' status
-        const yearsTraining = onboarding?.answers?.yearsTraining
-        const experience = onboarding?.answers?.experience
-        const isNewUser = experience === 'new' || yearsTraining === '0'
-        setIsBeginnerFlow(isNewUser)
-        setShowPicker(true)
+      try {
+        const id = await getCurrentUserId()
+        if (!active || !id) return
+        const [tier, program, onboarding] = await Promise.all([
+          fetchMyTier(id),
+          fetchMyProgram(id),
+          fetchMyOnboarding(id),
+        ])
+        if (!active) return
+        if (program) {
+          await applyLoadedProgram(program.id)
+        } else if (tier === 'blueprint') {
+          // Detect if beginner: 0-1 years of experience or 'new' status
+          const yearsTraining = onboarding?.answers?.yearsTraining
+          const experience = onboarding?.answers?.experience
+          const isNewUser = experience === 'new' || yearsTraining === '0'
+          setIsBeginnerFlow(isNewUser)
+          setShowPicker(true)
+        }
+      } finally {
+        if (active) setLoading(false)
       }
     })()
     return () => { active = false }
@@ -645,6 +566,15 @@ export default function ProgramsPage() {
   const selectedExerciseData = selected?.exercises.find((e) => e.name === selectedExercise) ?? null
   const selectedExerciseDB = selectedExercise ? matchedExercises.get(selectedExercise) ?? null : null
 
+  // Nothing is rendered until we know what this client's program actually is.
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   // Blueprint member with no program yet → pick-your-program flow.
   if (showPicker) {
     return (
@@ -658,13 +588,17 @@ export default function ProgramsPage() {
     )
   }
 
-  // Show emphasis customization after program pick
-  if (showEmphasisPicker) {
+  // Loaded, but this client has no program and is not in the picker flow —
+  // a coached client waiting on Anthony to assign one. Previously this fell
+  // through to the placeholder and showed a program that did not exist.
+  if (!hasAssigned) {
     return (
-      <div className="py-8">
-        <EmphasisPicker
-          onDone={() => setShowEmphasisPicker(false)}
-          onSkip={() => setShowEmphasisPicker(false)}
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <EmptyState
+          title="No program assigned yet"
+          line="Coach Anthony is putting yours together. He'll message you when it's ready."
+          actionLabel="Message Anthony"
+          actionHref="/studio/messages"
         />
       </div>
     )
@@ -1260,7 +1194,7 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder=", "
+                                                placeholder="lbs"
                                                 value={log.weight}
                                                 onChange={(e) => handleLogChange('weight', e.target.value)}
                                                 className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1268,7 +1202,7 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder=", "
+                                                placeholder="reps"
                                                 value={log.reps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
                                                 className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1454,7 +1388,7 @@ export default function ProgramsPage() {
                                                   <input
                                                     type="number"
                                                     inputMode="numeric"
-                                                    placeholder=", "
+                                                    placeholder="lbs"
                                                     value={iLog.weight}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
                                                     className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
