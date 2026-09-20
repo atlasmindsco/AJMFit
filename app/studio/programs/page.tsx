@@ -406,7 +406,7 @@ export default function ProgramsPage() {
         // Detect if beginner: 0-1 years of experience or 'new' status
         const yearsTraining = onboarding?.answers?.yearsTraining
         const experience = onboarding?.answers?.experience
-        const isNewUser = experience === 'new' || yearsTraining === 0 || yearsTraining === '0'
+        const isNewUser = experience === 'new' || yearsTraining === '0'
         setIsBeginnerFlow(isNewUser)
         setShowPicker(true)
       }

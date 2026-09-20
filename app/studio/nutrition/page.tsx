@@ -208,14 +208,15 @@ export default function NutritionPage() {
         throw new Error(errJson.error ?? `Analysis failed (${res.status})`)
       }
       const data = await res.json()
-      setAddForm({
+      setAddForm((prev) => ({
+        ...prev,
         name: data.foodName,
         serving: data.servingSize,
         calories: String(data.calories),
         protein: String(data.protein),
         carbs: String(data.carbs),
         fats: String(data.fats),
-      })
+      }))
       setAnalysisSource(data.source)
       setAnalysisComponents(data.components ?? [])
     } catch (err) {
@@ -302,14 +303,15 @@ export default function NutritionPage() {
         throw new Error(errJson.error ?? `Lookup failed (${res.status})`)
       }
       const data = await res.json()
-      setAddForm({
+      setAddForm((prev) => ({
+        ...prev,
         name: data.foodName,
         serving: data.servingSize,
         calories: String(data.calories),
         protein: String(data.protein),
         carbs: String(data.carbs),
         fats: String(data.fats),
-      })
+      }))
       setAnalysisSource(data.source)
       setAnalysisComponents(data.components ?? [])
     } catch (err) {
