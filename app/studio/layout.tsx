@@ -209,7 +209,7 @@ export default function ClientPortalLayout({
 
       {/* Page content. Extra bottom padding on mobile so the last card is not
           hidden behind the tab bar. */}
-      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-6">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-[calc(96px+env(safe-area-inset-bottom))] md:pb-6">
         {children}
       </main>
 
@@ -255,7 +255,10 @@ export default function ClientPortalLayout({
             className="md:hidden fixed inset-0 z-40 bg-black/60"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="md:hidden fixed bottom-[68px] left-0 right-0 z-50 bg-surface-raised border-t border-white/[0.08] px-4 py-3">
+          {/* Sits on top of the tab bar. The bar grows by the safe-area inset
+              on phones with a home indicator, so the offset has to include it
+              or this panel slides down over the buttons. */}
+          <div className="md:hidden fixed bottom-[calc(68px+env(safe-area-inset-bottom))] left-0 right-0 z-50 bg-surface-raised border-t border-white/[0.08] px-4 py-3">
             {navTabs
               .filter((tab) => !primaryTabs.some((p) => p.href === tab.href))
               .map((tab) => {
@@ -281,7 +284,7 @@ export default function ClientPortalLayout({
 
       {/* Floating Chaedyn Chat Widget */}
       {chatOpen && (
-        <div className="fixed bottom-[152px] md:bottom-20 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[460px] md:h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-card overflow-hidden">
+        <div className="fixed bottom-[calc(160px+env(safe-area-inset-bottom))] md:bottom-20 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[460px] md:h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-card overflow-hidden">
           <ChaedynChat portal="client" onNavigate={() => setChatOpen(false)} />
         </div>
       )}
@@ -289,7 +292,7 @@ export default function ClientPortalLayout({
       {/* Chaedyn FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
+        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
         aria-label={chatOpen ? 'Close Chea' : 'Chat with Chea'}
       >
         {chatOpen ? (
