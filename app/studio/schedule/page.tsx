@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import CalendlyEmbed from '@/components/studio/CalendlyEmbed'
+import EmptyState from '@/components/ui/EmptyState'
 import {
   fetchMySessions,
   fetchMyTier,
@@ -189,7 +190,10 @@ export default function SchedulePage() {
           Upcoming
         </h2>
         {upcoming.length === 0 ? (
-          <p className="text-white/40 text-sm font-body">No upcoming sessions yet.</p>
+          <EmptyState
+            title="Nothing on the calendar"
+            line="Book a call below and it will show up here."
+          />
         ) : (
           <ul className="space-y-2">
             {upcoming.map((s) => (

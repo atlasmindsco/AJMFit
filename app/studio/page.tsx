@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import MacroRing from '@/components/ui/MacroRing'
+import EmptyState from '@/components/ui/EmptyState'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
@@ -135,7 +136,9 @@ export default function ClientDashboard() {
     {
       label: 'Workouts This Week',
       value: val(workoutsThisWeek),
-      sub: 'logged',
+      // Match the "1,800 / 2,000" shape of the cards beside it, so the number
+      // reads as progress toward the week rather than a bare count.
+      sub: myProgram?.days_per_week ? `/ ${myProgram.days_per_week} planned` : 'logged',
       icon: CheckIcon,
       iconBg: 'bg-brand-blue/10',
       iconColor: 'text-brand-blue',
@@ -306,9 +309,12 @@ export default function ClientDashboard() {
               {loading ? (
                 <p className="text-white/30 text-sm font-body">Loading…</p>
               ) : recentPRs.length === 0 ? (
-                <p className="text-white/40 text-sm font-body">
-                  No personal records yet. Log a workout to set your first PR.
-                </p>
+                <EmptyState
+                  title="Your first PR is one workout away"
+                  line="Every lift you log sets the bar. Beat it next time and it shows up here."
+                  actionLabel="Start a workout"
+                  actionHref="/studio/programs"
+                />
               ) : (
                 <div className="space-y-3">
                   {recentPRs.map((pr) => (
@@ -342,9 +348,12 @@ export default function ClientDashboard() {
               {loading ? (
                 <p className="text-white/30 text-sm font-body">Loading…</p>
               ) : upcomingSessions.length === 0 ? (
-                <p className="text-white/40 text-sm font-body">
-                  No sessions scheduled. Coach Anthony will book your next call.
-                </p>
+                <EmptyState
+                  title="No calls booked"
+                  line="Coach Anthony books your next one, or you can grab a slot yourself."
+                  actionLabel="Book a session"
+                  actionHref="/studio/schedule"
+                />
               ) : (
                 <div className="space-y-2.5">
                   {upcomingSessions.map((s) => (

@@ -20,6 +20,20 @@ const navTabs = [
   { label: 'Community', href: '/studio/community' },
 ]
 
+const icon = (d: string) => (
+  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+    <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+  </svg>
+)
+
+/** The four destinations that get a thumb-reachable slot on mobile. */
+const primaryTabs = [
+  { label: 'Home', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
+  { label: 'Train', href: '/studio/programs', d: 'M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3' },
+  { label: 'Food', href: '/studio/nutrition', d: 'M6.75 3v8.25a2.25 2.25 0 0 0 4.5 0V3m-2.25 8.25V21M15.75 3c-1.243 1.5-1.5 3.75-1.5 5.25 0 1.243.757 2.25 1.5 2.25V21' },
+  { label: 'Coach', href: '/studio/messages', d: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155' },
+]
+
 export default function ClientPortalLayout({
   children,
 }: {
@@ -188,54 +202,86 @@ export default function ClientPortalLayout({
                 </svg>
               </button>
 
-              {/* Mobile hamburger */}
-              <button
-                className="md:hidden text-white/60 hover:text-white"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 px-4 pb-4 pt-2">
-            {navTabs.map((tab) => {
-              const isActive = pathname === tab.href
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-2.5 rounded-lg text-sm font-body font-medium mb-1 ${
-                    isActive
-                      ? 'bg-white/[0.10] text-white'
-                      : 'text-white/40 hover:text-white/70'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              )
-            })}
-          </div>
-        )}
       </nav>
 
-      {/* Page content */}
-      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Page content. Extra bottom padding on mobile so the last card is not
+          hidden behind the tab bar. */}
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-6">
         {children}
       </main>
+
+      {/* Mobile tab bar. This app gets used between sets, one-handed — the six
+          destinations were behind a hamburger at the top of the screen, which
+          is two taps away and the hardest place to reach. */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-base/95 backdrop-blur border-t border-white/[0.08] pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5">
+          {primaryTabs.map((tab) => {
+            const isActive = pathname === tab.href
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                onClick={() => setMobileMenuOpen(false)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
+                  isActive ? 'text-brand-blue' : 'text-white/40 active:text-white/70'
+                }`}
+              >
+                {icon(tab.d)}
+                <span className="text-[10px] font-display font-bold uppercase tracking-wide">{tab.label}</span>
+              </Link>
+            )
+          })}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            aria-expanded={mobileMenuOpen}
+            className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
+              mobileMenuOpen ? 'text-white' : 'text-white/40 active:text-white/70'
+            }`}
+          >
+            {icon('M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z')}
+            <span className="text-[10px] font-display font-bold uppercase tracking-wide">More</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* "More" sheet — the destinations that do not earn a permanent slot. */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            className="md:hidden fixed inset-0 z-40 bg-black/60"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="md:hidden fixed bottom-[68px] left-0 right-0 z-50 bg-surface-raised border-t border-white/[0.08] px-4 py-3">
+            {navTabs
+              .filter((tab) => !primaryTabs.some((p) => p.href === tab.href))
+              .map((tab) => {
+                const isActive = pathname === tab.href
+                return (
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-4 py-3 rounded-control text-sm font-body font-medium mb-1 ${
+                      isActive ? 'bg-white/[0.10] text-white' : 'text-white/60'
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                )
+              })}
+          </div>
+        </>
+      )}
 
       <FeedbackButton />
 
       {/* Floating Chaedyn Chat Widget */}
       {chatOpen && (
-        <div className="fixed bottom-20 right-6 z-50 w-[380px] h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-xl overflow-hidden">
+        <div className="fixed bottom-[152px] md:bottom-20 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[460px] md:h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-card overflow-hidden">
           <ChaedynChat portal="client" onNavigate={() => setChatOpen(false)} />
         </div>
       )}
@@ -243,7 +289,7 @@ export default function ClientPortalLayout({
       {/* Chaedyn FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
+        className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
         aria-label={chatOpen ? 'Close Chea' : 'Chat with Chea'}
       >
         {chatOpen ? (
