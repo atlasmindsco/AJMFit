@@ -39,31 +39,59 @@ export async function GET(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
 
-  const [{ data: unread }, { data: pending }, { data: settings }] = await Promise.all([
-    admin
-      .from('messages')
-      .select('user_id, body, created_at')
-      .eq('from_trainer', false)
-      .is('read_at', null)
-      .order('created_at', { ascending: true }),
-    admin
-      .from('applications')
-      .select('user_id, tier, created_at')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true }),
-    admin.from('coach_settings').select('email').limit(1).maybeSingle(),
-  ])
+  const [{ data: unread }, { data: pending }, { data: settings }, { data: awaitingCi }, { data: activeUsers }] =
+    await Promise.all([
+      admin
+        .from('messages')
+        .select('user_id, body, created_at')
+        .eq('from_trainer', false)
+        .is('read_at', null)
+        .order('created_at', { ascending: true }),
+      admin
+        .from('applications')
+        .select('user_id, tier, created_at')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true }),
+      admin.from('coach_settings').select('email').limit(1).maybeSingle(),
+      // Check-ins the coach has not replied to yet.
+      admin
+        .from('check_ins')
+        .select('user_id, submitted_at, energy, nutrition_adherence')
+        .is('coach_response', null)
+        .order('submitted_at', { ascending: true }),
+      admin.from('users').select('id').eq('status', 'active'),
+    ])
 
   const unreadRows = (unread ?? []) as Array<{ user_id: string; body: string; created_at: string }>
   const pendingRows = (pending ?? []) as Array<{ user_id: string; tier: string; created_at: string }>
+  const checkInRows = (awaitingCi ?? []) as Array<{
+    user_id: string
+    submitted_at: string
+    energy: number | null
+    nutrition_adherence: number | null
+  }>
 
-  if (!unreadRows.length && !pendingRows.length) {
+  // Clients who have gone quiet. This is the piece the coach cannot spot without
+  // opening every profile, which is exactly what the digest should remove.
+  const activeIds = ((activeUsers ?? []) as Array<{ id: string }>).map((u) => u.id)
+  const cutoff = new Date(Date.now() - 10 * 86400000).toISOString().slice(0, 10)
+  const { data: recentWorkouts } = await admin
+    .from('workouts')
+    .select('user_id, date')
+    .in('user_id', activeIds.length ? activeIds : ['00000000-0000-0000-0000-000000000000'])
+    .gte('date', cutoff)
+  const trainedRecently = new Set(((recentWorkouts ?? []) as Array<{ user_id: string }>).map((w) => w.user_id))
+  const quietIds = activeIds.filter((id) => !trainedRecently.has(id))
+
+  if (!unreadRows.length && !pendingRows.length && !checkInRows.length && !quietIds.length) {
     return NextResponse.json({ ok: true, sent: false, reason: 'nothing waiting' })
   }
 
   const idSet: Record<string, true> = {}
   for (const r of unreadRows) idSet[r.user_id] = true
   for (const r of pendingRows) idSet[r.user_id] = true
+  for (const r of checkInRows) idSet[r.user_id] = true
+  for (const id of quietIds) idSet[id] = true
   const { data: users } = await admin.from('users').select('id, name, email').in('id', Object.keys(idSet))
   const byId = new Map(
     ((users ?? []) as Array<{ id: string; name: string; email: string }>).map((u) => [u.id, u])
@@ -116,8 +144,33 @@ export async function GET(request: Request) {
     </div>`
   })
 
+  const checkInSectionRows = checkInRows.map((c) => {
+    const u = byId.get(c.user_id)
+    const low = [
+      c.energy != null && c.energy <= 2 ? `energy ${c.energy}/5` : '',
+      c.nutrition_adherence != null && c.nutrition_adherence <= 2 ? `nutrition ${c.nutrition_adherence}/5` : '',
+    ].filter(Boolean)
+    return `<div style="padding:12px 0;border-bottom:1px solid #eef1f5;">
+      <div style="color:#1B2D50;font-size:15px;font-weight:bold;">${escapeHtml(u?.name ?? 'Unknown client')}
+        <span style="font-weight:normal;color:#94a3b8;font-size:13px;"> · waiting ${waitLabel(
+          daysSince(c.submitted_at)
+        )}</span></div>
+      ${low.length ? `<div style="color:#DC2626;font-size:13px;margin-top:2px;">${low.join(' · ')}</div>` : ''}
+    </div>`
+  })
+
+  const quietSectionRows = quietIds.map((id) => {
+    const u = byId.get(id)
+    return `<div style="padding:12px 0;border-bottom:1px solid #eef1f5;">
+      <div style="color:#1B2D50;font-size:15px;font-weight:bold;">${escapeHtml(u?.name ?? 'Unknown client')}
+        <span style="font-weight:normal;color:#94a3b8;font-size:13px;"> · no workout in 10+ days</span></div>
+    </div>`
+  })
+
   const headline = [
+    checkInRows.length ? `${checkInRows.length} check-${checkInRows.length === 1 ? 'in' : 'ins'} to review` : '',
     sorted.length ? `${sorted.length} ${sorted.length === 1 ? 'client' : 'clients'} waiting on a reply` : '',
+    quietIds.length ? `${quietIds.length} gone quiet` : '',
     pendingRows.length ? `${pendingRows.length} pending ${pendingRows.length === 1 ? 'application' : 'applications'}` : '',
   ]
     .filter(Boolean)
@@ -137,7 +190,9 @@ export async function GET(request: Request) {
       </td></tr>
       <tr><td style="padding:28px 32px 8px;">
         <h1 style="margin:0 0 4px;color:#1B2D50;font-size:20px;font-weight:800;">${escapeHtml(headline)}</h1>
+        ${section('Check-ins to review', checkInSectionRows)}
         ${section('Waiting on a reply', messageRows)}
+        ${section('Gone quiet', quietSectionRows)}
         ${section('Pending applications', applicationRows)}
       </td></tr>
       <tr><td style="padding:20px 32px 32px;">

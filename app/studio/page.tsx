@@ -6,6 +6,10 @@ import Link from 'next/link'
 import MacroRing from '@/components/ui/MacroRing'
 import EmptyState from '@/components/ui/EmptyState'
 import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
+import PlanPanel from '@/components/studio/PlanPanel'
+import { isCoached } from '@/lib/tiers'
+import { fetchCheckInForWeek, weekOf } from '@/lib/check-ins'
+import type { Tier } from '@/lib/stripe/catalog'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
@@ -71,6 +75,7 @@ export default function ClientDashboard() {
   // first-run nudge never flashes at an established client while data loads.
   const [hasEverTrained, setHasEverTrained] = useState(true)
   const [weekStreak, setWeekStreak] = useState(0)
+  const [checkInDone, setCheckInDone] = useState(false)
   const [setupState, setSetupState] = useState({ intakeDone: false, startingStatsDone: false, nutritionDone: false, welcomeCallBooked: false, programAssigned: false })
 
   useEffect(() => {
@@ -82,7 +87,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked] =
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn] =
           await Promise.all([
             fetchTargets(id),
             fetchTodaysLogs(id),
@@ -99,6 +104,7 @@ export default function ClientDashboard() {
             fetchBodyMetrics(id, 5).catch(() => []),
             fetchNutritionSetup(id).catch(() => null),
             hasBookedOnboarding(id).catch(() => false),
+            fetchCheckInForWeek(id, weekOf()).catch(() => null),
           ])
         if (!active) return
         setTargets(t)
@@ -113,6 +119,7 @@ export default function ClientDashboard() {
         setTier(myTier)
         setHasEverTrained(history.length > 0)
         setWeekStreak(streak)
+        setCheckInDone(!!thisWeekCheckIn)
         setSetupState({
           intakeDone: !!onboarding,
           startingStatsDone: (metrics ?? []).some((m) => m.weight_lb != null),
@@ -224,6 +231,10 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {!loading && isCoached(tier as Tier) && (
+        <PlanPanel tier={tier as Tier} checkInDone={checkInDone} />
+      )}
 
       {/* Coached tiers get a setup checklist. One of its steps is the coach
           assigning a program, which the client cannot do — without saying so,
