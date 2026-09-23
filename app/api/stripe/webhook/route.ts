@@ -33,6 +33,14 @@ export async function POST(request: Request) {
     if (!userId) return
 
     const status = sub.status // trialing | active | past_due | canceled | unpaid | incomplete...
+
+    // What we had before this event, so the coach is alerted on the transition
+    // rather than on every webhook Stripe sends for the same state.
+    const { data: prior } = await db
+      .from('subscriptions')
+      .select('status, cancel_at_period_end')
+      .eq('stripe_subscription_id', sub.id)
+      .maybeSingle()
     // In current Stripe API versions the period boundary lives on the subscription item.
     const item = sub.items?.data?.[0] as
       | { current_period_end?: number }
@@ -65,6 +73,38 @@ export async function POST(request: Request) {
             : null
     if (userStatus) {
       await db.from('users').update({ status: userStatus }).eq('id', userId)
+    }
+
+    // Tell the coach when billing breaks or someone cancels. Nothing previously
+    // surfaced either — a client could lapse and be locked out of the studio
+    // without anyone knowing to reach out.
+    const nowCancelling = !!sub.cancel_at_period_end && !prior?.cancel_at_period_end
+    const broke = (status === 'past_due' || status === 'unpaid') && prior?.status !== status
+    const ended = status === 'canceled' && prior?.status !== 'canceled'
+    if (nowCancelling || broke || ended) {
+      try {
+        const { data: u } = await db.from('users').select('name, email').eq('id', userId).maybeSingle()
+        const { data: cs } = await db.from('coach_settings').select('email').limit(1).maybeSingle()
+        const who = `${u?.name ?? 'A client'} (${u?.email ?? 'unknown'})`
+        const what = ended
+          ? 'cancelled — their access has ended'
+          : broke
+            ? 'has a failed payment — they are paused and locked out until the card is fixed'
+            : 'has set their plan to cancel at the end of the period'
+        const { sendMail } = await import('@/lib/email')
+        await sendMail({
+          to: (cs?.email as string) || 'anthony@ajmfit.com',
+          replyTo: (u?.email as string) || undefined,
+          subject: `Billing: ${u?.name ?? 'a client'} ${ended ? 'cancelled' : broke ? 'payment failed' : 'is cancelling'}`,
+          text: `${who} ${what}.`,
+          html: `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1B2D50">
+            <p style="margin:0 0 10px"><strong>${who}</strong> ${what}.</p>
+            <p style="color:#64748B;margin:0">Worth a message before they go quiet for good.</p>
+          </div>`,
+        })
+      } catch (e) {
+        console.error('[stripe webhook] billing alert failed', e)
+      }
     }
   }
 

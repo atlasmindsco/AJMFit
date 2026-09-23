@@ -7,6 +7,7 @@ import MacroRing from '@/components/ui/MacroRing'
 import EmptyState from '@/components/ui/EmptyState'
 import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import PlanPanel from '@/components/studio/PlanPanel'
+import BillingPanel from '@/components/studio/BillingPanel'
 import { isCoached } from '@/lib/tiers'
 import { fetchCheckInForWeek, weekOf } from '@/lib/check-ins'
 import type { Tier } from '@/lib/stripe/catalog'
@@ -76,12 +77,14 @@ export default function ClientDashboard() {
   const [hasEverTrained, setHasEverTrained] = useState(true)
   const [weekStreak, setWeekStreak] = useState(0)
   const [checkInDone, setCheckInDone] = useState(false)
+  const [myUserId, setMyUserId] = useState<string | null>(null)
   const [setupState, setSetupState] = useState({ intakeDone: false, startingStatsDone: false, nutritionDone: false, welcomeCallBooked: false, programAssigned: false })
 
   useEffect(() => {
     let active = true
     ;(async () => {
       const id = await getCurrentUserId()
+      setMyUserId(id)
       if (!id) {
         if (active) setLoading(false)
         return
@@ -231,6 +234,8 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {!loading && myUserId && <BillingPanel userId={myUserId} />}
 
       {!loading && isCoached(tier as Tier) && (
         <PlanPanel tier={tier as Tier} checkInDone={checkInDone} />

@@ -1,30 +1,61 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { signOut } from '@/lib/current-user'
+import { signOut, getCurrentUserId } from '@/lib/current-user'
+import { createClient } from '@/lib/supabase/client'
 
 /**
  * Full-screen paywall shown in the studio to an approved client whose
- * subscription isn't active yet. Starts a Stripe Checkout (7-day trial).
+ * subscription isn't active yet.
+ *
+ * Someone who has never subscribed starts a Stripe Checkout with the 7-day
+ * trial. Someone who already has a Stripe customer — typically a failed
+ * payment that set them to 'paused' — is sent to the billing portal instead.
+ * Offering them checkout would have started a second subscription alongside
+ * the broken one and billed them twice.
  */
 export default function MembershipPaywall() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [hasBilling, setHasBilling] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const id = await getCurrentUserId()
+      if (!id || !active) return
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = supabase as any
+      const { data } = await db
+        .from('subscriptions')
+        .select('stripe_customer_id')
+        .eq('user_id', id)
+        .not('stripe_customer_id', 'is', null)
+        .limit(1)
+        .maybeSingle()
+      if (active) setHasBilling(!!data?.stripe_customer_id)
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
 
   const start = async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const endpoint = hasBilling ? '/api/stripe/portal' : '/api/stripe/checkout'
+      const res = await fetch(endpoint, { method: 'POST' })
       const body = (await res.json()) as { url?: string; error?: string }
       if (body.url) {
         window.location.href = body.url
         return
       }
-      setError(body.error ?? 'Could not start checkout. Please try again.')
+      setError(body.error ?? 'Could not open billing. Please try again.')
     } catch {
-      setError('Could not start checkout. Please try again.')
+      setError('Could not open billing. Please try again.')
     } finally {
       setLoading(false)
     }
