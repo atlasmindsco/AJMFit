@@ -111,3 +111,45 @@ export function weightTrend(rows: BodyMetric[]): WeightTrend {
     points: [...weighed].reverse(),
   }
 }
+
+export type PhotoPose = 'front' | 'side' | 'back'
+
+const BUCKET = 'progress-photos'
+
+/**
+ * Uploads a progress photo and returns its storage path.
+ *
+ * The bucket is private and keyed by {users.id}/..., which is what the storage
+ * policies check — a client can only ever write into their own folder. The
+ * path, not a URL, is what gets stored on the row: a public URL to a photo of
+ * someone's body should not exist, so display goes through a short-lived
+ * signed URL instead.
+ */
+export async function uploadProgressPhoto(
+  userId: string,
+  recordedOn: string,
+  pose: PhotoPose,
+  file: File
+): Promise<string> {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  const path = `${userId}/${recordedOn}-${pose}.${ext}`
+  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+    upsert: true,
+    contentType: file.type || undefined,
+  })
+  if (error) throw error
+  return path
+}
+
+/** Short-lived read URL. Null when there is no photo or the sign fails. */
+export async function signedPhotoUrl(path: string | null, seconds = 3600): Promise<string | null> {
+  if (!path) return null
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, seconds)
+  if (error) return null
+  return data?.signedUrl ?? null
+}
+
+export async function deleteProgressPhoto(path: string): Promise<void> {
+  const { error } = await supabase.storage.from(BUCKET).remove([path])
+  if (error) throw error
+}

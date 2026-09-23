@@ -6,6 +6,7 @@ import { getCurrentUserId } from '@/lib/current-user'
 import EmptyState from '@/components/ui/EmptyState'
 import { fetchPRs, fetchWorkoutHistory, fetchWeekStreak } from '@/lib/workout'
 import { milestones, type Milestone } from '@/lib/milestones'
+import ProgressPhotos from '@/components/studio/ProgressPhotos'
 import {
   fetchBodyMetrics,
   saveBodyMetric,
@@ -73,6 +74,10 @@ export default function ProgressPage() {
       active = false
     }
   }, [])
+
+  const reload = async () => {
+    if (userId) setRows(await fetchBodyMetrics(userId))
+  }
 
   const trend = weightTrend(rows)
 
@@ -264,6 +269,8 @@ export default function ProgressPage() {
           {saving ? 'Saving…' : saved ? 'Saved' : 'Save'}
         </button>
       </div>
+
+      {userId && <ProgressPhotos userId={userId} latest={rows[0] ?? null} onSaved={reload} />}
 
       {/* History */}
       {rows.length > 0 && (

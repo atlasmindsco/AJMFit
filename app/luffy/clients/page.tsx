@@ -15,6 +15,7 @@ import {
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type OnboardingForm } from '@/lib/onboarding'
 import AssignProgram from '@/components/admin/AssignProgram'
+import ClientPhotos from '@/components/admin/ClientPhotos'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
@@ -393,6 +394,8 @@ export default function ClientsPage() {
                           <p className="text-white/35 text-sm font-body">Not filled out yet.</p>
                         )}
                       </div>
+
+                      <ClientPhotos userId={client.id} />
 
                       <AssignProgram userId={client.id} />
                     </div>
