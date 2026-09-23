@@ -719,6 +719,12 @@ export default function NutritionPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2 mb-2">
                                   <label className="block">
                                     <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Food</span>
+                                    {/* The lookup lands ~600ms after you stop typing and fills
+                                        the macros. Every setAddForm here updates from prev
+                                        rather than a captured addForm: spreading the captured
+                                        copy meant the next keystroke wrote back a version from
+                                        before the lookup, wiping the calories that had just
+                                        appeared. */}
                                     <div className="relative">
                                       <input
                                         type="text"
@@ -726,7 +732,7 @@ export default function NutritionPage() {
                                         value={addForm.name}
                                         onChange={(e) => {
                                           const next = e.target.value
-                                          setAddForm({ ...addForm, name: next })
+                                          setAddForm((prev) => ({ ...prev, name: next }))
                                           runTypedLookup(next)
                                         }}
                                         className="w-full px-3 py-2 pr-9 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
@@ -742,7 +748,7 @@ export default function NutritionPage() {
                                       type="text"
                                       placeholder="optional"
                                       value={addForm.serving}
-                                      onChange={(e) => setAddForm({ ...addForm, serving: e.target.value })}
+                                      onChange={(e) => setAddForm((prev) => ({ ...prev, serving: e.target.value }))}
                                       className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
@@ -755,7 +761,7 @@ export default function NutritionPage() {
                                       value={addForm.calories}
                                       onChange={(e) => {
                                         macroFieldsTouchedRef.current = true
-                                        setAddForm({ ...addForm, calories: e.target.value })
+                                        setAddForm((prev) => ({ ...prev, calories: e.target.value }))
                                       }}
                                       className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
@@ -767,7 +773,7 @@ export default function NutritionPage() {
                                     {['8 oz', '10 oz', '12 oz', '1 cup', '2 cups', '1 tbsp'].map((size) => (
                                       <button
                                         key={size}
-                                        onClick={() => setAddForm({ ...addForm, serving: size })}
+                                        onClick={() => setAddForm((prev) => ({ ...prev, serving: size }))}
                                         className="px-2 py-1 text-[10px] bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold transition-colors"
                                       >
                                         {size}
@@ -785,7 +791,7 @@ export default function NutritionPage() {
                                       value={addForm.protein}
                                       onChange={(e) => {
                                         macroFieldsTouchedRef.current = true
-                                        setAddForm({ ...addForm, protein: e.target.value })
+                                        setAddForm((prev) => ({ ...prev, protein: e.target.value }))
                                       }}
                                       className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
@@ -799,7 +805,7 @@ export default function NutritionPage() {
                                       value={addForm.carbs}
                                       onChange={(e) => {
                                         macroFieldsTouchedRef.current = true
-                                        setAddForm({ ...addForm, carbs: e.target.value })
+                                        setAddForm((prev) => ({ ...prev, carbs: e.target.value }))
                                       }}
                                       className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
@@ -813,7 +819,7 @@ export default function NutritionPage() {
                                       value={addForm.fats}
                                       onChange={(e) => {
                                         macroFieldsTouchedRef.current = true
-                                        setAddForm({ ...addForm, fats: e.target.value })
+                                        setAddForm((prev) => ({ ...prev, fats: e.target.value }))
                                       }}
                                       className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
