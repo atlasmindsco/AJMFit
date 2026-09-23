@@ -33,6 +33,22 @@ import { useRouter } from 'next/navigation'
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100
 
+/**
+ * Serving sizes offered in the add-food form.
+ *
+ * This used to be a free-text box with a "quick sizes" helper that only
+ * appeared once you had already typed something, so the shortcut showed up
+ * after you no longer needed it. Picking from a list also gives the lookup a
+ * phrase it can actually price: "1 cup egg whites" resolves to 132 calories,
+ * where "egg whites" on its own returns a per-100g figure nobody ate.
+ */
+const SERVING_OPTIONS = [
+  '1 serving', '1 oz', '2 oz', '3 oz', '4 oz', '6 oz', '8 oz',
+  '1/4 cup', '1/3 cup', '1/2 cup', '1 cup', '2 cups',
+  '1 tbsp', '2 tbsp', '1 tsp',
+  '1 slice', '2 slices', '1 piece', '1 scoop', '100 g',
+]
+
 function formatTime(time: string | null) {
   if (!time) return ''
   const [h, m] = time.split(':')
@@ -63,6 +79,7 @@ export default function NutritionPage() {
   const [analysisSource, setAnalysisSource] = useState<'usda' | 'mixed' | 'gpt' | 'off' | null>(null)
   const [analysisComponents, setAnalysisComponents] = useState<Array<{ name: string; grams: number; source: 'usda' | 'gpt' | 'off' }>>([])
   const [typedLookupActive, setTypedLookupActive] = useState(false)
+  const [customServing, setCustomServing] = useState(false)
   const [scanningMealId, setScanningMealId] = useState<string | null>(null)
   const lookupAbortRef = useRef<AbortController | null>(null)
   const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -120,6 +137,23 @@ export default function NutritionPage() {
     lookupAbortRef.current?.abort()
     lookupAbortRef.current = null
     setTypedLookupActive(false)
+    setCustomServing(false)
+  }
+
+  /**
+   * Picking a serving re-prices the food for that amount.
+   *
+   * The macro fields are marked untouched first: choosing a serving is an
+   * explicit request for the right numbers, so it should override an earlier
+   * manual edit rather than be blocked by it.
+   */
+  const applyServing = (serving: string) => {
+    setAddForm((prev) => ({ ...prev, serving }))
+    const name = addForm.name.trim()
+    if (serving && name.length >= 3) {
+      macroFieldsTouchedRef.current = false
+      runTypedLookup(`${serving} ${name}`)
+    }
   }
 
   const handleAddFood = async (mealId: string) => {
@@ -744,13 +778,42 @@ export default function NutritionPage() {
                                   </label>
                                   <label className="block">
                                     <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Serving</span>
-                                    <input
-                                      type="text"
-                                      placeholder="optional"
-                                      value={addForm.serving}
-                                      onChange={(e) => setAddForm((prev) => ({ ...prev, serving: e.target.value }))}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
-                                    />
+                                    {customServing ? (
+                                      <input
+                                        type="text"
+                                        autoFocus
+                                        placeholder="e.g. 2 slices"
+                                        value={addForm.serving}
+                                        onChange={(e) => setAddForm((prev) => ({ ...prev, serving: e.target.value }))}
+                                        onBlur={(e) => applyServing(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      />
+                                    ) : (
+                                      <select
+                                        value={SERVING_OPTIONS.includes(addForm.serving) ? addForm.serving : ''}
+                                        onChange={(e) => {
+                                          if (e.target.value === '__custom') {
+                                            setCustomServing(true)
+                                            setAddForm((prev) => ({ ...prev, serving: '' }))
+                                            return
+                                          }
+                                          applyServing(e.target.value)
+                                        }}
+                                        className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      >
+                                        <option value="">
+                                          {addForm.serving && !SERVING_OPTIONS.includes(addForm.serving)
+                                            ? addForm.serving
+                                            : 'Choose…'}
+                                        </option>
+                                        {SERVING_OPTIONS.map((s) => (
+                                          <option key={s} value={s}>
+                                            {s}
+                                          </option>
+                                        ))}
+                                        <option value="__custom">Something else…</option>
+                                      </select>
+                                    )}
                                   </label>
                                   <label className="block">
                                     <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>
@@ -767,20 +830,6 @@ export default function NutritionPage() {
                                     />
                                   </label>
                                 </div>
-                                {addForm.serving && (
-                                  <div className="mb-2 flex gap-1 flex-wrap">
-                                    <span className="text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate">Quick sizes:</span>
-                                    {['8 oz', '10 oz', '12 oz', '1 cup', '2 cups', '1 tbsp'].map((size) => (
-                                      <button
-                                        key={size}
-                                        onClick={() => setAddForm((prev) => ({ ...prev, serving: size }))}
-                                        className="px-2 py-1 text-[10px] bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold transition-colors"
-                                      >
-                                        {size}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
                                 <div className="grid grid-cols-3 gap-2 mb-2">
                                   <label className="block">
                                     <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>

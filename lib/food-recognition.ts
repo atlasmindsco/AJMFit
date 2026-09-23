@@ -411,6 +411,12 @@ export async function lookupBarcode(barcode: string): Promise<RecognizedFood> {
       'User-Agent': 'AJM-FIT/1.0 (https://atlasmindspreview.com)',
     },
   })
+  // Open Food Facts answers 404 for a barcode it does not carry, which is an
+  // ordinary miss rather than a failure. Throwing a generic error here meant
+  // the route returned 500, so the client never reached its "not found, try
+  // typing the name" branch and showed the raw upstream message instead.
+  // Coverage of US grocery items is patchy, so this is a common path.
+  if (res.status === 404) throw new BarcodeNotFoundError(clean)
   if (!res.ok) throw new Error(`Open Food Facts error: ${res.status}`)
   const json = (await res.json()) as OffResponse
 
