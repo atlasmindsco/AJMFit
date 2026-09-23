@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { getCurrentUserId } from '@/lib/current-user'
 import EmptyState from '@/components/ui/EmptyState'
+import { fetchPRs, fetchWorkoutHistory, fetchWeekStreak } from '@/lib/workout'
+import { milestones, type Milestone } from '@/lib/milestones'
 import {
   fetchBodyMetrics,
   saveBodyMetric,
@@ -31,6 +33,7 @@ export default function ProgressPage() {
   const [saved, setSaved] = useState(false)
   const [showMeasurements, setShowMeasurements] = useState(false)
   const [form, setForm] = useState({ weight: '', waist: '', hips: '', chest: '', arm: '', thigh: '' })
+  const [earned, setEarned] = useState<Milestone[]>([])
 
   useEffect(() => {
     let active = true
@@ -43,8 +46,23 @@ export default function ProgressPage() {
         return
       }
       try {
-        const data = await fetchBodyMetrics(id)
-        if (active) setRows(data)
+        const [data, prs, hist, streak] = await Promise.all([
+          fetchBodyMetrics(id),
+          fetchPRs(id).catch(() => []),
+          fetchWorkoutHistory(id, 300).catch(() => []),
+          fetchWeekStreak(id).catch(() => 0),
+        ])
+        if (!active) return
+        setRows(data)
+        setEarned(
+          milestones({
+            workoutCount: hist.length,
+            firstWorkoutAt: hist.length ? hist[hist.length - 1].date ?? null : null,
+            prs,
+            weekStreak: streak,
+            metrics: data,
+          })
+        )
       } catch (e) {
         console.error('[Progress] load failed', e)
       } finally {
@@ -160,6 +178,26 @@ export default function ProgressPage() {
           </>
         )}
       </div>
+
+      {/* Milestones. Derived from real training outcomes rather than stored,
+          and deliberately not gamified — a reward for something that did not
+          matter teaches the client that none of the rewards mean anything. */}
+      {earned.length > 0 && (
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
+          <p className="font-display font-bold text-white text-sm mb-3">What you&rsquo;ve done so far</p>
+          <div className="space-y-2.5">
+            {earned.map((m) => (
+              <div key={m.key} className="flex items-start gap-3">
+                <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-display font-bold">{m.label}</p>
+                  <p className="text-white/40 text-xs font-body mt-0.5 leading-relaxed">{m.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Log */}
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
