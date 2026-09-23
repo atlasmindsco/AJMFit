@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchClients, tierLabel, relativeTime, type ClientRow } from '@/lib/admin'
+import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
+import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
 import { fetchFeedback, type Feedback } from '@/lib/feedback'
 
 interface Stats {
@@ -24,21 +26,24 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [clients, setClients] = useState<ClientRow[]>([])
   const [feedback, setFeedback] = useState<Feedback[]>([])
+  const [checkIns, setCheckIns] = useState<CheckIn[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f] = await Promise.all([
+        const [s, c, f, ci] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
+          fetchAllCheckIns().catch(() => []),
         ])
         if (!active) return
         setStats(s)
         setClients(c)
         setFeedback(f)
+        setCheckIns(ci)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -50,7 +55,7 @@ export default function AdminDashboard() {
     }
   }, [])
 
-  const dash = (v: number | string | undefined) => (loading || v === undefined ? ', ' : v)
+  const dash = (v: number | string | undefined) => (loading || v === undefined ? '—' : v)
   const pending = clients.filter((c) => c.application?.status === 'pending')
 
   const cards = [
@@ -59,7 +64,7 @@ export default function AdminDashboard() {
     { label: 'Total Clients', value: dash(stats?.totalClients) },
     {
       label: 'Revenue (MTD)',
-      value: loading || !stats ? ', ' : `$${(stats.revenueMtdCents / 100).toLocaleString()}`,
+      value: loading || !stats ? '—' : `$${(stats.revenueMtdCents / 100).toLocaleString()}`,
     },
   ]
 
@@ -103,30 +108,49 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 font-semibold">Name</th>
                     <th className="px-6 py-3 font-semibold">Tier</th>
                     <th className="px-6 py-3 font-semibold">Last Active</th>
-                    <th className="px-6 py-3 font-semibold">Status</th>
+                    <th className="px-6 py-3 font-semibold">Needs</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {clients.slice(0, 8).map((client) => {
-                    const tier = tierLabel(client.application?.tier)
-                    return (
-                      <tr key={client.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors duration-150">
-                        <td className="px-6 py-4">
-                          <span className="text-white text-sm font-body font-medium">{client.name}</span>
-                          <span className="block text-white/30 text-[11px] font-body">{client.email}</span>
-                        </td>
-                        <td className="px-6 py-4"><span className={`text-xs font-body ${getTierColor(tier)}`}>{tier}</span></td>
-                        <td className="px-6 py-4"><span className="text-white/40 text-xs font-body">{relativeTime(client.last_workout_at)}</span></td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-block text-[10px] font-display uppercase tracking-[0.15em] font-semibold px-2.5 py-1 rounded-control ${
-                            client.status === 'active' ? 'bg-emerald-500/10 text-emerald-400'
-                              : client.status === 'pending' ? 'bg-amber-500/10 text-amber-400'
-                              : 'bg-white/[0.06] text-white/30'
-                          }`}>{client.status}</span>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {/* Ranked by what needs the coach first, rather than by
+                      signup date. Finding out who was struggling used to mean
+                      opening every client in turn. */}
+                  {clients
+                    .filter((c) => c.status === 'active')
+                    .map((client) => {
+                      const tier = client.application?.tier
+                      const { status, reason } = clientStatus({
+                        coached: tier === 'accelerator' || tier === 'full-experience',
+                        lastWorkoutAt: client.last_workout_at,
+                        checkIns: checkIns.filter((ci) => ci.user_id === client.id),
+                      })
+                      return { client, status, reason }
+                    })
+                    .sort((a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status))
+                    .slice(0, 10)
+                    .map(({ client, status, reason }) => {
+                      const tier = tierLabel(client.application?.tier)
+                      const meta = STATUS_META[status]
+                      return (
+                        <tr key={client.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors duration-150">
+                          <td className="px-6 py-4">
+                            <span className="text-white text-sm font-body font-medium">{client.name}</span>
+                            <span className="block text-white/30 text-[11px] font-body">{client.email}</span>
+                          </td>
+                          <td className="px-6 py-4"><span className={`text-xs font-body ${getTierColor(tier)}`}>{tier}</span></td>
+                          <td className="px-6 py-4"><span className="text-white/40 text-xs font-body">{relativeTime(client.last_workout_at)}</span></td>
+                          <td className="px-6 py-4">
+                            <span className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full shrink-0 ${meta.dot}`} />
+                              <span>
+                                <span className={`block text-xs font-display font-bold ${meta.tone}`}>{meta.label}</span>
+                                <span className="block text-white/30 text-[11px] font-body">{reason}</span>
+                              </span>
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
                 </tbody>
               </table>
             )}
