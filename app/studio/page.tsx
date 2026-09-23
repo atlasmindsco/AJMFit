@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import MacroRing from '@/components/ui/MacroRing'
 import EmptyState from '@/components/ui/EmptyState'
+import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +22,9 @@ import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, 
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
+import { fetchBodyMetrics } from '@/lib/body-metrics'
+import { fetchNutritionSetup } from '@/lib/nutrition'
+import { hasBookedOnboarding } from '@/lib/scheduling'
 
 const CheckIcon = (
   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -67,6 +71,7 @@ export default function ClientDashboard() {
   // first-run nudge never flashes at an established client while data loads.
   const [hasEverTrained, setHasEverTrained] = useState(true)
   const [weekStreak, setWeekStreak] = useState(0)
+  const [setupState, setSetupState] = useState({ intakeDone: false, startingStatsDone: false, nutritionDone: false, welcomeCallBooked: false, programAssigned: false })
 
   useEffect(() => {
     let active = true
@@ -77,7 +82,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak] =
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked] =
           await Promise.all([
             fetchTargets(id),
             fetchTodaysLogs(id),
@@ -91,6 +96,9 @@ export default function ClientDashboard() {
             fetchMyTier(id),
             fetchWorkoutHistory(id, 1),
             fetchWeekStreak(id),
+            fetchBodyMetrics(id, 5).catch(() => []),
+            fetchNutritionSetup(id).catch(() => null),
+            hasBookedOnboarding(id).catch(() => false),
           ])
         if (!active) return
         setTargets(t)
@@ -105,6 +113,13 @@ export default function ClientDashboard() {
         setTier(myTier)
         setHasEverTrained(history.length > 0)
         setWeekStreak(streak)
+        setSetupState({
+          intakeDone: !!onboarding,
+          startingStatsDone: (metrics ?? []).some((m) => m.weight_lb != null),
+          nutritionDone: !!nutri?.nutrition_goal_setup_complete,
+          welcomeCallBooked: !!welcomeBooked,
+          programAssigned: !!program,
+        })
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -209,6 +224,13 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Coached tiers get a setup checklist. One of its steps is the coach
+          assigning a program, which the client cannot do — without saying so,
+          someone who has finished their half is left on an empty dashboard. */}
+      {!loading && tier !== null && tier !== 'blueprint' && (
+        <OnboardingChecklist state={setupState} />
+      )}
 
       {/* Blueprint is self-serve: no onboarding form, no call. Point them
           straight at the program picker until they've chosen one. */}
