@@ -300,6 +300,10 @@ export default function ProgramsPage() {
   const [intensityChoice, setIntensityChoice] = useState<Record<string, IntensityTechnique>>({}) // exercise key → selected technique
   const [intensityLogs, setIntensityLogs] = useState<Record<string, { weight: string; done: boolean }[]>>({}) // exercise key → 2 intensity set logs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Debounce per set so a personal record is judged once, after typing stops.
+  const prTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  // Weight already announced per exercise, so one record sends one email.
+  const prNotifiedRef = useRef<Record<string, number>>({})
 
   // Persistence
   const [userId, setUserId] = useState<string | null>(null)
@@ -521,6 +525,27 @@ export default function ProgramsPage() {
       })
       .catch((err) => console.error('[PRs] Failed to load:', err))
 
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  /**
+   * Restore swaps and any workout already in progress.
+   *
+   * Kept separate from the effect above because both need weeklyPlan to be
+   * loaded: they locate the day by matching its name. Run on mount they saw an
+   * empty plan, found nothing, and silently gave up — which is why a session
+   * appeared to vanish when the app was closed and reopened. The sets were
+   * always in the database; nothing was reading them back.
+   */
+  const restoredRef = useRef(false)
+  useEffect(() => {
+    if (restoredRef.current || !userId || weeklyPlan.length === 0) return
+    restoredRef.current = true
+    const id = userId
+
     dbFetchSwaps(id)
       .then((rows) => {
         // Swaps are scoped per day in UI (key = `${dayIndex}-${exerciseName}`), but stored
@@ -590,11 +615,7 @@ export default function ProgramsPage() {
         setView('workout')
       })
       .catch((err) => console.error('[In-progress workout] Failed to load:', err))
-    })
-    return () => {
-      active = false
-    }
-  }, [])
+  }, [userId, weeklyPlan])
 
   // Pre-match exercises for the selected day
   const matchedExercises = useMemo(() => {
@@ -1250,10 +1271,15 @@ export default function ProgramsPage() {
                                           updated[si] = { ...updated[si], [field]: value }
                                           setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
 
-                                          // Auto-start rest timer when set is completed
                                           const newLog = { ...updated[si] }
                                           const isComplete = newLog.weight !== '' && newLog.reps !== ''
-                                          if (isComplete) {
+                                          // Only when the set first becomes complete. This ran on
+                                          // every keystroke, so the rest timer restarted under you
+                                          // while you were still typing the weight.
+                                          const wasComplete =
+                                            (backingLogs[si]?.weight ?? '') !== '' &&
+                                            (backingLogs[si]?.reps ?? '') !== ''
+                                          if (isComplete && !wasComplete) {
                                             const restKey = `${selectedDay}-${exercise.name}`
                                             const defaultSec = parseRestSeconds(exercise.rest)
                                             const customSec = restTimers[restKey] ?? defaultSec
@@ -1277,7 +1303,15 @@ export default function ProgramsPage() {
                                               completed: isComplete,
                                             }).catch((err) => console.error('[Set save] Failed:', err))
 
-                                            // Upsert PR if weight + reps present and beats current
+                                            // Personal records are evaluated after typing stops, not
+                                            // on every keystroke. Typing "185" used to run this three
+                                            // times — and because dbPRs updates asynchronously, the
+                                            // comparison kept seeing the old record, so every
+                                            // intermediate value that beat it sent its own email.
+                                            // Editing an already-finished set fired another.
+                                            const prKey = `${displayName}-${si}`
+                                            if (prTimersRef.current[prKey]) clearTimeout(prTimersRef.current[prKey])
+                                            prTimersRef.current[prKey] = setTimeout(() => {
                                             if (isComplete && w && r) {
                                               const currentPR = pr?.weight ?? 0
                                               if (w > currentPR) {
@@ -1294,7 +1328,11 @@ export default function ProgramsPage() {
                                                     }))
                                                     // Celebrate beating an existing record (not the first-ever log),
                                                     // and ping Coach Anthony so he can reach out and celebrate them.
-                                                    if (currentPR > 0) {
+                                                    // One alert per record. Without this guard,
+                                                    // correcting the reps on a set that had already
+                                                    // set a PR sent Anthony the same email again.
+                                                    if (currentPR > 0 && prNotifiedRef.current[displayName] !== w) {
+                                                      prNotifiedRef.current[displayName] = w
                                                       setPrCelebration({ name: displayName, weight: w })
                                                       fetch('/api/studio/pr-notify', {
                                                         method: 'POST',
@@ -1306,6 +1344,7 @@ export default function ProgramsPage() {
                                                   .catch((err) => console.error('[PR upsert] Failed:', err))
                                               }
                                             }
+                                            }, 1200)
                                           }
                                         }
 
