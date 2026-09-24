@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
+  EMPTY_HEALTH_SCREEN,
+  HealthScreen,
   NutritionGoalSetup,
   calculateNutritionTargets,
+  screenHealth,
   validateSetup,
 } from '@/lib/nutrition-goals'
 
@@ -37,10 +40,38 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: errors[0] }, { status: 422 })
     }
 
+    // 2b. Same health gate as setup. A client's circumstances change, and an
+    // edit is exactly where they would tell us.
+    const healthScreen: HealthScreen = {
+      ...EMPTY_HEALTH_SCREEN,
+      ...((body as { healthScreen?: Partial<HealthScreen> }).healthScreen ?? {}),
+    }
+    const screen = screenHealth(healthScreen)
+    if (screen.blocked) {
+      const blockAdmin = createAdminClient() as any
+      try {
+        await blockAdmin
+          .from('users')
+          .update({
+            health_screen: healthScreen,
+            nutrition_block_code: screen.code,
+            health_screened_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('auth_id', user.id)
+      } catch (e) {
+        console.error('[nutrition/update] failed to record health block', e)
+      }
+      return NextResponse.json(
+        { error: screen.message, blocked: true, code: screen.code },
+        { status: 422 }
+      )
+    }
+
     // 3. Calculate nutrition targets
     const calculated = calculateNutritionTargets(setup as NutritionGoalSetup)
 
-    // 4. Save to database (clear custom overrides when user updates)
+    // 4. Save to database
     const admin = createAdminClient() as any
 
     // user.id is the AUTH id; public.users is keyed by its own id with the
@@ -59,16 +90,21 @@ export async function POST(request: Request) {
         protein_target: calculated.proteinGrams,
         carb_target: calculated.carbGrams,
         fat_target: calculated.fatGrams,
-        // Clear custom overrides when user updates their settings
-        custom_cal_target: null,
-        custom_protein_target: null,
-        custom_carb_target: null,
-        custom_fat_target: null,
+        health_screen: healthScreen,
+        nutrition_block_code: null,
+        health_screened_at: new Date().toISOString(),
+        // Coach overrides are deliberately NOT cleared here.
+        //
+        // This route used to null all four custom_* columns on every client
+        // edit. So a client updating their weight in settings silently erased
+        // the targets Anthony had set by hand, and neither of them was told.
+        // The recalculated values above still land in the calculated columns,
+        // which is what fetchTargets falls back to once an override is lifted.
         last_weight_update: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('auth_id', user.id)
-      .select('id')
+      .select('id, custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target')
 
     if (updateError || !updated?.length) {
       console.error('[nutrition/update] update error:', updateError ?? 'no matching users row')
@@ -78,7 +114,17 @@ export async function POST(request: Request) {
       )
     }
 
-    return NextResponse.json({ ok: true, calculated })
+    // If Anthony has set targets by hand, the recalculated numbers are stored
+    // but not in force. The client needs to be told that rather than being
+    // shown a target they are not actually on.
+    const row = updated[0]
+    const hasCoachOverride =
+      row.custom_cal_target !== null ||
+      row.custom_protein_target !== null ||
+      row.custom_carb_target !== null ||
+      row.custom_fat_target !== null
+
+    return NextResponse.json({ ok: true, calculated, hasCoachOverride })
   } catch (err) {
     console.error('[nutrition/update] error:', err)
     return NextResponse.json(

@@ -7,12 +7,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   ActivityLevel,
+  EMPTY_HEALTH_SCREEN,
   FitnessGoal,
+  HEALTH_SCREEN_QUESTIONS,
+  HealthScreen,
   NutritionGoalSetup,
   Sex,
   calculateNutritionTargets,
+  clampExplanation,
   getActivityLevelLabel,
   getGoalLabel,
+  screenHealth,
   validateSetup,
 } from '@/lib/nutrition-goals'
 
@@ -21,10 +26,14 @@ export default function SetupNutritionPage() {
   const searchParams = useSearchParams()
   const isEditing = searchParams.get('edit') === 'true'
 
-  const [step, setStep] = useState<'form' | 'review'>('form')
+  // The screen comes first and cannot be skipped: it decides whether this
+  // client should be given an automated calorie target at all.
+  const [step, setStep] = useState<'screen' | 'form' | 'review' | 'blocked'>('screen')
   const [loading, setLoading] = useState(isEditing)
   const [error, setError] = useState('')
   const [pageLoading, setPageLoading] = useState(isEditing)
+  const [health, setHealth] = useState<HealthScreen>(EMPTY_HEALTH_SCREEN)
+  const [blockMessage, setBlockMessage] = useState('')
 
   const [setup, setSetup] = useState<NutritionGoalSetup>({
     currentWeight: 0,
@@ -66,6 +75,9 @@ export default function SetupNutritionPage() {
         })
         setHeightFeet(feet)
         setHeightInches(inches)
+        if (data.healthScreen) {
+          setHealth({ ...EMPTY_HEALTH_SCREEN, ...data.healthScreen })
+        }
       } catch (err) {
         console.error('Failed to load setup:', err)
         setError('Could not load your nutrition setup')
@@ -89,27 +101,44 @@ export default function SetupNutritionPage() {
     setStep('review')
   }
 
+  const handleScreenContinue = () => {
+    const outcome = screenHealth(health)
+    if (outcome.blocked) {
+      setBlockMessage(outcome.message ?? '')
+      setStep('blocked')
+      // Tell the server so Anthony is flagged, even though the client stops here.
+      void fetch('/api/nutrition/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...setup, healthScreen: health }),
+      }).catch(() => {})
+      return
+    }
+    setStep('form')
+  }
+
   const handleSubmit = async () => {
     setLoading(true)
     setError('')
     try {
-      // Always save to localStorage as a backup
-      const calculated = calculateNutritionTargets(setup)
-      localStorage.setItem('ajmfit_nutrition_setup', JSON.stringify({
-        setup,
-        calculated,
-        savedAt: new Date().toISOString(),
-      }))
-
-      // Save to database
+      // No localStorage mirror. There used to be one, paired with a fallback
+      // in fetchTargets that treated 2,000 calories as "the save failed" and
+      // silently restored stale local values over a real target.
       const response = await fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(setup),
+        body: JSON.stringify({ ...setup, healthScreen: health }),
       })
 
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
-        const data = await response.json()
+        if (data.blocked) {
+          setBlockMessage(data.error ?? '')
+          setStep('blocked')
+          setLoading(false)
+          return
+        }
         throw new Error(data.error || 'Failed to save nutrition goals')
       }
 
@@ -147,7 +176,73 @@ export default function SetupNutritionPage() {
         </div>
 
         <div className="bg-white rounded-control border border-brand-navy/[0.08] shadow-[0_4px_40px_rgba(27,45,80,0.06)] p-8 md:p-10">
-          {step === 'form' ? (
+          {step === 'screen' ? (
+            <>
+              <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
+                Before we start
+              </h1>
+              <p className="text-center text-sm font-body text-brand-slate mt-2">
+                Tick anything that applies. If none do, carry straight on.
+              </p>
+
+              <div className="mt-8 space-y-2.5">
+                {HEALTH_SCREEN_QUESTIONS.map((q) => (
+                  <label
+                    key={q.key}
+                    className="flex items-start gap-3 p-3.5 rounded-control border border-brand-navy/[0.08] bg-brand-offwhite cursor-pointer hover:border-brand-blue/30 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={health[q.key]}
+                      onChange={(e) => setHealth((p) => ({ ...p, [q.key]: e.target.checked }))}
+                      className="mt-0.5 w-4 h-4 shrink-0 accent-brand-blue"
+                    />
+                    <span className="font-body text-sm text-brand-navy leading-snug">{q.label}</span>
+                  </label>
+                ))}
+              </div>
+
+              <p className="text-xs font-body text-brand-slate mt-4 leading-relaxed">
+                Anthony is a certified personal trainer, not a dietitian. Some situations need
+                nutrition advice from a medical professional, and this is how we catch them.
+              </p>
+
+              <button
+                type="button"
+                onClick={handleScreenContinue}
+                className="mt-6 w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+              >
+                Continue
+              </button>
+            </>
+          ) : step === 'blocked' ? (
+            <>
+              <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
+                Let&apos;s do this properly
+              </h1>
+              <div className="mt-6 p-4 rounded-control bg-brand-blue/[0.06] border border-brand-blue/20">
+                <p className="font-body text-sm text-brand-navy leading-relaxed">{blockMessage}</p>
+              </div>
+              <p className="text-sm font-body text-brand-slate mt-4 leading-relaxed">
+                Your training plan is unaffected. This only pauses automatic calorie and macro
+                targets.
+              </p>
+              <div className="mt-8 flex gap-3">
+                <button
+                  onClick={() => setStep('screen')}
+                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
+                >
+                  Back
+                </button>
+                <Link
+                  href="/studio/messages"
+                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 transition-all text-center"
+                >
+                  Message Anthony
+                </Link>
+              </div>
+            </>
+          ) : step === 'form' ? (
             <>
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
                 {isEditing ? 'Update Nutrition' : 'Nutrition Setup'}
@@ -337,6 +432,47 @@ export default function SetupNutritionPage() {
                   )}
                 </div>
 
+                {/* Where the number came from. A target a client does not
+                    understand is a target they abandon in week three. */}
+                <div className="rounded-control border border-brand-navy/[0.08] divide-y divide-brand-navy/[0.06]">
+                  <div className="flex justify-between px-4 py-2.5">
+                    <span className="text-sm font-body text-brand-slate">You burn about</span>
+                    <span className="text-sm font-body font-semibold text-brand-navy">
+                      {calculated.maintenanceCalories} cal/day
+                    </span>
+                  </div>
+                  {calculated.expectedLbsPerWeek !== 0 && (
+                    <div className="flex justify-between px-4 py-2.5">
+                      <span className="text-sm font-body text-brand-slate">
+                        Expected {calculated.expectedLbsPerWeek < 0 ? 'loss' : 'gain'}
+                      </span>
+                      <span className="text-sm font-body font-semibold text-brand-navy">
+                        {Math.abs(calculated.expectedLbsPerWeek)} lbs/week
+                      </span>
+                    </div>
+                  )}
+                  {calculated.weeksToGoal !== null && (
+                    <div className="flex justify-between px-4 py-2.5">
+                      <span className="text-sm font-body text-brand-slate">
+                        {setup.goalWeight} lbs by about
+                      </span>
+                      <span className="text-sm font-body font-semibold text-brand-navy">
+                        {new Date(
+                          Date.now() + calculated.weeksToGoal * 7 * 86400000
+                        ).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {calculated.clamp && (
+                  <div className="p-4 rounded-control bg-brand-orange/[0.06] border border-brand-orange/20">
+                    <p className="font-body text-sm text-brand-navy leading-relaxed">
+                      {clampExplanation(calculated.clamp, setup.sex)}
+                    </p>
+                  </div>
+                )}
+
                 {/* Macros */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-control p-4">
@@ -356,11 +492,11 @@ export default function SetupNutritionPage() {
                   </div>
                 </div>
 
-                {/* Verification */}
-                <div className="text-xs text-brand-slate bg-brand-offwhite p-3 rounded">
-                  {Math.round(calculated.proteinGrams * 4 + calculated.carbGrams * 4 + calculated.fatGrams * 9)} ={' '}
-                  {calculated.dailyCalories} cal
-                </div>
+                <p className="text-xs font-body text-brand-slate leading-relaxed">
+                  These are a starting estimate from your height, weight, age and activity, not a
+                  measurement of you. Anthony will adjust them from what your weight actually does
+                  over the next few weeks.
+                </p>
               </div>
 
               <div className="mt-8 flex gap-3">

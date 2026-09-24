@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
+  EMPTY_HEALTH_SCREEN,
+  HealthScreen,
   NutritionGoalSetup,
   calculateNutritionTargets,
+  screenHealth,
   validateSetup,
 } from '@/lib/nutrition-goals'
 
@@ -41,6 +44,39 @@ export async function POST(request: Request) {
     if (errors.length > 0) {
       console.error('[nutrition/setup] validation error:', errors[0])
       return NextResponse.json({ error: errors[0] }, { status: 422 })
+    }
+
+    // 2b. Health screen. Enforced here and not only in the form, because the
+    // form is client-side and this is the gate that decides whether anyone
+    // gets an automated calorie prescription at all.
+    const healthScreen: HealthScreen = {
+      ...EMPTY_HEALTH_SCREEN,
+      ...((body as { healthScreen?: Partial<HealthScreen> }).healthScreen ?? {}),
+    }
+    const screen = screenHealth(healthScreen)
+    if (screen.blocked) {
+      console.log('[nutrition/setup] blocked by health screen:', screen.code)
+      // Record the block before returning. Without this the client is told to
+      // speak to Anthony and Anthony is never told there is anything to speak
+      // about, which is the worst of both outcomes.
+      try {
+        const admin = createAdminClient() as any
+        await admin
+          .from('users')
+          .update({
+            health_screen: healthScreen,
+            nutrition_block_code: screen.code,
+            health_screened_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('auth_id', user.id)
+      } catch (e) {
+        console.error('[nutrition/setup] failed to record health block', e)
+      }
+      return NextResponse.json(
+        { error: screen.message, blocked: true, code: screen.code },
+        { status: 422 }
+      )
     }
 
     // 3. Calculate nutrition targets
@@ -134,6 +170,11 @@ export async function POST(request: Request) {
         protein_target: calculated.proteinGrams,
         carb_target: calculated.carbGrams,
         fat_target: calculated.fatGrams,
+        health_screen: healthScreen,
+        // Null here means "not blocked". A non-blocking flag such as a
+        // weight-affecting medication is carried on health_screen itself.
+        nutrition_block_code: null,
+        health_screened_at: new Date().toISOString(),
         last_weight_update: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

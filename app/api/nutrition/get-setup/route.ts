@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const { data, error } = await db
       .from('users')
       .select(
-        'current_weight, goal_weight, height, age, sex, activity_level, nutrition_goal'
+        'current_weight, goal_weight, height, age, sex, activity_level, nutrition_goal, health_screen'
       )
       .eq('auth_id', user.id)
       .single()
@@ -41,6 +41,9 @@ export async function GET(request: Request) {
       sex: data.sex,
       activityLevel: data.activity_level,
       goal: data.nutrition_goal,
+      // Pre-fills the health screen on an edit so a client changing their
+      // weight is not re-answering seven medical questions every time.
+      healthScreen: data.health_screen ?? null,
     })
   } catch (err) {
     console.error('[nutrition/get-setup] error:', err)
