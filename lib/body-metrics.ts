@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { localDate } from '@/lib/dates'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -60,7 +61,7 @@ export async function fetchBodyMetrics(userId: string, limit = 60): Promise<Body
  * rather than creating a second conflicting one.
  */
 export async function saveBodyMetric(userId: string, input: BodyMetricInput): Promise<BodyMetric> {
-  const recorded_on = input.recorded_on ?? new Date().toISOString().slice(0, 10)
+  const recorded_on = input.recorded_on ?? localDate()
   const { data, error } = await db
     .from('body_metrics')
     .upsert({ ...input, user_id: userId, recorded_on }, { onConflict: 'user_id,recorded_on' })

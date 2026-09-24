@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { localDate, localDateDaysAgo } from '@/lib/dates'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -157,7 +158,7 @@ export async function ensureDefaultMeals(userId: string): Promise<MealRow[]> {
 }
 
 export async function fetchTodaysLogs(userId: string): Promise<FoodLogRow[]> {
-  const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+  const today = localDate()
   const { data, error } = await db
     .from('food_logs')
     .select('id, meal_id, food_name, calories, protein, carbs, fats, serving_size')
@@ -191,6 +192,11 @@ export async function addFoodLog(input: AddFoodInput): Promise<FoodLogRow> {
       carbs: input.carbs,
       fats: input.fats,
       serving_size: input.servingSize ?? null,
+      // Must be stamped explicitly. Left out, the column falls back to the
+      // database default current_date, which is UTC on Supabase — so an
+      // evening entry was filed under tomorrow and vanished from today the
+      // moment it was saved.
+      date: localDate(),
     })
     .select('id, meal_id, food_name, calories, protein, carbs, fats, serving_size')
     .single()
@@ -260,7 +266,7 @@ export async function fetchRecentFoods(userId: string, limit = 12): Promise<Rece
 }
 
 export async function fetchDailyLog(userId: string): Promise<DailyLogRow> {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = localDate()
   const { data, error } = await db
     .from('daily_logs')
     .select('water_oz, notes')
@@ -272,7 +278,7 @@ export async function fetchDailyLog(userId: string): Promise<DailyLogRow> {
 }
 
 export async function setWater(userId: string, waterOz: number) {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = localDate()
   const { error } = await db
     .from('daily_logs')
     .upsert(
@@ -289,10 +295,8 @@ export interface DailyCalories {
 
 export async function fetchWeeklyCalories(userId: string): Promise<DailyCalories[]> {
   const today = new Date()
-  const sevenDaysAgo = new Date(today)
-  sevenDaysAgo.setDate(today.getDate() - 6)
-  const startStr = sevenDaysAgo.toISOString().slice(0, 10)
-  const endStr = today.toISOString().slice(0, 10)
+  const startStr = localDateDaysAgo(6, today)
+  const endStr = localDate(today)
 
   const { data, error } = await db
     .from('food_logs')
@@ -311,9 +315,7 @@ export async function fetchWeeklyCalories(userId: string): Promise<DailyCalories
   // Build 7-day array, earliest first
   const result: DailyCalories[] = []
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(today)
-    d.setDate(today.getDate() - i)
-    const key = d.toISOString().slice(0, 10)
+    const key = localDateDaysAgo(i, today)
     result.push({ date: key, calories: byDate[key] ?? 0 })
   }
   return result

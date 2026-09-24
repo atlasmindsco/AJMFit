@@ -9,6 +9,7 @@ import {
   type BodyMetric,
   type PhotoPose,
 } from '@/lib/body-metrics'
+import { localDate } from '@/lib/dates'
 
 const POSES: Array<{ key: PhotoPose; label: string; column: keyof BodyMetric }> = [
   { key: 'front', label: 'Front', column: 'photo_front_url' },
@@ -65,7 +66,7 @@ export default function ProgressPhotos({
     setBusy(pose)
     setError('')
     try {
-      const recordedOn = latest?.recorded_on ?? new Date().toISOString().slice(0, 10)
+      const recordedOn = latest?.recorded_on ?? localDate()
       const path = await uploadProgressPhoto(userId, recordedOn, pose, file)
       const column = POSES.find((p) => p.key === pose)!.column
       await saveBodyMetric(userId, { recorded_on: recordedOn, [column]: path })

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { localDate, localWeekStart } from '@/lib/dates'
 
 export type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
 
@@ -22,6 +23,9 @@ export async function startWorkout(input: StartWorkoutInput): Promise<string> {
       day_name: input.dayName,
       program_name: input.programName ?? null,
       program_phase: input.programPhase ?? null,
+      // Same reason as food logs: the column default is UTC current_date, so
+      // an evening session was recorded as tomorrow's workout.
+      date: localDate(),
     })
     .select('id')
     .single()
@@ -223,11 +227,7 @@ export async function fetchPRs(userId: string): Promise<PRRow[]> {
 
 /** Count of workouts logged since the start of the current week (Mon). */
 export async function fetchWorkoutsThisWeek(userId: string): Promise<number> {
-  const now = new Date()
-  const diffToMonday = (now.getDay() + 6) % 7 // days since Monday
-  const monday = new Date(now)
-  monday.setDate(now.getDate() - diffToMonday)
-  const startStr = monday.toISOString().slice(0, 10)
+  const startStr = localWeekStart()
   const { count, error } = await db
     .from('workouts')
     .select('id', { count: 'exact', head: true })
