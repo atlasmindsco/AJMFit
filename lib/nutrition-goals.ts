@@ -28,6 +28,9 @@ export type FitnessGoal = 'lose_fat' | 'build_muscle' | 'body_recomposition' | '
 export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extremely_active'
 export type Sex = 'male' | 'female' | 'other'
 
+/** Matches the values onboarding already collects for jobActivity. */
+export type JobActivity = 'sedentary' | 'on-my-feet' | 'physical'
+
 export interface NutritionGoalSetup {
   currentWeight: number // pounds
   goalWeight: number // pounds
@@ -36,6 +39,17 @@ export interface NutritionGoalSetup {
   sex: Sex
   activityLevel: ActivityLevel
   goal: FitnessGoal
+  /**
+   * Two-factor activity, preferred over activityLevel when both are present.
+   *
+   * The single activity dropdown asked the client to blend how much they move
+   * at work with how often they train, and then guess which band that lands
+   * in. The app already knows both: job activity from onboarding, training
+   * days from the assigned program. These fields are optional so that a client
+   * who set up before this existed still calculates.
+   */
+  jobActivity?: JobActivity
+  trainingDaysPerWeek?: number
 }
 
 /** Which guardrail, if any, decided the final calorie number. */
@@ -153,6 +167,71 @@ export function calculateMaintenanceCalories(bmrValue: number, activityLevel: Ac
 }
 
 /**
+ * Two-factor activity multiplier: what the job costs, plus what training adds.
+ *
+ * Deliberately calibrated to land on the old dropdown's numbers rather than
+ * below them, so that moving to this does not quietly re-baseline everyone's
+ * calories. A desk worker training four days comes out at 1.55, which is
+ * exactly what picking "Moderate (3-5 days/week)" produced before:
+ *
+ *   desk + 0 days = 1.20   (was "Sedentary",    1.20)
+ *   desk + 4 days = 1.55   (was "Moderate",     1.55)
+ *   desk + 6 days = 1.73   (was "Very Active",  1.725)
+ *
+ * The gain is not a different answer, it is a more reliable one: two facts the
+ * client can state plainly, instead of one band they have to self-assess into.
+ */
+const JOB_BASE: Record<JobActivity, number> = {
+  sedentary: 1.2,
+  'on-my-feet': 1.32,
+  physical: 1.45,
+}
+const PER_TRAINING_DAY = 0.0875
+const MAX_MULTIPLIER = 1.95
+
+export function activityMultiplier(job: JobActivity, trainingDaysPerWeek: number): number {
+  const days = Math.max(0, Math.min(7, trainingDaysPerWeek))
+  return Math.min(MAX_MULTIPLIER, JOB_BASE[job] + days * PER_TRAINING_DAY)
+}
+
+/**
+ * The legacy band closest to a two-factor multiplier.
+ *
+ * activity_level is still written to the database so that anything reading it
+ * keeps working. This keeps that column meaningful rather than frozen at
+ * whatever the client last picked from a dropdown they no longer see.
+ */
+export function nearestActivityLevel(multiplier: number): ActivityLevel {
+  let best: ActivityLevel = 'moderate'
+  let bestGap = Infinity
+  for (const [level, m] of Object.entries(ACTIVITY_MULTIPLIERS) as Array<[ActivityLevel, number]>) {
+    const gap = Math.abs(m - multiplier)
+    if (gap < bestGap) {
+      bestGap = gap
+      best = level
+    }
+  }
+  return best
+}
+
+export const JOB_ACTIVITY_OPTIONS: Array<{ value: JobActivity; label: string }> = [
+  { value: 'sedentary', label: 'Mostly sitting (desk job, driving)' },
+  { value: 'on-my-feet', label: 'On my feet most of the day' },
+  { value: 'physical', label: 'Physical work (lifting, trades, manual)' },
+]
+
+/**
+ * Maintenance from whichever inputs we have. Two-factor when the client has
+ * told us both, the old single dropdown otherwise.
+ */
+export function maintenanceFor(bmrValue: number, setup: NutritionGoalSetup): number {
+  if (setup.jobActivity && typeof setup.trainingDaysPerWeek === 'number') {
+    return Math.round(bmrValue * activityMultiplier(setup.jobActivity, setup.trainingDaysPerWeek))
+  }
+  return calculateMaintenanceCalories(bmrValue, setup.activityLevel)
+}
+
+/**
  * Protein reference weight.
  *
  * The previous version scaled protein off GOAL weight, which inverted the
@@ -181,7 +260,7 @@ const PROTEIN_PER_LB: Record<FitnessGoal, number> = {
  */
 export function calculateNutritionTargets(setup: NutritionGoalSetup): CalculatedTargets {
   const bmrValue = calculateBMR(setup.currentWeight, setup.height, setup.age, setup.sex)
-  const maintenanceCalories = calculateMaintenanceCalories(bmrValue, setup.activityLevel)
+  const maintenanceCalories = maintenanceFor(bmrValue, setup)
 
   // --- Intended change, from the rate band ---
   const rate = targetRatePerWeek(setup.goal, setup.currentWeight, setup.height)

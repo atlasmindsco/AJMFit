@@ -2,19 +2,24 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { getCurrentUserId } from '@/lib/current-user'
+import { fetchMyOnboarding } from '@/lib/onboarding'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ActivityLevel,
   EMPTY_HEALTH_SCREEN,
   FitnessGoal,
   HEALTH_SCREEN_QUESTIONS,
   HealthScreen,
+  JOB_ACTIVITY_OPTIONS,
+  JobActivity,
   NutritionGoalSetup,
   Sex,
+  activityMultiplier,
   calculateNutritionTargets,
   clampExplanation,
+  nearestActivityLevel,
   getActivityLevelLabel,
   getGoalLabel,
   screenHealth,
@@ -41,11 +46,46 @@ export default function SetupNutritionPage() {
     height: 0,
     age: 0,
     sex: 'male',
+    // Kept and still written for anything that reads activity_level, but it is
+    // derived from the two fields below rather than chosen by the client.
     activityLevel: 'moderate',
     goal: 'maintain',
+    jobActivity: 'sedentary',
+    trainingDaysPerWeek: 3,
   })
+  const [prefilled, setPrefilled] = useState(false)
   const [heightFeet, setHeightFeet] = useState(0)
   const [heightInches, setHeightInches] = useState(0)
+
+  // Pre-fill the two activity facts from onboarding. The client already
+  // answered both; asking again in different words is how the old dropdown
+  // ended up being the least reliable input in the calculation.
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const id = await getCurrentUserId()
+        if (!id || !active) return
+        const form = await fetchMyOnboarding(id)
+        if (!form || !active) return
+        const job = form.answers.jobActivity
+        const days = parseInt(form.answers.daysPerWeek ?? '', 10)
+        const validJob = JOB_ACTIVITY_OPTIONS.some((o) => o.value === job)
+        if (!validJob && !Number.isFinite(days)) return
+        setSetup((prev) => ({
+          ...prev,
+          ...(validJob ? { jobActivity: job as JobActivity } : {}),
+          ...(Number.isFinite(days) ? { trainingDaysPerWeek: Math.max(0, Math.min(7, days)) } : {}),
+        }))
+        setPrefilled(true)
+      } catch {
+        // Onboarding is optional. The defaults stand.
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
 
   // Load existing setup if editing
   useEffect(() => {
@@ -72,6 +112,8 @@ export default function SetupNutritionPage() {
           sex: data.sex || 'male',
           activityLevel: data.activityLevel || 'moderate',
           goal: data.goal || 'maintain',
+          jobActivity: data.jobActivity ?? 'sedentary',
+          trainingDaysPerWeek: data.trainingDaysPerWeek ?? 3,
         })
         setHeightFeet(feet)
         setHeightInches(inches)
@@ -124,10 +166,17 @@ export default function SetupNutritionPage() {
       // No localStorage mirror. There used to be one, paired with a fallback
       // in fetchTargets that treated 2,000 calories as "the save failed" and
       // silently restored stale local values over a real target.
+      // activity_level is still written so nothing reading that column breaks.
+      // It is derived from the two facts above rather than asked for.
+      const derived =
+        setup.jobActivity && typeof setup.trainingDaysPerWeek === 'number'
+          ? nearestActivityLevel(activityMultiplier(setup.jobActivity, setup.trainingDaysPerWeek))
+          : setup.activityLevel
+
       const response = await fetch('/api/nutrition/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...setup, healthScreen: health }),
+        body: JSON.stringify({ ...setup, activityLevel: derived, healthScreen: health }),
       })
 
       const data = await response.json().catch(() => ({}))
@@ -350,22 +399,46 @@ export default function SetupNutritionPage() {
                   </select>
                 </div>
 
-                {/* Activity Level */}
+                {/* Activity, as two facts rather than one self-assessed band.
+                    Both are pre-filled from onboarding where we already have
+                    them, so for most clients this is a confirmation. */}
                 <div>
                   <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
-                    Activity Level
+                    Your day job
                   </label>
                   <select
-                    value={setup.activityLevel}
-                    onChange={(e) => handleChange('activityLevel', e.target.value as ActivityLevel)}
+                    value={setup.jobActivity ?? 'sedentary'}
+                    onChange={(e) => handleChange('jobActivity', e.target.value as JobActivity)}
                     className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
-                    <option value="sedentary">Sedentary (little exercise)</option>
-                    <option value="light">Light (1-3 days/week)</option>
-                    <option value="moderate">Moderate (3-5 days/week)</option>
-                    <option value="very_active">Very Active (6-7 days/week)</option>
-                    <option value="extremely_active">Extremely Active (twice/day)</option>
+                    {JOB_ACTIVITY_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                    Training days per week
+                  </label>
+                  <select
+                    value={setup.trainingDaysPerWeek ?? 3}
+                    onChange={(e) => handleChange('trainingDaysPerWeek', parseInt(e.target.value))}
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                  >
+                    {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => (
+                      <option key={d} value={d}>
+                        {d === 0 ? 'Not training yet' : `${d} day${d === 1 ? '' : 's'}`}
+                      </option>
+                    ))}
+                  </select>
+                  {prefilled && (
+                    <p className="text-xs text-brand-navy/40 mt-1.5 font-body">
+                      Filled in from what you told us at onboarding. Change it if it has moved.
+                    </p>
+                  )}
                 </div>
 
                 {/* Fitness Goal */}
@@ -412,7 +485,13 @@ export default function SetupNutritionPage() {
                     <strong>Goal:</strong> {getGoalLabel(setup.goal)}
                   </p>
                   <p className="text-sm font-body text-brand-navy mt-1">
-                    <strong>Activity:</strong> {getActivityLevelLabel(setup.activityLevel)}
+                    <strong>Activity:</strong>{' '}
+                    {JOB_ACTIVITY_OPTIONS.find((o) => o.value === setup.jobActivity)?.label ??
+                      getActivityLevelLabel(setup.activityLevel)}
+                    {', '}
+                    {setup.trainingDaysPerWeek === 0
+                      ? 'not training yet'
+                      : `training ${setup.trainingDaysPerWeek}x a week`}
                   </p>
                   <p className="text-sm font-body text-brand-navy mt-1">
                     <strong>Target Weight:</strong> {setup.goalWeight} lbs

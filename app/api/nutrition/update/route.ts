@@ -86,6 +86,8 @@ export async function POST(request: Request) {
         age: setup.age,
         sex: setup.sex,
         activity_level: setup.activityLevel,
+        job_activity: setup.jobActivity ?? null,
+        training_days_per_week: setup.trainingDaysPerWeek ?? null,
         nutrition_goal: setup.goal,
         daily_cal_target: calculated.dailyCalories,
         protein_target: calculated.proteinGrams,
