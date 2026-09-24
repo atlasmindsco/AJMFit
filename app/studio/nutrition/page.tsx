@@ -573,6 +573,23 @@ export default function NutritionPage() {
         </div>
       </motion.div>
 
+      {/* The tracker answers "how much". This is the way through to "what". */}
+      <a
+        href="/studio/food"
+        className="flex items-center justify-between gap-4 mb-6 p-4 rounded-card bg-brand-blue/[0.05] border border-brand-blue/20 hover:bg-brand-blue/[0.08] transition-colors"
+      >
+        <div className="min-w-0">
+          <p className="font-display font-bold text-brand-navy text-sm">Not sure what to eat?</p>
+          <p className="text-brand-slate text-xs font-body mt-0.5">
+            Meal ideas that fit your targets, portion sizes you can judge by eye, and what to order when you
+            are out.
+          </p>
+        </div>
+        <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-wide">
+          Open
+        </span>
+      </a>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8 space-y-4">
           <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
@@ -1070,6 +1087,40 @@ export default function NutritionPage() {
                   )
                 })}
               </div>
+
+              {/* The average is the headline, not any single day.
+                  Consistency is a percentage rather than a streak on purpose:
+                  a streak resets to zero after one bad Saturday, which is
+                  exactly the all-or-nothing thinking that makes people quit.
+                  "Five of the last seven" survives a bad Saturday. */}
+              {(() => {
+                const logged = weekly.filter((d) => d.calories > 0)
+                if (logged.length === 0) return null
+                const avg = Math.round(
+                  logged.reduce((s, d) => s + d.calories, 0) / logged.length
+                )
+                const onTargetDays = logged.filter(
+                  (d) => Math.abs(d.calories - targets.calories) < targets.calories * 0.15
+                ).length
+                return (
+                  <div className="mt-4 pt-4 border-t border-brand-navy/[0.06] flex flex-wrap items-baseline gap-x-6 gap-y-1.5">
+                    <p className="text-brand-slate text-xs font-body">
+                      Average{' '}
+                      <span className="text-brand-navy font-semibold">{avg.toLocaleString()}</span> cal across{' '}
+                      {logged.length} logged {logged.length === 1 ? 'day' : 'days'}
+                    </p>
+                    <p className="text-brand-slate text-xs font-body">
+                      On target{' '}
+                      <span className="text-brand-navy font-semibold">
+                        {onTargetDays} of {logged.length}
+                      </span>
+                    </p>
+                    <p className="text-brand-slate text-2xs font-body w-full leading-relaxed">
+                      The average is what moves the scale. One day either way barely registers.
+                    </p>
+                  </div>
+                )
+              })()}
             </div>
           </motion.div>
         </div>
