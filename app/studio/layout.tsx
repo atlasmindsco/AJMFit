@@ -27,6 +27,7 @@ const navTabs = [
   { label: 'Progress', href: '/studio/progress' },
   { label: 'Schedule', href: '/studio/schedule' },
   { label: 'Community', href: '/studio/community' },
+  { label: 'Settings', href: '/studio/settings' },
 ]
 
 const icon = (d: string) => (
