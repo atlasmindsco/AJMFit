@@ -28,7 +28,16 @@ import {
   type FoodLogRow,
   type DailyCalories,
 } from '@/lib/nutrition'
+import {
+  calculateBMR,
+  calculateMaintenanceCalories,
+  type ActivityLevel,
+  type Sex,
+} from '@/lib/nutrition-goals'
 import { useRouter } from 'next/navigation'
+
+/** Per-viewer display preference. Never anything the coach needs to read. */
+const MACRO_PREF_KEY = 'ajmfit_show_all_macros'
 
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100
@@ -85,6 +94,32 @@ export default function NutritionPage() {
   const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const macroFieldsTouchedRef = useRef(false)
 
+  // Calories and protein are what decide the result for almost everyone.
+  // Carbs and fat stay available but are off by default, because three rings
+  // a client was never asked to hit mostly manufacture a feeling of failure.
+  const [showAllMacros, setShowAllMacros] = useState(false)
+  const [maintenance, setMaintenance] = useState<number | null>(null)
+
+  useEffect(() => {
+    try {
+      setShowAllMacros(localStorage.getItem(MACRO_PREF_KEY) === '1')
+    } catch {
+      // Private browsing or blocked storage. The default stands.
+    }
+  }, [])
+
+  const toggleMacros = () => {
+    setShowAllMacros((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem(MACRO_PREF_KEY, next ? '1' : '0')
+      } catch {
+        // Preference just will not persist. Not worth telling anyone about.
+      }
+      return next
+    })
+  }
+
   useEffect(() => {
     ;(async () => {
       const id = await getCurrentUserId()
@@ -112,6 +147,20 @@ export default function NutritionPage() {
         setLogs(l)
         setWaterOz(dl.water_oz)
         setWeekly(w)
+
+        // Maintenance is recomputed here rather than stored, so it always
+        // reflects the client's current weight. The deficit shown below is
+        // measured against the target actually in force, which means it stays
+        // honest when Anthony has set targets by hand.
+        if (setup.current_weight && setup.height && setup.age && setup.sex && setup.activity_level) {
+          const bmrValue = calculateBMR(
+            Number(setup.current_weight),
+            Number(setup.height),
+            Number(setup.age),
+            setup.sex as Sex
+          )
+          setMaintenance(calculateMaintenanceCalories(bmrValue, setup.activity_level as ActivityLevel))
+        }
       } catch (err) {
         console.error('[Nutrition] Failed to load:', err)
       } finally {
@@ -438,7 +487,6 @@ export default function NutritionPage() {
                     try {
                       const res = await fetch('/api/nutrition/delete-setup', { method: 'POST' })
                       if (res.ok) {
-                        localStorage.removeItem('ajmfit_nutrition_setup')
                         router.push('/studio/setup-nutrition')
                       } else {
                         alert('Failed to delete nutrition setup')
@@ -468,13 +516,36 @@ export default function NutritionPage() {
                 {Math.abs(targets.calories - totals.calories)} kcal {totals.calories > targets.calories ? 'over' : 'remaining'}
               </span>
             </div>
+
+            {/* Why this number is this number. A target a client does not
+                understand is a target they stop following. */}
+            {maintenance !== null && (
+              <p className="text-brand-slate text-xs font-body mt-3 leading-relaxed">
+                You burn roughly{' '}
+                <span className="text-brand-navy font-semibold">{maintenance.toLocaleString()}</span> kcal a
+                day.{' '}
+                {(() => {
+                  const delta = targets.calories - maintenance
+                  const lbs = Math.abs((delta * 7) / 3500).toFixed(1)
+                  if (Math.abs(delta) < 60) return 'Your target holds you roughly level.'
+                  return delta < 0
+                    ? `Eating ${Math.abs(delta)} under that is about ${lbs} lbs of loss a week.`
+                    : `Eating ${delta} over that is about ${lbs} lbs of gain a week.`
+                })()}
+              </p>
+            )}
           </div>
 
+          <div className="flex flex-col items-center lg:items-end gap-3">
           <div className="flex items-center justify-around lg:justify-end gap-6 lg:gap-8">
             {[
               { label: 'Protein', current: totals.protein, goal: targets.protein, unit: 'g', color: '#1A7BFF' },
-              { label: 'Carbs', current: totals.carbs, goal: targets.carbs, unit: 'g', color: '#F76B16' },
-              { label: 'Fats', current: totals.fats, goal: targets.fats, unit: 'g', color: '#64748B' },
+              ...(showAllMacros
+                ? [
+                    { label: 'Carbs', current: totals.carbs, goal: targets.carbs, unit: 'g', color: '#F76B16' },
+                    { label: 'Fats', current: totals.fats, goal: targets.fats, unit: 'g', color: '#64748B' },
+                  ]
+                : []),
             ].map((macro) => (
               <div key={macro.label} className="flex flex-col items-center">
                 <div className="relative">
@@ -491,6 +562,13 @@ export default function NutritionPage() {
                 </span>
               </div>
             ))}
+          </div>
+            <button
+              onClick={toggleMacros}
+              className="text-brand-slate hover:text-brand-navy text-xs font-body underline underline-offset-2 transition-colors"
+            >
+              {showAllMacros ? 'Hide carbs and fat' : 'Show carbs and fat'}
+            </button>
           </div>
         </div>
       </motion.div>
