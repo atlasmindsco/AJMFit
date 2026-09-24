@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { recordTargetChange } from '@/lib/nutrition-history'
 import {
   EMPTY_HEALTH_SCREEN,
   HealthScreen,
@@ -192,6 +193,23 @@ export async function POST(request: Request) {
     }
 
     console.log('[nutrition/setup] update successful:', { updated: updated[0] })
+
+    await recordTargetChange(admin, {
+      userId,
+      calories: calculated.dailyCalories,
+      protein: calculated.proteinGrams,
+      carbs: calculated.carbGrams,
+      fats: calculated.fatGrams,
+      source: 'setup',
+      reason: 'Starting targets from your height, weight, age and activity.',
+      clamp: calculated.clamp,
+      evidence: {
+        bmr: calculated.bmr,
+        maintenance: calculated.maintenanceCalories,
+        expectedLbsPerWeek: calculated.expectedLbsPerWeek,
+        goal: setup.goal,
+      },
+    })
 
     return NextResponse.json({ ok: true, calculated })
   } catch (err) {

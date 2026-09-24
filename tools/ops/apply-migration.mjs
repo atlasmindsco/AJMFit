@@ -56,17 +56,38 @@ console.log('─'.repeat(72))
 const client = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } })
 await client.connect()
 
-// Show the columns this migration touches, before and after.
-const COLS = `
-  select column_name, data_type
-  from information_schema.columns
-  where table_schema = 'public' and table_name = 'users'
-    and column_name in ('health_screen','nutrition_block_code','health_screened_at')
-  order by column_name`
+/**
+ * Inspect whatever the migration claims to create, so the operator sees the
+ * before and after rather than trusting the exit code. Tables and columns are
+ * read out of the SQL itself.
+ */
+const tables = [...sql.matchAll(/create table if not exists public\.(\w+)/gi)].map((m) => m[1])
+const altered = [...sql.matchAll(/alter table public\.(\w+)/gi)].map((m) => m[1])
+const addedCols = [...sql.matchAll(/add column if not exists (\w+)/gi)].map((m) => m[1])
 
-const before = await client.query(COLS)
-console.log(`\nBefore: ${before.rowCount} of 3 target columns exist`)
-for (const r of before.rows) console.log(`  ${r.column_name} (${r.data_type})`)
+async function snapshot() {
+  const out = []
+  for (const t of new Set([...tables, ...altered])) {
+    const { rows } = await client.query(
+      `select to_regclass($1) is not null as present`,
+      [`public.${t}`]
+    )
+    out.push(`  table public.${t}: ${rows[0].present ? 'present' : 'absent'}`)
+  }
+  if (addedCols.length) {
+    const { rows } = await client.query(
+      `select table_name, column_name from information_schema.columns
+       where table_schema='public' and column_name = any($1) order by table_name, column_name`,
+      [addedCols]
+    )
+    out.push(`  columns present: ${rows.length} of ${addedCols.length}`)
+    for (const r of rows) out.push(`    ${r.table_name}.${r.column_name}`)
+  }
+  return out.join('\n') || '  (nothing declarative to inspect)'
+}
+
+console.log('\nBefore:')
+console.log(await snapshot())
 
 if (!confirm) {
   console.log('\nDRY RUN. Nothing was written. Re-run with --confirm to apply.\n')
@@ -76,9 +97,8 @@ if (!confirm) {
 
 try {
   await client.query(sql)
-  const after = await client.query(COLS)
-  console.log(`\nAfter: ${after.rowCount} of 3 target columns exist`)
-  for (const r of after.rows) console.log(`  ${r.column_name} (${r.data_type})`)
+  console.log('\nAfter:')
+  console.log(await snapshot())
   console.log('\n✓ Applied.\n')
 } catch (e) {
   console.error(`\n✖ Failed: ${e.message}\n`)
