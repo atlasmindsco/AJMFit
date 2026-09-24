@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: Params) {
             All posts
           </Link>
           <div className="flex items-center gap-3 mb-5">
-            <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-white bg-brand-orange px-2.5 py-1 rounded-control">
+            <span className="font-display font-bold text-2xs uppercase tracking-[0.2em] text-white bg-brand-orange px-2.5 py-1 rounded-control">
               Brains &amp; Gains
             </span>
             <span className="text-white/50 text-xs">{formatIssueDate(post.date)} · {mins} min read</span>

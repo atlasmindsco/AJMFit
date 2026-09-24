@@ -228,7 +228,7 @@ export default function ClientDashboard() {
             <span className="font-display font-extrabold text-4xl sm:text-5xl leading-none text-outline-light tabular-nums">
               {weekStreak}
             </span>
-            <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-[0.18em] mt-1">
+            <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.18em] mt-1">
               {weekStreak === 1 ? 'Week streak' : 'Weeks straight'}
             </p>
           </div>
@@ -338,7 +338,7 @@ export default function ClientDashboard() {
               {stat.icon}
             </div>
             <div>
-              <p className="text-white/40 text-[11px] font-body uppercase tracking-wide">{stat.label}</p>
+              <p className="text-white/40 text-2xs font-body uppercase tracking-wide">{stat.label}</p>
               <div className="flex items-baseline gap-1.5">
                 <span className="font-display font-extrabold text-2xl text-white tracking-tight">{stat.value}</span>
                 <span className="text-white/40 text-xs font-body">{stat.sub}</span>
@@ -370,14 +370,14 @@ export default function ClientDashboard() {
                     const onTarget = d.calories > 0 && d.calories <= targets.calories
                     return (
                       <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
-                        <span className="text-white/50 text-[10px] font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
+                        <span className="text-white/50 text-2xs font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
                         <div className="w-full bg-white/[0.04] rounded-control flex items-end h-full">
                           <div
                             className={`w-full rounded-control ${onTarget ? 'bg-brand-blue' : 'bg-brand-orange'}`}
                             style={{ height: `${Math.max(h, d.calories > 0 ? 4 : 0)}%` }}
                           />
                         </div>
-                        <span className="text-white/40 text-[10px] font-body">{dayLabel(d.date)}</span>
+                        <span className="text-white/40 text-2xs font-body">{dayLabel(d.date)}</span>
                       </div>
                     )
                   })}
@@ -452,12 +452,12 @@ export default function ClientDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-body font-medium truncate">{s.type || 'Session'}</p>
-                        <p className="text-white/40 text-[11px] font-body mt-0.5">
+                        <p className="text-white/40 text-2xs font-body mt-0.5">
                           {new Date(s.starts_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · {s.duration_min} min
                         </p>
                       </div>
                       {s.join_url && (
-                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-control bg-brand-orange text-white text-[11px] font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
+                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-control bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
                           Join
                         </a>
                       )}
@@ -505,7 +505,7 @@ export default function ClientDashboard() {
                       </div>
                     </div>
                     <span className="font-body font-semibold text-white text-xs mt-2">{macro.name}</span>
-                    <span className="text-white/40 text-[10px] font-body">Goal {macro.goal}g</span>
+                    <span className="text-white/40 text-2xs font-body">Goal {macro.goal}g</span>
                   </div>
                 ))}
               </div>
@@ -522,13 +522,13 @@ export default function ClientDashboard() {
                 <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
                 <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
                   {myProgram.split && (
-                    <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-[11px] font-body font-semibold">{myProgram.split}</span>
+                    <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-2xs font-body font-semibold">{myProgram.split}</span>
                   )}
                   {myProgram.days_per_week != null && (
-                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold">{myProgram.days_per_week}× / week</span>
+                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">{myProgram.days_per_week}× / week</span>
                   )}
                   {myProgram.level && (
-                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-[11px] font-body font-semibold capitalize">{myProgram.level}</span>
+                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold capitalize">{myProgram.level}</span>
                   )}
                 </div>
                 {myProgram.description && (

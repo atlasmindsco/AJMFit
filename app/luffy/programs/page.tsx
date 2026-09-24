@@ -143,13 +143,13 @@ export default function ProgramsPage() {
 
             {/* Muscle filter */}
             <div>
-              <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mb-2">Muscle Group</p>
+              <p className="text-white/25 text-2xs font-display uppercase tracking-wide mb-2">Muscle Group</p>
               <div className="flex flex-wrap gap-1.5">
                 {MUSCLE_FILTERS.map((m) => (
                   <button
                     key={m}
                     onClick={() => setLibMuscle(m)}
-                    className={`px-2.5 py-1 rounded-control text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
+                    className={`px-2.5 py-1 rounded-control text-2xs font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libMuscle === m
                         ? 'bg-brand-orange text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
@@ -163,13 +163,13 @@ export default function ProgramsPage() {
 
             {/* Equipment filter */}
             <div>
-              <p className="text-white/25 text-[10px] font-display uppercase tracking-wide mb-2">Equipment</p>
+              <p className="text-white/25 text-2xs font-display uppercase tracking-wide mb-2">Equipment</p>
               <div className="flex flex-wrap gap-1.5">
                 {EQUIPMENT_FILTERS.map((e) => (
                   <button
                     key={e}
                     onClick={() => setLibEquipment(e)}
-                    className={`px-2.5 py-1 rounded-control text-[10px] font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
+                    className={`px-2.5 py-1 rounded-control text-2xs font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
                         ? 'bg-brand-blue text-white'
                         : 'bg-white/[0.04] text-white/30 hover:text-white/60'
@@ -218,7 +218,7 @@ export default function ProgramsPage() {
                     <p className="text-white font-body font-semibold text-sm truncate group-hover:text-brand-orange transition-colors duration-150">
                       {ex.name}
                     </p>
-                    <p className="text-white/30 text-[11px] font-body capitalize truncate">
+                    <p className="text-white/30 text-2xs font-body capitalize truncate">
                       {ex.primaryMuscles.join(', ')}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -304,7 +304,7 @@ export default function ProgramsPage() {
                   </div>
 
                   {selectedExercise.images.length > 1 && (
-                    <p className="text-center text-[10px] font-body text-white/20 -mt-4 mb-2">
+                    <p className="text-center text-2xs font-body text-white/20 -mt-4 mb-2">
                       Auto-cycling start / end position
                     </p>
                   )}
@@ -312,13 +312,13 @@ export default function ProgramsPage() {
                   <div className="px-6 pb-6 space-y-5">
                     {/* Badges */}
                     <div className="flex flex-wrap gap-1.5">
-                      <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.category}
                       </span>
-                      <span className="px-2 py-1 bg-white/[0.06] text-white/40 font-display font-semibold text-[10px] uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-white/[0.06] text-white/40 font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.equipment}
                       </span>
                     </div>
@@ -326,12 +326,12 @@ export default function ProgramsPage() {
                     {/* Muscles */}
                     <div className="flex items-start gap-5">
                       <div className="flex-1">
-                        <p className="text-[10px] font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Primary</p>
+                        <p className="text-2xs font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Primary</p>
                         <p className="font-display font-bold text-sm text-brand-orange capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
                       </div>
                       {selectedExercise.secondaryMuscles.length > 0 && (
                         <div className="flex-1">
-                          <p className="text-[10px] font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Secondary</p>
+                          <p className="text-2xs font-display font-semibold uppercase tracking-[0.14em] text-white/25 mb-1">Secondary</p>
                           <p className="font-body text-sm text-white/50 capitalize">{selectedExercise.secondaryMuscles.join(', ')}</p>
                         </div>
                       )}
@@ -344,7 +344,7 @@ export default function ProgramsPage() {
                         <ol className="space-y-2.5">
                           {selectedExercise.instructions.map((step, i) => (
                             <li key={i} className="flex gap-3">
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                              <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-2xs font-display font-bold mt-0.5">
                                 {i + 1}
                               </span>
                               <p className="font-body text-[13px] text-white/60 leading-relaxed">{step}</p>

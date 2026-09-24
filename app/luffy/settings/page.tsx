@@ -10,7 +10,7 @@ type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
   'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30'
-const labelCls = 'text-white/25 text-[10px] font-display uppercase tracking-wide block mb-2'
+const labelCls = 'text-white/25 text-2xs font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
   { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided, full app access' },

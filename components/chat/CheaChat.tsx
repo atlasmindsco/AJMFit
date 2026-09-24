@@ -171,7 +171,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className={`text-[10px] font-body ${isDark ? 'text-white/30' : 'text-brand-slate'}`}>Online now</span>
+            <span className={`text-2xs font-body ${isDark ? 'text-white/30' : 'text-brand-slate'}`}>Online now</span>
           </div>
         </div>
       </div>

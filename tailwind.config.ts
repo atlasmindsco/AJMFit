@@ -43,6 +43,15 @@ const config: Config = {
         control: '0.5rem',
         card: '0.875rem',
       },
+      // Type scale. Tailwind's stock xs/sm (12px/14px) were tuned for
+      // desktop density; on a phone — in Barlow Condensed, which is narrower
+      // than a normal face at the same nominal size — they read as fine print.
+      // Half the studio's text sat at 12px or below. Each step moves up 1px.
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '0.9375rem' }], // 11px, was text-[10px]
+        xs: ['0.8125rem', { lineHeight: '1.125rem' }],     // 13px, was 12px
+        sm: ['0.9375rem', { lineHeight: '1.375rem' }],     // 15px, was 14px
+      },
       fontFamily: {
         display: ['var(--font-barlow-condensed)', 'sans-serif'],
         body: ['var(--font-barlow)', 'sans-serif'],

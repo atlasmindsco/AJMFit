@@ -92,7 +92,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
 
   return (
     <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-      <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+      <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide mb-2">
         Training program
       </p>
 

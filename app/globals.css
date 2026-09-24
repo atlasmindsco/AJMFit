@@ -168,3 +168,21 @@ input, textarea, select {
   line-height: 1.1;
   color: var(--navy);
 }
+
+/* ---- iOS: stop the zoom-on-focus ----
+   Safari on iPhone zooms the whole page in when you tap a form control whose
+   font-size is under 16px, then leaves you scrolled sideways. 34 of the
+   studio's inputs sat at 13-15px, which is the single biggest reason the app
+   feels like a website rather than an app on a phone.
+
+   This has to beat Tailwind's text-sm/text-xs utilities, which are classes and
+   therefore win on specificity against a plain element selector — hence the
+   !important. Checkboxes and radios are excluded; they have no text to size,
+   and iOS does not zoom for them. */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

@@ -17,7 +17,7 @@ import {
 const inputCls =
   'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
 
-const labelCls = 'text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]'
+const labelCls = 'text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]'
 
 /**
  * Where a client logs bodyweight and measurements and sees them move.

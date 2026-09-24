@@ -87,9 +87,9 @@ export default function ProgramLibrary() {
                   <h3 className="text-white font-display font-bold text-sm">{p.name}</h3>
                   {p.description && <p className="text-white/50 text-sm font-body mt-0.5">{p.description}</p>}
                   <div className="flex gap-2 mt-2 flex-wrap">
-                    {p.level && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-brand-blue/10 text-brand-blue">{p.level}</span>}
-                    {p.days_per_week && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.days_per_week} days/wk</span>}
-                    {p.split && <span className="text-[10px] font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.split}</span>}
+                    {p.level && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-brand-blue/10 text-brand-blue">{p.level}</span>}
+                    {p.days_per_week && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.days_per_week} days/wk</span>}
+                    {p.split && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-white/50">{p.split}</span>}
                   </div>
                 </div>
                 <button onClick={() => deleteProgram(p.id).then(load)} title="Delete" className="text-white/20 hover:text-red-400 shrink-0">

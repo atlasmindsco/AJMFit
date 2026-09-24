@@ -333,15 +333,15 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
                       <p className="font-display font-bold text-base text-brand-blue">{preview.protein}g</p>
-                      <p className="text-brand-slate text-[11px] font-body uppercase tracking-wide">Protein</p>
+                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Protein</p>
                     </div>
                     <div>
                       <p className="font-display font-bold text-base text-brand-orange">{preview.carbs}g</p>
-                      <p className="text-brand-slate text-[11px] font-body uppercase tracking-wide">Carbs</p>
+                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Carbs</p>
                     </div>
                     <div>
                       <p className="font-display font-bold text-base text-brand-slate">{preview.fats}g</p>
-                      <p className="text-brand-slate text-[11px] font-body uppercase tracking-wide">Fats</p>
+                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Fats</p>
                     </div>
                   </div>
                 </div>

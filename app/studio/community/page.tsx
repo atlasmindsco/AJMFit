@@ -87,7 +87,7 @@ export default function CommunityPage() {
             <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
               <div className="flex gap-2 mb-3 flex-wrap">
                 {POST_CATEGORIES.map((c) => (
-                  <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-control text-[11px] font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40'}`}>{c}</button>
+                  <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40'}`}>{c}</button>
                 ))}
               </div>
               <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-sm text-white font-body mb-2 focus:outline-none focus:border-brand-orange/40" />
@@ -110,13 +110,13 @@ export default function CommunityPage() {
               <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
-                    <span className="text-white text-[10px] font-display font-bold">{initials(p.author_name ?? 'Member')}</span>
+                    <span className="text-white text-2xs font-display font-bold">{initials(p.author_name ?? 'Member')}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-body font-semibold">{p.author_name ?? 'Member'}</p>
-                    <p className="text-white/30 text-[11px] font-body">{p.category} · {timeAgo(p.created_at)}</p>
+                    <p className="text-white/30 text-2xs font-body">{p.category} · {timeAgo(p.created_at)}</p>
                   </div>
-                  {p.pinned && <span className="text-brand-orange text-[10px] font-display font-bold uppercase">Pinned</span>}
+                  {p.pinned && <span className="text-brand-orange text-2xs font-display font-bold uppercase">Pinned</span>}
                 </div>
                 <h3 className="text-white font-display font-bold text-sm">{p.title}</h3>
                 {p.body && <p className="text-white/60 text-sm font-body mt-1 leading-relaxed whitespace-pre-wrap">{p.body}</p>}
@@ -158,7 +158,7 @@ export default function CommunityPage() {
           </div>
 
           <div className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Leaderboard</h2><p className="text-white/30 text-[10px] font-body">Workouts this month</p></div>
+            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Leaderboard</h2><p className="text-white/30 text-2xs font-body">Workouts this month</p></div>
             <div className="p-4 space-y-2">
               {leaders.length === 0 ? <p className="text-white/40 text-sm font-body">No workouts logged yet this month.</p>
                 : leaders.map((l, i) => (

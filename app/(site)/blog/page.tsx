@@ -81,7 +81,7 @@ export default async function BlogIndex() {
                 </div>
                 <div className="p-9 lg:p-10 flex flex-col justify-center">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="font-display font-bold text-[11px] uppercase tracking-[0.2em] text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-control">Latest</span>
+                    <span className="font-display font-bold text-2xs uppercase tracking-[0.2em] text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-control">Latest</span>
                     <span className="text-brand-slate text-xs">{formatIssueDate(featured.date)}</span>
                   </div>
                   <h2 className="font-display font-extrabold text-4xl uppercase tracking-[-0.02em] leading-[0.95] text-brand-navy group-hover:text-brand-orange transition-colors duration-200">
@@ -113,7 +113,7 @@ export default async function BlogIndex() {
                 <ul className="mt-5 grid sm:grid-cols-2 gap-x-6 gap-y-3">
                   {benefits.map((b) => (
                     <li key={b} className="flex items-start gap-2.5">
-                      <span className="mt-1.5 shrink-0 text-[10px] text-brand-orange">◆</span>
+                      <span className="mt-1.5 shrink-0 text-2xs text-brand-orange">◆</span>
                       <span className="text-brand-slate font-body text-sm leading-relaxed">{b}</span>
                     </li>
                   ))}

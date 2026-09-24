@@ -97,7 +97,7 @@ export default function ClientMessagesPage() {
           </div>
           <div className="flex-1">
             <h2 className="font-display font-bold text-sm text-brand-navy">Coach Anthony</h2>
-            <span className="text-[10px] font-body text-brand-slate">Usually replies within a day</span>
+            <span className="text-2xs font-body text-brand-slate">Usually replies within a day</span>
           </div>
         </div>
 

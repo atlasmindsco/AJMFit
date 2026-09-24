@@ -108,17 +108,18 @@ export default function AdminLayout({
         <div className="h-20 flex items-center px-7 border-b border-white/[0.06]">
           <Link href="/luffy" className="flex items-center gap-3">
             <Image
-              src="/AJMfit.png"
+              src="/AJMfit-mark.png"
               alt="AJMFit"
-              width={40}
-              height={40}
-              className="w-10 h-10 object-contain"
+              width={137}
+              height={120}
+              priority
+              className="h-10 w-auto"
             />
             <div>
               <span className="font-display font-bold text-white text-sm uppercase tracking-[0.15em]">
                 AJMFit
               </span>
-              <span className="block text-[10px] font-display uppercase tracking-[0.3em] text-brand-orange">
+              <span className="block text-2xs font-display uppercase tracking-[0.3em] text-brand-orange">
                 Admin
               </span>
             </div>

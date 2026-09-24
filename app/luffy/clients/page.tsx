@@ -186,7 +186,7 @@ export default function ClientsPage() {
               }`}
             >
               {f}
-              <span className={`text-[10px] ${filter === f ? 'text-white/70' : 'text-white/30'}`}>{counts[f]}</span>
+              <span className={`text-2xs ${filter === f ? 'text-white/70' : 'text-white/30'}`}>{counts[f]}</span>
             </button>
           ))}
         </div>
@@ -244,10 +244,10 @@ export default function ClientsPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className={`text-[10px] font-display font-bold px-2 py-0.5 rounded ${getTierColor(tierLabelStr)}`}>
+                          <span className={`text-2xs font-display font-bold px-2 py-0.5 rounded ${getTierColor(tierLabelStr)}`}>
                             {tierLabelStr}
                           </span>
-                          <span className="text-white/25 text-[11px] font-body">{client.email}</span>
+                          <span className="text-white/25 text-2xs font-body">{client.email}</span>
                         </div>
                       </div>
                     </div>
@@ -257,14 +257,14 @@ export default function ClientsPage() {
                           <button
                             onClick={() => handleAccept(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-emerald-500/25 transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-2xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-emerald-500/25 transition-colors duration-200 disabled:opacity-50"
                           >
                             {processing === client.id ? '...' : 'Accept'}
                           </button>
                           <button
                             onClick={() => handleDecline(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-2xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
                           >
                             Decline
                           </button>
@@ -281,7 +281,7 @@ export default function ClientsPage() {
                               }}
                               disabled={processing === client.id}
                               title="Send them a fresh set-password link"
-                              className="px-2.5 py-1.5 rounded-control bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-control bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
                             >
                               {processing === client.id ? '...' : 'Resend invite'}
                             </button>
@@ -294,7 +294,7 @@ export default function ClientsPage() {
                             }}
                             disabled={processing === client.id}
                             title="Beta testers get free studio access (no payment)"
-                            className={`px-2.5 py-1.5 rounded-control text-[10px] font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
+                            className={`px-2.5 py-1.5 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
                               client.is_beta
                                 ? 'bg-brand-orange/15 border border-brand-orange/25 text-brand-orange'
                                 : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
@@ -303,7 +303,7 @@ export default function ClientsPage() {
                             Beta {client.is_beta ? 'On' : 'Off'}
                           </button>
                           <div className="hidden md:block text-right">
-                            <p className="text-white/30 text-[10px] font-display uppercase tracking-wide">Last Workout</p>
+                            <p className="text-white/30 text-2xs font-display uppercase tracking-wide">Last Workout</p>
                             <p className="text-white/60 text-xs font-body mt-1">{relativeTime(client.last_workout_at)}</p>
                           </div>
                           <svg
@@ -324,57 +324,57 @@ export default function ClientsPage() {
                   {isExpanded && client.application && (
                     <div className="mt-5 pt-5 border-t border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Goals</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Goals</p>
                         <p className="text-white/70 text-sm font-body mt-1 leading-relaxed">{client.application.goals}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Equipment</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Equipment</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {client.application.equipment.length > 0 ? (
                             client.application.equipment.map((eq) => (
-                              <span key={eq} className="bg-white/[0.04] text-white/60 text-[11px] font-body px-2 py-0.5 rounded">
+                              <span key={eq} className="bg-white/[0.04] text-white/60 text-2xs font-body px-2 py-0.5 rounded">
                                 {eq}
                               </span>
                             ))
                           ) : (
-                            <span className="text-white/40 text-[11px] font-body">None listed</span>
+                            <span className="text-white/40 text-2xs font-body">None listed</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Availability</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Availability</p>
                         <p className="text-white/70 text-sm font-body mt-1">{client.application.availability}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Billing</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Billing</p>
                         <p className="text-white/70 text-sm font-body mt-1 capitalize">{client.application.billing_cycle}</p>
                       </div>
                       {client.application.health_limitations && (
                         <div className="sm:col-span-2">
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Health Limitations</p>
+                          <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Health Limitations</p>
                           <p className="text-white/70 text-sm font-body mt-1 leading-relaxed">{client.application.health_limitations}</p>
                         </div>
                       )}
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Phone</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Phone</p>
                         <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? 'Not provided'}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Applied</p>
+                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Applied</p>
                         <p className="text-white/70 text-sm font-body mt-1">
                           {new Date(client.application.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
                       {client.application.referral && (
                         <div className="sm:col-span-2">
-                          <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">How they heard about us</p>
+                          <p className="text-white/25 text-2xs font-display uppercase tracking-wide">How they heard about us</p>
                           <p className="text-white/70 text-sm font-body mt-1">{client.application.referral}</p>
                         </div>
                       )}
 
                       {/* Onboarding form answers (pre-call questionnaire) */}
                       <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-                        <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+                        <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide mb-2">
                           Onboarding form
                         </p>
                         {onboardingMap.get(client.id) ? (
@@ -383,7 +383,7 @@ export default function ClientsPage() {
                               .filter((k) => (onboardingMap.get(client.id)!.answers[k] ?? '').toString().trim())
                               .map((k) => (
                                 <div key={k}>
-                                  <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">{ONBOARDING_LABELS[k]}</p>
+                                  <p className="text-white/25 text-2xs font-display uppercase tracking-wide">{ONBOARDING_LABELS[k]}</p>
                                   <p className="text-white/70 text-sm font-body mt-0.5 leading-relaxed">
                                     {String(onboardingMap.get(client.id)!.answers[k])}
                                   </p>
@@ -458,7 +458,7 @@ export default function ClientsPage() {
               <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
                 <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">New Applications</h2>
                 {pendingApplications.length > 0 && (
-                  <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-400">
+                  <span className="text-2xs font-display font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-400">
                     {pendingApplications.length}
                   </span>
                 )}
@@ -480,7 +480,7 @@ export default function ClientsPage() {
                           setFilter('pending')
                           setSelectedClient(client.id)
                         }}
-                        className="px-3 py-1.5 bg-brand-orange text-white text-[10px] font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark transition-colors duration-200"
+                        className="px-3 py-1.5 bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark transition-colors duration-200"
                       >
                         Review
                       </button>

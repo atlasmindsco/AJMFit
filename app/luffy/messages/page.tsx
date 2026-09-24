@@ -137,18 +137,18 @@ export default function MessagesPage() {
                   visible.map((t) => (
                     <button key={t.userId} onClick={() => setSelected(t.userId)} className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-200 border-b border-white/[0.03] ${selected === t.userId ? 'bg-white/[0.04]' : 'hover:bg-white/[0.02]'}`}>
                       <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0">
-                        <span className="text-white text-[10px] font-display font-bold">{initialsOf(t.name)}</span>
+                        <span className="text-white text-2xs font-display font-bold">{initialsOf(t.name)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="text-white text-sm font-body font-semibold truncate">{t.name}</p>
-                          <span className="text-white/20 text-[10px] font-body shrink-0 ml-2">{t.lastAt ? formatMsgTime(t.lastAt) : ''}</span>
+                          <span className="text-white/20 text-2xs font-body shrink-0 ml-2">{t.lastAt ? formatMsgTime(t.lastAt) : ''}</span>
                         </div>
                         <p className="text-white/30 text-xs font-body truncate mt-0.5">{t.lastBody ?? 'No messages yet'}</p>
                       </div>
                       {t.unread > 0 && (
                         <div className="w-5 h-5 rounded-full bg-brand-orange flex items-center justify-center shrink-0">
-                          <span className="text-white text-[10px] font-display font-bold">{t.unread}</span>
+                          <span className="text-white text-2xs font-display font-bold">{t.unread}</span>
                         </div>
                       )}
                     </button>
@@ -163,11 +163,11 @@ export default function MessagesPage() {
                 <>
                   <div className="px-6 py-4 border-b border-white/[0.06] flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-white/[0.08] flex items-center justify-center">
-                      <span className="text-white text-[10px] font-display font-bold">{initialsOf(active.name)}</span>
+                      <span className="text-white text-2xs font-display font-bold">{initialsOf(active.name)}</span>
                     </div>
                     <div>
                       <p className="text-white text-sm font-body font-semibold">{active.name}</p>
-                      <p className="text-white/30 text-[10px] font-body">{active.email}</p>
+                      <p className="text-white/30 text-2xs font-body">{active.email}</p>
                     </div>
                   </div>
 
@@ -179,7 +179,7 @@ export default function MessagesPage() {
                         <div key={msg.id} className={`flex ${msg.from_trainer ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[75%] px-4 py-3 rounded-card ${msg.from_trainer ? 'bg-brand-blue text-white rounded-br-md' : 'bg-white/[0.06] text-white/80 rounded-bl-md'}`}>
                             <p className="text-sm font-body leading-relaxed">{msg.body}</p>
-                            <p className={`text-[10px] font-body mt-1 ${msg.from_trainer ? 'text-white/40' : 'text-white/20'}`}>{formatMsgTime(msg.created_at)}</p>
+                            <p className={`text-2xs font-body mt-1 ${msg.from_trainer ? 'text-white/40' : 'text-white/20'}`}>{formatMsgTime(msg.created_at)}</p>
                           </div>
                         </div>
                       ))

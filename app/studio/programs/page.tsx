@@ -726,7 +726,7 @@ export default function ProgramsPage() {
                 <h1 className="font-display font-extrabold text-xl text-white tracking-tight">
                   {currentProgram.name}
                 </h1>
-                <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
+                <span className="text-2xs font-display font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
                   {currentProgram.level}
                 </span>
               </div>
@@ -738,12 +738,12 @@ export default function ProgramsPage() {
               {programLocation !== null && (
                 <button
                   onClick={() => setShowPicker(true)}
-                  className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
+                  className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
                 >
                   Change Program
                 </button>
               )}
-              <span className="text-[10px] font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
+              <span className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
               </span>
             </div>
@@ -757,7 +757,7 @@ export default function ProgramsPage() {
           const p = PROGRESSION[(programGoal ?? 'muscle') as ProgressionGoal]
           const item = (label: string, body: string) => (
             <div>
-              <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">{label}</p>
+              <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]">{label}</p>
               <p className="text-white/60 text-xs font-body mt-1 leading-relaxed">{body}</p>
             </div>
           )
@@ -809,25 +809,25 @@ export default function ProgramsPage() {
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
-                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
+                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
                       </div>
                       <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
                         </p>
-                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
+                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
                       </div>
                       <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-state-success font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
-                        <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mt-1">Completed</p>
+                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Completed</p>
                       </div>
                     </div>
 
                     {/* Program details */}
                     <div className="space-y-3">
-                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
+                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
                       {[
                         { label: 'Program', value: currentProgram.name },
                         { label: 'Type', value: 'Sample routine' },
@@ -843,7 +843,7 @@ export default function ProgramsPage() {
 
                     {/* Weekly split summary */}
                     <div className="space-y-2">
-                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
+                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
                       {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => {
                         const dayIndex = weeklyPlan.indexOf(day)
                         return (
@@ -1011,11 +1011,11 @@ export default function ProgramsPage() {
                     <div key={group.label}>
                       {/* Series header */}
                       <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em]">
+                        <p className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">
                           {group.label}
                         </p>
                         {group.isSuperset && (
-                          <span className="text-state-success text-[10px] font-display font-bold uppercase tracking-wide">
+                          <span className="text-state-success text-2xs font-display font-bold uppercase tracking-wide">
                             Superset
                           </span>
                         )}
@@ -1093,7 +1093,7 @@ export default function ProgramsPage() {
                                 >
                                   <div className="flex items-center gap-1.5">
                                     {group.isSuperset && (
-                                      <span className="text-state-success text-[10px] font-display font-bold">{seriesPrefix}</span>
+                                      <span className="text-state-success text-2xs font-display font-bold">{seriesPrefix}</span>
                                     )}
                                     <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
                                     {isSwapped && (
@@ -1158,11 +1158,11 @@ export default function ProgramsPage() {
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                             </svg>
                                             {isNewPR ? (
-                                              <span className="text-state-warning text-[11px] font-display font-bold uppercase tracking-wide">
+                                              <span className="text-state-warning text-2xs font-display font-bold uppercase tracking-wide">
                                                 New PR!
                                               </span>
                                             ) : (
-                                              <span className="text-white/40 text-[11px] font-display font-bold uppercase tracking-wide">
+                                              <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
                                                 Current PR
                                               </span>
                                             )}
@@ -1171,7 +1171,7 @@ export default function ProgramsPage() {
                                             <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-white/60'}`}>
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
-                                            <span className="text-white/20 text-[10px] font-body ml-2">{pr.date}</span>
+                                            <span className="text-white/20 text-2xs font-body ml-2">{pr.date}</span>
                                           </div>
                                         </div>
                                       )}
@@ -1189,7 +1189,7 @@ export default function ProgramsPage() {
                                               <svg className="w-3.5 h-3.5 text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                               </svg>
-                                              <span className="text-white/40 text-[10px] font-display font-bold uppercase tracking-wide">Rest Timer</span>
+                                              <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">Rest Timer</span>
                                             </div>
                                             {isEditingThis ? (
                                               <div className="flex items-center gap-1.5">
@@ -1200,7 +1200,7 @@ export default function ProgramsPage() {
                                                       setRestTimers((prev) => ({ ...prev, [restKey]: sec }))
                                                       setEditingRest(null)
                                                     }}
-                                                    className={`px-2 py-1 rounded text-[10px] font-display font-bold transition-colors duration-150 ${
+                                                    className={`px-2 py-1 rounded text-2xs font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
                                                         ? 'bg-brand-blue text-white'
                                                         : 'bg-white/[0.04] text-white/40 hover:text-white/70'
@@ -1251,9 +1251,9 @@ export default function ProgramsPage() {
 
                                       {/* Column headers */}
                                       <div className="grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-2">
-                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Set</span>
-                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
-                                        <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Reps</span>
+                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Reps</span>
                                         <span />
                                       </div>
 
@@ -1419,14 +1419,14 @@ export default function ProgramsPage() {
                                                       </span>
                                                     </div>
                                                     <div className="flex-1">
-                                                      <p className="text-brand-blue text-[11px] font-display font-bold uppercase tracking-wide">Rest</p>
+                                                      <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Rest</p>
                                                       <p className="text-white/25 text-[9px] font-body">
                                                         {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
                                                       </p>
                                                     </div>
                                                     <button
                                                       onClick={stopRestTimer}
-                                                      className="px-2.5 py-1 rounded-control bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
+                                                      className="px-2.5 py-1 rounded-control bg-white/[0.06] text-white/40 text-2xs font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
                                                     >
                                                       Skip
                                                     </button>
@@ -1456,7 +1456,7 @@ export default function ProgramsPage() {
                                             <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
-                                            <span className="text-white/60 text-[11px] font-display font-bold uppercase tracking-wide">Intensity Technique</span>
+                                            <span className="text-white/60 text-2xs font-display font-bold uppercase tracking-wide">Intensity Technique</span>
                                           </div>
                                           <button
                                             onClick={() => {
@@ -1491,7 +1491,7 @@ export default function ProgramsPage() {
                                                 <button
                                                   key={key}
                                                   onClick={() => setIntensityChoice((prev) => ({ ...prev, [logKey]: key }))}
-                                                  className={`py-2 px-2 rounded-control text-[10px] font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
+                                                  className={`py-2 px-2 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
                                                     isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/[0.05]'
                                                   }`}
                                                   style={
@@ -1510,13 +1510,13 @@ export default function ProgramsPage() {
                                         {/* Intensity set logger */}
                                         {intensityEnabled && selectedTechnique && (
                                           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-                                            <p className="text-white/30 text-[10px] font-body leading-relaxed mb-3">
+                                            <p className="text-white/30 text-2xs font-body leading-relaxed mb-3">
                                               {TECHNIQUE_META[selectedTechnique].hint}
                                             </p>
                                             <div className="grid grid-cols-[32px_1fr_40px] gap-2 mb-1.5">
-                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Set</span>
-                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
-                                              <span className="text-white/20 text-[10px] font-display font-bold uppercase tracking-wide text-center">Fail</span>
+                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Fail</span>
                                             </div>
                                             {currentIntensityLogs.map((iLog, idx) => {
                                               const meta = TECHNIQUE_META[selectedTechnique]
@@ -1584,7 +1584,7 @@ export default function ProgramsPage() {
                                                 </div>
                                               )
                                             })}
-                                            <p className="text-white/20 text-[10px] font-body mt-2 text-center">
+                                            <p className="text-white/20 text-2xs font-body mt-2 text-center">
                                               To failure, check when complete
                                             </p>
                                           </div>
@@ -1592,7 +1592,7 @@ export default function ProgramsPage() {
                                       </div>
 
                                       {/* Target reminder */}
-                                      <p className="text-white/20 text-[10px] font-body mt-2 text-center">
+                                      <p className="text-white/20 text-2xs font-body mt-2 text-center">
                                         Target: {exercise.reps} reps
                                       </p>
 
@@ -1606,7 +1606,7 @@ export default function ProgramsPage() {
                                             <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                                             </svg>
-                                            <span className="text-white/40 text-[10px] font-display font-bold uppercase tracking-wide">
+                                            <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
                                               {isSwapped ? 'Change Substitute' : 'Swap Exercise'}
                                             </span>
                                           </button>
@@ -1693,7 +1693,7 @@ export default function ProgramsPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
                           </span>
-                          <span className="text-state-success text-[11px] font-display font-bold uppercase tracking-wide">Workout Active</span>
+                          <span className="text-state-success text-2xs font-display font-bold uppercase tracking-wide">Workout Active</span>
                         </div>
                         <span className="text-state-success text-sm font-display font-bold tabular-nums">
                           {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
@@ -1812,12 +1812,12 @@ export default function ProgramsPage() {
                   {selectedExerciseDB && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {selectedExerciseDB.primaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-orange/15 text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-orange/15 text-brand-orange text-2xs font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-2xs font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -1834,7 +1834,7 @@ export default function ProgramsPage() {
                   {/* Setup section */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
+                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
                       <div className="grid grid-cols-3 gap-3">
                         <SetupCard icon="equipment" label="Equipment" value={selectedExerciseDB.equipment} />
                         <SetupCard icon="level" label="Level" value={selectedExerciseDB.level} />
@@ -1846,7 +1846,7 @@ export default function ProgramsPage() {
                   {/* Target muscles with MuscleMap */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
+                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
                       <div className="flex flex-col sm:flex-row gap-4 items-start">
                         <div className="w-full sm:w-48 shrink-0">
                           <MuscleMap
@@ -1864,7 +1864,7 @@ export default function ProgramsPage() {
                               </div>
                               <div>
                                 <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide">Primary</p>
+                                <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide">Primary</p>
                               </div>
                             </div>
                           ))}
@@ -1875,7 +1875,7 @@ export default function ProgramsPage() {
                               </div>
                               <div>
                                 <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-brand-blue text-[10px] font-display font-bold uppercase tracking-wide">Secondary</p>
+                                <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
                           ))}
@@ -1887,11 +1887,11 @@ export default function ProgramsPage() {
                   {/* Instructions */}
                   {selectedExerciseDB && selectedExerciseDB.instructions.length > 0 && (
                     <div>
-                      <h3 className="text-white/25 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
+                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
                       <ol className="space-y-3">
                         {selectedExerciseDB.instructions.map((step, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-[10px] font-display font-bold mt-0.5">
+                            <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-2xs font-display font-bold mt-0.5">
                               {i + 1}
                             </span>
                             <p className="text-white/60 text-sm font-body leading-relaxed">{step}</p>
@@ -1914,7 +1914,7 @@ export default function ProgramsPage() {
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
             {history.length > 0 && (
-              <span className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide">
+              <span className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide">
                 {history.length} logged
               </span>
             )}
@@ -2122,7 +2122,7 @@ function WorkoutComplete({
   const stat = (value: string, label: string) => (
     <div className="flex-1">
       <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
-      <p className="text-white/35 text-[10px] font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
+      <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
     </div>
   )
 
@@ -2135,7 +2135,7 @@ function WorkoutComplete({
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
         className="w-full max-w-sm text-center px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
       >
-        <p className="font-display font-bold text-[11px] uppercase tracking-[0.25em] text-brand-orange">
+        <p className="font-display font-bold text-2xs uppercase tracking-[0.25em] text-brand-orange">
           Session complete
         </p>
         <h2 className="font-display font-extrabold text-3xl text-white tracking-tight mt-2">

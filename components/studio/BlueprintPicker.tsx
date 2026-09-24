@@ -111,7 +111,7 @@ export default function BlueprintPicker({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5"
     >
-      <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]">Your program</p>
+      <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]">Your program</p>
       <p className="text-white font-display font-bold text-base mt-1">{title}</p>
       <p className="text-white/40 text-xs font-body mt-1">
         {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()} · {days} days a week
@@ -133,7 +133,7 @@ export default function BlueprintPicker({
     <div className="max-w-xl mx-auto">
       {/* Header */}
       <div className="text-center mb-6">
-        <span className="inline-block text-[10px] font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
+        <span className="inline-block text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
           Blueprint
         </span>
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight mt-3">

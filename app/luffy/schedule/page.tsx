@@ -161,8 +161,8 @@ export default function SchedulePage() {
                       )}
                     </div>
                     <div className="flex gap-1.5 shrink-0">
-                      <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-control bg-emerald-500/10 text-emerald-400 text-[10px] font-display font-bold uppercase hover:bg-emerald-500/20">Done</button>
-                      <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-control bg-white/[0.06] text-white/40 text-[10px] font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
+                      <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-control bg-emerald-500/10 text-emerald-400 text-2xs font-display font-bold uppercase hover:bg-emerald-500/20">Done</button>
+                      <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-control bg-white/[0.06] text-white/40 text-2xs font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
                     </div>
                   </div>
                 ))}
@@ -176,7 +176,7 @@ export default function SchedulePage() {
                 {past.slice(0, 10).map((s) => (
                   <div key={s.id} className="flex items-center justify-between p-2.5 rounded-control">
                     <p className="text-white/50 text-sm font-body">{s.clientName} · {s.type}</p>
-                    <span className={`text-[10px] font-display uppercase ${s.status === 'completed' ? 'text-emerald-400/70' : s.status === 'cancelled' ? 'text-white/25' : 'text-white/40'}`}>{s.status} · {fmt(s.starts_at)}</span>
+                    <span className={`text-2xs font-display uppercase ${s.status === 'completed' ? 'text-emerald-400/70' : s.status === 'cancelled' ? 'text-white/25' : 'text-white/40'}`}>{s.status} · {fmt(s.starts_at)}</span>
                   </div>
                 ))}
               </div>

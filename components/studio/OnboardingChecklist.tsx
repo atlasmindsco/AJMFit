@@ -69,7 +69,7 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
               }`}
             >
               <span
-                className={`mt-0.5 w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                className={`mt-0.5 w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-2xs font-bold ${
                   s.done ? 'bg-state-success text-white' : 'border border-white/20 text-transparent'
                 }`}
               >

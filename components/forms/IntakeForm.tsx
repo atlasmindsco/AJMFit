@@ -388,7 +388,7 @@ export default function IntakeForm() {
                         }`}
                       >
                         {opt.featured && (
-                          <div className="bg-brand-orange text-white text-center py-1.5 font-display font-bold text-[10px] uppercase tracking-[0.2em]">
+                          <div className="bg-brand-orange text-white text-center py-1.5 font-display font-bold text-2xs uppercase tracking-[0.2em]">
                             Most Popular
                           </div>
                         )}
@@ -435,7 +435,7 @@ export default function IntakeForm() {
                                 <ul className="mt-3 flex flex-col gap-1.5">
                                   {opt.features.map((feature, i) => (
                                     <li key={i} className="flex items-start gap-2">
-                                      <span className="mt-0.5 shrink-0 text-[10px] text-brand-orange">◆</span>
+                                      <span className="mt-0.5 shrink-0 text-2xs text-brand-orange">◆</span>
                                       <span className="text-xs font-body text-brand-slate leading-relaxed">
                                         {feature}
                                       </span>

@@ -10,7 +10,7 @@ interface ClientLite {
   email: string | null
 }
 
-const labelCls = 'text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em]'
+const labelCls = 'text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]'
 
 /** 1-5 rating, coloured so a problem is visible without reading. */
 function Rating({ label, value }: { label: string; value: number | null }) {

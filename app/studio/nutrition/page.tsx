@@ -486,7 +486,7 @@ export default function NutritionPage() {
                   </div>
                 </div>
                 <span className="font-body font-semibold text-brand-navy text-xs mt-1.5">{macro.label}</span>
-                <span className="text-brand-slate text-[10px] font-body">
+                <span className="text-brand-slate text-2xs font-body">
                   / {macro.goal}{macro.unit}
                 </span>
               </div>
@@ -609,7 +609,7 @@ export default function NutritionPage() {
                                             <>
                                               {item.food_name}
                                               {item.serving_size && (
-                                                <span className="text-brand-slate text-[11px] ml-1">({item.serving_size})</span>
+                                                <span className="text-brand-slate text-2xs ml-1">({item.serving_size})</span>
                                               )}
                                             </>
                                           )}
@@ -724,7 +724,7 @@ export default function NutritionPage() {
                               <div className="mt-3 bg-[#FAFBFD] rounded-control border border-brand-blue/20 p-3">
                                 {analysisSource && (
                                   <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-2">
-                                    <div className="flex items-center gap-2 text-[10px] font-display font-bold uppercase tracking-wide text-emerald-700">
+                                    <div className="flex items-center gap-2 text-2xs font-display font-bold uppercase tracking-wide text-emerald-700">
                                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                       </svg>
@@ -748,11 +748,11 @@ export default function NutritionPage() {
                                   </div>
                                 )}
                                 {analysisError && (
-                                  <div className="text-red-600 text-[11px] font-body mb-2">{analysisError}</div>
+                                  <div className="text-red-600 text-2xs font-body mb-2">{analysisError}</div>
                                 )}
                                 <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2 mb-2">
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Food</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Food</span>
                                     {/* The lookup lands ~600ms after you stop typing and fills
                                         the macros. Every setAddForm here updates from prev
                                         rather than a captured addForm: spreading the captured
@@ -777,7 +777,7 @@ export default function NutritionPage() {
                                     </div>
                                   </label>
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Serving</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Serving</span>
                                     {customServing ? (
                                       <input
                                         type="text"
@@ -816,7 +816,7 @@ export default function NutritionPage() {
                                     )}
                                   </label>
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>
                                     <input
                                       type="number"
                                       inputMode="numeric"
@@ -832,7 +832,7 @@ export default function NutritionPage() {
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 mb-2">
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -846,7 +846,7 @@ export default function NutritionPage() {
                                     />
                                   </label>
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-orange mb-1">Carbs (g)</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-orange mb-1">Carbs (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -860,7 +860,7 @@ export default function NutritionPage() {
                                     />
                                   </label>
                                   <label className="block">
-                                    <span className="block text-[10px] font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Fats (g)</span>
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Fats (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -977,7 +977,7 @@ export default function NutritionPage() {
                   const label = dateObj.toLocaleDateString('en-US', { weekday: 'short' })
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-[10px] font-display font-bold text-brand-navy">
+                      <span className="text-2xs font-display font-bold text-brand-navy">
                         {day.calories > 0 ? day.calories : '--'}
                       </span>
                       <div className="w-full rounded-t-md overflow-hidden" style={{ height: `${Math.max(heightPct, 4)}%` }}>
@@ -987,7 +987,7 @@ export default function NutritionPage() {
                           }`}
                         />
                       </div>
-                      <span className="text-[10px] font-body text-brand-slate">{label}</span>
+                      <span className="text-2xs font-body text-brand-slate">{label}</span>
                     </div>
                   )
                 })}
@@ -1030,7 +1030,7 @@ export default function NutritionPage() {
                   style={{ width: `${waterPct}%` }}
                 />
               </div>
-              <p className="text-brand-slate text-[10px] font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
+              <p className="text-brand-slate text-2xs font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
             </div>
           </motion.div>
 
@@ -1050,7 +1050,7 @@ export default function NutritionPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-brand-slate text-[11px] font-body italic text-center max-w-2xl mx-auto leading-relaxed">
+      <p className="mt-8 text-brand-slate text-2xs font-body italic text-center max-w-2xl mx-auto leading-relaxed">
         Macro values are estimates. Photo recognition uses AI and the USDA FoodData Central database; portion sizes may be off. Always review and adjust entries to match what you actually ate.
       </p>
     </div>

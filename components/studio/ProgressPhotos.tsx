@@ -109,7 +109,7 @@ export default function ProgressPhotos({
                 </span>
               )}
             </button>
-            <p className="text-white/35 text-[10px] font-display font-bold uppercase tracking-wide text-center mt-1.5">
+            <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide text-center mt-1.5">
               {p.label}
             </p>
             <input

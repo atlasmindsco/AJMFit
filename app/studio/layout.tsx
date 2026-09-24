@@ -129,7 +129,7 @@ export default function ClientPortalLayout({
     return (
       <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-4">
         <div className="flex items-center gap-2.5 mb-8">
-          <Image src="/AJMfit.png" alt="AJMFit" width={40} height={40} className="w-10 h-10 object-contain" />
+          <Image src="/AJMfit-mark.png" alt="AJMFit" width={137} height={120} priority className="h-10 w-auto" />
           <span className="font-display font-bold text-white text-lg uppercase tracking-[0.15em]">AJM Fit</span>
         </div>
         <ResumeSession title="Sign in to your studio" />
@@ -147,11 +147,12 @@ export default function ClientPortalLayout({
             <div className="flex items-center gap-8">
               <Link href="/studio" className="flex items-center gap-2.5 shrink-0">
                 <Image
-                  src="/AJMfit.png"
+                  src="/AJMfit-mark.png"
                   alt="AJMFit"
-                  width={36}
-                  height={36}
-                  className="w-9 h-9 object-contain"
+                  width={123}
+                  height={108}
+                  priority
+                  className="h-9 w-auto"
                 />
                 <span className="font-display font-bold text-white text-sm uppercase tracking-[0.15em]">
                   AJM Fit
@@ -184,7 +185,7 @@ export default function ClientPortalLayout({
               {/* Client identity */}
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
-                  <span className="text-white text-[10px] font-display font-bold">
+                  <span className="text-white text-2xs font-display font-bold">
                     {initials || '·'}
                   </span>
                 </div>
@@ -235,7 +236,7 @@ export default function ClientPortalLayout({
                 }`}
               >
                 {icon(tab.d)}
-                <span className="text-[10px] font-display font-bold uppercase tracking-wide">{tab.label}</span>
+                <span className="text-2xs font-display font-bold uppercase tracking-wide">{tab.label}</span>
               </Link>
             )
           })}
@@ -247,7 +248,7 @@ export default function ClientPortalLayout({
             }`}
           >
             {icon('M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z')}
-            <span className="text-[10px] font-display font-bold uppercase tracking-wide">More</span>
+            <span className="text-2xs font-display font-bold uppercase tracking-wide">More</span>
           </button>
         </div>
       </nav>

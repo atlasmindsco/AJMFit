@@ -46,8 +46,8 @@ function Scale({
         ))}
       </div>
       <div className="flex justify-between mt-1.5">
-        <span className="text-white/30 text-[10px] font-body">{low}</span>
-        <span className="text-white/30 text-[10px] font-body">{high}</span>
+        <span className="text-white/30 text-2xs font-body">{low}</span>
+        <span className="text-white/30 text-2xs font-body">{high}</span>
       </div>
     </div>
   )
@@ -264,13 +264,13 @@ export default function CheckInPage() {
 
       {answered.length > 0 && (
         <div className="mt-6">
-          <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-[0.15em] mb-2">
+          <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
             Anthony&rsquo;s past replies
           </p>
           <div className="space-y-2">
             {answered.slice(0, 4).map((c) => (
               <div key={c.id} className="bg-surface-raised rounded-card border border-white/[0.10] p-4">
-                <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide">
+                <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide">
                   Week of{' '}
                   {new Date(c.week_of + 'T00:00:00').toLocaleDateString('en-US', {
                     month: 'short',

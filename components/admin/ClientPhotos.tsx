@@ -61,7 +61,7 @@ export default function ClientPhotos({ userId }: { userId: string }) {
   if (trend.latest == null && shots.length === 0) {
     return (
       <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-        <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+        <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide mb-2">
           Progress
         </p>
         <p className="text-white/35 text-sm font-body">No weigh-ins or photos yet.</p>
@@ -71,14 +71,14 @@ export default function ClientPhotos({ userId }: { userId: string }) {
 
   return (
     <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-      <p className="text-brand-orange text-[10px] font-display font-bold uppercase tracking-wide mb-2">
+      <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide mb-2">
         Progress
       </p>
 
       {trend.latest != null && (
         <div className="flex items-end gap-6 mb-4">
           <div>
-            <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">Current</p>
+            <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Current</p>
             <p className="font-display font-extrabold text-2xl text-white tabular-nums">
               {trend.latest}
               <span className="text-white/30 text-xs font-body ml-1">lbs</span>
@@ -86,7 +86,7 @@ export default function ClientPhotos({ userId }: { userId: string }) {
           </div>
           {trend.change28dLb != null && (
             <div>
-              <p className="text-white/25 text-[10px] font-display uppercase tracking-wide">28 days</p>
+              <p className="text-white/25 text-2xs font-display uppercase tracking-wide">28 days</p>
               <p
                 className={`font-display font-extrabold text-2xl tabular-nums ${
                   trend.change28dLb === 0 ? 'text-white/50' : 'text-brand-orange'
@@ -104,7 +104,7 @@ export default function ClientPhotos({ userId }: { userId: string }) {
         <div className="space-y-3">
           {shots.map((s, i) => (
             <div key={s.date}>
-              <p className="text-white/30 text-[10px] font-display font-bold uppercase tracking-wide mb-1.5">
+              <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
                 {shots.length > 1 && i === 0 ? 'First' : shots.length > 1 ? 'Latest' : 'Photos'} ·{' '}
                 {new Date(s.date + 'T00:00:00').toLocaleDateString('en-US', {
                   month: 'short',
