@@ -11,19 +11,38 @@ type Params = { params: { slug: string } }
 const DEFAULT_OG = `${SITE_URL}/BandGnewsletter.png`
 
 // Pre-render the known posts at build; new ones stream in via ISR.
-// Swallow Kit failures here: a Kit hiccup during `next build` should not fail
-// the deploy, pages simply render on demand instead.
+//
+// Swallowing a failure of the LIST call was not enough. Each slug returned
+// here is then prerendered, and that prerender fetches the broadcast itself --
+// outside this try/catch. On 24 Sep 2026 the list succeeded, the fetch for one
+// post returned 502, and the build exited 1 with the whole deploy blocked.
+//
+// So a slug is only offered for prerendering once its post has actually been
+// fetched. Anything Kit will not hand over right now is simply left out and
+// renders on demand instead, which is what the original comment intended. The
+// extra fetch is cached by Next, so the prerender that follows reuses it.
 export async function generateStaticParams() {
+  let issues
   try {
-    const issues = await fetchIssues()
-    return issues.map((i) => ({ slug: i.slug }))
+    issues = await fetchIssues()
   } catch {
     return []
   }
+  const settled = await Promise.all(
+    issues.map(async (i) => {
+      try {
+        return (await fetchPostByParam(i.slug)) ? { slug: i.slug } : null
+      } catch {
+        return null
+      }
+    })
+  )
+  return settled.filter((x): x is { slug: string } => x !== null)
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const post = await fetchPostByParam(params.slug)
+  // Metadata must never be the thing that fails a build either.
+  const post = await fetchPostByParam(params.slug).catch(() => null)
   if (!post) return { title: 'Post' }
   const url = `${SITE_URL}/blog/${post.slug}`
   const image = post.thumbnailUrl || DEFAULT_OG

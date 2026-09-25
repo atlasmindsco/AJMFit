@@ -56,6 +56,66 @@ function kitHeaders(): HeadersInit {
   return { 'X-Kit-Api-Key': process.env.KIT_API_KEY || '', 'Content-Type': 'application/json' }
 }
 
+/**
+ * Kit could not be reached or refused us. Distinct from "there are no posts",
+ * which is a legitimate empty archive and must never be rendered as an error,
+ * nor an error rendered as an empty archive.
+ */
+export class KitUnavailableError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'KitUnavailableError'
+  }
+}
+
+/**
+ * True while `next build` is prerendering, false when serving a request.
+ *
+ * The distinction matters because the same failure needs opposite handling.
+ * At runtime, throwing is correct: ISR keeps serving the last good page. At
+ * build time, throwing kills the deploy, and the right answer is to render a
+ * holding state that ISR replaces within the revalidate window.
+ */
+export function isBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === 'phase-production-build'
+}
+
+/**
+ * Kit fetch with a retry on transient failures.
+ *
+ * A single Kit 502 during `next build` took the whole production deploy down
+ * on 24 Sep 2026: the list call and an individual broadcast call both blipped,
+ * the prerender of /blog/ajm-fit-is-live threw, and the build exited 1. The
+ * same commit deployed cleanly minutes later, untouched.
+ *
+ * Only 5xx and network errors are retried. A 4xx is a real answer -- expired
+ * key, lapsed plan, deleted broadcast -- and retrying it just delays the
+ * error that the caller needs to see.
+ */
+async function kitFetch(url: string, attempts = 3): Promise<Response> {
+  let lastError: unknown
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, {
+        headers: kitHeaders(),
+        next: { revalidate: REVALIDATE_SECONDS },
+      })
+      if (res.status < 500) return res
+      lastError = new Error(`HTTP ${res.status}`)
+      if (i === attempts - 1) return res
+    } catch (e) {
+      lastError = e
+      if (i === attempts - 1) throw e
+    }
+    // 300ms, then 900ms. Long enough to clear a blip, short enough that a
+    // real outage still fails the request quickly.
+    await new Promise((r) => setTimeout(r, 300 * 3 ** i))
+    console.warn(`[blog] Kit retry ${i + 1}/${attempts - 1} for ${url}:`, lastError)
+  }
+  // Unreachable: the loop either returns or throws on its last iteration.
+  throw lastError
+}
+
 /** Best available publish date for ordering/display. */
 function issueDate(b: KitBroadcast): string {
   return b.published_at || b.send_at || b.created_at
@@ -131,14 +191,11 @@ function extractBody(html: string): string {
 export async function fetchIssues(): Promise<BlogIssue[]> {
   const key = process.env.KIT_API_KEY
   if (!key) return []
-  const res = await fetch(`${KIT_BASE}/broadcasts?per_page=100`, {
-    headers: kitHeaders(),
-    next: { revalidate: REVALIDATE_SECONDS },
-  })
+  const res = await kitFetch(`${KIT_BASE}/broadcasts?per_page=100`)
   if (!res.ok) {
     const detail = await res.text().catch(() => '')
     console.error('[blog] Kit list failed:', res.status, detail)
-    throw new Error(`Kit broadcasts list failed (HTTP ${res.status})`)
+    throw new KitUnavailableError(`Kit broadcasts list failed (HTTP ${res.status})`)
   }
   const data = (await res.json()) as { broadcasts?: KitBroadcast[] }
   const issues = (data.broadcasts ?? [])
@@ -155,12 +212,9 @@ export async function fetchIssues(): Promise<BlogIssue[]> {
 export async function fetchPost(id: number): Promise<BlogPost | null> {
   const key = process.env.KIT_API_KEY
   if (!key || !Number.isFinite(id)) return null
-  const res = await fetch(`${KIT_BASE}/broadcasts/${id}`, {
-    headers: kitHeaders(),
-    next: { revalidate: REVALIDATE_SECONDS },
-  })
+  const res = await kitFetch(`${KIT_BASE}/broadcasts/${id}`)
   if (res.status === 404) return null
-  if (!res.ok) throw new Error(`Kit broadcast fetch failed (HTTP ${res.status})`)
+  if (!res.ok) throw new KitUnavailableError(`Kit broadcast fetch failed (HTTP ${res.status})`)
   const data = (await res.json()) as { broadcast?: KitBroadcast }
   const b = data.broadcast
   if (!b || b.public !== true) return null // never expose non-public via direct URL

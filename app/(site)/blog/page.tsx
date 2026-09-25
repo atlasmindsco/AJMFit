@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
-import { fetchIssues, formatIssueDate } from '@/lib/blog'
+import { fetchIssues, formatIssueDate, isBuildPhase, type BlogIssue } from '@/lib/blog'
 import NewsletterSignup from '@/components/newsletter/NewsletterSignup'
 
 export const metadata: Metadata = {
@@ -29,7 +29,28 @@ const benefits = [
 ]
 
 export default async function BlogIndex() {
-  const issues = await fetchIssues()
+  // A Kit outage during `next build` used to take the whole production deploy
+  // down: fetchIssues threw, the prerender failed, and the build exited 1. It
+  // happened on 24 Sep 2026 on a transient 502, blocking an unrelated release.
+  //
+  // At build time we render a holding state instead, which ISR replaces with
+  // the real archive within the revalidate window. At runtime the error is
+  // still thrown on purpose: that keeps the last good cached page in front of
+  // visitors, where swallowing it would replace the live archive with the
+  // "no issues yet" empty state. Those two states are deliberately different
+  // screens, because one is "nothing published" and the other is "we cannot
+  // reach Kit", and showing the wrong one is how the archive looked deleted
+  // when the Kit plan lapsed.
+  let issues: BlogIssue[]
+  let unavailable = false
+  try {
+    issues = await fetchIssues()
+  } catch (e) {
+    if (!isBuildPhase()) throw e
+    console.warn('[blog] Kit unavailable during build, rendering holding state:', e)
+    issues = []
+    unavailable = true
+  }
   const featured = issues[0]
   const rest = issues.slice(1)
 
@@ -50,7 +71,22 @@ export default async function BlogIndex() {
         </div>
       </header>
 
-      {issues.length === 0 ? (
+      {unavailable ? (
+        /* Not the same thing as an empty archive: the issues exist, we just
+           could not load them at build time. Saying "coming soon" here would
+           tell readers the archive is empty when it is not. */
+        <section className="max-w-2xl mx-auto px-6 lg:px-8">
+          <div className="rounded-control border border-brand-navy/[0.08] bg-white p-12 text-center mb-12">
+            <h2 className="font-display font-extrabold text-2xl uppercase tracking-tight text-brand-navy">
+              Loading the Archive
+            </h2>
+            <p className="text-brand-slate mt-3">
+              The issues are taking a moment to load. Refresh in a few minutes and they will be here.
+            </p>
+          </div>
+          <NewsletterSignup variant="band" />
+        </section>
+      ) : issues.length === 0 ? (
         /* Empty state */
         <section className="max-w-2xl mx-auto px-6 lg:px-8">
           <div className="rounded-control border border-brand-navy/[0.08] bg-white p-12 text-center mb-12">
