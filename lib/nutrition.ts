@@ -111,6 +111,38 @@ export async function updateTargets(userId: string, targets: MacroTargets) {
   if (error) throw error
 }
 
+export interface TargetChangeNote {
+  calories: number | null
+  reason: string | null
+  source: string
+  created_at: string
+}
+
+/**
+ * The most recent change to this client's targets, so the daily page can say
+ * why the number moved. A target that changes without explanation is the
+ * fastest way to lose someone's trust in the whole system.
+ *
+ * Clients can read their own history rows; the table has no insert policy, so
+ * this is read-only by construction.
+ */
+export async function fetchLatestTargetChange(userId: string): Promise<TargetChangeNote | null> {
+  const { data, error } = await db
+    .from('nutrition_target_history')
+    .select('cal_target, reason, source, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+  if (error || !data?.length) return null
+  const row = data[0]
+  return {
+    calories: row.cal_target === null ? null : Number(row.cal_target),
+    reason: row.reason,
+    source: row.source,
+    created_at: row.created_at,
+  }
+}
+
 export async function fetchMeals(userId: string): Promise<MealRow[]> {
   const { data, error } = await db
     .from('meals')

@@ -17,6 +17,7 @@ import {
   fetchTodaysLogs,
   fetchDailyLog,
   fetchWeeklyCalories,
+  fetchLatestTargetChange,
   ensureDefaultMeals,
   addFoodLog,
   updateFoodLog,
@@ -27,6 +28,7 @@ import {
   type MealRow,
   type FoodLogRow,
   type DailyCalories,
+  type TargetChangeNote,
 } from '@/lib/nutrition'
 import {
   calculateBMR,
@@ -99,6 +101,7 @@ export default function NutritionPage() {
   // a client was never asked to hit mostly manufacture a feeling of failure.
   const [showAllMacros, setShowAllMacros] = useState(false)
   const [maintenance, setMaintenance] = useState<number | null>(null)
+  const [lastChange, setLastChange] = useState<TargetChangeNote | null>(null)
 
   useEffect(() => {
     try {
@@ -135,18 +138,20 @@ export default function NutritionPage() {
           return
         }
 
-        const [t, m, l, dl, w] = await Promise.all([
+        const [t, m, l, dl, w, change] = await Promise.all([
           fetchTargets(id),
           ensureDefaultMeals(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
           fetchWeeklyCalories(id),
+          fetchLatestTargetChange(id),
         ])
         setTargets(t)
         setMeals(m)
         setLogs(l)
         setWaterOz(dl.water_oz)
         setWeekly(w)
+        setLastChange(change)
 
         // Maintenance is recomputed here rather than stored, so it always
         // reflects the client's current weight. The deficit shown below is
@@ -572,6 +577,24 @@ export default function NutritionPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Why the number moved. Shown only for a real adjustment, not for the
+          setup row every client has: a permanent "here is your starting
+          target" banner is noise, but a silent change is worse than noise. */}
+      {lastChange?.reason && lastChange.source !== 'setup' && (
+        <div className="mb-6 p-4 rounded-card bg-brand-orange/[0.05] border border-brand-orange/20">
+          <div className="flex items-baseline justify-between gap-3 mb-1">
+            <p className="font-display font-bold text-brand-navy text-sm">Your targets changed</p>
+            <span className="shrink-0 text-brand-slate text-2xs font-body">
+              {new Date(lastChange.created_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+          <p className="text-brand-slate text-xs font-body leading-relaxed">{lastChange.reason}</p>
+        </div>
+      )}
 
       {/* The tracker answers "how much". This is the way through to "what". */}
       <a

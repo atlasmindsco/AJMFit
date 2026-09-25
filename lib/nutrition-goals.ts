@@ -255,6 +255,48 @@ const PROTEIN_PER_LB: Record<FitnessGoal, number> = {
 }
 
 /**
+ * Split out so the adjustment engine recomputes macros exactly the way setup
+ * does. When this lived inline in calculateNutritionTargets, any later change
+ * to a target had to re-implement the fat floor and the carbohydrate
+ * remainder, and the two would drift.
+ */
+export function deriveMacros(
+  dailyCalories: number,
+  currentWeight: number,
+  goalWeight: number,
+  goal: FitnessGoal
+): { proteinGrams: number; fatGrams: number; carbGrams: number; lowCarb: boolean } {
+  const refWeight = proteinReferenceWeight(currentWeight, goalWeight)
+  let proteinGrams = Math.round(refWeight * PROTEIN_PER_LB[goal])
+
+  // Fat takes the higher of 27.5% of calories and an essential-intake floor of
+  // 0.3 g per pound of reference weight. In a clamped low-calorie case the
+  // floor is what binds.
+  const fatFromPercent = (dailyCalories * 0.275) / 9
+  const fatFloor = refWeight * 0.3
+  let fatGrams = Math.round(Math.max(fatFromPercent, fatFloor))
+
+  // Keep the macros summing to the calorie target and never negative. Protein
+  // is defended first, then fat; carbohydrate absorbs the remainder.
+  const capProteinCals = dailyCalories * 0.5
+  if (proteinGrams * 4 > capProteinCals) proteinGrams = Math.floor(capProteinCals / 4)
+
+  let carbCals = dailyCalories - proteinGrams * 4 - fatGrams * 9
+  if (carbCals < 0) {
+    fatGrams = Math.max(0, Math.floor((dailyCalories - proteinGrams * 4) / 9))
+    carbCals = dailyCalories - proteinGrams * 4 - fatGrams * 9
+  }
+  const carbGrams = Math.max(0, Math.round(carbCals / 4))
+
+  return { proteinGrams, fatGrams, carbGrams, lowCarb: carbGrams < LOW_CARB_GRAMS }
+}
+
+/** The floors the adjustment engine must also respect. */
+export function calorieFloorFor(sex: Sex, bmrValue: number): number {
+  return Math.max(ABSOLUTE_FLOOR[sex] ?? ABSOLUTE_FLOOR.other, bmrValue)
+}
+
+/**
  * Full calculation. Rate first, then clamps, then macros, then an honest
  * restatement of the rate the clamped calories will actually produce.
  */
@@ -309,29 +351,9 @@ export function calculateNutritionTargets(setup: NutritionGoalSetup): Calculated
   const finalDelta = dailyCalories - maintenanceCalories
 
   // --- Macros ---
-  const refWeight = proteinReferenceWeight(setup.currentWeight, setup.goalWeight)
-  let proteinGrams = Math.round(refWeight * PROTEIN_PER_LB[setup.goal])
-
-  // Fat takes the higher of 27.5% of calories and an essential-intake floor of
-  // 0.3 g per pound of reference weight. In a clamped low-calorie case the
-  // floor is what binds.
-  const fatFromPercent = (dailyCalories * 0.275) / 9
-  const fatFloor = refWeight * 0.3
-  let fatGrams = Math.round(Math.max(fatFromPercent, fatFloor))
-
-  // Keep the macros summing to the calorie target and never negative. Protein
-  // is defended first, then fat; carbohydrate absorbs the remainder.
-  const capProteinCals = dailyCalories * 0.5
-  if (proteinGrams * 4 > capProteinCals) proteinGrams = Math.floor(capProteinCals / 4)
-
-  let carbCals = dailyCalories - proteinGrams * 4 - fatGrams * 9
-  if (carbCals < 0) {
-    fatGrams = Math.max(0, Math.floor((dailyCalories - proteinGrams * 4) / 9))
-    carbCals = dailyCalories - proteinGrams * 4 - fatGrams * 9
-  }
-  const carbGrams = Math.max(0, Math.round(carbCals / 4))
-
-  if (carbGrams < LOW_CARB_GRAMS && clamp === null) clamp = 'low_carb'
+  const macros = deriveMacros(dailyCalories, setup.currentWeight, setup.goalWeight, setup.goal)
+  const { proteinGrams, fatGrams, carbGrams } = macros
+  if (macros.lowCarb && clamp === null) clamp = 'low_carb'
 
   // --- What this will actually do, after clamping ---
   const expectedLbsPerWeek = (finalDelta * 7) / CALORIES_PER_POUND

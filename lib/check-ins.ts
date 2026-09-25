@@ -11,6 +11,10 @@ export interface CheckIn {
   workouts_completed: number | null
   nutrition_adherence: number | null
   energy: number | null
+  /** All optional: a longer check-in is one that gets abandoned. */
+  hunger: number | null
+  sleep_quality: number | null
+  training_performance: number | null
   win: string | null
   obstacle: string | null
   submitted_at: string
@@ -20,7 +24,15 @@ export interface CheckIn {
 
 export type CheckInInput = Pick<
   CheckIn,
-  'weight_lb' | 'workouts_completed' | 'nutrition_adherence' | 'energy' | 'win' | 'obstacle'
+  | 'weight_lb'
+  | 'workouts_completed'
+  | 'nutrition_adherence'
+  | 'energy'
+  | 'hunger'
+  | 'sleep_quality'
+  | 'training_performance'
+  | 'win'
+  | 'obstacle'
 >
 
 /**

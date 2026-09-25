@@ -65,6 +65,13 @@ export default function CheckInPage() {
   const [workouts, setWorkouts] = useState('')
   const [nutrition, setNutrition] = useState<number | null>(null)
   const [energy, setEnergy] = useState<number | null>(null)
+  // Hunger, sleep and training quality are what tell a deficit that is working
+  // apart from one that is about to fail. They degrade before the weight trend
+  // does, so without them the engine would keep cutting someone who is
+  // quietly falling apart. Optional on purpose: a longer form gets abandoned.
+  const [hunger, setHunger] = useState<number | null>(null)
+  const [sleep, setSleep] = useState<number | null>(null)
+  const [performance, setPerformance] = useState<number | null>(null)
   const [win, setWin] = useState('')
   const [obstacle, setObstacle] = useState('')
 
@@ -95,6 +102,9 @@ export default function CheckInPage() {
           setWorkouts(mine.workouts_completed != null ? String(mine.workouts_completed) : '')
           setNutrition(mine.nutrition_adherence)
           setEnergy(mine.energy)
+          setHunger(mine.hunger)
+          setSleep(mine.sleep_quality)
+          setPerformance(mine.training_performance)
           setWin(mine.win ?? '')
           setObstacle(mine.obstacle ?? '')
         } else {
@@ -127,6 +137,9 @@ export default function CheckInPage() {
         workouts_completed: workouts.trim() === '' ? null : Number(workouts),
         nutrition_adherence: nutrition,
         energy,
+        hunger,
+        sleep_quality: sleep,
+        training_performance: performance,
         win: win.trim() || null,
         obstacle: obstacle.trim() || null,
       })
@@ -222,6 +235,24 @@ export default function CheckInPage() {
           <p className={labelCls}>Energy and recovery</p>
           <p className={hintCls}>Sleep, soreness, how you felt in the gym.</p>
           <Scale value={energy} onChange={setEnergy} low="Running on empty" high="Fresh" />
+        </div>
+
+        <div>
+          <p className={labelCls}>How hungry were you?</p>
+          <p className={hintCls}>Constant hunger is the warning sign, not a test of willpower.</p>
+          <Scale value={hunger} onChange={setHunger} low="Comfortable" high="Hungry all the time" />
+        </div>
+
+        <div>
+          <p className={labelCls}>Sleep quality</p>
+          <p className={hintCls}>Poor sleep stalls fat loss on its own.</p>
+          <Scale value={sleep} onChange={setSleep} low="Broken" high="Slept well" />
+        </div>
+
+        <div>
+          <p className={labelCls}>How was training?</p>
+          <p className={hintCls}>Strength and effort compared to last week.</p>
+          <Scale value={performance} onChange={setPerformance} low="Much worse" high="Much better" />
         </div>
 
         <div>
