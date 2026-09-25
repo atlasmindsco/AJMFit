@@ -154,43 +154,36 @@ export interface SaveSetInput {
 }
 
 export async function saveSet(input: SaveSetInput) {
-  const { data: existing } = await db
-    .from('workout_sets')
-    .select('id')
-    .eq('workout_id', input.workoutId)
-    .eq('exercise_name', input.exerciseName)
-    .eq('set_number', input.setNumber)
-    .eq('is_intensity_set', input.isIntensitySet ?? false)
-    .maybeSingle()
-
-  if (existing) {
-    const { error } = await db
-      .from('workout_sets')
-      .update({
-        weight: input.weight,
-        reps: input.reps,
-        completed: input.completed ?? false,
-        intensity_technique: input.intensityTechnique ?? null,
-      })
-      .eq('id', existing.id)
-    if (error) throw error
-    return existing.id as string
-  }
-
+  // One atomic upsert, not a lookup followed by an insert.
+  //
+  // The old version SELECTed to see whether the set existed and then INSERTed
+  // if it did not. Two statements, no atomicity, and it runs on every
+  // keystroke: typing "165" fires three saves whose lookups all complete
+  // before any of their inserts land, so all three insert. That produced 952
+  // rows for 340 real sets across the database, and training volume that read
+  // roughly three times what clients had actually lifted.
+  //
+  // onConflict targets the workout_sets_one_per_slot unique index, so a lost
+  // race is now a harmless update of the same row rather than another copy of
+  // it. The index is the guarantee; this is just the well-behaved path to it.
   const { data, error } = await db
     .from('workout_sets')
-    .insert({
-      workout_id: input.workoutId,
-      user_id: input.userId,
-      exercise_name: input.exerciseName,
-      original_exercise_name: input.originalExerciseName ?? null,
-      set_number: input.setNumber,
-      weight: input.weight,
-      reps: input.reps,
-      is_intensity_set: input.isIntensitySet ?? false,
-      intensity_technique: input.intensityTechnique ?? null,
-      completed: input.completed ?? false,
-    })
+    .upsert(
+      {
+        workout_id: input.workoutId,
+        user_id: input.userId,
+        exercise_name: input.exerciseName,
+        original_exercise_name: input.originalExerciseName ?? null,
+        set_number: input.setNumber,
+        weight: input.weight,
+        reps: input.reps,
+        is_intensity_set: input.isIntensitySet ?? false,
+        intensity_technique: input.intensityTechnique ?? null,
+        completed: input.completed ?? false,
+        logged_at: new Date().toISOString(),
+      },
+      { onConflict: 'workout_id,exercise_name,set_number,is_intensity_set' }
+    )
     .select('id')
     .single()
   if (error || !data) throw error ?? new Error('Failed to save set')

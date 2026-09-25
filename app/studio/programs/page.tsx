@@ -302,6 +302,15 @@ export default function ProgramsPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   // Debounce per set so a personal record is judged once, after typing stops.
   const prTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  /**
+   * Set saves are debounced per set, like the PR check above it.
+   *
+   * Typing "165" used to fire three saves. The database now refuses duplicate
+   * rows, so they can no longer pile up, but three writes still race: if "16"
+   * lands after "165" the client is left recorded as having lifted 16. Waiting
+   * for typing to stop sends one write with the value they actually meant.
+   */
+  const setSaveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   // Weight already announced per exercise, so one record sends one email.
   const prNotifiedRef = useRef<Record<string, number>>({})
 
@@ -1291,17 +1300,23 @@ export default function ProgramsPage() {
                                           if (userId && wid) {
                                             const w = Number(newLog.weight) || null
                                             const r = Number(newLog.reps) || null
-                                            dbSaveSet({
-                                              workoutId: wid,
-                                              userId,
-                                              exerciseName: displayName,
-                                              originalExerciseName: isSwapped ? exercise.name : null,
-                                              setNumber: si + 1,
-                                              weight: w,
-                                              reps: r,
-                                              isIntensitySet: false,
-                                              completed: isComplete,
-                                            }).catch((err) => console.error('[Set save] Failed:', err))
+                                            const saveKey = `${logKey}-${si}`
+                                            if (setSaveTimersRef.current[saveKey]) {
+                                              clearTimeout(setSaveTimersRef.current[saveKey])
+                                            }
+                                            setSaveTimersRef.current[saveKey] = setTimeout(() => {
+                                              dbSaveSet({
+                                                workoutId: wid,
+                                                userId,
+                                                exerciseName: displayName,
+                                                originalExerciseName: isSwapped ? exercise.name : null,
+                                                setNumber: si + 1,
+                                                weight: w,
+                                                reps: r,
+                                                isIntensitySet: false,
+                                                completed: isComplete,
+                                              }).catch((err) => console.error('[Set save] Failed:', err))
+                                            }, 500)
 
                                             // Personal records are evaluated after typing stops, not
                                             // on every keystroke. Typing "185" used to run this three
