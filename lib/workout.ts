@@ -16,6 +16,31 @@ export interface StartWorkoutInput {
 }
 
 export async function startWorkout(input: StartWorkoutInput): Promise<string> {
+  // Resume an open session for this same day rather than opening a second one.
+  //
+  // A client mid-workout tapped away to another tab, came back, ended the
+  // session and started it again to keep going. Because this function always
+  // inserted, that produced TWO workout rows for one session on 24 Sep 2026:
+  // 65 minutes with 39 sets, then 12 minutes with 52 — 38 of which repeated
+  // slots from the first and 24 of which were byte-identical. His history
+  // showed two sessions and roughly double the volume he actually lifted.
+  //
+  // Starting a workout that is already open should hand back the one already
+  // running. It cannot lose data, and it removes the only way a single session
+  // could ever split in two.
+  const { data: open } = await db
+    .from('workouts')
+    .select('id')
+    .eq('user_id', input.userId)
+    .eq('day_name', input.dayName)
+    .eq('date', localDate())
+    .is('ended_at', null)
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (open?.id) return open.id as string
+
   const { data, error } = await db
     .from('workouts')
     .insert({

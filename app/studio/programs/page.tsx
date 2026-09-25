@@ -1741,6 +1741,29 @@ export default function ProgramsPage() {
                           setWorkoutElapsed(0)
                           stopRestTimer()
 
+                          // Clear this day's logged sets from the screen.
+                          //
+                          // Ending a session used to leave every set sitting
+                          // there fully filled in, so the screen still looked
+                          // live. A client who wanted to carry on pressed
+                          // Start again and re-entered work that was already
+                          // saved, and because saveSet scopes its "already
+                          // exists?" check to the workout id, every one of
+                          // those became a NEW row against the new session
+                          // rather than an update. That is how one workout
+                          // became two with the sets counted twice.
+                          const clearDay = <T,>(prev: Record<string, T>) => {
+                            const next = { ...prev }
+                            for (const key of Object.keys(next)) {
+                              if (key.startsWith(`${selectedDay}-`)) delete next[key]
+                            }
+                            return next
+                          }
+                          setSetLogs(clearDay)
+                          // Intensity sets save through the same per-workout
+                          // path, so leaving them on screen duplicates too.
+                          setIntensityLogs(clearDay)
+
                           if (workoutId) {
                             try {
                               await dbEndWorkout(workoutId, elapsed)
