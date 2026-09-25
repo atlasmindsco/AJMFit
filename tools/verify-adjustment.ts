@@ -1,7 +1,7 @@
 import { decideAdjustment, type AdjustmentInputs } from '../lib/nutrition-adjustment.ts'
 
 const BASE: AdjustmentInputs = {
-  currentAvgWeight: 200, priorAvgWeight: 202, daysBetween: 14, weighInsInWindow: 5,
+  currentAvgWeight: 200, priorAvgWeight: 202, daysBetween: 14, weighInsInWindow: 5, priorWeighInsInWindow: 5,
   currentCalories: 2300, maintenanceCalories: 2900, bmr: 1850,
   sex: 'male', goal: 'lose_fat', currentWeight: 200, goalWeight: 175,
   targetRatePctPerWeek: -0.65,
@@ -22,7 +22,9 @@ const check = (label: string, over: Partial<AdjustmentInputs>, expect: string, e
 console.log('VERDICTS\n')
 check('on target', {}, 'hold')
 check('not enough days', { daysBetween: 7 }, 'insufficient_data')
-check('too few weigh-ins', { weighInsInWindow: 2 }, 'insufficient_data')
+check('too few weigh-ins', { weighInsInWindow: 1 }, 'insufficient_data')
+ check('weekly check-in only (2+2)', { weighInsInWindow: 2, priorWeighInsInWindow: 2 }, 'hold')
+ check('prior window empty', { priorWeighInsInWindow: 1 }, 'insufficient_data')
 check('medication declared', { medicationFlag: true }, 'escalate', 'medication_flag')
 check('losing far too fast', { currentAvgWeight: 195, priorAvgWeight: 202 }, 'escalate', 'rapid_loss')
 check('gaining while cutting', { currentAvgWeight: 203, priorAvgWeight: 202 }, 'escalate', 'gaining_in_deficit')

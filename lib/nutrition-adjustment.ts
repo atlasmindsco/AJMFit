@@ -52,8 +52,9 @@ export interface AdjustmentInputs {
   priorAvgWeight: number | null
   /** Days between the midpoints of those two windows. */
   daysBetween: number
-  /** How many separate days contributed weight in the recent window. */
+  /** How many separate days contributed weight to each window. */
   weighInsInWindow: number
+  priorWeighInsInWindow: number
 
   currentCalories: number
   maintenanceCalories: number
@@ -106,7 +107,21 @@ export interface AdjustmentResult {
 
 /** Minimum data before any decision. Two weeks, and enough weigh-ins to mean it. */
 const MIN_DAYS = 13
-const MIN_WEIGH_INS = 3
+/**
+ * Two weigh-ins per window, not three.
+ *
+ * The first version asked for three inside a seven-day window, which quietly
+ * meant the engine could only ever fire for someone weighing in most days on
+ * the Progress page. The weekly check-in -- the thing clients are actually
+ * asked to do, and which already writes its weight into body_metrics --
+ * produces one per week, so a diligent client checking in every week would
+ * have been told "not enough data" forever.
+ *
+ * The windows are now a fortnight wide each, so a weekly check-in gives two
+ * per window and a daily weigher gives a dozen. Two is still enough to honour
+ * the rule that matters: never act on a single weigh-in.
+ */
+const MIN_WEIGH_INS = 2
 /** Wait this long after a change before judging it. */
 const COOLDOWN_DAYS = 13
 /** Rate within this much of target counts as on track. */
@@ -159,6 +174,7 @@ export function decideAdjustment(i: AdjustmentInputs): AdjustmentResult {
     priorAvgWeight: i.priorAvgWeight,
     daysBetween: i.daysBetween,
     weighInsInWindow: i.weighInsInWindow,
+    priorWeighInsInWindow: i.priorWeighInsInWindow,
     lbsChange: lbsChange === null ? null : Math.round(lbsChange * 100) / 100,
     actualRatePct: actualRatePct === null ? null : Math.round(actualRatePct * 100) / 100,
     targetRatePct: i.targetRatePctPerWeek,
@@ -181,11 +197,11 @@ export function decideAdjustment(i: AdjustmentInputs): AdjustmentResult {
       evidence
     )
   }
-  if (i.weighInsInWindow < MIN_WEIGH_INS) {
+  if (i.weighInsInWindow < MIN_WEIGH_INS || i.priorWeighInsInWindow < MIN_WEIGH_INS) {
     return nothing(
       'insufficient_data',
-      'We need a few more weigh-ins before changing anything. Aim for three or more a week.',
-      `Only ${i.weighInsInWindow} weigh-ins in the recent window.`,
+      'We need another weigh-in or two before changing anything. Your weekly check-in counts.',
+      `Weigh-ins: ${i.weighInsInWindow} recent, ${i.priorWeighInsInWindow} prior. Needs ${MIN_WEIGH_INS} in each.`,
       evidence
     )
   }

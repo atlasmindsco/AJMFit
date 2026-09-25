@@ -96,19 +96,27 @@ export async function evaluateClient(
     return { ...base, result: null as never, applied: false, skipped: `health block: ${user.nutrition_block_code}` }
   }
 
-  // --- Weight windows: most recent 7 days against the 7 days a fortnight before ---
+  // --- Weight windows: the last fortnight against the fortnight before it ---
+  //
+  // Two 14-day windows rather than two 7-day ones, because the weekly check-in
+  // is the input most clients will actually use and it produces one weigh-in a
+  // week. Seven-day windows needing three weigh-ins each meant the engine
+  // could only ever fire for someone weighing in most days on the Progress
+  // page, and would tell a diligent weekly client "not enough data" forever.
+  //
+  // The midpoints are still 14 days apart, so the rate maths is unchanged.
   const { data: weights } = await admin
     .from('body_metrics')
     .select('recorded_on, weight_lb, waist_in')
     .eq('user_id', user.id)
-    .gte('recorded_on', iso(new Date(today.getTime() - 30 * DAY)))
+    .gte('recorded_on', iso(new Date(today.getTime() - 35 * DAY)))
     .order('recorded_on', { ascending: false })
 
   const rows = (weights ?? []) as WeightRow[]
-  const recent = windowMean(rows, iso(new Date(today.getTime() - 6 * DAY)), iso(today))
+  const recent = windowMean(rows, iso(new Date(today.getTime() - 13 * DAY)), iso(today))
   const prior = windowMean(
     rows,
-    iso(new Date(today.getTime() - 20 * DAY)),
+    iso(new Date(today.getTime() - 27 * DAY)),
     iso(new Date(today.getTime() - 14 * DAY))
   )
 
@@ -204,6 +212,7 @@ export async function evaluateClient(
     priorAvgWeight: prior.mean,
     daysBetween: recent.mean !== null && prior.mean !== null ? 14 : 0,
     weighInsInWindow: recent.count,
+    priorWeighInsInWindow: prior.count,
     currentCalories,
     maintenanceCalories: maintenance,
     bmr,

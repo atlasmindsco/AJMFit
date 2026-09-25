@@ -56,6 +56,32 @@ const admin = stubAdmin({
   users: [user],
 })
 
+// The case that would previously have gone unnoticed: a client who only ever
+// uses the weekly check-in, producing one weigh-in a week.
+const weeklyOnly = stubAdmin({
+  body_metrics: [
+    { user_id: 'u1', recorded_on: d(1), weight_lb: 201.6, waist_in: null },
+    { user_id: 'u1', recorded_on: d(8), weight_lb: 201.8, waist_in: null },
+    { user_id: 'u1', recorded_on: d(15), weight_lb: 202.0, waist_in: null },
+    { user_id: 'u1', recorded_on: d(22), weight_lb: 202.1, waist_in: null },
+  ],
+  check_ins: [{ user_id: 'u1', week_of: d(2), nutrition_adherence: 5, energy: 4, hunger: 2, sleep_quality: 4, training_performance: 4 }],
+  nutrition_target_history: [{ user_id: 'u1', created_at: new Date(Date.now() - 40 * 86400000).toISOString() }],
+  nutrition_adjustments: [],
+  users: [user],
+})
+const weekly = await evaluateClient(weeklyOnly as any, user, { dryRun: true, today })
+console.log('WEEKLY-CHECK-IN-ONLY CLIENT\n')
+console.log('  weigh-ins recent/prior:', weekly.result.evidence.weighInsInWindow, '/', weekly.result.evidence.priorWeighInsInWindow)
+console.log('  verdict               :', weekly.result.verdict)
+console.log(
+  '  ',
+  weekly.result.verdict !== 'insufficient_data'
+    ? 'ok - a weekly client gets a decision'
+    : '*** FAIL: weekly client never evaluated ***'
+)
+console.log()
+
 const out = await evaluateClient(admin as any, user, { dryRun: true, today })
 const e = out.result.evidence
 console.log('GATHERING\n')
