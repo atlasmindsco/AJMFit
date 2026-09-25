@@ -15,15 +15,28 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 
+/**
+ * The mark travels inside each cover as a data URI.
+ *
+ * A cover is shown with <img src="cover.svg">, and browsers refuse to load
+ * external references from an SVG used that way, so an href to /AJMfit-logo.png
+ * would simply render nothing. Embedding costs ~34 KB a file and keeps every
+ * cover a single self-contained asset that also works as a share image.
+ */
+const LOGO = readFileSync(new URL('./logo-embed.png', import.meta.url)).toString('base64')
+
 const lib = JSON.parse(
   readFileSync(new URL('../program-library/blueprint-library.json', import.meta.url), 'utf8')
 )
 
-const INK = '#141b2d' // outline black, warmer than pure black
-const ORANGE = '#F76B16'
-const ORANGE_LT = '#FFA24D'
-const BLUE = '#1A7BFF'
-const BLUE_DK = '#0f2a5c'
+const INK = '#0b1020' // outline black, warmer than pure black
+// Sampled straight off the logo artwork rather than guessed: its blues are a
+// far deeper royal than the site's #1A7BFF, and its orange is closer to a
+// red-orange. Covers that sit next to the mark have to use the mark's colours.
+const ORANGE = '#EE3A00'
+const ORANGE_LT = '#FF8A1F'
+const BLUE = '#0B5CE8'
+const BLUE_DK = '#001A6E'
 const STEEL = '#8FA3BF'
 const STEEL_LT = '#D8E3F0'
 const STEEL_DK = '#43536e'
@@ -235,9 +248,7 @@ function cover(key, split) {
             text-anchor="middle" letter-spacing="2">${split.days_per_week} DAYS / WEEK</text>
     </g>
 
-    <text x="70" y="100" font-family="${FONT}" font-weight="800" font-size="34" fill="#fff"
-          letter-spacing="8" stroke="${INK}" stroke-width="6" paint-order="stroke"
-          stroke-linejoin="round">AJM FIT</text>
+    <image href="data:image/png;base64,${LOGO}" x="50" y="26" width="204" height="136"/>
 
     ${
       split.recommended
