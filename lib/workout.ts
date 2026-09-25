@@ -89,7 +89,14 @@ export async function autoCloseStaleWorkouts(userId: string): Promise<void> {
   for (const w of (stale ?? []) as { id: string }[]) {
     await db
       .from('workouts')
-      .update({ ended_at: new Date().toISOString(), duration_seconds: 45 * 60 })
+      // Duration stays NULL rather than being invented.
+      //
+      // This used to stamp 45 * 60 on every session it closed, so a workout
+      // nobody timed came back as a confident "45 min". Jamel's two sessions
+      // on 17 Sep 2026 both read exactly 45 minutes for that reason: neither
+      // number was measured. The history row already renders the duration only
+      // when there is one, so null simply shows no time, which is the truth.
+      .update({ ended_at: new Date().toISOString(), duration_seconds: null })
       .eq('id', w.id)
   }
 }
