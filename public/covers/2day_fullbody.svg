@@ -1,35 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Full Body (2-day)">
   <defs>
-    <linearGradient id="o" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#F76B16"/>
+    <linearGradient id="o" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#FFA24D"/><stop offset="1" stop-color="#F76B16"/>
     </linearGradient>
-    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1A7BFF"/><stop offset="1" stop-color="#0f1d38"/>
+    <linearGradient id="b" x1="0.2" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A7BFF"/><stop offset="1" stop-color="#0f2a5c"/>
     </linearGradient>
-    <clipPath id="card"><rect width="1200" height="630" rx="28"/></clipPath>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="3.4" fill="#fff" opacity="0.16"/>
+    </pattern>
+    <clipPath id="card"><rect width="1200" height="630" rx="30"/></clipPath>
   </defs>
   <g clip-path="url(#card)">
     <rect width="1200" height="630" fill="url(#b)"/>
-    <path d="M0 0 H690 L470 630 H0 Z" fill="url(#o)"/>
-    <path d="M690 0 L716 0 L496 630 L470 630 Z" fill="#ffffff" opacity="0.92"/>
-    <g opacity="0.14" fill="none" stroke="#fff" stroke-width="2">
-      <line x1="760" y1="-40" x2="640" y2="670"/><line x1="812" y1="-40" x2="692" y2="670"/><line x1="864" y1="-40" x2="744" y2="670"/><line x1="916" y1="-40" x2="796" y2="670"/><line x1="968" y1="-40" x2="848" y2="670"/><line x1="1020" y1="-40" x2="900" y2="670"/><line x1="1072" y1="-40" x2="952" y2="670"/><line x1="1124" y1="-40" x2="1004" y2="670"/><line x1="1176" y1="-40" x2="1056" y2="670"/>
+    <rect width="1200" height="630" fill="url(#dots)"/>
+    <g transform="translate(880,300)"><path d="M150.0 0.0 L469.3 25.8 L469.3 -25.8 Z" fill="#fff" opacity="0.13"/><path d="M143.9 42.3 L509.0 180.4 L525.7 123.4 Z" fill="#fff" opacity="0.13"/><path d="M126.2 81.1 L494.3 357.5 L530.5 301.1 Z" fill="#fff" opacity="0.13"/><path d="M98.2 113.4 L287.8 371.6 L326.8 337.7 Z" fill="#fff" opacity="0.13"/><path d="M62.3 136.4 L197.0 502.8 L251.0 478.1 Z" fill="#fff" opacity="0.13"/><path d="M21.3 148.5 L53.5 607.7 L119.9 598.1 Z" fill="#fff" opacity="0.13"/><path d="M-21.3 148.5 L-92.4 460.8 L-41.2 468.2 Z" fill="#fff" opacity="0.13"/><path d="M-62.3 136.4 L-251.0 478.1 L-197.0 502.8 Z" fill="#fff" opacity="0.13"/><path d="M-98.2 113.4 L-424.2 438.4 L-373.5 482.3 Z" fill="#fff" opacity="0.13"/><path d="M-126.2 81.1 L-408.8 232.0 L-380.8 275.5 Z" fill="#fff" opacity="0.13"/><path d="M-143.9 42.3 L-525.7 123.4 L-509.0 180.4 Z" fill="#fff" opacity="0.13"/><path d="M-150.0 0.0 L-609.1 -33.5 L-609.1 33.5 Z" fill="#fff" opacity="0.13"/><path d="M-143.9 -42.3 L-443.0 -157.0 L-457.6 -107.4 Z" fill="#fff" opacity="0.13"/><path d="M-126.2 -81.1 L-437.5 -316.5 L-469.6 -266.5 Z" fill="#fff" opacity="0.13"/><path d="M-98.2 -113.4 L-373.5 -482.3 L-424.2 -438.4 Z" fill="#fff" opacity="0.13"/><path d="M-62.3 -136.4 L-171.4 -437.6 L-218.5 -416.1 Z" fill="#fff" opacity="0.13"/><path d="M-21.3 -148.5 L-47.4 -537.9 L-106.1 -529.5 Z" fill="#fff" opacity="0.13"/><path d="M21.3 -148.5 L119.9 -598.1 L53.5 -607.7 Z" fill="#fff" opacity="0.13"/><path d="M62.3 -136.4 L218.5 -416.1 L171.4 -437.6 Z" fill="#fff" opacity="0.13"/><path d="M98.2 -113.4 L375.5 -388.0 L330.7 -426.9 Z" fill="#fff" opacity="0.13"/><path d="M126.2 -81.1 L530.5 -301.1 L494.3 -357.5 Z" fill="#fff" opacity="0.13"/><path d="M143.9 -42.3 L457.6 -107.4 L443.0 -157.0 Z" fill="#fff" opacity="0.13"/></g>
+
+    <path d="M0 0 H700 L474 630 H0 Z" fill="url(#o)"/>
+    <path d="M700 0 L474 630" fill="none" stroke="#141b2d" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M726 0 L500 630 L546 630 L772 0 Z" fill="#fff" stroke="#141b2d" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <g transform="translate(890,300)">
+  <g>
+    <g transform="translate(-150,-40) rotate(-14)">
+      <rect x="-78" y="-13" width="156" height="26" rx="13" fill="#8FA3BF" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+      
+  <ellipse cx="-92" cy="0" rx="26.04" ry="62" fill="#43536e" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="-98.2" cy="0" rx="18.599999999999998" ry="53.32" fill="#8FA3BF" stroke="#141b2d" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M-106.88 -32.24 q 11.16 31 0 64.48"
+        fill="none" stroke="#D8E3F0" stroke-width="7" stroke-linecap="round" opacity="0.95"/>
+  <ellipse cx="92" cy="0" rx="26.04" ry="62" fill="#43536e" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="85.8" cy="0" rx="18.599999999999998" ry="53.32" fill="#8FA3BF" stroke="#141b2d" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M77.12 -32.24 q 11.16 31 0 64.48"
+        fill="none" stroke="#D8E3F0" stroke-width="7" stroke-linecap="round" opacity="0.95"/>
     </g>
-    
-  <g transform="translate(905,300) scale(1.25)" opacity="0.92">
-    <rect x="-70" y="-7" width="140" height="14" rx="7" fill="#cfd8e6"/>
-    <rect x="-104" y="-38" width="34" height="76" rx="9" fill="#39495f"/>
-    <rect x="70" y="-38" width="34" height="76" rx="9" fill="#39495f"/>
-  </g>
-    <text x="72" y="352" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="124"
-          fill="#fff" letter-spacing="-1" style="text-transform:uppercase">
-      <tspan x="72" dy="0">FULL BODY</tspan>
-    </text>
-    <rect x="72" y="390" width="226" height="62" rx="31" fill="#1B2D50" opacity="0.92"/>
-    <text x="185" y="431"
-          font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="700" font-size="34" fill="#fff" text-anchor="middle"
-          letter-spacing="3">2 DAYS / WEEK</text>
-    <text x="72" y="96" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="700" font-size="30" fill="#fff" opacity="0.85" letter-spacing="7">AJM FIT</text>
-    <g transform="translate(1058,86)"><circle r="46" fill="#fff" opacity="0.95"/><text y="-2" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="24" fill="#F76B16" text-anchor="middle">TOP</text><text y="24" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="700" font-size="20" fill="#1B2D50" text-anchor="middle">PICK</text></g>
+    <g transform="translate(160,60) rotate(12)">
+      <rect x="-78" y="-13" width="156" height="26" rx="13" fill="#8FA3BF" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+      
+  <ellipse cx="-92" cy="0" rx="26.04" ry="62" fill="#43536e" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="-98.2" cy="0" rx="18.599999999999998" ry="53.32" fill="#8FA3BF" stroke="#141b2d" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M-106.88 -32.24 q 11.16 31 0 64.48"
+        fill="none" stroke="#D8E3F0" stroke-width="7" stroke-linecap="round" opacity="0.95"/>
+  <ellipse cx="92" cy="0" rx="26.04" ry="62" fill="#43536e" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="85.8" cy="0" rx="18.599999999999998" ry="53.32" fill="#8FA3BF" stroke="#141b2d" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M77.12 -32.24 q 11.16 31 0 64.48"
+        fill="none" stroke="#D8E3F0" stroke-width="7" stroke-linecap="round" opacity="0.95"/>
+    </g>
+  </g></g>
+
+    <g font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="118" letter-spacing="-1">
+      <text x="70" y="312" fill="#141b2d" transform="translate(7,8)"><tspan x="70" dy="0">FULL BODY</tspan></text>
+      <text x="70" y="312" fill="#fff" stroke="#141b2d" stroke-width="15"
+            stroke-linejoin="round" paint-order="stroke"><tspan x="70" dy="0">FULL BODY</tspan></text>
+    </g>
+
+    <g transform="translate(70,358)">
+      <rect width="290" height="72" rx="36" fill="#141b2d"/>
+      <rect x="5" y="5" width="280" height="62" rx="31" fill="#F76B16"/>
+      <text x="145" y="48" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="38" fill="#fff"
+            text-anchor="middle" letter-spacing="2">2 DAYS / WEEK</text>
+    </g>
+
+    <text x="70" y="100" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="34" fill="#fff"
+          letter-spacing="8" stroke="#141b2d" stroke-width="6" paint-order="stroke"
+          stroke-linejoin="round">AJM FIT</text>
+
+    <g transform="translate(1062,92) rotate(-12)">
+      <circle r="56" fill="#141b2d"/><circle r="50" fill="#FFD34D"/>
+      <text y="-4" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="27" fill="#141b2d" text-anchor="middle">TOP</text>
+      <text y="26" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="24" fill="#141b2d" text-anchor="middle">PICK</text>
+    </g>
+
+    <rect x="4" y="4" width="1192" height="622" rx="28" fill="none" stroke="#141b2d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
   </g>
 </svg>
