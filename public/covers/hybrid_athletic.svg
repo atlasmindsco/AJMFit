@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Athletic Performance (4-day)">
+  <defs>
+    <linearGradient id="o" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#F76B16"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A7BFF"/><stop offset="1" stop-color="#0f1d38"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="1200" height="630" rx="28"/></clipPath>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="1200" height="630" fill="url(#b)"/>
+    <path d="M0 0 H690 L470 630 H0 Z" fill="url(#o)"/>
+    <path d="M690 0 L716 0 L496 630 L470 630 Z" fill="#ffffff" opacity="0.92"/>
+    <g opacity="0.14" fill="none" stroke="#fff" stroke-width="2">
+      <line x1="760" y1="-40" x2="640" y2="670"/><line x1="812" y1="-40" x2="692" y2="670"/><line x1="864" y1="-40" x2="744" y2="670"/><line x1="916" y1="-40" x2="796" y2="670"/><line x1="968" y1="-40" x2="848" y2="670"/><line x1="1020" y1="-40" x2="900" y2="670"/><line x1="1072" y1="-40" x2="952" y2="670"/><line x1="1124" y1="-40" x2="1004" y2="670"/><line x1="1176" y1="-40" x2="1056" y2="670"/>
+    </g>
+    
+  <g transform="translate(905,300) scale(1.25)" opacity="0.92" fill="none" stroke="#cfd8e6" stroke-width="15" stroke-linecap="round">
+    <circle cx="14" cy="-76" r="22" fill="#cfd8e6" stroke="none"/>
+    <path d="M-16 6 L26 -34 L66 -10"/>
+    <path d="M26 -34 L20 26 L-24 66"/>
+    <path d="M20 26 L62 52"/>
+    <path d="M-2 -28 L-52 -14"/>
+  </g>
+    <text x="72" y="300" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="800" font-size="104"
+          fill="#fff" letter-spacing="-1" style="text-transform:uppercase">
+      <tspan x="72" dy="0">ATHLETIC</tspan><tspan x="72" dy="95.68">PERFORMANCE</tspan>
+    </text>
+    <rect x="72" y="442" width="226" height="62" rx="31" fill="#1B2D50" opacity="0.92"/>
+    <text x="185" y="483"
+          font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="700" font-size="34" fill="#fff" text-anchor="middle"
+          letter-spacing="3">4 DAYS / WEEK</text>
+    <text x="72" y="96" font-family="'Barlow Condensed','Arial Narrow',Haettenschweiler,Impact,sans-serif" font-weight="700" font-size="30" fill="#fff" opacity="0.85" letter-spacing="7">AJM FIT</text>
+    
+  </g>
+</svg>
