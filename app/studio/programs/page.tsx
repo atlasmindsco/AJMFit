@@ -37,7 +37,14 @@ import {
 } from '@/lib/progression'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
-import { fetchMyProgram } from '@/lib/programs'
+import {
+  completeBlock,
+  fetchMyBlock,
+  fetchMyProgram,
+  gatherReviewInputs,
+  type Assignment,
+} from '@/lib/programs'
+import { blockProgress, buildReview, recommendNextBlock, type BlockReview } from '@/lib/blocks'
 
 /* ── Types ── */
 interface ExerciseDB {
@@ -111,6 +118,13 @@ type ProgramView = 'preview' | 'workout' | 'exercise'
  * client saw a program that was not theirs before their own arrived, and a
  * coached client with nothing assigned never saw anything else.
  */
+/**
+ * Sessions a block needs before its end is worth interrupting someone about.
+ * Below this there is nothing to review, only an absence to notice — and the
+ * coach dashboard already notices absences.
+ */
+const MIN_SESSIONS_FOR_REVIEW = 4
+
 const EMPTY_PROGRAM = {
   name: '',
   level: '',
@@ -348,6 +362,10 @@ export default function ProgramsPage() {
   const [rirByExercise, setRirByExercise] = useState<Record<string, number>>({})
   /** Used only to spot a client typing their own weight into a load field. */
   const [bodyWeightLb, setBodyWeightLb] = useState<number | null>(null)
+  /** The training block this client is in. Null until loaded, or if they have no program. */
+  const [block, setBlock] = useState<Assignment | null>(null)
+  const [blockReview, setBlockReview] = useState<BlockReview | null>(null)
+  const [reviewDismissed, setReviewDismissed] = useState(false)
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
@@ -405,6 +423,34 @@ export default function ProgramsPage() {
         // "All Levels"; the answer is in onboarding and was never read.
         const cw = Number(onboarding?.answers?.currentWeight)
         if (Number.isFinite(cw) && cw > 0) setBodyWeightLb(cw)
+
+        // The block this client is in. If it has run its eight weeks and has
+        // not been reviewed yet, build the review now — this is the moment the
+        // product has never had, where a program actually finishes.
+        const b = await fetchMyBlock(id)
+        if (!active) return
+        setBlock(b)
+        if (b && !b.completed_at) {
+          const prog = blockProgress(b.assigned_at, b.block_weeks)
+          if (prog.isComplete) {
+            const inputs = await gatherReviewInputs(id, b.assigned_at)
+            if (!active) return
+            const review = buildReview({ blockWeeks: b.block_weeks, ...inputs })
+
+            // Close it either way, but only INTERRUPT someone who actually
+            // trained. Two clients carry assignments from July, before blocks
+            // existed, with zero sessions logged against them — opening the app
+            // to a "Block complete, 8 weeks done" celebration of nothing would
+            // make the feature look broken and would read as sarcasm. Their
+            // inactivity already reaches Anthony through the at-risk status,
+            // which is the right channel for it.
+            completeBlock(b.id, review).catch((err) =>
+              console.error('[Block] Failed to record completion:', err)
+            )
+            setBlock({ ...b, completed_at: new Date().toISOString(), review })
+            if (review.sessions >= MIN_SESSIONS_FOR_REVIEW) setBlockReview(review)
+          }
+        }
 
         setLevel(
           experienceFrom(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
@@ -757,6 +803,16 @@ export default function ProgramsPage() {
         {workoutSummary && (
           <WorkoutComplete summary={workoutSummary} onDone={() => setWorkoutSummary(null)} />
         )}
+        {blockReview && !reviewDismissed && (
+          <BlockComplete
+            review={blockReview}
+            onPickNew={() => {
+              setReviewDismissed(true)
+              setShowPicker(true)
+            }}
+            onKeepGoing={() => setReviewDismissed(true)}
+          />
+        )}
       </AnimatePresence>
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8">
@@ -791,6 +847,34 @@ export default function ProgramsPage() {
             </div>
           </div>
         </div>
+
+        {/* Where you are in the block.
+            A program used to have no length, so it had no end and no week
+            number — clients sat on one template for weeks without ever being
+            told how far through they were or that there was a finish line. */}
+        {block && !block.completed_at && (() => {
+          const prog = blockProgress(block.assigned_at, block.block_weeks)
+          return (
+            <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
+              <div className="flex items-baseline justify-between mb-2.5">
+                <p className="font-display font-bold text-white text-sm">
+                  Week {prog.week} of {prog.totalWeeks}
+                </p>
+                <p className="text-white/35 text-2xs font-body">
+                  {prog.isFinalWeek
+                    ? 'Final week — results at the end'
+                    : `${prog.daysLeft} days to go`}
+                </p>
+              </div>
+              <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-brand-orange transition-[width] duration-500"
+                  style={{ width: `${Math.round(prog.fraction * 100)}%` }}
+                />
+              </div>
+            </div>
+          )
+        })()}
 
         {/* How to progress. The library prescribes sets and reps but never said
             how this week should differ from last week, which is the difference
@@ -2347,6 +2431,108 @@ function SetupCard({ icon, label, value }: { icon: string; label: string; value:
  * is the habit worth reinforcing, and it previously got no acknowledgement at
  * all.
  */
+/**
+ * The end of a block.
+ *
+ * Before this there was nothing here at all: a program ran until the client
+ * chose something else, and eight weeks of work produced no moment where
+ * anybody looked at what had happened. Every number on this screen comes from
+ * sets they already logged — the value is entirely in putting them in one
+ * place at the one moment a client is ready to think about what is next.
+ */
+function BlockComplete({
+  review,
+  onPickNew,
+  onKeepGoing,
+}: {
+  review: BlockReview
+  onPickNew: () => void
+  onKeepGoing: () => void
+}) {
+  const next = recommendNextBlock(review)
+  const movers = review.lifts.filter((l) => l.change !== 0).slice(0, 5)
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/75 overflow-y-auto py-8">
+      <motion.div
+        initial={{ scale: 0.94, opacity: 0, y: 16 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+        className="w-full max-w-md px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
+      >
+        <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.2em]">
+          Block complete
+        </p>
+        <h2 className="font-display font-extrabold text-2xl text-white tracking-tight mt-2 mb-4">
+          {review.weeks} weeks done
+        </h2>
+
+        <p className="text-white/70 text-sm font-body leading-relaxed mb-5">{review.headline}</p>
+
+        <div className="flex items-start gap-3 mb-5">
+          {[
+            [String(review.sessions), review.sessions === 1 ? 'Session' : 'Sessions'],
+            [String(review.perWeek), 'Per week'],
+            [String(review.improved), review.improved === 1 ? 'Lift up' : 'Lifts up'],
+          ].map(([value, label]) => (
+            <div key={label} className="flex-1">
+              <p className="font-display font-extrabold text-xl text-white tabular-nums">{value}</p>
+              <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {movers.length > 0 && (
+          <div className="rounded-control border border-white/[0.08] divide-y divide-white/[0.06] mb-5">
+            {movers.map((l) => (
+              <div key={l.exercise} className="flex items-center justify-between px-3.5 py-2.5 gap-3">
+                <span className="text-white/70 text-xs font-body truncate">{l.exercise}</span>
+                <span
+                  className={`shrink-0 text-xs font-body font-semibold tabular-nums ${
+                    l.change > 0 ? 'text-state-success' : 'text-state-warning'
+                  }`}
+                >
+                  {l.first} → {l.last} lbs
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {review.weightChangeLb !== null && review.weightChangeLb !== 0 && (
+          <p className="text-white/45 text-xs font-body mb-5">
+            Bodyweight {review.weightChangeLb > 0 ? 'up' : 'down'}{' '}
+            {Math.abs(review.weightChangeLb)} lbs across the block.
+          </p>
+        )}
+
+        <div className="rounded-control bg-brand-blue/[0.08] border border-brand-blue/25 px-4 py-3.5 mb-6">
+          <p className="font-display font-bold text-white text-sm">{next.title}</p>
+          <p className="text-white/60 text-xs font-body leading-relaxed mt-1">{next.detail}</p>
+        </div>
+
+        <div className="flex gap-2.5">
+          <button
+            onClick={onPickNew}
+            className="flex-1 py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+          >
+            Choose next
+          </button>
+          <button
+            onClick={onKeepGoing}
+            className="flex-1 py-3.5 bg-white/[0.06] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
+          >
+            Keep this one
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 function WorkoutComplete({
   summary,
   onDone,

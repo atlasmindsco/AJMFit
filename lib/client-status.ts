@@ -25,6 +25,15 @@ export interface StatusInput {
   coached: boolean
   lastWorkoutAt: string | null
   checkIns: CheckIn[]
+  /**
+   * Days until this client's training block ends, when one is running.
+   *
+   * Surfaced BEFORE the block finishes rather than after, so the next one is
+   * ready on the day. A coached client who reaches their final session and
+   * then waits a week for their coach to decide what is next has been handed
+   * the dead end this whole feature exists to remove.
+   */
+  blockEndsInDays?: number | null
 }
 
 export interface StatusResult {
@@ -36,7 +45,12 @@ export interface StatusResult {
 const daysSince = (iso: string | null): number | null =>
   iso == null ? null : Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
 
-export function clientStatus({ coached, lastWorkoutAt, checkIns }: StatusInput): StatusResult {
+export function clientStatus({
+  coached,
+  lastWorkoutAt,
+  checkIns,
+  blockEndsInDays,
+}: StatusInput): StatusResult {
   const sorted = [...checkIns].sort((a, b) => b.week_of.localeCompare(a.week_of))
   const thisWeek = weekOf()
   const lastWeek = previousWeekOf(thisWeek)
@@ -63,7 +77,22 @@ export function clientStatus({ coached, lastWorkoutAt, checkIns }: StatusInput):
     return { status: 'at_risk', reason: 'Missed the last two check-ins' }
   }
 
-  // 3. Training, but something in the last check-in needs a response.
+  // 3. A coached client's block is about to end and needs a decision.
+  //
+  // Sits above the check-in signals because it has a deadline the others do
+  // not: those can be answered tomorrow, and this one stops being useful the
+  // moment the client finishes their last session.
+  if (coached && blockEndsInDays != null && blockEndsInDays >= 0 && blockEndsInDays <= 7) {
+    return {
+      status: 'needs_attention',
+      reason:
+        blockEndsInDays === 0
+          ? 'Training block ends today — next block needed'
+          : `Training block ends in ${blockEndsInDays} days — decide what is next`,
+    }
+  }
+
+  // 4. Training, but something in the last check-in needs a response.
   const latest = sorted[0]
   if (latest) {
     if (latest.energy != null && latest.energy <= 2) {
@@ -83,7 +112,7 @@ export function clientStatus({ coached, lastWorkoutAt, checkIns }: StatusInput):
     return { status: 'needs_attention', reason: `Last workout ${sinceWorkout} days ago` }
   }
 
-  // 4. Nothing wrong, but this week's check-in has not arrived yet.
+  // 5. Nothing wrong, but this week's check-in has not arrived yet.
   if (coached && !sorted.some((c) => c.week_of === thisWeek)) {
     return { status: 'check_in_due', reason: 'No check-in for this week yet' }
   }

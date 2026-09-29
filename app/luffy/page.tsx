@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { fetchActiveBlocks, type Assignment } from '@/lib/programs'
+import { blockProgress } from '@/lib/blocks'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchClients, tierLabel, relativeTime, type ClientRow } from '@/lib/admin'
@@ -27,23 +29,26 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState<ClientRow[]>([])
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [checkIns, setCheckIns] = useState<CheckIn[]>([])
+  const [blocks, setBlocks] = useState<Map<string, Assignment>>(new Map())
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f, ci] = await Promise.all([
+        const [s, c, f, ci, bl] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
           fetchAllCheckIns().catch(() => []),
+          fetchActiveBlocks().catch(() => new Map()),
         ])
         if (!active) return
         setStats(s)
         setClients(c)
         setFeedback(f)
         setCheckIns(ci)
+        setBlocks(bl)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -123,6 +128,10 @@ export default function AdminDashboard() {
                         coached: tier === 'accelerator' || tier === 'full-experience',
                         lastWorkoutAt: client.last_workout_at,
                         checkIns: checkIns.filter((ci) => ci.user_id === client.id),
+                        blockEndsInDays: (() => {
+                          const b = blocks.get(client.id)
+                          return b ? blockProgress(b.assigned_at, b.block_weeks).daysLeft : null
+                        })(),
                       })
                       return { client, status, reason }
                     })
