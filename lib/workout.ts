@@ -151,6 +151,8 @@ export interface SaveSetInput {
   isIntensitySet?: boolean
   intensityTechnique?: IntensityTechnique | null
   completed?: boolean
+  /** Reps left in reserve. Optional; null means the client did not say. */
+  rir?: number | null
 }
 
 export async function saveSet(input: SaveSetInput) {
@@ -180,6 +182,7 @@ export async function saveSet(input: SaveSetInput) {
         is_intensity_set: input.isIntensitySet ?? false,
         intensity_technique: input.intensityTechnique ?? null,
         completed: input.completed ?? false,
+        rir: input.rir ?? null,
         logged_at: new Date().toISOString(),
       },
       { onConflict: 'workout_id,exercise_name,set_number,is_intensity_set' }
@@ -357,6 +360,99 @@ export async function fetchSwaps(userId: string): Promise<SwapRow[]> {
 export interface LastSet {
   weight: number | null
   reps: number | null
+  rir?: number | null
+}
+
+/** One past session on one exercise, summarised. */
+export interface ExerciseSession {
+  /** Local calendar date, YYYY-MM-DD. */
+  date: string
+  /** Heaviest working set that session. */
+  topWeight: number
+  /** Reps achieved on the heaviest set. */
+  topReps: number
+  /** Lowest rep count across the working sets — where the set actually failed. */
+  lowestReps: number
+  sets: number
+  /** Lowest reported RIR that session, or null if nobody said. */
+  rir: number | null
+}
+
+/**
+ * The last several sessions on every exercise, newest first.
+ *
+ * fetchLastSets returns a single session, which is enough to say "beat this"
+ * and not enough to say anything else. One session cannot tell a first stall
+ * from a fourth, cannot see a lift sliding backwards, and cannot tell whether
+ * a bad day is a bad day or a trend — which is why seven exercises across the
+ * client base went down over weeks with nothing noticing.
+ *
+ * Six sessions is the window: long enough for a stall to be real, short enough
+ * that a block from two months ago does not drag the verdict around.
+ */
+export async function fetchExerciseHistory(
+  userId: string,
+  sessionsPerExercise = 6
+): Promise<Record<string, ExerciseSession[]>> {
+  const { data, error } = await db
+    .from('workout_sets')
+    .select('exercise_name, weight, reps, rir, workout_id, workouts!inner(date)')
+    .eq('user_id', userId)
+    .eq('completed', true)
+    .eq('is_intensity_set', false)
+    .order('logged_at', { ascending: false })
+    .limit(2000)
+  if (error) return {}
+
+  type Row = {
+    exercise_name: string
+    weight: number | null
+    reps: number | null
+    rir: number | null
+    workout_id: string
+    workouts: { date: string } | { date: string }[] | null
+  }
+
+  // Group by exercise, then by the workout the set belonged to. Grouping on
+  // workout_id rather than date keeps two sessions on the same calendar day
+  // apart, which matters for anyone who trains twice.
+  const byExercise = new Map<string, Map<string, { date: string; rows: Row[] }>>()
+  for (const row of (data ?? []) as Row[]) {
+    if (row.weight == null || row.reps == null) continue
+    const w = Array.isArray(row.workouts) ? row.workouts[0] : row.workouts
+    const date = w?.date ?? ''
+    if (!date) continue
+    let sessions = byExercise.get(row.exercise_name)
+    if (!sessions) {
+      sessions = new Map()
+      byExercise.set(row.exercise_name, sessions)
+    }
+    const s = sessions.get(row.workout_id)
+    if (s) s.rows.push(row)
+    else sessions.set(row.workout_id, { date, rows: [row] })
+  }
+
+  const out: Record<string, ExerciseSession[]> = {}
+  for (const [name, sessions] of Array.from(byExercise.entries())) {
+    const summarised = Array.from(sessions.values())
+      .map(({ date, rows }) => {
+        const top = rows.reduce((a, b) => (Number(b.weight) > Number(a.weight) ? b : a))
+        const reps = rows.map((r) => Number(r.reps) || 0)
+        const rirs = rows.map((r) => r.rir).filter((r): r is number => r != null)
+        return {
+          date,
+          topWeight: Number(top.weight) || 0,
+          topReps: Number(top.reps) || 0,
+          lowestReps: reps.length ? Math.min(...reps) : 0,
+          sets: rows.length,
+          rir: rirs.length ? Math.min(...rirs) : null,
+        }
+      })
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, sessionsPerExercise)
+    out[name] = summarised
+  }
+  return out
 }
 
 /**

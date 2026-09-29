@@ -18,13 +18,23 @@ import {
   fetchWorkoutHistory as dbFetchWorkoutHistory,
   autoCloseStaleWorkouts as dbAutoCloseStaleWorkouts,
   fetchLastSets as dbFetchLastSets,
+  fetchExerciseHistory as dbFetchExerciseHistory,
+  type ExerciseSession,
   type LastSet,
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
-import { PROGRESSION, nextTarget, type ProgressionGoal } from '@/lib/progression'
+import {
+  PROGRESSION,
+  experienceFrom,
+  isBodyweightMovement,
+  nextTarget,
+  sessionFatigue,
+  type ExperienceLevel,
+  type ProgressionGoal,
+} from '@/lib/progression'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import { fetchMyProgram } from '@/lib/programs'
@@ -332,6 +342,12 @@ export default function ProgramsPage() {
   const [loading, setLoading] = useState(true)
   // What this client did last time on each exercise, shown while they log.
   const [lastSets, setLastSets] = useState<Record<string, LastSet[]>>({})
+  /** Last six sessions per exercise. One session cannot tell a stall from a bad day. */
+  const [exHistory, setExHistory] = useState<Record<string, ExerciseSession[]>>({})
+  const [level, setLevel] = useState<ExperienceLevel>('beginner')
+  const [rirByExercise, setRirByExercise] = useState<Record<string, number>>({})
+  /** Used only to spot a client typing their own weight into a load field. */
+  const [bodyWeightLb, setBodyWeightLb] = useState<number | null>(null)
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
@@ -344,6 +360,8 @@ export default function ProgramsPage() {
     seconds: number
     sets: number
     volume: number
+    /** Set when several lifts came in under last time. */
+    fatigue: string | null
   } | null>(null)
   const loadHistory = useCallback((uid: string) => {
     dbFetchWorkoutHistory(uid, 12)
@@ -381,6 +399,17 @@ export default function ProgramsPage() {
           fetchMyOnboarding(id),
         ])
         if (!active) return
+
+        // Training age decides how big a load jump is and how many flat
+        // sessions count as a stall. Every program in the library is stamped
+        // "All Levels"; the answer is in onboarding and was never read.
+        const cw = Number(onboarding?.answers?.currentWeight)
+        if (Number.isFinite(cw) && cw > 0) setBodyWeightLb(cw)
+
+        setLevel(
+          experienceFrom(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
+        )
+
         if (program) {
           await applyLoadedProgram(program.id)
         } else if (tier === 'blueprint') {
@@ -518,6 +547,10 @@ export default function ProgramsPage() {
     dbFetchLastSets(id)
       .then(setLastSets)
       .catch((err) => console.error('[Last sets] Failed to load:', err))
+
+    dbFetchExerciseHistory(id)
+      .then(setExHistory)
+      .catch((err) => console.error('[Exercise history] Failed to load:', err))
 
     dbFetchPRs(id)
       .then((rows) => {
@@ -771,10 +804,9 @@ export default function ProgramsPage() {
             </div>
           )
           return (
-            <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4 grid grid-cols-1 sm:grid-cols-2 gap-5">
               {item('How to progress', p.rule)}
               {item('How hard to push', p.effort)}
-              {item('Backing off', p.deload)}
             </div>
           )
         })()}
@@ -1238,23 +1270,94 @@ export default function ProgramsPage() {
                                           prescribes sets and reps but never said what to do
                                           differently from one week to the next. */}
                                       {(() => {
+                                        const hist = exHistory[displayName] ?? []
+                                        const daysSinceLast = hist[0]
+                                          ? Math.max(
+                                              0,
+                                              Math.round(
+                                                (Date.now() - Date.parse(hist[0].date + 'T00:00:00')) / 86400000
+                                              )
+                                            )
+                                          : 0
                                         const t = nextTarget(
                                           displayName,
                                           exercise.reps,
-                                          (programGoal ?? 'muscle') as ProgressionGoal,
-                                          lastSets[displayName]
+                                          {
+                                            goal: (programGoal ?? 'muscle') as ProgressionGoal,
+                                            level,
+                                            daysSinceLast,
+                                            bodyWeightLb,
+                                          },
+                                          hist
                                         )
                                         if (!t) return null
+
+                                        // Last session as a LABEL, not a placeholder. The
+                                        // previous numbers used to live in the input's grey
+                                        // placeholder, styled exactly like the word "lbs" and
+                                        // gone the moment a digit was typed — so they vanished
+                                        // at the exact moment the client was deciding whether
+                                        // last week was hard.
+                                        const prevSets = (lastSets[displayName] ?? []).filter(
+                                          (s) => s && s.weight != null && s.reps != null
+                                        )
+                                        const trend = hist.slice(0, 6).reverse()
+                                        const trendMax = Math.max(...trend.map((s) => s.topWeight), 1)
+
                                         return (
-                                          <div
-                                            className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
-                                              t.addLoad
-                                                ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
-                                                : 'bg-white/[0.03] border-white/[0.08] text-white/55'
-                                            }`}
-                                          >
-                                            {t.text}
-                                          </div>
+                                          <>
+                                            {prevSets.length > 0 && (
+                                              <div className="mb-2 flex items-center justify-between gap-3">
+                                                <p className="text-white/40 text-2xs font-body">
+                                                  <span className="text-white/25">Last time: </span>
+                                                  {Number(prevSets[0].weight)} lbs ·{' '}
+                                                  {prevSets.map((s) => s.reps).join(', ')}
+                                                </p>
+                                                {/* Six-session trend. A client who can see their
+                                                    bench has been flat for five weeks works out
+                                                    the stall before the app has to say it. */}
+                                                {trend.length >= 3 && (
+                                                  <span
+                                                    className="flex items-end gap-[3px] h-5 shrink-0"
+                                                    title={trend
+                                                      .map((s) => `${s.date}: ${s.topWeight} lbs x ${s.topReps}`)
+                                                      .join('\n')}
+                                                    aria-label={`Recent top sets: ${trend
+                                                      .map((s) => `${s.topWeight} pounds`)
+                                                      .join(', ')}`}
+                                                  >
+                                                    {trend.map((s, i) => (
+                                                      <span
+                                                        key={i}
+                                                        className={`w-[5px] rounded-sm ${
+                                                          i === trend.length - 1
+                                                            ? 'bg-brand-blue'
+                                                            : 'bg-white/25'
+                                                        }`}
+                                                        style={{
+                                                          height: `${Math.max(
+                                                            14,
+                                                            (s.topWeight / trendMax) * 100
+                                                          )}%`,
+                                                        }}
+                                                      />
+                                                    ))}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            )}
+                                            <div
+                                              className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
+                                                t.addLoad
+                                                  ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
+                                                  : t.attention
+                                                    ? 'bg-state-warning/[0.10] border-state-warning/30 text-state-warning'
+                                                    : 'bg-white/[0.03] border-white/[0.08] text-white/55'
+                                              }`}
+                                            >
+                                              {t.text}
+                                            </div>
+                                          </>
                                         )
                                       })()}
 
@@ -1372,6 +1475,21 @@ export default function ProgramsPage() {
                                         const prevWeight = prev?.weight != null ? String(Number(prev.weight)) : null
                                         const prevReps = prev?.reps != null ? String(prev.reps) : null
 
+                                        // Bodyweight typed into a load field.
+                                        //
+                                        // This has already happened: an Inverted Row logged at
+                                        // 160 lb and a Floor Glute-Ham Raise at 158, both of them
+                                        // the client's own weight, now sitting in their personal
+                                        // records. On a movement loaded by the body, a number
+                                        // near their bodyweight is almost always the body, not
+                                        // added plates. Asked once, never blocked.
+                                        const typedWeight = Number(log.weight)
+                                        const bodyweightLooking =
+                                          isBodyweightMovement(displayName) &&
+                                          bodyWeightLb != null &&
+                                          Number.isFinite(typedWeight) &&
+                                          Math.abs(typedWeight - bodyWeightLb) <= 12
+
                                         return (
                                           <div key={si}>
                                             <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
@@ -1410,6 +1528,12 @@ export default function ProgramsPage() {
                                                 )}
                                               </div>
                                             </div>
+
+                                            {bodyweightLooking && (
+                                              <p className="ml-8 mr-10 mb-1.5 text-state-warning/80 text-2xs font-body">
+                                                That looks like your bodyweight. This one is already loaded by you — put ADDED weight here, or 0 if there is none.
+                                              </p>
+                                            )}
 
                                             {/* Rest timer between sets */}
                                             {filled && !isLastSet && (
@@ -1463,6 +1587,61 @@ export default function ProgramsPage() {
                                           </div>
                                         )
                                       })}
+
+                                      {/* How hard was that?
+                                          One optional tap per exercise, not per set. The program
+                                          tells everyone to leave reps in reserve and never asks
+                                          whether they did, which is why a stall cannot be read:
+                                          stuck at 135x9 with three left is an effort problem,
+                                          stuck at 135x9 with nothing left is a real plateau, and
+                                          without this they are the same row in the database. */}
+                                      {(backingLogs ?? []).some((l) => l.weight !== '' && l.reps !== '') && (
+                                        <div className="mt-3 flex items-center gap-2 flex-wrap">
+                                          <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide">
+                                            Left in the tank
+                                          </span>
+                                          {[0, 1, 2, 3].map((n) => {
+                                            const on = rirByExercise[logKey] === n
+                                            return (
+                                              <button
+                                                key={n}
+                                                onClick={() => {
+                                                  setRirByExercise((prev) => ({ ...prev, [logKey]: n }))
+                                                  const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                                  if (!userId || !wid) return
+                                                  // Stamp it on the last completed set: the final
+                                                  // set is the one whose difficulty means anything.
+                                                  const lastIdx = backingLogs.reduce(
+                                                    (acc, l, i) => (l.weight !== '' && l.reps !== '' ? i : acc),
+                                                    -1
+                                                  )
+                                                  if (lastIdx < 0) return
+                                                  const l = backingLogs[lastIdx]
+                                                  dbSaveSet({
+                                                    workoutId: wid,
+                                                    userId,
+                                                    exerciseName: displayName,
+                                                    originalExerciseName: isSwapped ? exercise.name : null,
+                                                    setNumber: lastIdx + 1,
+                                                    weight: Number(l.weight) || null,
+                                                    reps: Number(l.reps) || null,
+                                                    isIntensitySet: false,
+                                                    completed: true,
+                                                    rir: n,
+                                                  }).catch((err) => console.error('[RIR] Failed:', err))
+                                                }}
+                                                className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                  on
+                                                    ? 'bg-brand-blue text-white'
+                                                    : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                }`}
+                                              >
+                                                {n === 0 ? 'Nothing' : n === 3 ? '3+' : n}
+                                              </button>
+                                            )
+                                          })}
+                                        </div>
+                                      )}
 
                                       {/* Intensity Technique toggle */}
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
@@ -1736,11 +1915,30 @@ export default function ProgramsPage() {
                               }
                             }
                           }
+                          // Several lifts down on the same day is a recovery
+                          // signal, not a programming one, and it is visible in
+                          // data already collected — the app simply never looked
+                          // across exercises before.
+                          const todayTops: Record<string, { topWeight: number; topReps: number }> = {}
+                          for (const ex of selected?.exercises ?? []) {
+                            const key = `${selectedDay}-${ex.name}`
+                            const name = swappedExercises[key] ?? ex.name
+                            const rows = setLogs[key] ?? []
+                            let tw = 0, tr = 0
+                            for (const r of rows) {
+                              const w = Number(r.weight), rp = Number(r.reps)
+                              if (r.weight !== '' && r.reps !== '' && !isNaN(w) && !isNaN(rp) && w > tw) { tw = w; tr = rp }
+                            }
+                            if (tw > 0) todayTops[name] = { topWeight: tw, topReps: tr }
+                          }
+                          const fatigue = sessionFatigue(todayTops, exHistory)
+
                           setWorkoutSummary({
                             dayName: selected?.name ?? 'Session',
                             seconds: elapsed,
                             sets: doneSets,
                             volume: Math.round(volume),
+                            fatigue: fatigue.text,
                           })
 
                           setWorkoutStartTime((prev) => {
@@ -2153,7 +2351,13 @@ function WorkoutComplete({
   summary,
   onDone,
 }: {
-  summary: { dayName: string; seconds: number; sets: number; volume: number }
+  summary: {
+    dayName: string
+    seconds: number
+    sets: number
+    volume: number
+    fatigue: string | null
+  }
   onDone: () => void
 }) {
   const mins = Math.max(1, Math.round(summary.seconds / 60))
@@ -2185,6 +2389,15 @@ function WorkoutComplete({
           {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
           {stat(summary.volume.toLocaleString(), 'Lbs Lifted')}
         </div>
+
+        {/* Said once, here, and nowhere else. A client who has just finished is
+            receptive to "take it easy"; the same sentence on every exercise
+            during the session would read as nagging. */}
+        {summary.fatigue && (
+          <p className="text-left text-white/55 text-xs font-body leading-relaxed mb-5 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
+            {summary.fatigue}
+          </p>
+        )}
 
         <button
           onClick={onDone}
