@@ -19,6 +19,7 @@ import {
   autoCloseStaleWorkouts as dbAutoCloseStaleWorkouts,
   fetchLastSets as dbFetchLastSets,
   fetchExerciseHistory as dbFetchExerciseHistory,
+  fetchTimedHistory as dbFetchTimedHistory,
   type ExerciseSession,
   type LastSet,
   type WorkoutHistoryRow,
@@ -45,6 +46,16 @@ import {
   type Assignment,
 } from '@/lib/programs'
 import { blockProgress, buildReview, recommendNextBlock, type BlockReview } from '@/lib/blocks'
+import {
+  canComponentProgress,
+  explosiveGuidance,
+  inferTimedRole,
+  isExplosiveMovement,
+  isTimedPrescription,
+  parsePrescribedDuration,
+  timedTarget,
+  type TimedRole,
+} from '@/lib/conditioning'
 
 /* ── Types ── */
 interface ExerciseDB {
@@ -335,6 +346,8 @@ export default function ProgramsPage() {
    * for typing to stop sends one write with the value they actually meant.
    */
   const setSaveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  /** Same debounce for timed slots: typing "25" should not write 2 then 25. */
+  const timedSaveRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   // Weight already announced per exercise, so one record sends one email.
   const prNotifiedRef = useRef<Record<string, number>>({})
 
@@ -366,6 +379,10 @@ export default function ProgramsPage() {
   const [block, setBlock] = useState<Assignment | null>(null)
   const [blockReview, setBlockReview] = useState<BlockReview | null>(null)
   const [reviewDismissed, setReviewDismissed] = useState(false)
+  /** Past runs, rows and intervals. Lifting history cannot carry these: they have no load. */
+  const [timedHistory, setTimedHistory] = useState<Record<string, Array<{ date: string; durationSeconds: number | null; distanceMi: number | null }>>>({})
+  /** Minutes typed into a timed slot, keyed like setLogs. */
+  const [timedLogs, setTimedLogs] = useState<Record<string, string>>({})
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
@@ -597,6 +614,10 @@ export default function ProgramsPage() {
     dbFetchExerciseHistory(id)
       .then(setExHistory)
       .catch((err) => console.error('[Exercise history] Failed to load:', err))
+
+    dbFetchTimedHistory(id)
+      .then(setTimedHistory)
+      .catch((err) => console.error('[Timed history] Failed to load:', err))
 
     dbFetchPRs(id)
       .then((rows) => {
@@ -1166,7 +1187,11 @@ export default function ProgramsPage() {
                           const backingLogs = fullLogs.length < exercise.sets
                             ? [...fullLogs, ...Array.from({ length: exercise.sets - fullLogs.length }, () => ({ weight: '', reps: '' }))]
                             : fullLogs
-                          const currentLogs = backingLogs.slice(0, workingSetCount)
+                          // A run is not a set of anything. Timed work gets a
+                          // duration field instead of weight-by-reps rows, so
+                          // the set list is deliberately empty for it.
+                          const timed = isTimedPrescription(exercise.reps)
+                          const currentLogs = timed ? [] : backingLogs.slice(0, workingSetCount)
                           const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
                           const pr = dbPRs[exercise.name] ?? null
                           // Check if any entered set beats the PR
@@ -1354,6 +1379,103 @@ export default function ProgramsPage() {
                                           prescribes sets and reps but never said what to do
                                           differently from one week to the next. */}
                                       {(() => {
+                                        // Timed work: a run, a row, an interval.
+                                        // Its own model entirely — the lifting
+                                        // engine returns nothing for minutes,
+                                        // which is why these slots sat at the
+                                        // same 20 or 45 minutes forever.
+                                        if (timed) {
+                                          const prescribed = parsePrescribedDuration(exercise.reps)
+                                          const role = inferTimedRole(prescribed, displayName)
+                                          const week = block
+                                            ? blockProgress(block.assigned_at, block.block_weeks).week
+                                            : 1
+                                          const tt = timedTarget({
+                                            role,
+                                            exerciseName: displayName,
+                                            prescribedSeconds: prescribed,
+                                            history: timedHistory[displayName] ?? [],
+                                            weekInBlock: week,
+                                            canProgress: canComponentProgress('running', week),
+                                          })
+                                          const past = timedHistory[displayName] ?? []
+                                          const typed = timedLogs[logKey] ?? ''
+                                          return (
+                                            <>
+                                              {past[0]?.durationSeconds != null && (
+                                                <p className="text-white/40 text-2xs font-body mb-2">
+                                                  <span className="text-white/25">Last time: </span>
+                                                  {Math.round(past[0].durationSeconds / 60)} min
+                                                </p>
+                                              )}
+                                              <div
+                                                className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
+                                                  tt.isProgression
+                                                    ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
+                                                    : 'bg-white/[0.03] border-white/[0.08] text-white/55'
+                                                }`}
+                                              >
+                                                {tt.text}
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <input
+                                                  type="number"
+                                                  inputMode="numeric"
+                                                  placeholder={
+                                                    tt.suggestSeconds
+                                                      ? String(Math.round(tt.suggestSeconds / 60))
+                                                      : 'min'
+                                                  }
+                                                  value={typed}
+                                                  onChange={(e) => {
+                                                    const v = e.target.value
+                                                    setTimedLogs((prev) => ({ ...prev, [logKey]: v }))
+                                                    const wid =
+                                                      selectedDay !== null ? workoutIds[selectedDay] : null
+                                                    const m = Number(v)
+                                                    if (!userId || !wid || !Number.isFinite(m) || m <= 0) return
+                                                    if (timedSaveRef.current[logKey]) {
+                                                      clearTimeout(timedSaveRef.current[logKey])
+                                                    }
+                                                    timedSaveRef.current[logKey] = setTimeout(() => {
+                                                      dbSaveSet({
+                                                        workoutId: wid,
+                                                        userId,
+                                                        exerciseName: displayName,
+                                                        originalExerciseName: isSwapped ? exercise.name : null,
+                                                        setNumber: 1,
+                                                        weight: null,
+                                                        reps: null,
+                                                        isIntensitySet: false,
+                                                        completed: true,
+                                                        durationSeconds: Math.round(m * 60),
+                                                      }).catch((err) =>
+                                                        console.error('[Timed save] Failed:', err)
+                                                      )
+                                                    }, 500)
+                                                  }}
+                                                  className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                <span className="text-white/35 text-xs font-body">
+                                                  minutes
+                                                </span>
+                                              </div>
+                                            </>
+                                          )
+                                        }
+
+                                        // Sprints and jumps are prescribed in reps, so they
+                                        // arrive here rather than in the timed branch. Double
+                                        // progression would cheerfully add five pounds to a box
+                                        // jump; nothing about that is a good idea.
+                                        if (isExplosiveMovement(displayName)) {
+                                          return (
+                                            <div className="mb-2 px-3 py-2 rounded-control border border-white/[0.08] bg-white/[0.03] text-white/55 text-xs font-body leading-relaxed">
+                                              {explosiveGuidance(displayName)}
+                                            </div>
+                                          )
+                                        }
+
                                         const hist = exHistory[displayName] ?? []
                                         const daysSinceLast = hist[0]
                                           ? Math.max(

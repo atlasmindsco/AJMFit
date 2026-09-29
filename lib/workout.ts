@@ -153,6 +153,9 @@ export interface SaveSetInput {
   completed?: boolean
   /** Reps left in reserve. Optional; null means the client did not say. */
   rir?: number | null
+  /** Timed work: a run, a row, an interval. Null for anything counted in reps. */
+  durationSeconds?: number | null
+  distanceMi?: number | null
 }
 
 export async function saveSet(input: SaveSetInput) {
@@ -183,6 +186,8 @@ export async function saveSet(input: SaveSetInput) {
         intensity_technique: input.intensityTechnique ?? null,
         completed: input.completed ?? false,
         rir: input.rir ?? null,
+        duration_seconds: input.durationSeconds ?? null,
+        distance_mi: input.distanceMi ?? null,
         logged_at: new Date().toISOString(),
       },
       { onConflict: 'workout_id,exercise_name,set_number,is_intensity_set' }
@@ -390,6 +395,42 @@ export interface ExerciseSession {
  * Six sessions is the window: long enough for a stall to be real, short enough
  * that a block from two months ago does not drag the verdict around.
  */
+/** Past timed bouts per exercise, newest first, for the conditioning models. */
+export async function fetchTimedHistory(
+  userId: string,
+  perExercise = 6
+): Promise<Record<string, Array<{ date: string; durationSeconds: number | null; distanceMi: number | null }>>> {
+  const { data, error } = await db
+    .from('workout_sets')
+    .select('exercise_name, duration_seconds, distance_mi, workouts!inner(date)')
+    .eq('user_id', userId)
+    .eq('completed', true)
+    .not('duration_seconds', 'is', null)
+    .order('logged_at', { ascending: false })
+    .limit(400)
+  if (error) return {}
+
+  const out: Record<string, Array<{ date: string; durationSeconds: number | null; distanceMi: number | null }>> = {}
+  for (const row of (data ?? []) as Array<{
+    exercise_name: string
+    duration_seconds: number | null
+    distance_mi: number | null
+    workouts: { date: string } | { date: string }[] | null
+  }>) {
+    const w = Array.isArray(row.workouts) ? row.workouts[0] : row.workouts
+    if (!w?.date) continue
+    const list = (out[row.exercise_name] ??= [])
+    if (list.length < perExercise) {
+      list.push({
+        date: w.date,
+        durationSeconds: row.duration_seconds,
+        distanceMi: row.distance_mi == null ? null : Number(row.distance_mi),
+      })
+    }
+  }
+  return out
+}
+
 export async function fetchExerciseHistory(
   userId: string,
   sessionsPerExercise = 6
