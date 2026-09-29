@@ -18,6 +18,7 @@ import {
   fetchDailyLog,
   fetchWeeklyCalories,
   fetchLatestTargetChange,
+  fetchRecentFoods,
   ensureDefaultMeals,
   addFoodLog,
   updateFoodLog,
@@ -29,6 +30,7 @@ import {
   type FoodLogRow,
   type DailyCalories,
   type TargetChangeNote,
+  type RecentFood,
 } from '@/lib/nutrition'
 import {
   calculateBMR,
@@ -102,6 +104,10 @@ export default function NutritionPage() {
   const [showAllMacros, setShowAllMacros] = useState(false)
   const [maintenance, setMaintenance] = useState<number | null>(null)
   const [lastChange, setLastChange] = useState<TargetChangeNote | null>(null)
+  // The foods this client actually eats, ranked by how often. Shown inline on
+  // each meal so re-logging a staple is one tap, with no sheet and no keyboard.
+  const [usualFoods, setUsualFoods] = useState<RecentFood[]>([])
+  const [loggingUsual, setLoggingUsual] = useState<string | null>(null)
 
   useEffect(() => {
     try {
@@ -138,13 +144,14 @@ export default function NutritionPage() {
           return
         }
 
-        const [t, m, l, dl, w, change] = await Promise.all([
+        const [t, m, l, dl, w, change, usual] = await Promise.all([
           fetchTargets(id),
           ensureDefaultMeals(id),
           fetchTodaysLogs(id),
           fetchDailyLog(id),
           fetchWeeklyCalories(id),
           fetchLatestTargetChange(id),
+          fetchRecentFoods(id, 10),
         ])
         setTargets(t)
         setMeals(m)
@@ -152,6 +159,7 @@ export default function NutritionPage() {
         setWaterOz(dl.water_oz)
         setWeekly(w)
         setLastChange(change)
+        setUsualFoods(usual)
 
         // Maintenance is recomputed here rather than stored, so it always
         // reflects the client's current weight. The deficit shown below is
@@ -231,6 +239,38 @@ export default function NutritionPage() {
       console.error('[Add food] Failed:', err)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  /**
+   * Re-log a food the client already eats, in one tap.
+   *
+   * Uses the macros stored on the most recent logging of that food, so it
+   * needs no lookup, no network round trip to the food database, and works
+   * offline-ish. The usual list is refreshed afterwards because this logging
+   * changes the ranking -- eating something again should push it up.
+   */
+  const handleLogUsual = async (mealId: string, food: RecentFood) => {
+    if (!userId) return
+    const key = `${mealId}-${food.food_name}`
+    setLoggingUsual(key)
+    try {
+      const newLog = await addFoodLog({
+        userId,
+        mealId,
+        foodName: food.food_name,
+        calories: food.calories,
+        protein: Number(food.protein),
+        carbs: Number(food.carbs),
+        fats: Number(food.fats),
+        servingSize: food.serving_size ?? undefined,
+      })
+      setLogs((prev) => [...prev, newLog])
+      fetchRecentFoods(userId, 10).then(setUsualFoods).catch(() => {})
+    } catch (err) {
+      console.error('[Usual food] Failed to log:', err)
+    } finally {
+      setLoggingUsual(null)
     }
   }
 
@@ -1009,6 +1049,43 @@ export default function NutritionPage() {
                                 </div>
                               </div>
                             ) : (
+                              <>
+                              {/* What this client actually eats, ranked by how
+                                  often. One tap logs it with the same portion
+                                  as last time -- no sheet, no keyboard, no
+                                  second trip to the barcode scanner. */}
+                              {usualFoods.length > 0 && (
+                                <div className="mt-3">
+                                  <p className="text-brand-slate text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
+                                    Your usual
+                                  </p>
+                                  <div className="flex gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                    {usualFoods.map((f) => {
+                                      const key = `${meal.id}-${f.food_name}`
+                                      const busy = loggingUsual === key
+                                      return (
+                                        <button
+                                          key={f.food_name}
+                                          onClick={() => handleLogUsual(meal.id, f)}
+                                          disabled={loggingUsual !== null}
+                                          title={`${f.food_name} · ${f.serving_size ?? '1 serving'} · eaten ${f.times}x`}
+                                          className="shrink-0 max-w-[168px] text-left px-3 py-2 rounded-control border border-brand-navy/[0.10] bg-white hover:border-brand-blue/40 hover:bg-brand-blue/[0.03] active:scale-[0.97] disabled:opacity-50 transition-all duration-150"
+                                        >
+                                          <span className="block text-brand-navy text-xs font-body font-semibold truncate">
+                                            {busy ? 'Adding…' : f.food_name}
+                                          </span>
+                                          <span className="block text-brand-slate text-2xs font-body truncate">
+                                            {Math.round(f.calories)} cal
+                                            {f.serving_size ? ` · ${f.serving_size}` : ''}
+                                            {f.times >= 3 ? ` · ${f.times}x` : ''}
+                                          </span>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
                               <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <button
                                   onClick={() => setSearchMealId(meal.id)}
@@ -1071,6 +1148,7 @@ export default function NutritionPage() {
                                   + Manual
                                 </button>
                               </div>
+                              </>
                             )}
                           </div>
                         </motion.div>

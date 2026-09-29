@@ -254,27 +254,84 @@ export interface RecentFood {
   carbs: number
   fats: number
   serving_size: string | null
+  /** How many times this food has been logged in the window. */
+  times: number
+  /** Days since it was last eaten. 0 means today. */
+  daysAgo: number
 }
 
-/** Most recently logged foods, deduped by name, for one-tap re-logging. */
+/** Half-life of the recency weighting, in days. */
+const USUAL_HALF_LIFE = 30
+/** How far back to look. Long enough to learn a routine, short enough to forget an old one. */
+const USUAL_WINDOW_DAYS = 90
+
+/**
+ * The foods this client actually eats, best first, for one-tap re-logging.
+ *
+ * Ranked by how OFTEN a food is eaten, weighted by how recently. The previous
+ * version took the last 60 rows and deduped by name, which is pure recency: at
+ * six entries a day that is ten days of history, and a food eaten every single
+ * morning ranked no higher than one eaten once yesterday. Someone looking for
+ * "the thing I always have" had to scroll past whatever they happened to try
+ * last week.
+ *
+ * Each logging contributes 0.5 ^ (daysAgo / 30), so eating something today is
+ * worth twice as much as eating it a month ago and four times as much as two
+ * months ago. Frequency accumulates; a daily staple beats a one-off within a
+ * few days and keeps its place, while last month's experiment fades out on its
+ * own without needing to be pruned.
+ *
+ * The macros returned are the MOST RECENT ones for that food, not an average:
+ * if a client has started having a bigger portion, the number they get back is
+ * the portion they are actually eating now.
+ */
 export async function fetchRecentFoods(userId: string, limit = 12): Promise<RecentFood[]> {
+  const since = localDateDaysAgo(USUAL_WINDOW_DAYS)
   const { data, error } = await db
     .from('food_logs')
-    .select('food_name, calories, protein, carbs, fats, serving_size')
+    .select('food_name, calories, protein, carbs, fats, serving_size, date')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(60)
+    .gte('date', since)
+    .order('date', { ascending: false })
+    .limit(600)
   if (error) throw error
-  const seen = new Set<string>()
-  const out: RecentFood[] = []
-  for (const row of (data ?? []) as RecentFood[]) {
+
+  const today = localDate()
+  const dayMs = 86400000
+  const daysBetween = (d: string) =>
+    Math.max(0, Math.round((Date.parse(today) - Date.parse(d)) / dayMs))
+
+  type Row = Omit<RecentFood, 'times' | 'daysAgo'> & { date: string }
+  const groups = new Map<string, { score: number; times: number; newest: Row; daysAgo: number }>()
+
+  for (const row of (data ?? []) as Row[]) {
     const key = row.food_name.trim().toLowerCase()
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(row)
-    if (out.length >= limit) break
+    if (!key) continue
+    const ago = daysBetween(row.date)
+    const weight = Math.pow(0.5, ago / USUAL_HALF_LIFE)
+    const g = groups.get(key)
+    if (!g) {
+      // Rows arrive newest first, so the first one seen is the newest.
+      groups.set(key, { score: weight, times: 1, newest: row, daysAgo: ago })
+    } else {
+      g.score += weight
+      g.times += 1
+    }
   }
-  return out
+
+  return Array.from(groups.values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((g) => ({
+      food_name: g.newest.food_name,
+      calories: g.newest.calories,
+      protein: g.newest.protein,
+      carbs: g.newest.carbs,
+      fats: g.newest.fats,
+      serving_size: g.newest.serving_size,
+      times: g.times,
+      daysAgo: g.daysAgo,
+    }))
 }
 
 export async function fetchDailyLog(userId: string): Promise<DailyLogRow> {

@@ -90,7 +90,16 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    inputRef.current?.focus()
+    // Focus the search box on a desktop, never on a touch screen.
+    //
+    // Autofocusing everywhere threw up the on-screen keyboard the instant the
+    // sheet opened, which covered the list of foods the client already eats --
+    // so the fastest way to log a staple was hidden behind the slowest one.
+    // A phone user now sees their usual foods first and taps the box only if
+    // they actually want to search for something new.
+    const touch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+    if (!touch) inputRef.current?.focus()
+
     fetchRecentFoods(userId)
       .then((r) => setRecents(r.map(recentToHit)))
       .catch(() => setRecents([]))
@@ -358,7 +367,9 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
           ) : (
             <div className="p-4">
               {showRecentsHeading && (
-                <p className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide mb-2">Recent</p>
+                <p className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide mb-2">
+                  Your usual
+                </p>
               )}
               {error && <p className="text-red-500 text-xs font-body mb-3">{error}</p>}
               {searching && (
