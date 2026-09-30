@@ -38,6 +38,14 @@ import {
   type ActivityLevel,
   type Sex,
 } from '@/lib/nutrition-goals'
+import {
+  UNITS,
+  defaultUnitFor,
+  formatServing,
+  parseServing,
+  unitsFor,
+  type UnitKey,
+} from '@/lib/servings'
 import { useRouter } from 'next/navigation'
 
 /** Per-viewer display preference. Never anything the coach needs to read. */
@@ -45,22 +53,6 @@ const MACRO_PREF_KEY = 'ajmfit_show_all_macros'
 
 const DEFAULT_TARGETS: MacroTargets = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 const WATER_GOAL_OZ = 100
-
-/**
- * Serving sizes offered in the add-food form.
- *
- * This used to be a free-text box with a "quick sizes" helper that only
- * appeared once you had already typed something, so the shortcut showed up
- * after you no longer needed it. Picking from a list also gives the lookup a
- * phrase it can actually price: "1 cup egg whites" resolves to 132 calories,
- * where "egg whites" on its own returns a per-100g figure nobody ate.
- */
-const SERVING_OPTIONS = [
-  '1 serving', '1 oz', '2 oz', '3 oz', '4 oz', '6 oz', '8 oz',
-  '1/4 cup', '1/3 cup', '1/2 cup', '1 cup', '2 cups',
-  '1 tbsp', '2 tbsp', '1 tsp',
-  '1 slice', '2 slices', '1 piece', '1 scoop', '100 g',
-]
 
 function formatTime(time: string | null) {
   if (!time) return ''
@@ -92,11 +84,15 @@ export default function NutritionPage() {
   const [analysisSource, setAnalysisSource] = useState<'usda' | 'mixed' | 'gpt' | 'off' | null>(null)
   const [analysisComponents, setAnalysisComponents] = useState<Array<{ name: string; grams: number; source: 'usda' | 'gpt' | 'off' }>>([])
   const [typedLookupActive, setTypedLookupActive] = useState(false)
-  const [customServing, setCustomServing] = useState(false)
+  /** Amount and unit are chosen separately; the stored serving string is built from them. */
+  const [servingAmount, setServingAmount] = useState('1')
+  const [servingUnit, setServingUnit] = useState<UnitKey>('g')
   const [scanningMealId, setScanningMealId] = useState<string | null>(null)
   const lookupAbortRef = useRef<AbortController | null>(null)
   const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const macroFieldsTouchedRef = useRef(false)
+  /** Once the client picks a unit, stop re-guessing it from the food name. */
+  const unitTouchedRef = useRef(false)
 
   // Calories and protein are what decide the result for almost everyone.
   // Carbs and fat stay available but are off by default, because three rings
@@ -195,11 +191,13 @@ export default function NutritionPage() {
     setAnalysisError(null)
     setAnalysisComponents([])
     macroFieldsTouchedRef.current = false
+    unitTouchedRef.current = false
     if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current)
     lookupAbortRef.current?.abort()
     lookupAbortRef.current = null
     setTypedLookupActive(false)
-    setCustomServing(false)
+    setServingAmount('1')
+    setServingUnit('g')
   }
 
   /**
@@ -392,6 +390,13 @@ export default function NutritionPage() {
           carbs: String(data.carbs),
           fats: String(data.fats),
         }))
+        // Show the lookup's own serving on the controls, so what the client
+        // sees matches the macros that came back with it.
+        const parsed = parseServing(String(data.servingSize ?? ''))
+        if (parsed && !unitTouchedRef.current) {
+          setServingAmount(String(parsed.amount))
+          setServingUnit(parsed.unit)
+        }
         setAnalysisSource(data.source)
         setAnalysisComponents(data.components ?? [])
       } catch (err) {
@@ -925,6 +930,14 @@ export default function NutritionPage() {
                                         onChange={(e) => {
                                           const next = e.target.value
                                           setAddForm((prev) => ({ ...prev, name: next }))
+                                          // Move to a unit that suits the food, but
+                                          // only while the client has not picked one
+                                          // themselves — overriding a deliberate
+                                          // choice mid-typing would be maddening.
+                                          const allowed = unitsFor(next)
+                                          if (!unitTouchedRef.current && !allowed.includes(servingUnit)) {
+                                            setServingUnit(defaultUnitFor(next))
+                                          }
                                           runTypedLookup(next)
                                         }}
                                         className="w-full px-3 py-2 pr-9 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
@@ -934,44 +947,74 @@ export default function NutritionPage() {
                                       )}
                                     </div>
                                   </label>
+                                  {/* Amount and unit, separately.
+                                      One flat list used to mix them together —
+                                      "1 slice", "1/4 cup", "100 g" — which left
+                                      exactly one gram option, so a 20g spoonful
+                                      of jelly could not be entered at all, and
+                                      offered slices for foods nobody slices.
+                                      The unit list is now filtered to what could
+                                      plausibly measure this particular food. */}
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Serving</span>
-                                    {customServing ? (
+                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">
+                                      How much
+                                    </span>
+                                    <div className="flex gap-1.5">
                                       <input
-                                        type="text"
-                                        autoFocus
-                                        placeholder="e.g. 2 slices"
-                                        value={addForm.serving}
-                                        onChange={(e) => setAddForm((prev) => ({ ...prev, serving: e.target.value }))}
-                                        onBlur={(e) => applyServing(e.target.value)}
-                                        className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
-                                      />
-                                    ) : (
-                                      <select
-                                        value={SERVING_OPTIONS.includes(addForm.serving) ? addForm.serving : ''}
+                                        type="number"
+                                        inputMode="decimal"
+                                        step="any"
+                                        min="0"
+                                        placeholder="1"
+                                        value={servingAmount}
                                         onChange={(e) => {
-                                          if (e.target.value === '__custom') {
-                                            setCustomServing(true)
-                                            setAddForm((prev) => ({ ...prev, serving: '' }))
-                                            return
+                                          setServingAmount(e.target.value)
+                                          const n = Number(e.target.value)
+                                          if (Number.isFinite(n) && n > 0) {
+                                            applyServing(formatServing(n, servingUnit))
                                           }
-                                          applyServing(e.target.value)
                                         }}
-                                        className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                        className="w-20 shrink-0 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                      />
+                                      <select
+                                        value={servingUnit}
+                                        onChange={(e) => {
+                                          const u = e.target.value as UnitKey
+                                          unitTouchedRef.current = true
+                                          setServingUnit(u)
+                                          const n = Number(servingAmount)
+                                          if (Number.isFinite(n) && n > 0) applyServing(formatServing(n, u))
+                                        }}
+                                        className="flex-1 min-w-0 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                       >
-                                        <option value="">
-                                          {addForm.serving && !SERVING_OPTIONS.includes(addForm.serving)
-                                            ? addForm.serving
-                                            : 'Choose…'}
-                                        </option>
-                                        {SERVING_OPTIONS.map((s) => (
-                                          <option key={s} value={s}>
-                                            {s}
+                                        {unitsFor(addForm.name).map((u) => (
+                                          <option key={u} value={u}>
+                                            {UNITS[u].label}
                                           </option>
                                         ))}
-                                        <option value="__custom">Something else…</option>
                                       </select>
-                                    )}
+                                    </div>
+                                    {/* One-tap amounts, sized to the unit: grams
+                                        offer 10/20/30, cups offer quarters. */}
+                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                      {UNITS[servingUnit].quick.map((q) => (
+                                        <button
+                                          key={q}
+                                          type="button"
+                                          onClick={() => {
+                                            setServingAmount(String(q))
+                                            applyServing(formatServing(q, servingUnit))
+                                          }}
+                                          className={`px-2 py-0.5 rounded text-2xs font-body transition-colors duration-150 ${
+                                            Number(servingAmount) === q
+                                              ? 'bg-brand-blue text-white'
+                                              : 'bg-brand-navy/[0.05] text-brand-slate hover:bg-brand-navy/[0.1]'
+                                          }`}
+                                        >
+                                          {formatServing(q, servingUnit)}
+                                        </button>
+                                      ))}
+                                    </div>
                                   </label>
                                   <label className="block">
                                     <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>

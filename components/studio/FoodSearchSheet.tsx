@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { addFoodLog, fetchRecentFoods, type FoodLogRow, type MealRow, type RecentFood } from '@/lib/nutrition'
+import { servingChoices, formatServing, type ServingChoice } from '@/lib/servings'
 
 interface FoodServing {
   label: string
@@ -34,9 +35,9 @@ interface Props {
   onAdded: (log: FoodLogRow) => void
 }
 
-function scaled(hit: FoodHit, serving: FoodServing, qty: number) {
+function scaled(hit: FoodHit, gramsPerUnit: number, qty: number) {
   if (hit.per100) {
-    const factor = (serving.grams * qty) / 100
+    const factor = (gramsPerUnit * qty) / 100
     return {
       calories: Math.round(hit.per100.calories * factor),
       protein: Math.round(hit.per100.protein * factor * 10) / 10,
@@ -82,7 +83,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<FoodHit | null>(null)
-  const [servingIdx, setServingIdx] = useState(0)
+  const [unitIdx, setUnitIdx] = useState(0)
   const [qtyText, setQtyText] = useState('1')
   const [saving, setSaving] = useState(false)
   const [justAdded, setJustAdded] = useState<string | null>(null)
@@ -151,25 +152,70 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
   }, [selected, onClose])
 
   const qty = Math.max(parseFloat(qtyText) || 0, 0)
-  const serving = selected?.servings[servingIdx] ?? null
-  const preview = selected && serving ? scaled(selected, serving, qty) : null
+
+  // A searched food scales off per-100g macros, so it can be measured in any
+  // unit whose gram weight we know. A recent food carries fixed macros for the
+  // serving it was logged at, so the only honest unit is that same serving.
+  const choices: ServingChoice[] = selected
+    ? selected.per100
+      ? servingChoices(selected.servings[0])
+      : [
+          {
+            unit: 'serving',
+            label: selected.servings[0]?.label || '1 serving',
+            gramsPerUnit: 0,
+            quick: [0.5, 1, 2],
+            allowsFraction: true,
+          },
+        ]
+    : []
+  const choice = choices[unitIdx] ?? choices[0] ?? null
+  const preview = selected && choice ? scaled(selected, choice.gramsPerUnit, qty) : null
 
   const pick = (hit: FoodHit) => {
     setSelected(hit)
-    setServingIdx(0)
-    setQtyText('1')
+    setUnitIdx(0)
+    // Start on the amount that matches the unit: one tablespoon, one serving —
+    // but 100 g rather than 1 g, since nobody weighs out a single gram.
+    const first = hit.per100 ? servingChoices(hit.servings[0])[0] : null
+    setQtyText(first && first.unit === 'g' ? '100' : '1')
   }
 
   const stepQty = (delta: number) => {
-    const next = Math.max(Math.round((qty + delta) * 4) / 4, 0.25)
+    // Grams step in tens; everything else in quarters.
+    const grams = choice?.unit === 'g'
+    const step = grams ? delta * 10 : delta
+    const next = grams
+      ? Math.max(Math.round(qty + step), 1)
+      : Math.max(Math.round((qty + step) * 4) / 4, 0.25)
     setQtyText(String(next))
   }
 
+  const pickUnit = (idx: number) => {
+    const next = choices[idx]
+    if (!next || !choice) return
+    // Carry the amount across so switching units re-expresses the same food
+    // rather than silently changing how much of it you logged.
+    if (next.gramsPerUnit > 0 && choice.gramsPerUnit > 0) {
+      const grams = qty * choice.gramsPerUnit
+      const converted = grams / next.gramsPerUnit
+      setQtyText(String(next.unit === 'g' ? Math.round(converted) : Math.round(converted * 4) / 4))
+    }
+    setUnitIdx(idx)
+  }
+
   const handleAdd = async () => {
-    if (!selected || !serving || !preview || qty <= 0 || saving) return
+    if (!selected || !choice || !preview || qty <= 0 || saving) return
     setSaving(true)
     try {
-      const servingLabel = qty === 1 ? serving.label : `${qty} × ${serving.label}`
+      // "20 g", "1 tbsp", "2 oz" — the thing the client actually chose.
+      // A recent food has no gram weight to scale, so it keeps its own label.
+      const servingLabel =
+        choice.gramsPerUnit > 0
+          ? formatServing(qty, choice.unit)
+          : qty === 1
+            ? choice.label
+            : `${qty} × ${choice.label}`
       const log = await addFoodLog({
         userId,
         mealId: meal.id,
@@ -276,7 +322,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          {selected && serving ? (
+          {selected && choice ? (
             <div className="p-4 space-y-5">
               <div>
                 <div className="flex items-center gap-1.5">
@@ -288,48 +334,77 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
 
               <div className="space-y-3">
                 <label className="block">
-                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Serving size</span>
+                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Measure in</span>
                   <select
-                    value={servingIdx}
-                    onChange={(e) => setServingIdx(Number(e.target.value))}
-                    className="mt-1.5 w-full px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                    value={unitIdx}
+                    onChange={(e) => pickUnit(Number(e.target.value))}
+                    disabled={choices.length < 2}
+                    className="mt-1.5 w-full px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-60"
                   >
-                    {selected.servings.map((s, i) => (
-                      <option key={i} value={i}>
-                        {s.label}
+                    {choices.map((c, i) => (
+                      <option key={c.unit} value={i}>
+                        {c.label}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <div>
-                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Number of servings</span>
+                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">
+                    How {choice?.unit === 'g' || choice?.unit === 'oz' ? 'much' : 'many'}
+                  </span>
                   <div className="mt-1.5 flex items-center gap-2">
                     <button
                       onClick={() => stepQty(-0.5)}
                       className="w-10 h-10 rounded-control border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
-                      aria-label="Decrease servings"
+                      aria-label="Decrease amount"
                     >
                       −
                     </button>
                     <input
                       type="number"
                       inputMode="decimal"
-                      min="0.25"
-                      step="0.25"
+                      min={choice?.unit === 'g' ? 1 : 0.25}
+                      step={choice?.unit === 'g' ? 1 : 0.25}
                       value={qtyText}
                       onChange={(e) => setQtyText(e.target.value)}
                       className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                      aria-label="Number of servings"
+                      aria-label={`Amount in ${choice?.unit ?? 'servings'}`}
                     />
                     <button
                       onClick={() => stepQty(0.5)}
                       className="w-10 h-10 rounded-control border border-brand-navy/10 text-brand-navy font-display font-bold hover:bg-[#FAFBFD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue active:scale-95 transition-colors duration-150"
-                      aria-label="Increase servings"
+                      aria-label="Increase amount"
                     >
                       +
                     </button>
                   </div>
+
+                  {/* One tap for the amounts people actually use. */}
+                  {choice && choice.quick.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {choice.quick.map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setQtyText(String(n))}
+                          className={`px-2.5 py-1 rounded-full text-xs font-body border transition-colors duration-150 ${
+                            qty === n
+                              ? 'bg-brand-blue text-white border-brand-blue'
+                              : 'bg-white text-brand-slate border-brand-navy/10 hover:bg-[#FAFBFD]'
+                          }`}
+                        >
+                          {formatServing(n, choice.unit)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* What that works out to on a scale. */}
+                  {choice && choice.gramsPerUnit > 0 && choice.unit !== 'g' && qty > 0 && (
+                    <p className="mt-2 text-brand-slate text-xs font-body">
+                      ≈ {Math.round(qty * choice.gramsPerUnit)} g
+                    </p>
+                  )}
                 </div>
               </div>
 
