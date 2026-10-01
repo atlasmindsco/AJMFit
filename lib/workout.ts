@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { localDate, localWeekStart } from '@/lib/dates'
+import type { TrainedDay } from '@/lib/rotation'
 
 export type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
 
@@ -138,6 +139,39 @@ export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<W
     ended_at: w.ended_at,
     set_count: counts.get(w.id) ?? 0,
   }))
+}
+
+/**
+ * Every finished, actually-logged session, for working out where the client is
+ * in their rotation.
+ *
+ * Deliberately not `fetchWorkoutHistory`: that one is capped at 12 rows for a
+ * display list, and a 6-day program needs more than 12 to find a lap boundary.
+ * This fetches names and timestamps only, so it stays cheap.
+ */
+export async function fetchTrainedDays(userId: string, limit = 60): Promise<TrainedDay[]> {
+  const { data: workouts } = await db
+    .from('workouts')
+    .select('id, day_name, ended_at')
+    .eq('user_id', userId)
+    .not('ended_at', 'is', null)
+    .not('day_name', 'is', null)
+    .order('ended_at', { ascending: false })
+    .limit(limit)
+  const rows = (workouts ?? []) as Array<{ id: string; day_name: string; ended_at: string }>
+  if (rows.length === 0) return []
+
+  // A session with no sets was opened and abandoned — 7 of 41 in production.
+  // Counting those would skip the client past a day they never trained.
+  const { data: sets } = await db
+    .from('workout_sets')
+    .select('workout_id')
+    .in('workout_id', rows.map((w) => w.id))
+  const logged = new Set((sets ?? []).map((s: { workout_id: string }) => s.workout_id))
+
+  return rows
+    .filter((w) => logged.has(w.id))
+    .map((w) => ({ dayName: w.day_name, at: w.ended_at }))
 }
 
 export interface SaveSetInput {

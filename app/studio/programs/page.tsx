@@ -20,10 +20,14 @@ import {
   fetchLastSets as dbFetchLastSets,
   fetchExerciseHistory as dbFetchExerciseHistory,
   fetchTimedHistory as dbFetchTimedHistory,
+  fetchTrainedDays as dbFetchTrainedDays,
   type ExerciseSession,
   type LastSet,
   type WorkoutHistoryRow,
 } from '@/lib/workout'
+import { rotationState } from '@/lib/rotation'
+import { alertRestOver, primeRestAudio } from '@/lib/rest-alert'
+import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -327,7 +331,7 @@ export default function ProgramsPage() {
 
   // Rest timer
   const [restTimers, setRestTimers] = useState<Record<string, number>>({}) // per-exercise custom rest in seconds
-  const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number } | null>(null)
+  const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number; endsAt: number } | null>(null)
   const [editingRest, setEditingRest] = useState<string | null>(null)
   const [workoutStartTime, setWorkoutStartTime] = useState<Record<number, number>>({}) // day index → unix ms
   const [workoutElapsed, setWorkoutElapsed] = useState(0) // seconds, ticks for active workout
@@ -358,6 +362,12 @@ export default function ProgramsPage() {
 
   // ── Assigned program + Blueprint self-serve picker ──
   const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(EMPTY_WEEKLY_PLAN)
+  /** Where the client is in the rotation. -1 until the program loads. */
+  const [todayIndex, setTodayIndex] = useState(-1)
+  /** Set while the End Workout prompt is open, carrying the session tally. */
+  const [confirmEnd, setConfirmEnd] = useState<{ logged: number; planned: number } | null>(null)
+  /** Sets written down but not yet saved to the server. */
+  const [pendingSets, setPendingSets] = useState(0)
   const [currentProgram, setCurrentProgram] = useState<PlanProgram>(EMPTY_PROGRAM)
   const [showPicker, setShowPicker] = useState(false)
   const [isBeginnerFlow, setIsBeginnerFlow] = useState(false)
@@ -404,19 +414,46 @@ export default function ProgramsPage() {
       .catch((e) => console.error('[History] load failed', e))
   }, [])
 
-  const applyLoadedProgram = useCallback(async (programId: string) => {
+  /**
+   * Load the program and work out where in it the client actually is.
+   *
+   * `completed` used to arrive hardcoded false on every day, so the ticks never
+   * appeared, the overview tile read 0/N forever, and "today" was permanently
+   * Day 1. The history to answer this was always in the database; nothing read
+   * it. Rotation failures are swallowed: a client whose history will not load
+   * should still get their program, just without the ticks.
+   */
+  const applyLoadedProgram = useCallback(async (programId: string, uid: string | null) => {
     const loaded = await loadAssignedProgram(programId)
-    if (loaded) {
-      setWeeklyPlan(loaded.weeklyPlan)
-      setCurrentProgram(loaded.program)
-      setProgramLocation(loaded.location)
-      setProgramGoal(loaded.goal)
-      setHasAssigned(true)
+    if (!loaded) return
+
+    let plan = loaded.weeklyPlan
+    let today = plan.findIndex((d) => d.exercises.length > 0)
+    if (uid) {
+      try {
+        const trained = await dbFetchTrainedDays(uid)
+        const state = rotationState(
+          plan.map((d) => d.name),
+          plan.map((d) => d.exercises.length > 0),
+          trained
+        )
+        plan = plan.map((d) => ({ ...d, completed: state.completed.has(d.name) }))
+        today = state.todayIndex
+      } catch (err) {
+        console.error('[Rotation] Failed to read history:', err)
+      }
     }
+
+    setWeeklyPlan(plan)
+    setTodayIndex(today)
+    setCurrentProgram(loaded.program)
+    setProgramLocation(loaded.location)
+    setProgramGoal(loaded.goal)
+    setHasAssigned(true)
   }, [])
 
   const handlePickerDone = useCallback(async (programId: string) => {
-    await applyLoadedProgram(programId)
+    await applyLoadedProgram(programId, await getCurrentUserId())
     setShowPicker(false)
   }, [applyLoadedProgram])
 
@@ -474,7 +511,7 @@ export default function ProgramsPage() {
         )
 
         if (program) {
-          await applyLoadedProgram(program.id)
+          await applyLoadedProgram(program.id, id)
         } else if (tier === 'blueprint') {
           // Detect if beginner: 0-1 years of experience or 'new' status
           const yearsTraining = onboarding?.answers?.yearsTraining
@@ -558,19 +595,32 @@ export default function ProgramsPage() {
       : ''
   }
 
+  /**
+   * Rest countdown, driven by a deadline rather than by a counter.
+   *
+   * The old version decremented `remaining` once a second and trusted the
+   * result. A phone screen sleeps about thirty seconds into a ninety-second
+   * rest, and a backgrounded tab's intervals are throttled or suspended
+   * outright on iOS — so the number the client came back to was simply wrong,
+   * usually by most of the rest. Storing when the rest ENDS and subtracting
+   * from the clock each tick means a sleeping phone costs nothing: the timer is
+   * correct the instant the screen comes back, because it was never counting.
+   */
   const startRestTimer = useCallback((exerciseKey: string, seconds: number) => {
     if (timerRef.current) clearInterval(timerRef.current)
-    setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds })
+    const endsAt = Date.now() + seconds * 1000
+    setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds, endsAt })
     timerRef.current = setInterval(() => {
-      setActiveTimer((prev) => {
-        if (!prev || prev.remaining <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current)
-          timerRef.current = null
-          return null
-        }
-        return { ...prev, remaining: prev.remaining - 1 }
-      })
-    }, 1000)
+      const left = Math.ceil((endsAt - Date.now()) / 1000)
+      if (left <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current)
+        timerRef.current = null
+        alertRestOver()
+        setActiveTimer(null)
+        return
+      }
+      setActiveTimer((prev) => (prev && prev.endsAt === endsAt ? { ...prev, remaining: left } : prev))
+    }, 500)
   }, [])
 
   const stopRestTimer = useCallback(() => {
@@ -585,6 +635,142 @@ export default function ProgramsPage() {
   }, [])
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
+
+  /**
+   * Save a set, and keep it if the write fails.
+   *
+   * Every call used to end in `.catch(console.error)`, which on a weak gym
+   * connection meant the set was gone — while its row still showed the green
+   * tick, because that tick reads local state rather than the write. Nothing
+   * about this changes the happy path; it only stops a failure being silent.
+   */
+  const saveSetSafely = useCallback(async (slot: string, payload: Parameters<typeof dbSaveSet>[0]) => {
+    try {
+      await dbSaveSet(payload)
+      // A success means the connection is back, so anything held goes now.
+      if (queueSize() > 0) {
+        const { remaining } = await flushQueue((p) => dbSaveSet(p as Parameters<typeof dbSaveSet>[0]))
+        setPendingSets(remaining)
+      }
+    } catch (err) {
+      console.error('[Set save] Queued after failure:', err)
+      setPendingSets(enqueue(slot, payload))
+    }
+  }, [])
+
+  /**
+   * Count what has actually been logged, so End Workout can say so.
+   *
+   * Luis tapped Food mid-session, came back, and ended a workout he had not
+   * finished. The session resumes correctly now, but ending one is still a
+   * single unguarded tap on a full-width button that clears the screen and
+   * stamps the end time. Naming the gap is what makes the prompt worth
+   * reading: "End anyway?" is ignorable, "12 of 18 sets" is not.
+   */
+  const tallySession = () => {
+    let logged = 0
+    let planned = 0
+    for (const ex of selected?.exercises ?? []) {
+      if (isTimedPrescription(ex.reps)) continue
+      planned += ex.sets
+      const needsWeight = !isExplosiveMovement(swappedExercises[`${selectedDay}-${ex.name}`] ?? ex.name)
+      for (const row of setLogs[`${selectedDay}-${ex.name}`] ?? []) {
+        if (needsWeight ? row.weight !== '' && row.reps !== '' : row.reps !== '') logged++
+      }
+    }
+    return { logged, planned }
+  }
+
+  const finishWorkout = async () => {
+    if (selectedDay === null) return
+    const elapsed = workoutElapsed
+    const workoutId = workoutIds[selectedDay]
+
+    // Tally the session before the logs are cleared.
+    let doneSets = 0
+    let volume = 0
+    for (const ex of selected?.exercises ?? []) {
+      const rows = setLogs[`${selectedDay}-${ex.name}`] ?? []
+      for (const row of rows) {
+        const w = Number(row.weight)
+        const r = Number(row.reps)
+        if (row.weight !== '' && row.reps !== '' && !isNaN(w) && !isNaN(r)) {
+          doneSets++
+          volume += w * r
+        }
+      }
+    }
+    // Several lifts down on the same day is a recovery
+    // signal, not a programming one, and it is visible in
+    // data already collected — the app simply never looked
+    // across exercises before.
+    const todayTops: Record<string, { topWeight: number; topReps: number }> = {}
+    for (const ex of selected?.exercises ?? []) {
+      const key = `${selectedDay}-${ex.name}`
+      const name = swappedExercises[key] ?? ex.name
+      const rows = setLogs[key] ?? []
+      let tw = 0, tr = 0
+      for (const r of rows) {
+        const w = Number(r.weight), rp = Number(r.reps)
+        if (r.weight !== '' && r.reps !== '' && !isNaN(w) && !isNaN(rp) && w > tw) { tw = w; tr = rp }
+      }
+      if (tw > 0) todayTops[name] = { topWeight: tw, topReps: tr }
+    }
+    const fatigue = sessionFatigue(todayTops, exHistory)
+
+    setWorkoutSummary({
+      dayName: selected?.name ?? 'Session',
+      seconds: elapsed,
+      sets: doneSets,
+      volume: Math.round(volume),
+      fatigue: fatigue.text,
+    })
+
+    setWorkoutStartTime((prev) => {
+      const next = { ...prev }
+      delete next[selectedDay]
+      return next
+    })
+    setWorkoutIds((prev) => {
+      const next = { ...prev }
+      delete next[selectedDay]
+      return next
+    })
+    setWorkoutElapsed(0)
+    stopRestTimer()
+
+    // Clear this day's logged sets from the screen.
+    //
+    // Ending a session used to leave every set sitting
+    // there fully filled in, so the screen still looked
+    // live. A client who wanted to carry on pressed
+    // Start again and re-entered work that was already
+    // saved, and because saveSet scopes its "already
+    // exists?" check to the workout id, every one of
+    // those became a NEW row against the new session
+    // rather than an update. That is how one workout
+    // became two with the sets counted twice.
+    const clearDay = <T,>(prev: Record<string, T>) => {
+      const next = { ...prev }
+      for (const key of Object.keys(next)) {
+        if (key.startsWith(`${selectedDay}-`)) delete next[key]
+      }
+      return next
+    }
+    setSetLogs(clearDay)
+    // Intensity sets save through the same per-workout
+    // path, so leaving them on screen duplicates too.
+    setIntensityLogs(clearDay)
+
+    if (workoutId) {
+      try {
+        await dbEndWorkout(workoutId, elapsed)
+        if (userId) loadHistory(userId)
+      } catch (err) {
+        console.error('[Workout] Failed to end:', err)
+      }
+    }
+  }
 
   // Load exercise database
   useEffect(() => {
@@ -673,7 +859,21 @@ export default function ProgramsPage() {
     // Rehydrate an in-progress workout if one exists
     dbFetchInProgressWorkout(id)
       .then((data) => {
-        if (!data) return
+        if (!data) {
+          // No live session, so honour a ?day= deep link from the dashboard.
+          // This is what lets "Start Workout" on the home screen land on the
+          // session itself rather than on the program brochure.
+          //
+          // Read off location rather than useSearchParams: this page is
+          // statically rendered, and the hook would force a Suspense boundary
+          // around the whole thing for one optional number.
+          const want = Number(new URLSearchParams(window.location.search).get('day'))
+          if (Number.isInteger(want) && want >= 0 && weeklyPlan[want]?.exercises.length) {
+            setSelectedDay(want)
+            setView('workout')
+          }
+          return
+        }
         const { workout, sets } = data
         const dayIdx = weeklyPlan.findIndex((d) => d.name === workout.day_name)
         if (dayIdx === -1) return
@@ -762,6 +962,28 @@ export default function ProgramsPage() {
     return () => clearInterval(interval)
   }, [])
 
+  /**
+   * Push held sets whenever the connection looks alive again.
+   *
+   * `online` covers the obvious case; the interval covers the one that
+   * actually happens in a gym, where the phone still claims to be online over
+   * a single bar and requests simply time out.
+   */
+  useEffect(() => {
+    setPendingSets(queueSize())
+    const flush = async () => {
+      if (queueSize() === 0) return
+      const { remaining } = await flushQueue((p) => dbSaveSet(p as Parameters<typeof dbSaveSet>[0]))
+      setPendingSets(remaining)
+    }
+    window.addEventListener('online', flush)
+    const id = setInterval(flush, 20000)
+    return () => {
+      window.removeEventListener('online', flush)
+      clearInterval(id)
+    }
+  }, [])
+
   // Tick elapsed time while a workout is active
   const activeWorkoutStartedAt = selectedDay !== null ? workoutStartTime[selectedDay] ?? null : null
   useEffect(() => {
@@ -817,6 +1039,19 @@ export default function ProgramsPage() {
             name={prCelebration.name}
             weight={prCelebration.weight}
             onDone={() => setPrCelebration(null)}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {confirmEnd && (
+          <ConfirmEnd
+            logged={confirmEnd.logged}
+            planned={confirmEnd.planned}
+            onCancel={() => setConfirmEnd(null)}
+            onConfirm={async () => {
+              setConfirmEnd(null)
+              await finishWorkout()
+            }}
           />
         )}
       </AnimatePresence>
@@ -998,8 +1233,16 @@ export default function ProgramsPage() {
                             onClick={() => { setSelectedDay(dayIndex); setView('workout') }}
                             className="w-full flex items-center gap-3 py-2.5 px-3 rounded-control bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
                           >
-                            <span className="text-white/40 text-xs font-body w-10 shrink-0">{day.day.slice(0, 3)}</span>
+                            {/* `day.day` is the literal string "Day 1", so
+                                slicing it to 3 characters printed the word
+                                "Day" on every single row. */}
+                            <span className="text-white/40 text-xs font-body w-8 shrink-0 tabular-nums">{dayIndex + 1}</span>
                             <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-brand-blue transition-colors duration-200">{day.name}</span>
+                            {dayIndex === todayIndex && (
+                              <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-[9px] font-display font-bold uppercase tracking-wide shrink-0">
+                                Today
+                              </span>
+                            )}
                             <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
                             {day.completed ? (
                               <div className="w-5 h-5 rounded-full bg-state-success flex items-center justify-center shrink-0">
@@ -1088,9 +1331,16 @@ export default function ProgramsPage() {
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                              <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
-                                {day.name}
-                              </p>
+                              <div className="flex items-center gap-1.5">
+                                <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
+                                  {day.name}
+                                </p>
+                                {i === todayIndex && (
+                                  <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-[9px] font-display font-bold uppercase tracking-wide shrink-0">
+                                    Today
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-white/30 text-xs font-body">
                                 Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
                               </p>
@@ -1114,18 +1364,14 @@ export default function ProgramsPage() {
                     </div>
 
                     {/* Today's workout CTA */}
-                    {(() => {
-                      const todayIndex = weeklyPlan.findIndex((d) => !d.completed && d.exercises.length > 0)
-                      if (todayIndex === -1) return null
-                      return (
-                        <button
-                          onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                          className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
-                        >
-                          Continue, {weeklyPlan[todayIndex].name}
-                        </button>
-                      )
-                    })()}
+                    {todayIndex >= 0 && weeklyPlan[todayIndex] && (
+                      <button
+                        onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
+                        className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                      >
+                        Start {weeklyPlan[todayIndex].name}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -1191,12 +1437,24 @@ export default function ProgramsPage() {
                           // duration field instead of weight-by-reps rows, so
                           // the set list is deliberately empty for it.
                           const timed = isTimedPrescription(exercise.reps)
+                          // Sprints, jumps and throws are prescribed in reps, so
+                          // they reach the set grid and get asked how much weight
+                          // they sprinted with. The hybrid athlete on Complete
+                          // Athlete logged ONE set across two sessions; three of
+                          // his four Day 1 slots are this. No weight column for
+                          // these, and a set is done once the efforts are in.
+                          const explosive = isExplosiveMovement(displayName)
+                          const needsWeight = !explosive
                           const currentLogs = timed ? [] : backingLogs.slice(0, workingSetCount)
                           const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
                           const pr = dbPRs[exercise.name] ?? null
                           // Check if any entered set beats the PR
                           const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.weight && l.reps ? Number(l.weight) : 0)))
-                          const isNewPR = pr ? bestEnteredWeight > pr.weight : bestEnteredWeight > 0
+                          // A record needs something to beat. Without the null
+                          // guard this read `bestEntered > 0`, so the first time
+                          // a client ever did an exercise, every set they logged
+                          // came up gold — a trophy for existing.
+                          const isNewPR = pr != null && bestEnteredWeight > pr.weight
 
                           return (
                             <div key={exercise.name} className="rounded-card bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
@@ -1438,7 +1696,7 @@ export default function ProgramsPage() {
                                                       clearTimeout(timedSaveRef.current[logKey])
                                                     }
                                                     timedSaveRef.current[logKey] = setTimeout(() => {
-                                                      dbSaveSet({
+                                                      void saveSetSafely(`${logKey}-timed`, {
                                                         workoutId: wid,
                                                         userId,
                                                         exerciseName: displayName,
@@ -1449,9 +1707,7 @@ export default function ProgramsPage() {
                                                         isIntensitySet: false,
                                                         completed: true,
                                                         durationSeconds: Math.round(m * 60),
-                                                      }).catch((err) =>
-                                                        console.error('[Timed save] Failed:', err)
-                                                      )
+                                                      })
                                                     }, 500)
                                                   }}
                                                   className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1567,36 +1823,57 @@ export default function ProgramsPage() {
                                         )
                                       })()}
 
-                                      {/* Column headers */}
-                                      <div className="grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-2">
-                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
-                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
-                                        <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Reps</span>
-                                        <span />
-                                      </div>
+                                      {/* Column headers.
+                                          Timed work has no set rows at all, and
+                                          these headers used to render above the
+                                          nothing — "SET | WEIGHT (LBS) | REPS"
+                                          sitting over a 20-minute row. */}
+                                      {currentLogs.length > 0 && (
+                                        <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-2`}>
+                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                          {needsWeight && (
+                                            <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                          )}
+                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">{explosive ? 'Efforts' : 'Reps'}</span>
+                                          <span />
+                                        </div>
+                                      )}
 
                                       {/* Set rows */}
                                       {currentLogs.map((log, si) => {
-                                        const filled = log.weight !== '' && log.reps !== ''
+                                        // A jump has no weight, so requiring one
+                                        // would mean the set could never be
+                                        // marked done.
+                                        const filled = needsWeight
+                                          ? log.weight !== '' && log.reps !== ''
+                                          : log.reps !== ''
                                         const setWeight = Number(log.weight) || 0
-                                        const setBeatsPR = filled && pr ? setWeight > pr.weight : filled && setWeight > 0
+                                        const setBeatsPR = filled && pr != null && setWeight > pr.weight
                                         const setTimerKey = `${logKey}-set${si}`
                                         const isLastSet = si === currentLogs.length - 1
                                         const timerActive = activeTimer?.key === setTimerKey
 
                                         const handleLogChange = (field: 'weight' | 'reps', value: string) => {
+                                          // Also primed on Start Workout, but a
+                                          // resumed session never passes through
+                                          // that button — and a resumed session
+                                          // still needs the rest beep.
+                                          primeRestAudio()
                                           const updated = [...backingLogs]
                                           updated[si] = { ...updated[si], [field]: value }
                                           setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
 
                                           const newLog = { ...updated[si] }
-                                          const isComplete = newLog.weight !== '' && newLog.reps !== ''
+                                          const isComplete = needsWeight
+                                            ? newLog.weight !== '' && newLog.reps !== ''
+                                            : newLog.reps !== ''
                                           // Only when the set first becomes complete. This ran on
                                           // every keystroke, so the rest timer restarted under you
                                           // while you were still typing the weight.
-                                          const wasComplete =
-                                            (backingLogs[si]?.weight ?? '') !== '' &&
-                                            (backingLogs[si]?.reps ?? '') !== ''
+                                          const wasComplete = needsWeight
+                                            ? (backingLogs[si]?.weight ?? '') !== '' &&
+                                              (backingLogs[si]?.reps ?? '') !== ''
+                                            : (backingLogs[si]?.reps ?? '') !== ''
                                           if (isComplete && !wasComplete) {
                                             const restKey = `${selectedDay}-${exercise.name}`
                                             const defaultSec = parseRestSeconds(exercise.rest)
@@ -1614,7 +1891,7 @@ export default function ProgramsPage() {
                                               clearTimeout(setSaveTimersRef.current[saveKey])
                                             }
                                             setSaveTimersRef.current[saveKey] = setTimeout(() => {
-                                              dbSaveSet({
+                                              void saveSetSafely(saveKey, {
                                                 workoutId: wid,
                                                 userId,
                                                 exerciseName: displayName,
@@ -1624,7 +1901,7 @@ export default function ProgramsPage() {
                                                 reps: r,
                                                 isIntensitySet: false,
                                                 completed: isComplete,
-                                              }).catch((err) => console.error('[Set save] Failed:', err))
+                                              })
                                             }, 500)
 
                                             // Personal records are evaluated after typing stops, not
@@ -1636,7 +1913,7 @@ export default function ProgramsPage() {
                                             const prKey = `${displayName}-${si}`
                                             if (prTimersRef.current[prKey]) clearTimeout(prTimersRef.current[prKey])
                                             prTimersRef.current[prKey] = setTimeout(() => {
-                                            if (isComplete && w && r) {
+                                            if (isComplete && w && r && needsWeight) {
                                               const currentPR = pr?.weight ?? 0
                                               if (w > currentPR) {
                                                 dbUpsertPR({ userId, exerciseName: displayName, weight: w, reps: r, workoutId: wid })
@@ -1698,16 +1975,18 @@ export default function ProgramsPage() {
 
                                         return (
                                           <div key={si}>
-                                            <div className={`grid grid-cols-[32px_1fr_1fr_36px] gap-2 mb-1 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
+                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-1 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
                                               <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
-                                              <input
-                                                type="number"
-                                                inputMode="numeric"
-                                                placeholder={prevWeight ?? 'lbs'}
-                                                value={log.weight}
-                                                onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
+                                              {needsWeight && (
+                                                <input
+                                                  type="number"
+                                                  inputMode="numeric"
+                                                  placeholder={prevWeight ?? 'lbs'}
+                                                  value={log.weight}
+                                                  onChange={(e) => handleLogChange('weight', e.target.value)}
+                                                  className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                              )}
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
@@ -1823,7 +2102,7 @@ export default function ProgramsPage() {
                                                   )
                                                   if (lastIdx < 0) return
                                                   const l = backingLogs[lastIdx]
-                                                  dbSaveSet({
+                                                  void saveSetSafely(`${logKey}-${lastIdx}`, {
                                                     workoutId: wid,
                                                     userId,
                                                     exerciseName: displayName,
@@ -1834,7 +2113,7 @@ export default function ProgramsPage() {
                                                     isIntensitySet: false,
                                                     completed: true,
                                                     rir: n,
-                                                  }).catch((err) => console.error('[RIR] Failed:', err))
+                                                  })
                                                 }}
                                                 className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
                                                   on
@@ -1849,7 +2128,11 @@ export default function ProgramsPage() {
                                         </div>
                                       )}
 
-                                      {/* Intensity Technique toggle */}
+                                      {/* Intensity Technique toggle.
+                                          Strength only. A dropset on a box jump
+                                          or a treadmill walk is not a thing, and
+                                          it was being offered on both. */}
+                                      {!timed && !explosive && (
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
@@ -1929,7 +2212,7 @@ export default function ProgramsPage() {
                                                 const wid = selectedDay !== null ? workoutIds[selectedDay] : null
                                                 if (userId && wid) {
                                                   const row = updated[idx]
-                                                  dbSaveSet({
+                                                  void saveSetSafely(`${logKey}-int${idx}`, {
                                                     workoutId: wid,
                                                     userId,
                                                     exerciseName: displayName,
@@ -1940,7 +2223,7 @@ export default function ProgramsPage() {
                                                     isIntensitySet: true,
                                                     intensityTechnique: selectedTechnique,
                                                     completed: row.done,
-                                                  }).catch((err) => console.error('[Intensity set] Failed:', err))
+                                                  })
                                                 }
                                               }
                                               return (
@@ -1990,11 +2273,16 @@ export default function ProgramsPage() {
                                           </div>
                                         )}
                                       </div>
+                                      )}
 
-                                      {/* Target reminder */}
-                                      <p className="text-white/20 text-2xs font-body mt-2 text-center">
-                                        Target: {exercise.reps} reps
-                                      </p>
+                                      {/* Target reminder.
+                                          Rendered unconditionally, so a 20-minute
+                                          row session read "Target: 20 min reps". */}
+                                      {!timed && (
+                                        <p className="text-white/20 text-2xs font-body mt-2 text-center">
+                                          Target: {exercise.reps} {explosive ? 'efforts' : 'reps'}
+                                        </p>
+                                      )}
 
                                       {/* Swap exercise button */}
                                       {alternatives.length > 0 && (
@@ -2101,97 +2389,22 @@ export default function ProgramsPage() {
                           {(workoutElapsed % 60).toString().padStart(2, '0')}
                         </span>
                       </div>
+
+                      {/* Say it when a set has not reached the server.
+                          The green tick on a set row is local state, so without
+                          this the screen looks identical whether the write
+                          landed or vanished. */}
+                      {pendingSets > 0 && (
+                        <div className="flex items-center gap-2 rounded-card bg-state-warning/10 border border-state-warning/25 px-4 py-2.5">
+                          <span className="w-2 h-2 rounded-full bg-state-warning shrink-0" />
+                          <p className="text-state-warning text-2xs font-body">
+                            {pendingSets} {pendingSets === 1 ? 'set is' : 'sets are'} saved on this phone and waiting for signal. Keep
+                            training — they&rsquo;ll sync on their own.
+                          </p>
+                        </div>
+                      )}
                       <button
-                        onClick={async () => {
-                          if (selectedDay === null) return
-                          const elapsed = workoutElapsed
-                          const workoutId = workoutIds[selectedDay]
-
-                          // Tally the session before the logs are cleared.
-                          let doneSets = 0
-                          let volume = 0
-                          for (const ex of selected?.exercises ?? []) {
-                            const rows = setLogs[`${selectedDay}-${ex.name}`] ?? []
-                            for (const row of rows) {
-                              const w = Number(row.weight)
-                              const r = Number(row.reps)
-                              if (row.weight !== '' && row.reps !== '' && !isNaN(w) && !isNaN(r)) {
-                                doneSets++
-                                volume += w * r
-                              }
-                            }
-                          }
-                          // Several lifts down on the same day is a recovery
-                          // signal, not a programming one, and it is visible in
-                          // data already collected — the app simply never looked
-                          // across exercises before.
-                          const todayTops: Record<string, { topWeight: number; topReps: number }> = {}
-                          for (const ex of selected?.exercises ?? []) {
-                            const key = `${selectedDay}-${ex.name}`
-                            const name = swappedExercises[key] ?? ex.name
-                            const rows = setLogs[key] ?? []
-                            let tw = 0, tr = 0
-                            for (const r of rows) {
-                              const w = Number(r.weight), rp = Number(r.reps)
-                              if (r.weight !== '' && r.reps !== '' && !isNaN(w) && !isNaN(rp) && w > tw) { tw = w; tr = rp }
-                            }
-                            if (tw > 0) todayTops[name] = { topWeight: tw, topReps: tr }
-                          }
-                          const fatigue = sessionFatigue(todayTops, exHistory)
-
-                          setWorkoutSummary({
-                            dayName: selected?.name ?? 'Session',
-                            seconds: elapsed,
-                            sets: doneSets,
-                            volume: Math.round(volume),
-                            fatigue: fatigue.text,
-                          })
-
-                          setWorkoutStartTime((prev) => {
-                            const next = { ...prev }
-                            delete next[selectedDay]
-                            return next
-                          })
-                          setWorkoutIds((prev) => {
-                            const next = { ...prev }
-                            delete next[selectedDay]
-                            return next
-                          })
-                          setWorkoutElapsed(0)
-                          stopRestTimer()
-
-                          // Clear this day's logged sets from the screen.
-                          //
-                          // Ending a session used to leave every set sitting
-                          // there fully filled in, so the screen still looked
-                          // live. A client who wanted to carry on pressed
-                          // Start again and re-entered work that was already
-                          // saved, and because saveSet scopes its "already
-                          // exists?" check to the workout id, every one of
-                          // those became a NEW row against the new session
-                          // rather than an update. That is how one workout
-                          // became two with the sets counted twice.
-                          const clearDay = <T,>(prev: Record<string, T>) => {
-                            const next = { ...prev }
-                            for (const key of Object.keys(next)) {
-                              if (key.startsWith(`${selectedDay}-`)) delete next[key]
-                            }
-                            return next
-                          }
-                          setSetLogs(clearDay)
-                          // Intensity sets save through the same per-workout
-                          // path, so leaving them on screen duplicates too.
-                          setIntensityLogs(clearDay)
-
-                          if (workoutId) {
-                            try {
-                              await dbEndWorkout(workoutId, elapsed)
-                              if (userId) loadHistory(userId)
-                            } catch (err) {
-                              console.error('[Workout] Failed to end:', err)
-                            }
-                          }
-                        }}
+                        onClick={() => setConfirmEnd(tallySession())}
                         className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
                       >
                         End Workout
@@ -2201,6 +2414,10 @@ export default function ProgramsPage() {
                     <button
                       onClick={async () => {
                         if (selectedDay === null || !selected) return
+                        // Must happen inside the tap. A browser will not open an
+                        // audio context from a timer callback, so priming it
+                        // anywhere else means the rest beep never sounds.
+                        primeRestAudio()
                         setWorkoutStartTime((prev) => ({ ...prev, [selectedDay]: Date.now() }))
                         setWorkoutElapsed(0)
                         const firstExercise = selected.exercises[0]
@@ -2648,6 +2865,70 @@ function BlockComplete({
             className="flex-1 py-3.5 bg-white/[0.06] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
           >
             Keep this one
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+/**
+ * The last thing between a client and a closed session.
+ *
+ * Ending a workout cannot be undone from the UI — it stamps the end time,
+ * clears the screen and files the session — and until now it was one tap on a
+ * full-width button at the bottom of the list, with no prompt at all. The
+ * count is the whole point: a client who meant to end is unbothered by one
+ * tap, and a client who did not sees the number that tells them.
+ */
+function ConfirmEnd({
+  logged,
+  planned,
+  onCancel,
+  onConfirm,
+}: {
+  logged: number
+  planned: number
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  const short = planned > 0 && logged < planned
+  return (
+    <div className="fixed inset-0 z-[65] flex items-center justify-center px-4 bg-black/70">
+      <motion.div
+        initial={{ scale: 0.94, opacity: 0, y: 12 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+        className="w-full max-w-xs px-6 py-6 rounded-card bg-surface-raised border border-white/[0.12] shadow-[0_10px_60px_rgba(0,0,0,0.5)]"
+        role="alertdialog"
+        aria-label="End workout"
+      >
+        <h2 className="font-display font-extrabold text-xl text-white tracking-tight">End this workout?</h2>
+        <p className="text-white/55 text-sm font-body leading-relaxed mt-2">
+          {short ? (
+            <>
+              You&rsquo;ve logged <span className="text-state-warning font-semibold">{logged} of {planned} sets</span>. Anything
+              not logged won&rsquo;t be saved.
+            </>
+          ) : logged > 0 ? (
+            <>All {logged} sets logged. Nice work.</>
+          ) : (
+            <>Nothing has been logged yet, so this session won&rsquo;t count towards your program.</>
+          )}
+        </p>
+        <div className="flex gap-2 mt-6">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+          >
+            Keep going
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 py-3 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+          >
+            End
           </button>
         </div>
       </motion.div>

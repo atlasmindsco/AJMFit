@@ -23,7 +23,9 @@ import {
   type MacroTargets,
   type NutritionTotals,
 } from '@/lib/nutrition'
-import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, type PRRow } from '@/lib/workout'
+import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, fetchTrainedDays, type PRRow } from '@/lib/workout'
+import { loadAssignedProgram, type PlanDay } from '@/lib/blueprint'
+import { rotationState } from '@/lib/rotation'
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
@@ -69,6 +71,8 @@ export default function ClientDashboard() {
   const [weekCals, setWeekCals] = useState<Array<{ date: string; calories: number }>>([])
   const [prs, setPrs] = useState<PRRow[]>([])
   const [myProgram, setMyProgram] = useState<Program | null>(null)
+  /** The session to offer, and where it sits in the program. */
+  const [today, setToday] = useState<{ index: number; day: PlanDay } | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
   const [tier, setTier] = useState<string | null>(null)
@@ -130,6 +134,31 @@ export default function ClientDashboard() {
           welcomeCallBooked: !!welcomeBooked,
           programAssigned: !!program,
         })
+
+        // Which session is actually next.
+        //
+        // The card used to show the PROGRAM name and a generic "Start
+        // Training" link into the program browser — so the one question a
+        // client opens the app to ask, "what am I doing today", was the one
+        // thing the home screen would not answer.
+        if (program) {
+          try {
+            const [loaded, trained] = await Promise.all([
+              loadAssignedProgram(program.id),
+              fetchTrainedDays(id),
+            ])
+            if (!active || !loaded) return
+            const state = rotationState(
+              loaded.weeklyPlan.map((d) => d.name),
+              loaded.weeklyPlan.map((d) => d.exercises.length > 0),
+              trained
+            )
+            const day = state.todayIndex >= 0 ? loaded.weeklyPlan[state.todayIndex] : null
+            if (day) setToday({ index: state.todayIndex, day })
+          } catch (err) {
+            console.error('[Dashboard] Could not work out today’s session:', err)
+          }
+        }
       } catch (err) {
         console.error('[Dashboard] Failed to load:', err)
       } finally {
@@ -234,6 +263,95 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Today's training.
+          First card on the page, because it is the question the client opened
+          the app to ask. It used to sit last, below calories, PRs, sessions
+          and nutrition — and named the program rather than the session. */}
+      <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="mb-6 bg-surface-raised rounded-card border border-white/[0.10] p-5">
+        <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
+        {loading ? (
+          <p className="text-white/30 text-sm font-body mt-1 mb-4">Loading…</p>
+        ) : today ? (
+          <>
+            <p className="font-display font-extrabold text-xl text-white mt-2 leading-tight">{today.day.name}</p>
+            <p className="text-white/50 text-sm font-body mt-1">
+              {today.day.muscles}
+            </p>
+            <div className="flex flex-wrap gap-1.5 mt-2.5 mb-3">
+              <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-2xs font-body font-semibold">
+                {today.day.exercises.length} exercises
+              </span>
+              {today.day.duration && (
+                <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">{today.day.duration}</span>
+              )}
+              <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">
+                Day {today.index + 1}
+              </span>
+            </div>
+
+            {/* The first few lifts, with what they did last time.
+                Enough to know whether to bring chalk, read without opening
+                anything. */}
+            <div className="space-y-1 mb-4">
+              {today.day.exercises.slice(0, 3).map((ex) => (
+                <div key={ex.name} className="flex items-baseline gap-2 text-sm font-body">
+                  <span className="text-white/70 truncate">{ex.name}</span>
+                  <span className="text-white/25 text-xs ml-auto shrink-0 tabular-nums">
+                    {ex.sets} × {ex.reps}
+                  </span>
+                </div>
+              ))}
+              {today.day.exercises.length > 3 && (
+                <p className="text-white/25 text-xs font-body">
+                  + {today.day.exercises.length - 3} more
+                </p>
+              )}
+            </div>
+
+            <Link
+              href={`/studio/programs?day=${today.index}`}
+              className="block w-full text-center py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+            >
+              Start Workout
+            </Link>
+          </>
+        ) : myProgram ? (
+          <>
+            <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
+            <Link
+              href="/studio/programs"
+              className="block w-full text-center mt-4 py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+            >
+              Start Training
+            </Link>
+          </>
+        ) : tier === 'blueprint' ? (
+          <>
+            <p className="text-white/50 text-sm font-body mt-1 mb-4">
+              Pick your program: goal, days per week, gym or home. Ready in seconds.
+            </p>
+            <Link
+              href="/studio/programs"
+              className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+            >
+              Pick Your Program
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-white/50 text-sm font-body mt-1 mb-4">
+              Coach Anthony hasn&rsquo;t assigned your program yet. Browse the exercise library in the meantime.
+            </p>
+            <Link
+              href="/studio/programs"
+              className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
+            >
+              Browse Exercises
+            </Link>
+          </>
+        )}
+      </motion.div>
 
       {!loading && myUserId && <BillingPanel userId={myUserId} />}
 
@@ -512,61 +630,6 @@ export default function ClientDashboard() {
             </div>
           </motion.div>
 
-          {/* Today's Workout CTA */}
-          <motion.div custom={7} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
-            <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
-            {loading ? (
-              <p className="text-white/30 text-sm font-body mt-1 mb-4">Loading…</p>
-            ) : myProgram ? (
-              <>
-                <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
-                <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
-                  {myProgram.split && (
-                    <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-2xs font-body font-semibold">{myProgram.split}</span>
-                  )}
-                  {myProgram.days_per_week != null && (
-                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">{myProgram.days_per_week}× / week</span>
-                  )}
-                  {myProgram.level && (
-                    <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold capitalize">{myProgram.level}</span>
-                  )}
-                </div>
-                {myProgram.description && (
-                  <p className="text-white/50 text-sm font-body mb-4 line-clamp-2">{myProgram.description}</p>
-                )}
-                <Link
-                  href="/studio/programs"
-                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
-                >
-                  Start Training
-                </Link>
-              </>
-            ) : tier === 'blueprint' ? (
-              <>
-                <p className="text-white/50 text-sm font-body mt-1 mb-4">
-                  Pick your program: goal, days per week, gym or home. Ready in seconds.
-                </p>
-                <Link
-                  href="/studio/programs"
-                  className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
-                >
-                  Pick Your Program
-                </Link>
-              </>
-            ) : (
-              <>
-                <p className="text-white/50 text-sm font-body mt-1 mb-4">
-                  Coach Anthony hasn&rsquo;t assigned your program yet. Browse the exercise library in the meantime.
-                </p>
-                <Link
-                  href="/studio/programs"
-                  className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
-                >
-                  Browse Exercises
-                </Link>
-              </>
-            )}
-          </motion.div>
         </div>
       </div>
     </div>
