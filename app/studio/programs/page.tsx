@@ -29,6 +29,7 @@ import { rotationState } from '@/lib/rotation'
 import { alertRestOver, primeRestAudio } from '@/lib/rest-alert'
 import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
+import { judgeSet, type RecordHit } from '@/lib/records'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -347,7 +348,6 @@ export default function ProgramsPage() {
    * waiting for the client to confirm it.
    */
   const [setLogs, setSetLogs] = useState<Record<string, SetRow[]>>({})
-  const [swapMenuOpen, setSwapMenuOpen] = useState<string | null>(null)
   const [swappedExercises, setSwappedExercises] = useState<Record<string, string>>({})
 
   // Rest timer
@@ -387,6 +387,16 @@ export default function ProgramsPage() {
   const [confirmEnd, setConfirmEnd] = useState<{ logged: number; planned: number } | null>(null)
   /** Sets written down but not yet saved to the server. */
   const [pendingSets, setPendingSets] = useState(0)
+  /** Which exercise the client is on, while a session is running. */
+  const [focusIndex, setFocusIndex] = useState(0)
+  /** Exercises the client chose to skip this session. */
+  const [skipped, setSkipped] = useState<Record<string, boolean>>({})
+  /** Exercise name whose demonstration sheet is open over the session. */
+  const [demoFor, setDemoFor] = useState<string | null>(null)
+  /** Exercise whose swap sheet is open, if any. */
+  const [swapFor, setSwapFor] = useState<string | null>(null)
+  /** Records set during this session, for the completion screen. */
+  const [sessionRecordList, setSessionRecords] = useState<Array<{ exerciseName: string } & RecordHit>>([])
   const [currentProgram, setCurrentProgram] = useState<PlanProgram>(EMPTY_PROGRAM)
   const [showPicker, setShowPicker] = useState(false)
   const [isBeginnerFlow, setIsBeginnerFlow] = useState(false)
@@ -426,6 +436,12 @@ export default function ProgramsPage() {
     volume: number
     /** Set when several lifts came in under last time. */
     fatigue: string | null
+    /** Lifts that beat last session, in plain words. */
+    improvements: string[]
+    /** Records set today. */
+    records: Array<{ exerciseName: string } & RecordHit>
+    /** The next training day in the rotation. */
+    nextUp: string | null
   } | null>(null)
   const loadHistory = useCallback((uid: string) => {
     dbFetchWorkoutHistory(uid, 12)
@@ -655,6 +671,51 @@ export default function ProgramsPage() {
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
 
+  /** True while this day's workout is running. */
+  const sessionActive = selectedDay !== null && Boolean(workoutStartTime[selectedDay])
+
+  /** How far through each exercise the client is, for the progress strip. */
+  const exerciseProgress = (selected?.exercises ?? []).map((ex) => {
+    const key = `${selectedDay}-${ex.name}`
+    const rows = setLogs[key] ?? []
+    const timed = isTimedPrescription(ex.reps)
+    const done = timed ? ((timedLogs[key] ?? '') !== '' ? 1 : 0) : rows.filter((r) => r.logged).length
+    const total = timed ? 1 : ex.sets
+    return { name: ex.name, done, total, complete: done >= total, skipped: Boolean(skipped[key]) }
+  })
+
+  /**
+   * One exercise at a time while training, the whole list while browsing.
+   *
+   * Reuses the same card either way rather than growing a second copy of the
+   * set logger — the only difference is how many of them are on screen.
+   */
+  const sessionGroups =
+    sessionActive && selected && selected.exercises[focusIndex]
+      ? [
+          {
+            label: '',
+            isSuperset: false,
+            exercises: [
+              {
+                exercise: selected.exercises[focusIndex],
+                seriesPrefix: selected.exercises[focusIndex].series,
+              },
+            ],
+          },
+        ]
+      : groupBySeries(selected?.exercises ?? [])
+
+  /** Move to the next exercise that still needs doing, else just the next one. */
+  const goToExercise = (i: number) => {
+    if (!selected) return
+    const clamped = Math.max(0, Math.min(selected.exercises.length - 1, i))
+    setFocusIndex(clamped)
+    setExpandedWorkoutExercise(selected.exercises[clamped].name)
+    stopRestTimer()
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   /**
    * Save a set, and keep it if the write fails.
    *
@@ -736,13 +797,48 @@ export default function ProgramsPage() {
     }
     const fatigue = sessionFatigue(todayTops, exHistory)
 
+    // Did anything actually go up today?
+    //
+    // The most reinforcing thing the app can show, and the comparison was
+    // already made on every exercise during the session — it just never
+    // survived to the end of it.
+    const improvements: string[] = []
+    for (const ex of selected?.exercises ?? []) {
+      const key = `${selectedDay}-${ex.name}`
+      const name = swappedExercises[key] ?? ex.name
+      const todayTop = todayTops[name]
+      if (!todayTop) continue
+      const prevSession = (exHistory[name] ?? [])[0]
+      if (!prevSession || prevSession.topWeight <= 0) continue
+      if (todayTop.topWeight > prevSession.topWeight) {
+        improvements.push(`${name}: ${todayTop.topWeight} lb, up from ${prevSession.topWeight}`)
+      } else if (todayTop.topWeight === prevSession.topWeight && todayTop.topReps > prevSession.topReps) {
+        improvements.push(`${name}: ${todayTop.topReps} reps at ${todayTop.topWeight} lb, up from ${prevSession.topReps}`)
+      }
+    }
+
+    // What they train next, so the session closes with a loop rather than a
+    // full stop. The day just finished counts towards the rotation.
+    const nextUp = (() => {
+      if (!selected || selectedDay === null) return null
+      for (let step = 1; step <= weeklyPlan.length; step++) {
+        const i = (selectedDay + step) % weeklyPlan.length
+        if (weeklyPlan[i].exercises.length > 0) return weeklyPlan[i].name
+      }
+      return null
+    })()
+
     setWorkoutSummary({
       dayName: selected?.name ?? 'Session',
       seconds: elapsed,
       sets: doneSets,
       volume: Math.round(volume),
       fatigue: fatigue.text,
+      improvements,
+      records: sessionRecordList,
+      nextUp,
     })
+    setSessionRecords([])
 
     setWorkoutStartTime((prev) => {
       const next = { ...prev }
@@ -940,7 +1036,14 @@ export default function ProgramsPage() {
         for (const key of Object.keys(intensityByExercise)) onMap[key] = true
         setIntensityOn(onMap)
 
-        // Jump to the in-progress workout view
+        // Jump to the in-progress workout view, landing on the first exercise
+        // that still has sets left rather than back at the top.
+        const day = weeklyPlan[dayIdx]
+        const resumeAt = day.exercises.findIndex((ex) => {
+          const rows = workingByExercise[`${dayIdx}-${ex.name}`] ?? []
+          return rows.filter((r) => r.logged).length < ex.sets
+        })
+        setFocusIndex(resumeAt === -1 ? 0 : resumeAt)
         setSelectedDay(dayIdx)
         setView('workout')
       })
@@ -1149,6 +1252,49 @@ export default function ProgramsPage() {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {swapFor && selected && (
+          <SwapSheet
+            exerciseName={swapFor}
+            current={swappedExercises[`${selectedDay}-${swapFor}`] ?? swapFor}
+            alternatives={getAlternatives(swapFor)}
+            isSwapped={Boolean(swappedExercises[`${selectedDay}-${swapFor}`])}
+            onClose={() => setSwapFor(null)}
+            onReset={() => {
+              const key = `${selectedDay}-${swapFor}`
+              setSwappedExercises((prev) => {
+                const next = { ...prev }
+                delete next[key]
+                return next
+              })
+              if (userId) dbRemoveSwap(userId, swapFor).catch((err) => console.error('[Swap remove] Failed:', err))
+              setSwapFor(null)
+            }}
+            onPick={(alt, forever) => {
+              setSwappedExercises((prev) => ({ ...prev, [`${selectedDay}-${swapFor}`]: alt }))
+              // A swap is usually "the rack is busy right now", so it lasts
+              // this session unless the client says otherwise. It used to be
+              // saved for every future occurrence of that exercise, forever,
+              // with no way to undo it short of finding the menu again.
+              if (forever && userId) {
+                dbSaveSwap(userId, swapFor, alt).catch((err) => console.error('[Swap save] Failed:', err))
+              }
+              setSwapFor(null)
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {demoFor && (
+          <DemoSheet
+            name={demoFor}
+            data={matchedExercises.get(demoFor) ?? null}
+            onClose={() => setDemoFor(null)}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {confirmEnd && (
@@ -1507,9 +1653,53 @@ export default function ProgramsPage() {
                   <p className="text-white/40 text-xs font-body mt-0.5">{selected.muscles}</p>
                 </div>
 
-                {/* Series-grouped exercises */}
+                {/* Series-grouped exercises.
+                    While a session is running this collapses to the ONE
+                    exercise the client is on. Browsing a program and executing
+                    one are different jobs that were sharing a screen: the
+                    execution screen carried the browse furniture (thumbnails,
+                    series headers, every other exercise) and none of the
+                    execution furniture (where am I, what is left, what next). */}
+                {/* Where am I, and how much is left.
+                    The accordion let any exercise be opened at any time, which
+                    was fine, but nothing ever said "3 of 6" — after one long
+                    expanded card the client had lost their place in the list. */}
+                {sessionActive && selected && (
+                  <div className="px-4 pt-4">
+                    <div className="flex items-center gap-1.5">
+                      {exerciseProgress.map((p, i) => (
+                        <button
+                          key={p.name}
+                          onClick={() => goToExercise(i)}
+                          className="flex-1 h-1.5 rounded-full transition-colors duration-200"
+                          style={{
+                            backgroundColor: p.skipped
+                              ? 'rgba(255,255,255,0.10)'
+                              : p.complete
+                                ? '#22C55E'
+                                : i === focusIndex
+                                  ? '#1A7BFF'
+                                  : 'rgba(255,255,255,0.12)',
+                          }}
+                          aria-label={`${p.name}: ${p.skipped ? 'skipped' : p.complete ? 'done' : `${p.done} of ${p.total} sets`}`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide">
+                        Exercise {focusIndex + 1} of {selected.exercises.length}
+                      </p>
+                      <p className="text-white/25 text-2xs font-body">
+                        {exerciseProgress.filter((p) => p.complete).length} done
+                        {exerciseProgress.some((p) => p.skipped) &&
+                          ` · ${exerciseProgress.filter((p) => p.skipped).length} skipped`}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="p-4 space-y-4">
-                  {groupBySeries(selected.exercises).map((group) => (
+                  {sessionGroups.map((group) => (
                     <div key={group.label}>
                       {/* Series header */}
                       <div className="flex items-center justify-between mb-2.5">
@@ -1530,10 +1720,11 @@ export default function ProgramsPage() {
                           const displayName = swappedExercises[swapKey] ?? exercise.name
                           const isSwapped = displayName !== exercise.name
                           const alternatives = getAlternatives(exercise.name)
-                          const showSwapMenu = swapMenuOpen === exercise.name
                           const dbMatch = matchedExercises.get(exercise.name) ?? null
                           const showEnd = imagePreview[exercise.name] ?? false
-                          const isOpen = expandedWorkoutExercise === exercise.name
+                          // In a running session the one exercise on screen is
+                          // always open: there is nothing to collapse it to.
+                          const isOpen = sessionActive || expandedWorkoutExercise === exercise.name
                           const logKey = `${selectedDay}-${exercise.name}`
                           const intensityEnabled = intensityOn[logKey] ?? false
                           const selectedTechnique = intensityChoice[logKey] ?? null
@@ -1677,18 +1868,50 @@ export default function ProgramsPage() {
                                   </div>
                                 </button>
 
-                                {/* Right side, expand toggle */}
-                                <button
-                                  onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
-                                  className="text-right shrink-0 flex flex-col items-end"
-                                >
-                                  <p className="text-brand-orange text-xs font-display font-bold">
-                                    {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
-                                  </p>
-                                  <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                                  </svg>
-                                </button>
+                                {/* While training, the two things reached for
+                                    mid-session sit in the header: how do I do
+                                    this, and the rack is busy. Both were buried
+                                    — the demo behind a full page navigation away
+                                    from the workout, the swap three scrolls
+                                    down inside the card. */}
+                                {sessionActive ? (
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    {dbMatch && (
+                                      <button
+                                        onClick={() => setDemoFor(exercise.name)}
+                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
+                                        aria-label="How to do this exercise"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                                        </svg>
+                                      </button>
+                                    )}
+                                    {alternatives.length > 0 && (
+                                      <button
+                                        onClick={() => setSwapFor(exercise.name)}
+                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
+                                        aria-label="Swap this exercise"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                                        </svg>
+                                      </button>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
+                                    className="text-right shrink-0 flex flex-col items-end"
+                                  >
+                                    <p className="text-brand-orange text-xs font-display font-bold">
+                                      {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
+                                    </p>
+                                    <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                    </svg>
+                                  </button>
+                                )}
                               </div>
 
                               {/* Expandable set logger */}
@@ -2062,8 +2285,20 @@ export default function ProgramsPage() {
                                             })
 
                                             if (w && r && needsWeight) {
-                                              const currentPR = pr?.weight ?? 0
-                                              if (w > currentPR) {
+                                              const best = pr ? { weight: pr.weight, reps: pr.reps } : null
+                                              const hit = judgeSet({ weight: w, reps: r }, best)
+                                              if (hit) {
+                                                setSessionRecords((prevRecs) => {
+                                                  const rest = prevRecs.filter((x) => x.exerciseName !== displayName)
+                                                  return [...rest, { exerciseName: displayName, ...hit }]
+                                                })
+                                              }
+                                              // The stored best tracks the heaviest bar, which is
+                                              // what the next session's target is built from. A
+                                              // rep record at the same weight updates the reps
+                                              // beside it so the comparison stays honest.
+                                              const beatsStored = !best || w > best.weight || (w === best.weight && r > best.reps)
+                                              if (beatsStored) {
                                                 dbUpsertPR({ userId, exerciseName: displayName, weight: w, reps: r, workoutId: wid })
                                                   .then(() => {
                                                     setDbPRs((prevPRs) => ({
@@ -2071,23 +2306,23 @@ export default function ProgramsPage() {
                                                       [displayName]: {
                                                         weight: w,
                                                         reps: r,
-                                                        previous: currentPR || undefined,
+                                                        previous: best?.weight || undefined,
                                                         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                                                       },
                                                     }))
-                                                    // Only a record that beat an
-                                                    // existing one, and only once.
-                                                    if (currentPR > 0 && prNotifiedRef.current[displayName] !== w) {
-                                                      prNotifiedRef.current[displayName] = w
-                                                      setPrCelebration({ name: displayName, weight: w })
-                                                      fetch('/api/studio/pr-notify', {
-                                                        method: 'POST',
-                                                        headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify({ exerciseName: displayName, weight: w, reps: r, previousWeight: currentPR }),
-                                                      }).catch(() => {})
-                                                    }
                                                   })
                                                   .catch((err) => console.error('[PR upsert] Failed:', err))
+                                              }
+                                              // Interrupt the workout only for the kinds worth it,
+                                              // and only once per record.
+                                              if (hit?.celebrate && prNotifiedRef.current[displayName] !== hit.value) {
+                                                prNotifiedRef.current[displayName] = hit.value
+                                                setPrCelebration({ name: displayName, weight: w })
+                                                fetch('/api/studio/pr-notify', {
+                                                  method: 'POST',
+                                                  headers: { 'Content-Type': 'application/json' },
+                                                  body: JSON.stringify({ exerciseName: displayName, weight: w, reps: r, previousWeight: hit.previous }),
+                                                }).catch(() => {})
                                               }
                                             }
                                           }
@@ -2436,80 +2671,25 @@ export default function ProgramsPage() {
                                         </p>
                                       )}
 
-                                      {/* Swap exercise button */}
-                                      {alternatives.length > 0 && (
-                                        <div className="mt-3 relative">
-                                          <button
-                                            onClick={() => setSwapMenuOpen(showSwapMenu ? null : exercise.name)}
-                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
-                                          >
-                                            <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-                                            </svg>
-                                            <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
-                                              {isSwapped ? 'Change Substitute' : 'Swap Exercise'}
-                                            </span>
-                                          </button>
-
-                                          {/* Swap dropdown */}
-                                          <AnimatePresence>
-                                            {showSwapMenu && (
-                                              <motion.div
-                                                initial={{ opacity: 0, y: -4 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -4 }}
-                                                transition={{ duration: 0.15 }}
-                                                className="absolute bottom-full left-0 right-0 mb-1 bg-surface-overlay border border-white/[0.10] rounded-card shadow-[0_8px_30px_rgba(0,0,0,0.5)] overflow-hidden z-20"
-                                              >
-                                                <div className="px-3 py-2 border-b border-white/[0.06]">
-                                                  <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-[0.15em]">
-                                                    Equipment not available? Pick a substitute:
-                                                  </p>
-                                                </div>
-                                                {alternatives.map((alt) => (
-                                                  <button
-                                                    key={alt}
-                                                    onClick={() => {
-                                                      setSwappedExercises((prev) => ({ ...prev, [swapKey]: alt }))
-                                                      setSwapMenuOpen(null)
-                                                      if (userId) {
-                                                        dbSaveSwap(userId, exercise.name, alt).catch((err) => console.error('[Swap save] Failed:', err))
-                                                      }
-                                                    }}
-                                                    className={`w-full px-3 py-2.5 text-left hover:bg-white/[0.04] transition-colors duration-150 flex items-center justify-between ${
-                                                      displayName === alt ? 'bg-white/[0.04]' : ''
-                                                    }`}
-                                                  >
-                                                    <span className="text-white/70 text-sm font-body">{alt}</span>
-                                                    {displayName === alt && (
-                                                      <svg className="w-4 h-4 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                      </svg>
-                                                    )}
-                                                  </button>
-                                                ))}
-                                                {isSwapped && (
-                                                  <button
-                                                    onClick={() => {
-                                                      setSwappedExercises((prev) => {
-                                                        const next = { ...prev }
-                                                        delete next[swapKey]
-                                                        return next
-                                                      })
-                                                      setSwapMenuOpen(null)
-                                                      if (userId) {
-                                                        dbRemoveSwap(userId, exercise.name).catch((err) => console.error('[Swap remove] Failed:', err))
-                                                      }
-                                                    }}
-                                                    className="w-full px-3 py-2.5 text-left border-t border-white/[0.06] hover:bg-white/[0.04] transition-colors duration-150"
-                                                  >
-                                                    <span className="text-brand-orange text-sm font-body font-semibold">Reset to Original</span>
-                                                  </button>
-                                                )}
-                                              </motion.div>
-                                            )}
-                                          </AnimatePresence>
-                                        </div>
+                                      {/* While training, swapping lives in the
+                                          exercise header — it used to sit below
+                                          the sets, the RIR row and the whole
+                                          intensity block, three scrolls into an
+                                          expanded card, at the exact moment the
+                                          client is standing at an occupied rack.
+                                          Browsing keeps a plain button here. */}
+                                      {!sessionActive && alternatives.length > 0 && (
+                                        <button
+                                          onClick={() => setSwapFor(exercise.name)}
+                                          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
+                                        >
+                                          <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                                          </svg>
+                                          <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
+                                            {isSwapped ? 'Change substitute' : 'Swap exercise'}
+                                          </span>
+                                        </button>
                                       )}
                                     </div>
                                   </motion.div>
@@ -2522,6 +2702,54 @@ export default function ProgramsPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Moving through the session.
+                    Finishing an exercise used to mean scrolling, collapsing it
+                    and finding the next one. Skip is explicit so the
+                    progression engine can tell "chose not to do this" from
+                    "never came back to it". */}
+                {sessionActive && selected && (
+                  <div className="px-4 pb-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => goToExercise(focusIndex - 1)}
+                        disabled={focusIndex === 0}
+                        className="px-4 py-3 rounded-control bg-white/[0.06] text-white/70 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-30 disabled:active:scale-100"
+                      >
+                        Back
+                      </button>
+                      {focusIndex < selected.exercises.length - 1 ? (
+                        <button
+                          onClick={() => goToExercise(focusIndex + 1)}
+                          className="flex-1 min-w-0 px-4 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
+                        >
+                          <span className="block truncate">
+                            Next: {swappedExercises[`${selectedDay}-${selected.exercises[focusIndex + 1].name}`] ?? selected.exercises[focusIndex + 1].name}
+                          </span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmEnd(tallySession())}
+                          className="flex-1 px-4 py-3 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+                        >
+                          Finish Workout
+                        </button>
+                      )}
+                    </div>
+                    {!exerciseProgress[focusIndex]?.complete && (
+                      <button
+                        onClick={() => {
+                          const key = `${selectedDay}-${selected.exercises[focusIndex].name}`
+                          setSkipped((prev) => ({ ...prev, [key]: true }))
+                          if (focusIndex < selected.exercises.length - 1) goToExercise(focusIndex + 1)
+                        }}
+                        className="w-full py-2.5 text-white/30 text-2xs font-display font-bold uppercase tracking-wide hover:text-white/60 transition-colors duration-200"
+                      >
+                        Skip this exercise
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {/* Start / End Workout button */}
                 <div className="p-4 pt-0">
@@ -2561,6 +2789,8 @@ export default function ProgramsPage() {
                         primeRestAudio()
                         setWorkoutStartTime((prev) => ({ ...prev, [selectedDay]: Date.now() }))
                         setWorkoutElapsed(0)
+                        setFocusIndex(0)
+                        setSkipped({})
                         const firstExercise = selected.exercises[0]
                         if (firstExercise) setExpandedWorkoutExercise(firstExercise.name)
 
@@ -3014,6 +3244,222 @@ function BlockComplete({
 }
 
 /**
+ * Swapping an exercise, at the moment it is actually needed.
+ *
+ * The alternatives themselves were never the problem — the engine matches on
+ * movement pattern and equipment and is good. What was wrong was that the
+ * button lived three scrolls down inside an expanded card, and that every swap
+ * was saved globally and permanently. Two swaps have ever been saved in
+ * production, which is not the same as two swaps ever being wanted.
+ */
+function SwapSheet({
+  exerciseName,
+  current,
+  alternatives,
+  isSwapped,
+  onClose,
+  onReset,
+  onPick,
+}: {
+  exerciseName: string
+  current: string
+  alternatives: string[]
+  isSwapped: boolean
+  onClose: () => void
+  onReset: () => void
+  onPick: (alt: string, forever: boolean) => void
+}) {
+  const [reason, setReason] = useState<'busy' | 'missing' | 'hurts' | null>(null)
+  const [forever, setForever] = useState(false)
+
+  const reasons: Array<{ key: 'busy' | 'missing' | 'hurts'; label: string }> = [
+    { key: 'busy', label: "It's busy" },
+    { key: 'missing', label: 'Not here' },
+    { key: 'hurts', label: "Doesn't feel right" },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-[68] flex items-end sm:items-center sm:justify-center">
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} aria-hidden="true" />
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 20, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+        className="relative w-full sm:max-w-sm max-h-[85vh] overflow-y-auto bg-surface-raised border-t sm:border border-white/[0.12] sm:rounded-card rounded-t-card px-5 py-5"
+        role="dialog"
+        aria-label={`Swap ${exerciseName}`}
+      >
+        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em]">Swap</p>
+        <h2 className="font-display font-extrabold text-xl text-white tracking-tight mt-1">{exerciseName}</h2>
+
+        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Why?</p>
+        <div className="flex gap-1.5 flex-wrap">
+          {reasons.map((r) => (
+            <button
+              key={r.key}
+              onClick={() => setReason(r.key)}
+              className={`px-3 py-2 rounded-control text-xs font-body transition-colors duration-150 ${
+                reason === r.key ? 'bg-brand-blue text-white' : 'bg-white/[0.06] text-white/60 hover:text-white'
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Pain is a coaching signal, not a UI event. There is nowhere to
+            store it yet, so the client is pointed at the one place it will
+            actually reach Anthony. */}
+        {reason === 'hurts' && (
+          <p className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.10] border border-state-warning/25 text-state-warning text-xs font-body leading-relaxed">
+            Swap it for today, then tell Coach Anthony in Messages. Something that doesn&rsquo;t feel right is worth him
+            knowing about before next week.
+          </p>
+        )}
+
+        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Instead, do</p>
+        <div className="space-y-1.5">
+          {alternatives.map((alt) => (
+            <button
+              key={alt}
+              onClick={() => onPick(alt, forever)}
+              className={`w-full px-3.5 py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
+                current === alt ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+              }`}
+            >
+              <span className="text-white text-sm font-body">{alt}</span>
+              {current === alt && (
+                <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <label className="flex items-center gap-2.5 mt-4 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={forever}
+            onChange={(e) => setForever(e.target.checked)}
+            className="w-4 h-4 rounded accent-brand-blue"
+          />
+          <span className="text-white/55 text-xs font-body">Use this every time, not just today</span>
+        </label>
+
+        <div className="flex gap-2 mt-5">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+          >
+            Cancel
+          </button>
+          {isSwapped && (
+            <button
+              onClick={onReset}
+              className="flex-1 py-3 rounded-control bg-brand-orange/15 text-brand-orange text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orange/25 active:scale-[0.98] transition-all duration-200"
+            >
+              Undo swap
+            </button>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+/**
+ * How to do it, without leaving the session.
+ *
+ * The exercise detail used to replace the whole workout screen, so checking
+ * form meant navigating away mid-set and finding your way back. Same content,
+ * over the top, and the cues come before the full instruction list — nobody
+ * holding a dumbbell reads eight numbered steps.
+ */
+function DemoSheet({
+  name,
+  data,
+  onClose,
+}: {
+  name: string
+  data: ExerciseDB | null
+  onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-[68] flex items-end sm:items-center sm:justify-center">
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} aria-hidden="true" />
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 20, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+        className="relative w-full sm:max-w-sm max-h-[85vh] overflow-y-auto bg-surface-raised border-t sm:border border-white/[0.12] sm:rounded-card rounded-t-card px-5 py-5"
+        role="dialog"
+        aria-label={`How to do ${name}`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="font-display font-extrabold text-lg text-white tracking-tight">{name}</h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white shrink-0 active:scale-95 transition-all duration-150"
+            aria-label="Close"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {data?.images[0] && (
+          <div className="mt-4">
+            <ExerciseImageCycler images={data.images} name={data.name} />
+          </div>
+        )}
+
+        {data && (
+          <div className="flex flex-wrap gap-1.5 mt-4">
+            {data.primaryMuscles.map((m) => (
+              <span key={m} className="px-2 py-0.5 rounded-control bg-brand-orange/15 text-brand-orange text-2xs font-display font-bold uppercase tracking-wide capitalize">
+                {m}
+              </span>
+            ))}
+            <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/55 text-2xs font-body capitalize">{data.equipment}</span>
+          </div>
+        )}
+
+        {data && data.instructions.length > 0 && (
+          <div className="mt-5">
+            <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mb-2">The first things to get right</p>
+            <ol className="space-y-2">
+              {data.instructions.slice(0, 3).map((step, i) => (
+                <li key={i} className="flex gap-2.5 text-white/70 text-sm font-body leading-relaxed">
+                  <span className="text-brand-blue font-display font-bold shrink-0">{i + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+            {data.instructions.length > 3 && (
+              <details className="mt-3">
+                <summary className="text-brand-blue text-xs font-body cursor-pointer">All {data.instructions.length} steps</summary>
+                <ol className="space-y-2 mt-2">
+                  {data.instructions.slice(3).map((step, i) => (
+                    <li key={i} className="flex gap-2.5 text-white/55 text-sm font-body leading-relaxed">
+                      <span className="text-white/30 font-display font-bold shrink-0">{i + 4}</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            )}
+          </div>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
+/**
  * The last thing between a client and a closed session.
  *
  * Ending a workout cannot be undone from the UI — it stamps the end time,
@@ -3087,6 +3533,9 @@ function WorkoutComplete({
     sets: number
     volume: number
     fatigue: string | null
+    improvements: string[]
+    records: Array<{ exerciseName: string } & RecordHit>
+    nextUp: string | null
   }
   onDone: () => void
 }) {
@@ -3114,18 +3563,59 @@ function WorkoutComplete({
           {summary.dayName}
         </h2>
 
-        <div className="flex items-start gap-3 mt-6 mb-7">
+        <div className="flex items-start gap-3 mt-6 mb-6">
           {stat(`${mins}`, mins === 1 ? 'Minute' : 'Minutes')}
           {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
           {stat(summary.volume.toLocaleString(), 'Lbs Lifted')}
         </div>
 
+        {/* Records first: the one thing worth reading twice. */}
+        {summary.records.length > 0 && (
+          <div className="text-left mb-4 px-3 py-3 rounded-control bg-state-warning/[0.10] border border-state-warning/25">
+            <p className="text-state-warning text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+              {summary.records.length === 1 ? 'Personal record' : `${summary.records.length} personal records`}
+            </p>
+            <ul className="space-y-1.5">
+              {summary.records.map((r) => (
+                <li key={r.exerciseName} className="text-white/75 text-xs font-body leading-relaxed">
+                  <span className="text-white font-semibold">{r.exerciseName}</span> &mdash; {r.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Did I progress? The question the old screen could not answer,
+            using a comparison it had already made on every exercise. */}
+        {summary.improvements.length > 0 && (
+          <div className="text-left mb-4 px-3 py-3 rounded-control bg-brand-orange/[0.08] border border-brand-orange/20">
+            <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+              Up on last time
+            </p>
+            <ul className="space-y-1">
+              {summary.improvements.slice(0, 4).map((line) => (
+                <li key={line} className="text-white/75 text-xs font-body">{line}</li>
+              ))}
+              {summary.improvements.length > 4 && (
+                <li className="text-white/35 text-xs font-body">+ {summary.improvements.length - 4} more</li>
+              )}
+            </ul>
+          </div>
+        )}
+
         {/* Said once, here, and nowhere else. A client who has just finished is
             receptive to "take it easy"; the same sentence on every exercise
             during the session would read as nagging. */}
         {summary.fatigue && (
-          <p className="text-left text-white/55 text-xs font-body leading-relaxed mb-5 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
+          <p className="text-left text-white/55 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
             {summary.fatigue}
+          </p>
+        )}
+
+        {/* Closes the loop rather than ending on a full stop. */}
+        {summary.nextUp && (
+          <p className="text-white/40 text-xs font-body mb-5">
+            Next up: <span className="text-white/70 font-semibold">{summary.nextUp}</span>
           </p>
         )}
 
