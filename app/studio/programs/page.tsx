@@ -28,6 +28,7 @@ import {
 import { rotationState } from '@/lib/rotation'
 import { alertRestOver, primeRestAudio } from '@/lib/rest-alert'
 import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
+import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -36,6 +37,7 @@ import {
   experienceFrom,
   isBodyweightMovement,
   nextTarget,
+  parseRepRange,
   sessionFatigue,
   type ExperienceLevel,
   type ProgressionGoal,
@@ -119,6 +121,15 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
 }
 
 type ProgramView = 'preview' | 'workout' | 'exercise'
+
+interface SetRow {
+  weight: string
+  reps: string
+  /** False while the numbers are only a suggestion. */
+  logged: boolean
+}
+
+const emptyRow = (): SetRow => ({ weight: '', reps: '', logged: false })
 
 /* ── Current Program ──
  * Self-guided sample routine. A personalized program is generated for each
@@ -325,7 +336,17 @@ export default function ProgramsPage() {
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
   const [imagePreview, setImagePreview] = useState<Record<string, boolean>>({})
   const [expandedWorkoutExercise, setExpandedWorkoutExercise] = useState<string | null>(null)
-  const [setLogs, setSetLogs] = useState<Record<string, { weight: string; reps: string }[]>>({})
+  /**
+   * One row per set.
+   *
+   * `logged` is the change that makes prefilling possible. A set used to count
+   * as done the moment both boxes held something, so filling the numbers in
+   * advance would have marked every set complete on load, started the rest
+   * timer and written the lot to the database. Separating "what we suggest"
+   * from "what you did" means the row can arrive filled in and still be
+   * waiting for the client to confirm it.
+   */
+  const [setLogs, setSetLogs] = useState<Record<string, SetRow[]>>({})
   const [swapMenuOpen, setSwapMenuOpen] = useState<string | null>(null)
   const [swappedExercises, setSwappedExercises] = useState<Record<string, string>>({})
 
@@ -339,18 +360,16 @@ export default function ProgramsPage() {
   const [intensityChoice, setIntensityChoice] = useState<Record<string, IntensityTechnique>>({}) // exercise key → selected technique
   const [intensityLogs, setIntensityLogs] = useState<Record<string, { weight: string; done: boolean }[]>>({}) // exercise key → 2 intensity set logs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  // Debounce per set so a personal record is judged once, after typing stops.
-  const prTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
-  /**
-   * Set saves are debounced per set, like the PR check above it.
+  /*
+   * Strength sets no longer need a save debounce or a PR debounce.
    *
-   * Typing "165" used to fire three saves. The database now refuses duplicate
-   * rows, so they can no longer pile up, but three writes still race: if "16"
-   * lands after "165" the client is left recorded as having lifted 16. Waiting
-   * for typing to stop sends one write with the value they actually meant.
+   * Both existed because a set wrote itself on every keystroke: typing "165"
+   * fired three saves whose order was not guaranteed, and three personal-record
+   * checks that each sent their own email. Logging is now one deliberate tap,
+   * so there is exactly one write with exactly the numbers the client
+   * confirmed. Timed slots still type free-form, so they keep theirs.
    */
-  const setSaveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
-  /** Same debounce for timed slots: typing "25" should not write 2 then 25. */
+  /** A debounce for timed slots: typing "25" should not write 2 then 25. */
   const timedSaveRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   // Weight already announced per exercise, so one record sends one email.
   const prNotifiedRef = useRef<Record<string, number>>({})
@@ -673,9 +692,8 @@ export default function ProgramsPage() {
     for (const ex of selected?.exercises ?? []) {
       if (isTimedPrescription(ex.reps)) continue
       planned += ex.sets
-      const needsWeight = !isExplosiveMovement(swappedExercises[`${selectedDay}-${ex.name}`] ?? ex.name)
       for (const row of setLogs[`${selectedDay}-${ex.name}`] ?? []) {
-        if (needsWeight ? row.weight !== '' && row.reps !== '' : row.reps !== '') logged++
+        if (row.logged) logged++
       }
     }
     return { logged, planned }
@@ -694,7 +712,7 @@ export default function ProgramsPage() {
       for (const row of rows) {
         const w = Number(row.weight)
         const r = Number(row.reps)
-        if (row.weight !== '' && row.reps !== '' && !isNaN(w) && !isNaN(r)) {
+        if (row.logged && !isNaN(w) && !isNaN(r)) {
           doneSets++
           volume += w * r
         }
@@ -712,7 +730,7 @@ export default function ProgramsPage() {
       let tw = 0, tr = 0
       for (const r of rows) {
         const w = Number(r.weight), rp = Number(r.reps)
-        if (r.weight !== '' && r.reps !== '' && !isNaN(w) && !isNaN(rp) && w > tw) { tw = w; tr = rp }
+        if (r.logged && !isNaN(w) && !isNaN(rp) && w > tw) { tw = w; tr = rp }
       }
       if (tw > 0) todayTops[name] = { topWeight: tw, topReps: tr }
     }
@@ -882,7 +900,7 @@ export default function ProgramsPage() {
         setWorkoutStartTime((prev) => ({ ...prev, [dayIdx]: new Date(workout.started_at).getTime() }))
 
         // Group sets by exercise
-        const workingByExercise: Record<string, { weight: string; reps: string }[]> = {}
+        const workingByExercise: Record<string, SetRow[]> = {}
         const intensityByExercise: Record<string, { weight: string; done: boolean }[]> = {}
         const techniqueByExercise: Record<string, IntensityTechnique> = {}
 
@@ -902,11 +920,14 @@ export default function ProgramsPage() {
             if (!workingByExercise[key]) workingByExercise[key] = []
             // Grow array as needed
             while (workingByExercise[key].length < set.set_number) {
-              workingByExercise[key].push({ weight: '', reps: '' })
+              workingByExercise[key].push(emptyRow())
             }
             workingByExercise[key][set.set_number - 1] = {
               weight: set.weight !== null ? String(set.weight) : '',
               reps: set.reps !== null ? String(set.reps) : '',
+              // A row that came back from the database is something the client
+              // did, not something being suggested to them.
+              logged: set.completed,
             }
           }
         }
@@ -986,6 +1007,26 @@ export default function ProgramsPage() {
 
   // Tick elapsed time while a workout is active
   const activeWorkoutStartedAt = selectedDay !== null ? workoutStartTime[selectedDay] ?? null : null
+
+  /**
+   * Hold the screen awake for the length of the session.
+   *
+   * Re-acquired on visibility change because the browser silently drops the
+   * lock whenever the tab is hidden — a trip to the Food tab and back would
+   * otherwise leave the phone sleeping between sets again.
+   */
+  useEffect(() => {
+    if (!activeWorkoutStartedAt) return
+    void acquireWakeLock()
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !hasWakeLock()) void acquireWakeLock()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      void releaseWakeLock()
+    }
+  }, [activeWorkoutStartedAt])
   useEffect(() => {
     if (!activeWorkoutStartedAt) return
     const tick = () => setWorkoutElapsed(Math.floor((Date.now() - activeWorkoutStartedAt) / 1000))
@@ -1042,6 +1083,73 @@ export default function ProgramsPage() {
           />
         )}
       </AnimatePresence>
+      {/* Pinned session bar.
+          The clock, the rest countdown and End lived at the bottom of a list
+          of six exercises — so during a 90-second rest the client either
+          scrolled to find the timer or did without it. This sits above the
+          bottom nav wherever they have scrolled to. */}
+      {view === 'workout' && selectedDay !== null && workoutStartTime[selectedDay] && (
+        <div className="fixed bottom-[76px] sm:bottom-4 left-0 right-0 z-50 px-4 pointer-events-none">
+          <div className="mx-auto max-w-lg pointer-events-auto flex items-center gap-2 rounded-card bg-surface-overlay/95 backdrop-blur border border-white/[0.12] shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-3 py-2.5">
+            {activeTimer ? (
+              <>
+                <div className="relative w-9 h-9 shrink-0">
+                  <svg className="w-9 h-9 -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                    <circle
+                      cx="18" cy="18" r="15" fill="none"
+                      stroke="#1A7BFF"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(activeTimer.remaining / activeTimer.total) * 94.25} 94.25`}
+                      className="transition-[stroke-dasharray] duration-500 ease-linear"
+                    />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Rest</p>
+                  <p className="text-white font-display font-bold text-lg leading-none tabular-nums">
+                    {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')}
+                  </p>
+                </div>
+                <button
+                  onClick={stopRestTimer}
+                  className="ml-auto px-3 py-2 rounded-control bg-white/[0.08] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                >
+                  Skip
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="relative flex h-2 w-2 shrink-0 ml-1">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide">Training</p>
+                  <p className="text-white font-display font-bold text-lg leading-none tabular-nums">
+                    {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
+                    {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
+                    {(workoutElapsed % 60).toString().padStart(2, '0')}
+                  </p>
+                </div>
+                {pendingSets > 0 && (
+                  <span className="ml-2 px-2 py-1 rounded-control bg-state-warning/15 text-state-warning text-2xs font-body shrink-0">
+                    {pendingSets} syncing
+                  </span>
+                )}
+                <button
+                  onClick={() => setConfirmEnd(tallySession())}
+                  className="ml-auto px-4 py-2 rounded-control bg-white/[0.08] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] hover:text-white active:scale-95 transition-all duration-150"
+                >
+                  End
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <AnimatePresence>
         {confirmEnd && (
           <ConfirmEnd
@@ -1380,7 +1488,9 @@ export default function ProgramsPage() {
 
           {/* ════════ VIEW 2: WORKOUT OVERVIEW ════════ */}
           {view === 'workout' && selected && (
-            <motion.div key="workout" {...slideIn}>
+            /* Room at the foot for the pinned session bar, which would
+               otherwise sit on top of the last exercise. */
+            <motion.div key="workout" {...slideIn} className={selectedDay !== null && workoutStartTime[selectedDay] ? 'pb-24' : ''}>
               <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-white/[0.10]">
@@ -1428,10 +1538,10 @@ export default function ProgramsPage() {
                           const intensityEnabled = intensityOn[logKey] ?? false
                           const selectedTechnique = intensityChoice[logKey] ?? null
                           const workingSetCount = intensityEnabled ? Math.max(1, exercise.sets - 1) : exercise.sets
-                          const fullLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, () => ({ weight: '', reps: '' }))
+                          const fullLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, emptyRow)
                           // Ensure backing array always holds `exercise.sets` rows so data isn't lost when toggling intensity on/off.
                           const backingLogs = fullLogs.length < exercise.sets
-                            ? [...fullLogs, ...Array.from({ length: exercise.sets - fullLogs.length }, () => ({ weight: '', reps: '' }))]
+                            ? [...fullLogs, ...Array.from({ length: exercise.sets - fullLogs.length }, emptyRow)]
                             : fullLogs
                           // A run is not a set of anything. Timed work gets a
                           // duration field instead of weight-by-reps rows, so
@@ -1446,10 +1556,44 @@ export default function ProgramsPage() {
                           const explosive = isExplosiveMovement(displayName)
                           const needsWeight = !explosive
                           const currentLogs = timed ? [] : backingLogs.slice(0, workingSetCount)
+
+                          // Hoisted out of the advice block below so the set
+                          // rows can be filled from it. The engine has always
+                          // worked this out and then only said it in a sentence.
+                          const exerciseHist = exHistory[displayName] ?? []
+                          const daysSince = exerciseHist[0]
+                            ? Math.max(0, Math.round((Date.now() - Date.parse(exerciseHist[0].date + 'T00:00:00')) / 86400000))
+                            : 0
+                          const target =
+                            timed || explosive
+                              ? null
+                              : nextTarget(
+                                  displayName,
+                                  exercise.reps,
+                                  {
+                                    goal: (programGoal ?? 'muscle') as ProgressionGoal,
+                                    level,
+                                    daysSinceLast: daysSince,
+                                    bodyWeightLb,
+                                  },
+                                  exerciseHist
+                                )
+                          const suggested = {
+                            weight: target?.suggestedWeight != null ? String(target.suggestedWeight) : '',
+                            // An explosive slot has no load, but the prescribed
+                            // effort count is still worth putting in the box.
+                            reps: explosive
+                              ? String(parseRepRange(exercise.reps)?.min ?? '')
+                              : target?.suggestedReps != null
+                                ? String(target.suggestedReps)
+                                : '',
+                          }
+                          /** The set the client is on: the first one not yet confirmed. */
+                          const activeSet = currentLogs.findIndex((l) => !l.logged)
                           const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
                           const pr = dbPRs[exercise.name] ?? null
                           // Check if any entered set beats the PR
-                          const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.weight && l.reps ? Number(l.weight) : 0)))
+                          const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.logged ? Number(l.weight) || 0 : 0)))
                           // A record needs something to beat. Without the null
                           // guard this read `bestEntered > 0`, so the first time
                           // a client ever did an exercise, every set they logged
@@ -1732,26 +1876,8 @@ export default function ProgramsPage() {
                                           )
                                         }
 
-                                        const hist = exHistory[displayName] ?? []
-                                        const daysSinceLast = hist[0]
-                                          ? Math.max(
-                                              0,
-                                              Math.round(
-                                                (Date.now() - Date.parse(hist[0].date + 'T00:00:00')) / 86400000
-                                              )
-                                            )
-                                          : 0
-                                        const t = nextTarget(
-                                          displayName,
-                                          exercise.reps,
-                                          {
-                                            goal: (programGoal ?? 'muscle') as ProgressionGoal,
-                                            level,
-                                            daysSinceLast,
-                                            bodyWeightLb,
-                                          },
-                                          hist
-                                        )
+                                        const hist = exerciseHist
+                                        const t = target
                                         if (!t) return null
 
                                         // Last session as a LABEL, not a placeholder. The
@@ -1768,13 +1894,37 @@ export default function ProgramsPage() {
 
                                         return (
                                           <>
+                                            {/* LAST and TODAY, at a size you can
+                                                read at arm's length.
+                                                Both numbers existed before — the
+                                                previous session in 10px grey, the
+                                                target buried in a sentence — and
+                                                both are what the client is
+                                                actually deciding between. */}
+                                            <div className="mb-2 mt-2 rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 space-y-1.5">
+                                              {prevSets.length > 0 && (
+                                                <div className="flex items-baseline gap-3">
+                                                  <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Last</span>
+                                                  <span className="text-white/70 text-sm font-body tabular-nums">
+                                                    {Number(prevSets[0].weight)} lb &middot; {prevSets.map((s) => s.reps).join(', ')}
+                                                  </span>
+                                                </div>
+                                              )}
+                                              <div className="flex items-baseline gap-3">
+                                                <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Today</span>
+                                                <span className={`text-base font-display font-bold tabular-nums ${t.addLoad ? 'text-brand-orange' : 'text-white'}`}>
+                                                  {t.suggestedWeight != null ? `${t.suggestedWeight} lb` : 'Bodyweight'}
+                                                  {t.suggestedReps != null && <span className="text-white/50 font-body text-sm"> &times; {exercise.reps}</span>}
+                                                </span>
+                                                {t.addLoad && (
+                                                  <span className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide ml-auto shrink-0">
+                                                    &uarr; Up
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </div>
                                             {prevSets.length > 0 && (
-                                              <div className="mb-2 flex items-center justify-between gap-3">
-                                                <p className="text-white/40 text-2xs font-body">
-                                                  <span className="text-white/25">Last time: </span>
-                                                  {Number(prevSets[0].weight)} lbs ·{' '}
-                                                  {prevSets.map((s) => s.reps).join(', ')}
-                                                </p>
+                                              <div className="mb-2 flex items-center justify-end gap-3">
                                                 {/* Six-session trend. A client who can see their
                                                     bench has been flat for five weeks works out
                                                     the stall before the app has to say it. */}
@@ -1841,85 +1991,83 @@ export default function ProgramsPage() {
 
                                       {/* Set rows */}
                                       {currentLogs.map((log, si) => {
-                                        // A jump has no weight, so requiring one
-                                        // would mean the set could never be
-                                        // marked done.
-                                        const filled = needsWeight
-                                          ? log.weight !== '' && log.reps !== ''
-                                          : log.reps !== ''
-                                        const setWeight = Number(log.weight) || 0
+                                        const filled = log.logged
+                                        // What stands in the box: what the client
+                                        // typed, else what we suggest. The
+                                        // suggestion is shown dimmed so it never
+                                        // passes for something they entered.
+                                        const shownWeight = log.weight !== '' ? log.weight : suggested.weight
+                                        const shownReps = log.reps !== '' ? log.reps : suggested.reps
+                                        const isSuggestion = !log.logged && log.weight === '' && log.reps === ''
+                                        const isActive = si === activeSet
+                                        const canLog = needsWeight
+                                          ? shownWeight !== '' && shownReps !== ''
+                                          : shownReps !== ''
+                                        const setWeight = Number(shownWeight) || 0
                                         const setBeatsPR = filled && pr != null && setWeight > pr.weight
                                         const setTimerKey = `${logKey}-set${si}`
                                         const isLastSet = si === currentLogs.length - 1
                                         const timerActive = activeTimer?.key === setTimerKey
 
+                                        /**
+                                         * Typing a number no longer logs the set.
+                                         *
+                                         * This used to fire the rest timer and a
+                                         * database write the instant both boxes
+                                         * held something — which is exactly why
+                                         * the numbers could not be prefilled.
+                                         * Editing now only edits; LOG SET below
+                                         * is what commits.
+                                         */
                                         const handleLogChange = (field: 'weight' | 'reps', value: string) => {
-                                          // Also primed on Start Workout, but a
-                                          // resumed session never passes through
-                                          // that button — and a resumed session
-                                          // still needs the rest beep.
                                           primeRestAudio()
                                           const updated = [...backingLogs]
-                                          updated[si] = { ...updated[si], [field]: value }
-                                          setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
-
-                                          const newLog = { ...updated[si] }
-                                          const isComplete = needsWeight
-                                            ? newLog.weight !== '' && newLog.reps !== ''
-                                            : newLog.reps !== ''
-                                          // Only when the set first becomes complete. This ran on
-                                          // every keystroke, so the rest timer restarted under you
-                                          // while you were still typing the weight.
-                                          const wasComplete = needsWeight
-                                            ? (backingLogs[si]?.weight ?? '') !== '' &&
-                                              (backingLogs[si]?.reps ?? '') !== ''
-                                            : (backingLogs[si]?.reps ?? '') !== ''
-                                          if (isComplete && !wasComplete) {
-                                            const restKey = `${selectedDay}-${exercise.name}`
-                                            const defaultSec = parseRestSeconds(exercise.rest)
-                                            const customSec = restTimers[restKey] ?? defaultSec
-                                            startRestTimer(setTimerKey, customSec)
+                                          // Take the suggestion as the starting
+                                          // point for the other field, so editing
+                                          // one number does not blank the other.
+                                          //
+                                          // Editing un-ticks the set. Re-saving on
+                                          // each keystroke instead would put back
+                                          // the bug this app already fixed once:
+                                          // typing "185" fired three writes and
+                                          // three PR emails. Changing a number
+                                          // means it is not confirmed any more,
+                                          // which is both safer and truer.
+                                          updated[si] = {
+                                            weight: field === 'weight' ? value : shownWeight,
+                                            reps: field === 'reps' ? value : shownReps,
+                                            logged: false,
                                           }
+                                          setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
+                                        }
 
-                                          // Persist to DB if a workout is active
+                                        /** Confirm the set: tick it, rest, save. */
+                                        const commitSet = (idx: number, rows: SetRow[]) => {
+                                          const row = rows[idx]
+                                          const w = needsWeight ? Number(row.weight) || null : null
+                                          const r = Number(row.reps) || null
+
                                           const wid = selectedDay !== null ? workoutIds[selectedDay] : null
                                           if (userId && wid) {
-                                            const w = Number(newLog.weight) || null
-                                            const r = Number(newLog.reps) || null
-                                            const saveKey = `${logKey}-${si}`
-                                            if (setSaveTimersRef.current[saveKey]) {
-                                              clearTimeout(setSaveTimersRef.current[saveKey])
-                                            }
-                                            setSaveTimersRef.current[saveKey] = setTimeout(() => {
-                                              void saveSetSafely(saveKey, {
-                                                workoutId: wid,
-                                                userId,
-                                                exerciseName: displayName,
-                                                originalExerciseName: isSwapped ? exercise.name : null,
-                                                setNumber: si + 1,
-                                                weight: w,
-                                                reps: r,
-                                                isIntensitySet: false,
-                                                completed: isComplete,
-                                              })
-                                            }, 500)
+                                            void saveSetSafely(`${logKey}-${idx}`, {
+                                              workoutId: wid,
+                                              userId,
+                                              exerciseName: displayName,
+                                              originalExerciseName: isSwapped ? exercise.name : null,
+                                              setNumber: idx + 1,
+                                              weight: w,
+                                              reps: r,
+                                              isIntensitySet: false,
+                                              completed: true,
+                                            })
 
-                                            // Personal records are evaluated after typing stops, not
-                                            // on every keystroke. Typing "185" used to run this three
-                                            // times — and because dbPRs updates asynchronously, the
-                                            // comparison kept seeing the old record, so every
-                                            // intermediate value that beat it sent its own email.
-                                            // Editing an already-finished set fired another.
-                                            const prKey = `${displayName}-${si}`
-                                            if (prTimersRef.current[prKey]) clearTimeout(prTimersRef.current[prKey])
-                                            prTimersRef.current[prKey] = setTimeout(() => {
-                                            if (isComplete && w && r && needsWeight) {
+                                            if (w && r && needsWeight) {
                                               const currentPR = pr?.weight ?? 0
                                               if (w > currentPR) {
                                                 dbUpsertPR({ userId, exerciseName: displayName, weight: w, reps: r, workoutId: wid })
                                                   .then(() => {
-                                                    setDbPRs((prev) => ({
-                                                      ...prev,
+                                                    setDbPRs((prevPRs) => ({
+                                                      ...prevPRs,
                                                       [displayName]: {
                                                         weight: w,
                                                         reps: r,
@@ -1927,11 +2075,8 @@ export default function ProgramsPage() {
                                                         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                                                       },
                                                     }))
-                                                    // Celebrate beating an existing record (not the first-ever log),
-                                                    // and ping Coach Anthony so he can reach out and celebrate them.
-                                                    // One alert per record. Without this guard,
-                                                    // correcting the reps on a set that had already
-                                                    // set a PR sent Anthony the same email again.
+                                                    // Only a record that beat an
+                                                    // existing one, and only once.
                                                     if (currentPR > 0 && prNotifiedRef.current[displayName] !== w) {
                                                       prNotifiedRef.current[displayName] = w
                                                       setPrCelebration({ name: displayName, weight: w })
@@ -1945,15 +2090,24 @@ export default function ProgramsPage() {
                                                   .catch((err) => console.error('[PR upsert] Failed:', err))
                                               }
                                             }
-                                            }, 1200)
                                           }
                                         }
 
-                                        // What they did on this set last session. Shown as the
-                                        // placeholder rather than prefilled: a set counts as
-                                        // complete once both fields are non-empty, so prefilling
-                                        // would mark every set done on load and fire the rest
-                                        // timer and the DB write.
+                                        /** The LOG SET button. */
+                                        const logThisSet = () => {
+                                          primeRestAudio()
+                                          const updated = [...backingLogs]
+                                          updated[si] = { weight: shownWeight, reps: shownReps, logged: true }
+                                          setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
+                                          commitSet(si, updated)
+                                          if (!isLastSet) {
+                                            const restKey = `${selectedDay}-${exercise.name}`
+                                            startRestTimer(setTimerKey, restTimers[restKey] ?? parseRestSeconds(exercise.rest))
+                                          }
+                                        }
+
+
+                                        // This set last session, for the hint under the row.
                                         const prev = lastSets[displayName]?.[si]
                                         const prevWeight = prev?.weight != null ? String(Number(prev.weight)) : null
                                         const prevReps = prev?.reps != null ? String(prev.reps) : null
@@ -1966,34 +2120,46 @@ export default function ProgramsPage() {
                                         // records. On a movement loaded by the body, a number
                                         // near their bodyweight is almost always the body, not
                                         // added plates. Asked once, never blocked.
-                                        const typedWeight = Number(log.weight)
+                                        const typedWeight = Number(shownWeight)
                                         const bodyweightLooking =
                                           isBodyweightMovement(displayName) &&
                                           bodyWeightLb != null &&
+                                          log.weight !== '' &&
                                           Number.isFinite(typedWeight) &&
                                           Math.abs(typedWeight - bodyWeightLb) <= 12
 
+                                        // A suggestion is shown in grey; the
+                                        // moment the client touches it or logs
+                                        // it, it reads as theirs.
+                                        const numberTone = filled
+                                          ? 'text-white'
+                                          : isSuggestion
+                                            ? 'text-white/35'
+                                            : 'text-white'
+
                                         return (
-                                          <div key={si}>
-                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-1 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
+                                          <div key={si} className={`rounded-control mb-1 ${isActive && !filled ? 'bg-white/[0.04] px-1.5 py-1.5' : ''}`}>
+                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
                                               <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
                                               {needsWeight && (
                                                 <input
                                                   type="number"
                                                   inputMode="numeric"
                                                   placeholder={prevWeight ?? 'lbs'}
-                                                  value={log.weight}
+                                                  value={shownWeight}
                                                   onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                  className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone}`}
+                                                  aria-label={`Set ${si + 1} weight in pounds`}
                                                 />
                                               )}
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder={prevReps ?? 'reps'}
-                                                value={log.reps}
+                                                placeholder={prevReps ?? (explosive ? 'efforts' : 'reps')}
+                                                value={shownReps}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className="w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone}`}
+                                                aria-label={`Set ${si + 1} ${explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -2003,16 +2169,41 @@ export default function ProgramsPage() {
                                                     </svg>
                                                   </div>
                                                 ) : filled ? (
-                                                  <div className="w-6 h-6 rounded-full bg-state-success/20 flex items-center justify-center">
+                                                  <button
+                                                    onClick={() => {
+                                                      // Un-tick, so a mistyped set
+                                                      // can be corrected without
+                                                      // hunting for an edit mode.
+                                                      const updated = [...backingLogs]
+                                                      updated[si] = { ...updated[si], logged: false }
+                                                      setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
+                                                    }}
+                                                    className="w-6 h-6 rounded-full bg-state-success/20 flex items-center justify-center hover:bg-state-success/30 transition-colors duration-150"
+                                                    aria-label={`Set ${si + 1} logged. Tap to edit.`}
+                                                  >
                                                     <svg className="w-3.5 h-3.5 text-state-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                     </svg>
-                                                  </div>
+                                                  </button>
                                                 ) : (
                                                   <div className="w-6 h-6 rounded-full bg-white/[0.04] border border-white/[0.08]" />
                                                 )}
                                               </div>
                                             </div>
+
+                                            {/* One tap to log the set in front of you.
+                                                This replaces four taps and two typed
+                                                numbers per set — roughly 15
+                                                interactions a session instead of 60. */}
+                                            {isActive && !filled && (
+                                              <button
+                                                onClick={logThisSet}
+                                                disabled={!canLog}
+                                                className="w-full mt-1.5 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
+                                              >
+                                                Log set {si + 1}
+                                              </button>
+                                            )}
 
                                             {bodyweightLooking && (
                                               <p className="ml-8 mr-10 mb-1.5 text-state-warning/80 text-2xs font-body">
@@ -2020,55 +2211,10 @@ export default function ProgramsPage() {
                                               </p>
                                             )}
 
-                                            {/* Rest timer between sets */}
-                                            {filled && !isLastSet && (
-                                              <div className="ml-8 mr-10 my-1.5">
-                                                {timerActive && activeTimer ? (
-                                                  <div className="flex items-center gap-2 rounded-control bg-brand-blue/10 border border-brand-blue/20 px-3 py-2">
-                                                    {/* Progress ring */}
-                                                    <div className="relative w-8 h-8 shrink-0">
-                                                      <svg className="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
-                                                        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                                                        <circle
-                                                          cx="18" cy="18" r="15" fill="none"
-                                                          stroke="#1A7BFF"
-                                                          strokeWidth="3"
-                                                          strokeLinecap="round"
-                                                          strokeDasharray={`${(activeTimer.remaining / activeTimer.total) * 94.25} 94.25`}
-                                                          className="transition-[stroke-dasharray] duration-1000 ease-linear"
-                                                        />
-                                                      </svg>
-                                                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display font-bold text-brand-blue">
-                                                        {activeTimer.remaining}
-                                                      </span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                      <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Rest</p>
-                                                      <p className="text-white/25 text-[9px] font-body">
-                                                        {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')} remaining
-                                                      </p>
-                                                    </div>
-                                                    <button
-                                                      onClick={stopRestTimer}
-                                                      className="px-2.5 py-1 rounded-control bg-white/[0.06] text-white/40 text-2xs font-display font-bold uppercase tracking-wide hover:text-white/70 transition-colors duration-200"
-                                                    >
-                                                      Skip
-                                                    </button>
-                                                  </div>
-                                                ) : (
-                                                  <div className="flex items-center gap-2 px-3 py-1">
-                                                    <div className="flex-1 h-px bg-white/[0.06]" />
-                                                    <span className="text-white/15 text-[9px] font-display font-bold uppercase tracking-wide flex items-center gap-1">
-                                                      <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                      </svg>
-                                                      Rest complete
-                                                    </span>
-                                                    <div className="flex-1 h-px bg-white/[0.06]" />
-                                                  </div>
-                                                )}
-                                              </div>
-                                            )}
+                                            {/* The rest countdown lives in the
+                                                pinned bar now, where it is
+                                                visible however far the client
+                                                has scrolled. */}
                                           </div>
                                         )
                                       })}
@@ -2079,11 +2225,17 @@ export default function ProgramsPage() {
                                           whether they did, which is why a stall cannot be read:
                                           stuck at 135x9 with three left is an effort problem,
                                           stuck at 135x9 with nothing left is a real plateau, and
-                                          without this they are the same row in the database. */}
-                                      {(backingLogs ?? []).some((l) => l.weight !== '' && l.reps !== '') && (
-                                        <div className="mt-3 flex items-center gap-2 flex-wrap">
-                                          <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide">
-                                            Left in the tank
+                                          without this they are the same row in the database.
+
+                                          Asked when the exercise is FINISHED, not as soon as one
+                                          set lands. 2 of 432 sets in production carry a rating:
+                                          it appeared mid-exercise, greyed, while the client was
+                                          still working, which is the wrong moment to ask and the
+                                          wrong weight to ask it at. */}
+                                      {currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
+                                        <div className="mt-3 flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5">
+                                          <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
+                                            Reps left in the tank?
                                           </span>
                                           {[0, 1, 2, 3].map((n) => {
                                             const on = rirByExercise[logKey] === n
@@ -2097,7 +2249,7 @@ export default function ProgramsPage() {
                                                   // Stamp it on the last completed set: the final
                                                   // set is the one whose difficulty means anything.
                                                   const lastIdx = backingLogs.reduce(
-                                                    (acc, l, i) => (l.weight !== '' && l.reps !== '' ? i : acc),
+                                                    (acc, l, i) => (l.logged ? i : acc),
                                                     -1
                                                   )
                                                   if (lastIdx < 0) return
@@ -2375,20 +2527,9 @@ export default function ProgramsPage() {
                 <div className="p-4 pt-0">
                   {selectedDay !== null && workoutStartTime[selectedDay] ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between rounded-card bg-state-success/10 border border-state-success/20 px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
-                          </span>
-                          <span className="text-state-success text-2xs font-display font-bold uppercase tracking-wide">Workout Active</span>
-                        </div>
-                        <span className="text-state-success text-sm font-display font-bold tabular-nums">
-                          {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
-                          {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
-                          {(workoutElapsed % 60).toString().padStart(2, '0')}
-                        </span>
-                      </div>
+                      {/* The clock and End also live in the pinned bar; this
+                          stays for anyone who scrolls to the bottom expecting
+                          to find it where it has always been. */}
 
                       {/* Say it when a set has not reached the server.
                           The green tick on a set row is local state, so without

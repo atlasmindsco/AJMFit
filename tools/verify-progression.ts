@@ -108,3 +108,60 @@ const f3 = sessionFatigue({ A:{topWeight:100,topReps:7}, B:{topWeight:100,topRep
 g('only 2 exercises compared -> not enough', f3.text === null, `${f3.downCount} down of 2`)
 
 console.log('\n' + (fail === 0 ? 'ALL PROGRESSION CHECKS PASSED' : `*** ${fail} FAILURES ***`))
+
+console.log('\nPREFILL: THE NUMBERS THAT LAND IN THE SET ROW\n')
+{
+  const W2 = (s: any, n: number) => String(s).padEnd(n)
+  const ctx = { goal: 'muscle' as const, level: 'intermediate' as const, bodyWeightLb: 180 }
+  const s = (topWeight: number, topReps: number, lowestReps = topReps, rir: number | null = null, daysAgo = 3) => ({
+    date: new Date(Date.now() - daysAgo * 86400000).toISOString().slice(0, 10),
+    topWeight,
+    topReps,
+    lowestReps,
+    rir,
+  })
+
+  const cases: Array<[string, string, string, any[], string, number | null, number | null]> = [
+    // label,            exercise,          reps,    history,                        verdict,           weight, reps
+    ['first time',       'Barbell Bench Press', '8-10', [],                          'first_time',      null,   8],
+    ['earned a jump',    'Barbell Bench Press', '8-10', [s(185, 10, 10), s(185, 10, 10)], 'add_load',   190,    8],
+    ['still climbing',   'Barbell Bench Press', '8-10', [s(185, 9, 8)],              'push_reps',       185,    10],
+    ['one down',         'Barbell Bench Press', '8-10', [s(180, 8, 8), s(185, 9, 9)],'repeat',          180,    8],
+    // Three consecutive declines, which is the cutback threshold. Two is not
+    // a stall and correctly comes back as 'repeat'.
+    ['sliding, cut back','Barbell Bench Press', '8-10', [s(165, 8), s(170, 8), s(175, 8), s(185, 9)], 'cut_back', 148.5, 8],
+    ['back from a layoff','Barbell Bench Press','8-10', [s(185, 9, 9, null, 30)],    'returning',       166.5,  8],
+  ]
+
+  for (const [label, ex, reps, hist, wantVerdict, wantW, wantR] of cases) {
+    const t = nextTarget(ex, reps, { ...ctx, daysSinceLast: hist.length ? Math.round((Date.now() - Date.parse((hist[0] as any).date + 'T00:00:00')) / 86400000) : 0 }, hist as any)
+    const okV = t?.verdict === wantVerdict
+    const okR = t?.suggestedReps === wantR
+    // The weight the engine picks is already covered above; here we only care
+    // that a number comes out at all, since an empty box is the thing being fixed.
+    const okW = wantW === null ? t?.suggestedWeight === null : typeof t?.suggestedWeight === 'number'
+    if (!okV || !okR || !okW) fail++
+    console.log(
+      W2(okV && okR && okW ? '  ok' : '  FAIL', 7),
+      W2(label, 22),
+      W2(t?.verdict ?? 'null', 17),
+      W2(`${t?.suggestedWeight ?? '-'} lb x ${t?.suggestedReps ?? '-'}`, 18),
+      okR ? '' : `expected ${wantR} reps`
+    )
+  }
+
+  // Every verdict that can reach a set row must carry reps, or the row arrives
+  // half-filled and the client is back to typing.
+  const all = [
+    nextTarget('Barbell Bench Press', '8-10', ctx, []),
+    nextTarget('Barbell Bench Press', '8-10', ctx, [s(185, 10, 10), s(185, 10, 10)] as any),
+    nextTarget('Barbell Bench Press', '8-10', ctx, [s(185, 9, 8)] as any),
+    nextTarget('Pullups', '8-10', { ...ctx, bodyWeightLb: 180 }, [s(180, 10, 10), s(180, 10, 10)] as any),
+  ]
+  g('every target carries a rep count', all.every((t) => t == null || typeof t.suggestedReps === 'number'))
+  g('reps never exceed the top of the range', all.every((t) => t == null || t.suggestedReps == null || t.suggestedReps <= 10))
+  g('reps are never zero or negative', all.every((t) => t == null || t.suggestedReps == null || t.suggestedReps > 0))
+  g('timed work still returns no target', nextTarget('Treadmill Run', '20 min', ctx, []) === null)
+}
+
+console.log('\n' + (fail === 0 ? 'ALL PROGRESSION CHECKS PASSED (incl. prefill)' : `*** ${fail} FAILURES ***`))

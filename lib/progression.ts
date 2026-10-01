@@ -147,6 +147,16 @@ export interface NextTarget {
   attention: boolean
   /** Suggested working load, when there is one. */
   suggestedWeight: number | null
+  /**
+   * Suggested reps for the first working set.
+   *
+   * Exists so the set row can arrive filled in. The advice sentence has always
+   * carried this number in words — "go up to 185 and start again at 8" — and
+   * the client then typed 185 and 8 by hand into two boxes. Saying it twice,
+   * once in prose and once in the field, costs nothing; making them transcribe
+   * it costs four taps a set.
+   */
+  suggestedReps: number | null
 }
 
 export interface TargetContext {
@@ -204,6 +214,7 @@ export function nextTarget(
       addLoad: false,
       attention: false,
       suggestedWeight: null,
+      suggestedReps: range.min,
       text: `First time on this one. Pick a weight you could do about ${range.max + 2} reps with, and we'll build from there.`,
     }
   }
@@ -224,6 +235,7 @@ export function nextTarget(
       addLoad: false,
       attention: false,
       suggestedWeight: target,
+      suggestedReps: range.min,
       text: `Welcome back — it's been ${Math.round(away / 7)} weeks. Start around ${target} lbs today and build back up. It'll come back faster than you think.`,
     }
   }
@@ -237,6 +249,7 @@ export function nextTarget(
       addLoad: false,
       attention: true,
       suggestedWeight: target,
+      suggestedReps: range.min,
       text: `This one's slipped ${declining} sessions running. Drop to ${target} lbs and build back up — that clears it faster than grinding the same weight.`,
     }
   }
@@ -250,6 +263,7 @@ export function nextTarget(
       addLoad: false,
       attention: true,
       suggestedWeight: last.topWeight,
+      suggestedReps: last.topReps,
       text: `${flat} sessions at ${last.topWeight} lbs and you're giving it everything. Time to swap this for something similar — a fresh movement usually gets things moving again.`,
     }
   }
@@ -265,6 +279,7 @@ export function nextTarget(
       addLoad: false,
       attention: false,
       suggestedWeight: null,
+      suggestedReps: Math.min(range.max, last.topReps + 1),
       text: `Strong — you're on top of this one. Add a rep or two rather than weight, and leave the weight box at 0 unless you're holding a plate.`,
     }
   }
@@ -276,6 +291,7 @@ export function nextTarget(
       addLoad: true,
       attention: false,
       suggestedWeight: target,
+      suggestedReps: range.min,
       text:
         range.min === range.max
           ? `You hit all ${range.max}s last time — go up to ${target} lbs.`
@@ -294,6 +310,7 @@ export function nextTarget(
       addLoad: false,
       attention: false,
       suggestedWeight: last.topWeight,
+      suggestedReps: last.topReps,
       text:
         declining === 1
           ? `Last time was a bit down on the one before. Run ${last.topWeight} lbs back — everyone has an off day.`
@@ -307,6 +324,7 @@ export function nextTarget(
     addLoad: false,
     attention: false,
     suggestedWeight: last.topWeight,
+    suggestedReps: Math.min(range.max, last.topReps + 1),
     text:
       range.min === range.max
         ? `Stay at ${last.topWeight} lbs and get all ${range.max}s. Lowest set last time was ${last.lowestReps}.`
