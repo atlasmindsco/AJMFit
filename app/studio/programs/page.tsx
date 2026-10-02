@@ -2748,18 +2748,18 @@ export default function ProgramsPage() {
                                       )}
 
                                       {/* Intensity Technique toggle.
-                                          Strength only — a dropset on a box jump
-                                          or a treadmill walk is not a thing, and
-                                          it was being offered on both.
+                                          Available to every client. It is opt-in
+                                          and defaults to off, so it costs nothing
+                                          until someone reaches for it — and a
+                                          client deciding whether to take a set to
+                                          failure does not need the app deciding
+                                          for them.
 
-                                          And not for beginners. Someone in their
-                                          first months needs to turn up and add
-                                          weight, not reach for rest-pause; the
-                                          panel is four controls of noise on every
-                                          exercise for a client who should not be
-                                          using it. It was used 8 times in 432
-                                          sets by anyone. */}
-                                      {!timed && !explosive && !treatAsBeginner && (
+                                          The only gate is the movement: a drop
+                                          set on a box jump or a treadmill walk is
+                                          not a thing, and both were being offered
+                                          it before Phase 1. */}
+                                      {!timed && !explosive && (
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
