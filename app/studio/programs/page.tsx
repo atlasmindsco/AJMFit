@@ -26,10 +26,11 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import { rotationState } from '@/lib/rotation'
-import { alertRestOver, primeRestAudio } from '@/lib/rest-alert'
+import { alertRestOver, primeRestAudio, primeRestNotifications } from '@/lib/rest-alert'
 import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
 import { judgeSet, type RecordHit } from '@/lib/records'
+import { cuesFor } from '@/lib/cues'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -395,6 +396,8 @@ export default function ProgramsPage() {
   const [demoFor, setDemoFor] = useState<string | null>(null)
   /** Exercise whose swap sheet is open, if any. */
   const [swapFor, setSwapFor] = useState<string | null>(null)
+  /** Miles typed against a timed slot, keyed like timedLogs. */
+  const [distanceLogs, setDistanceLogs] = useState<Record<string, string>>({})
   /** Records set during this session, for the completion screen. */
   const [sessionRecordList, setSessionRecords] = useState<Array<{ exerciseName: string } & RecordHit>>([])
   const [currentProgram, setCurrentProgram] = useState<PlanProgram>(EMPTY_PROGRAM)
@@ -2074,6 +2077,7 @@ export default function ProgramsPage() {
                                                         isIntensitySet: false,
                                                         completed: true,
                                                         durationSeconds: Math.round(m * 60),
+                                                        distanceMi: Number(distanceLogs[logKey]) || null,
                                                       })
                                                     }, 500)
                                                   }}
@@ -2083,6 +2087,67 @@ export default function ProgramsPage() {
                                                   minutes
                                                 </span>
                                               </div>
+
+                                              {/* Distance, optional.
+                                                  Without it a run cannot have a
+                                                  record at all: these slots are
+                                                  prescribed at a fixed 10 or 20
+                                                  minutes, so "longest ever" would
+                                                  only reward having more time that
+                                                  day. Ground covered and the pace
+                                                  it was covered at are the things
+                                                  that actually improve. */}
+                                              {!/stretch|mobility|foam|warm/i.test(displayName) && (
+                                                <div className="flex items-center gap-2 mt-2">
+                                                  <input
+                                                    type="number"
+                                                    inputMode="decimal"
+                                                    step="0.1"
+                                                    placeholder="—"
+                                                    value={distanceLogs[logKey] ?? ''}
+                                                    onChange={(e) => {
+                                                      const v = e.target.value
+                                                      setDistanceLogs((prev) => ({ ...prev, [logKey]: v }))
+                                                      const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                                      const mins = Number(timedLogs[logKey])
+                                                      if (!userId || !wid || !Number.isFinite(mins) || mins <= 0) return
+                                                      if (timedSaveRef.current[`${logKey}-d`]) {
+                                                        clearTimeout(timedSaveRef.current[`${logKey}-d`])
+                                                      }
+                                                      timedSaveRef.current[`${logKey}-d`] = setTimeout(() => {
+                                                        void saveSetSafely(`${logKey}-timed`, {
+                                                          workoutId: wid,
+                                                          userId,
+                                                          exerciseName: displayName,
+                                                          originalExerciseName: isSwapped ? exercise.name : null,
+                                                          setNumber: 1,
+                                                          weight: null,
+                                                          reps: null,
+                                                          isIntensitySet: false,
+                                                          completed: true,
+                                                          durationSeconds: Math.round(mins * 60),
+                                                          distanceMi: Number(v) || null,
+                                                        })
+                                                      }, 500)
+                                                    }}
+                                                    className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    aria-label="Distance in miles, optional"
+                                                  />
+                                                  <span className="text-white/35 text-xs font-body">
+                                                    miles <span className="text-white/20">(optional)</span>
+                                                  </span>
+                                                </div>
+                                              )}
+
+                                              {/* Pace, the moment both are in. */}
+                                              {Number(typed) > 0 && Number(distanceLogs[logKey]) > 0 && (
+                                                <p className="text-white/40 text-2xs font-body mt-2">
+                                                  {(() => {
+                                                    const sec = (Number(typed) * 60) / Number(distanceLogs[logKey])
+                                                    return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')} per mile`
+                                                  })()}
+                                                </p>
+                                              )}
                                             </>
                                           )
                                         }
@@ -2196,12 +2261,166 @@ export default function ProgramsPage() {
                                         )
                                       })()}
 
+                                      {/* Cues in front of a beginner, behind a
+                                          tap for everyone else.
+                                          Disclosed per EXERCISE as well as per
+                                          client: an advanced lifter meeting a
+                                          Zercher squat for the first time is a
+                                          beginner at that movement, and the
+                                          history to know that is already loaded. */}
+                                      {sessionActive && (() => {
+                                        const coaching = cuesFor(displayName)
+                                        const firstTime = exerciseHist.length === 0
+                                        if (!coaching || !(level === 'beginner' || firstTime)) return null
+                                        return (
+                                          <div className="mt-2 mb-3 px-3 py-2.5 rounded-control bg-brand-blue/[0.07] border border-brand-blue/20">
+                                            <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
+                                              {firstTime && level !== 'beginner' ? 'First time on this one' : 'Get these right'}
+                                            </p>
+                                            <ul className="space-y-1">
+                                              {coaching.cues.slice(0, 2).map((cue, i) => (
+                                                <li key={i} className="text-white/75 text-xs font-body leading-relaxed">{cue}</li>
+                                              ))}
+                                            </ul>
+                                            {level === 'beginner' && (
+                                              <p className="text-state-warning/90 text-xs font-body leading-relaxed mt-2">
+                                                Watch out: {coaching.mistake}
+                                              </p>
+                                            )}
+                                          </div>
+                                        )
+                                      })()}
+
+                                      {/* Sprints, jumps and throws: tap an effort
+                                          as you do it.
+                                          Phase 1 got the weight column off these
+                                          and left a reps box, which is still the
+                                          wrong shape — a box jump set is three
+                                          jumps, counted, not a number recalled
+                                          and typed with chalk on your hands. The
+                                          circles are the set. */}
+                                      {explosive && currentLogs.length > 0 && (
+                                        <div className="space-y-2.5">
+                                          {currentLogs.map((log, si) => {
+                                            const prescribed = parseRepRange(exercise.reps)?.min ?? 1
+                                            const doneCount = log.logged ? Number(log.reps) || 0 : Number(log.reps) || 0
+                                            const setKey = `${logKey}-${si}`
+                                            const tapEffort = (n: number) => {
+                                              primeRestAudio()
+                                              // Tapping the effort you are already
+                                              // on clears it, so an accidental tap
+                                              // costs one more tap, not a retype.
+                                              const next = doneCount === n ? n - 1 : n
+                                              const updated = [...backingLogs]
+                                              updated[si] = { weight: '', reps: next > 0 ? String(next) : '', logged: next >= prescribed }
+                                              setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
+
+                                              const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                              if (userId && wid && next > 0) {
+                                                void saveSetSafely(setKey, {
+                                                  workoutId: wid,
+                                                  userId,
+                                                  exerciseName: displayName,
+                                                  originalExerciseName: isSwapped ? exercise.name : null,
+                                                  setNumber: si + 1,
+                                                  weight: null,
+                                                  reps: next,
+                                                  isIntensitySet: false,
+                                                  completed: next >= prescribed,
+                                                })
+                                              }
+                                              if (next >= prescribed && si < currentLogs.length - 1) {
+                                                const restKey = `${selectedDay}-${exercise.name}`
+                                                startRestTimer(`${logKey}-set${si}`, restTimers[restKey] ?? parseRestSeconds(exercise.rest))
+                                              }
+                                            }
+                                            return (
+                                              <div key={si} className="flex items-center gap-3">
+                                                <span className={`text-xs font-display font-bold w-6 shrink-0 ${log.logged ? 'text-state-success' : 'text-white/30'}`}>
+                                                  {si + 1}
+                                                </span>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                  {Array.from({ length: prescribed }, (_, n) => {
+                                                    const on = doneCount > n
+                                                    return (
+                                                      <button
+                                                        key={n}
+                                                        onClick={() => tapEffort(n + 1)}
+                                                        className={`w-11 h-11 rounded-full border-2 flex items-center justify-center font-display font-bold text-sm transition-all duration-150 active:scale-90 ${
+                                                          on
+                                                            ? 'bg-state-success/25 border-state-success text-state-success'
+                                                            : 'bg-white/[0.03] border-white/[0.12] text-white/25 hover:border-white/25'
+                                                        }`}
+                                                        aria-label={`Set ${si + 1}, effort ${n + 1} of ${prescribed}${on ? ', done' : ''}`}
+                                                      >
+                                                        {on ? (
+                                                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                          </svg>
+                                                        ) : (
+                                                          n + 1
+                                                        )}
+                                                      </button>
+                                                    )
+                                                  })}
+                                                </div>
+                                              </div>
+                                            )
+                                          })}
+
+                                          {/* Quality, not quantity: the only thing
+                                              worth recording about explosive work,
+                                              and the thing the coach-only rule in
+                                              lib/conditioning.ts is waiting on. */}
+                                          {currentLogs.every((l) => l.logged) && (
+                                            <div className="flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 mt-1">
+                                              <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
+                                                How did they feel?
+                                              </span>
+                                              {[
+                                                { key: 3, label: 'All sharp' },
+                                                { key: 1, label: 'Slowed down' },
+                                              ].map((q) => (
+                                                <button
+                                                  key={q.key}
+                                                  onClick={() => {
+                                                    setRirByExercise((prevR) => ({ ...prevR, [logKey]: q.key }))
+                                                    const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                                    if (!userId || !wid) return
+                                                    const lastIdx = currentLogs.length - 1
+                                                    void saveSetSafely(`${logKey}-${lastIdx}`, {
+                                                      workoutId: wid,
+                                                      userId,
+                                                      exerciseName: displayName,
+                                                      originalExerciseName: isSwapped ? exercise.name : null,
+                                                      setNumber: lastIdx + 1,
+                                                      weight: null,
+                                                      reps: Number(currentLogs[lastIdx]?.reps) || null,
+                                                      isIntensitySet: false,
+                                                      completed: true,
+                                                      rir: q.key,
+                                                    })
+                                                  }}
+                                                  className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                    rirByExercise[logKey] === q.key
+                                                      ? 'bg-brand-blue text-white'
+                                                      : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                  }`}
+                                                >
+                                                  {q.label}
+                                                </button>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+
                                       {/* Column headers.
                                           Timed work has no set rows at all, and
                                           these headers used to render above the
                                           nothing — "SET | WEIGHT (LBS) | REPS"
                                           sitting over a 20-minute row. */}
-                                      {currentLogs.length > 0 && (
+                                      {!explosive && currentLogs.length > 0 && (
                                         <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-2`}>
                                           <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
                                           {needsWeight && (
@@ -2212,8 +2431,9 @@ export default function ProgramsPage() {
                                         </div>
                                       )}
 
-                                      {/* Set rows */}
-                                      {currentLogs.map((log, si) => {
+                                      {/* Set rows. Explosive work is counted in
+                                          the circles above instead. */}
+                                      {(explosive ? [] : currentLogs).map((log, si) => {
                                         const filled = log.logged
                                         // What stands in the box: what the client
                                         // typed, else what we suggest. The
@@ -2467,10 +2687,10 @@ export default function ProgramsPage() {
                                           it appeared mid-exercise, greyed, while the client was
                                           still working, which is the wrong moment to ask and the
                                           wrong weight to ask it at. */}
-                                      {currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
+                                      {!explosive && currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
                                         <div className="mt-3 flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5">
                                           <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
-                                            Reps left in the tank?
+                                            {level === 'beginner' ? 'Could you have done more?' : 'Reps left in the tank?'}
                                           </span>
                                           {[0, 1, 2, 3].map((n) => {
                                             const on = rirByExercise[logKey] === n
@@ -2516,10 +2736,18 @@ export default function ProgramsPage() {
                                       )}
 
                                       {/* Intensity Technique toggle.
-                                          Strength only. A dropset on a box jump
+                                          Strength only — a dropset on a box jump
                                           or a treadmill walk is not a thing, and
-                                          it was being offered on both. */}
-                                      {!timed && !explosive && (
+                                          it was being offered on both.
+
+                                          And not for beginners. Someone in their
+                                          first months needs to turn up and add
+                                          weight, not reach for rest-pause; the
+                                          panel is four controls of noise on every
+                                          exercise for a client who should not be
+                                          using it. It was used 8 times in 432
+                                          sets by anyone. */}
+                                      {!timed && !explosive && level !== 'beginner' && (
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
@@ -2787,6 +3015,7 @@ export default function ProgramsPage() {
                         // audio context from a timer callback, so priming it
                         // anywhere else means the rest beep never sounds.
                         primeRestAudio()
+                        void primeRestNotifications()
                         setWorkoutStartTime((prev) => ({ ...prev, [selectedDay]: Date.now() }))
                         setWorkoutElapsed(0)
                         setFocusIndex(0)
@@ -3386,6 +3615,7 @@ function DemoSheet({
   data: ExerciseDB | null
   onClose: () => void
 }) {
+  const coaching = cuesFor(name)
   return (
     <div className="fixed inset-0 z-[68] flex items-end sm:items-center sm:justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} aria-hidden="true" />
@@ -3428,31 +3658,42 @@ function DemoSheet({
           </div>
         )}
 
-        {data && data.instructions.length > 0 && (
+        {/* Coaching before description.
+            The library's instructions describe a movement; they do not coach
+            one. These are the two or three things that decide whether the set
+            was any good, written for someone holding a dumbbell. */}
+        {coaching && (
           <div className="mt-5">
-            <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mb-2">The first things to get right</p>
-            <ol className="space-y-2">
-              {data.instructions.slice(0, 3).map((step, i) => (
-                <li key={i} className="flex gap-2.5 text-white/70 text-sm font-body leading-relaxed">
-                  <span className="text-brand-blue font-display font-bold shrink-0">{i + 1}</span>
+            <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mb-2">Get these right</p>
+            <ul className="space-y-2">
+              {coaching.cues.map((cue, i) => (
+                <li key={i} className="flex gap-2.5 text-white text-sm font-body leading-relaxed">
+                  <span className="text-brand-blue shrink-0">&bull;</span>
+                  {cue}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.08] border border-state-warning/20">
+              <p className="text-state-warning text-2xs font-display font-bold uppercase tracking-wide mb-1">Common mistake</p>
+              <p className="text-white/70 text-sm font-body leading-relaxed">{coaching.mistake}</p>
+            </div>
+          </div>
+        )}
+
+        {data && data.instructions.length > 0 && (
+          <details className="mt-4">
+            <summary className="text-brand-blue text-xs font-body cursor-pointer">
+              {coaching ? 'Full step-by-step' : 'Step-by-step'} ({data.instructions.length} steps)
+            </summary>
+            <ol className="space-y-2 mt-2">
+              {data.instructions.map((step, i) => (
+                <li key={i} className="flex gap-2.5 text-white/55 text-sm font-body leading-relaxed">
+                  <span className="text-white/30 font-display font-bold shrink-0">{i + 1}</span>
                   {step}
                 </li>
               ))}
             </ol>
-            {data.instructions.length > 3 && (
-              <details className="mt-3">
-                <summary className="text-brand-blue text-xs font-body cursor-pointer">All {data.instructions.length} steps</summary>
-                <ol className="space-y-2 mt-2">
-                  {data.instructions.slice(3).map((step, i) => (
-                    <li key={i} className="flex gap-2.5 text-white/55 text-sm font-body leading-relaxed">
-                      <span className="text-white/30 font-display font-bold shrink-0">{i + 4}</span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </details>
-            )}
-          </div>
+          </details>
         )}
       </motion.div>
     </div>

@@ -58,6 +58,57 @@ function beep(): void {
   }
 }
 
+/**
+ * Register the notification-only service worker and ask for permission.
+ *
+ * Called from the Start Workout tap, because permission prompts outside a
+ * gesture are ignored or auto-denied. A refusal is final and fine: the beep
+ * and the vibration still work, and nothing here is load-bearing.
+ */
+export async function primeRestNotifications(): Promise<void> {
+  if (typeof window === 'undefined') return
+  try {
+    if ('serviceWorker' in navigator) {
+      await navigator.serviceWorker.register('/sw.js')
+    }
+    if ('Notification' in window && Notification.permission === 'default') {
+      await Notification.requestPermission()
+    }
+  } catch {
+    // No service worker, no permission, no notification. Carry on.
+  }
+}
+
+/**
+ * A notification, but only when the client cannot see the screen anyway.
+ *
+ * Showing one while they are looking at the running timer is just noise. This
+ * is for the phone that went dark in a pocket during a 180-second rest.
+ *
+ * On iOS Safari a backgrounded tab's timers are suspended, so this will often
+ * not fire there at all — nothing short of a push server fixes that, and a
+ * push server for a rest timer is not a trade worth making.
+ */
+async function notify(): Promise<void> {
+  try {
+    if (typeof document === 'undefined' || !document.hidden) return
+    if (!('Notification' in window) || Notification.permission !== 'granted') return
+    const reg = await navigator.serviceWorker?.getRegistration()
+    if (!reg) return
+    await reg.showNotification('Rest over', {
+      body: 'Next set.',
+      icon: '/AJMfit.png',
+      badge: '/AJMfit.png',
+      // One rest notification at a time, replaced rather than stacked.
+      tag: 'ajmfit-rest',
+      renotify: true,
+      requireInteraction: false,
+    } as NotificationOptions)
+  } catch {
+    // Never worth breaking a workout over.
+  }
+}
+
 /** Fire everything this device supports. Safe to call from a timer. */
 export function alertRestOver(): void {
   beep()
@@ -66,4 +117,5 @@ export function alertRestOver(): void {
   } catch {
     // Not supported on iOS Safari.
   }
+  void notify()
 }

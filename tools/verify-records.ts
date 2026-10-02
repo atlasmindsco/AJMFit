@@ -1,4 +1,4 @@
-import { judgeSet, estimate1RM, sessionRecords, type PersonalBest } from '../lib/records.ts'
+import { judgeSet, judgeTimed, estimate1RM, sessionRecords, type PersonalBest } from '../lib/records.ts'
 
 const W = (s: any, n: number) => String(s).padEnd(n)
 let fail = 0
@@ -101,6 +101,34 @@ console.log('\nJUNK IN\n')
   g('NaN weight', judgeSet({ weight: NaN, reps: 8 }, best) === null)
   g('NaN reps', judgeSet({ weight: 185, reps: NaN }, best) === null)
   g('negative reps', judgeSet({ weight: 185, reps: -3 }, best) === null)
+}
+
+console.log('\nRUNNING RECORDS NEED DISTANCE\n')
+{
+  const mi = (durationSeconds: number, distanceMi: number | null) => ({ durationSeconds, distanceMi })
+
+  // 3 miles in 27:00 = 9:00/mi.
+  const best = mi(1620, 3)
+  g('faster over the same distance', judgeTimed(mi(1560, 3), best)?.kind === 'e1rm')
+  g('and it is celebrated', judgeTimed(mi(1560, 3), best)?.celebrate === true)
+  g('slower over the same distance is nothing', judgeTimed(mi(1700, 3), best) === null)
+  g('further, even if slower', judgeTimed(mi(2400, 4), best)?.kind === 'reps')
+
+  // The whole reason this function exists: duration alone proves nothing.
+  g('a longer session alone is NOT a record', judgeTimed(mi(3600, null), mi(1200, null)) === null)
+  g('no previous distance, no comparison', judgeTimed(mi(1560, 3), mi(1620, null)) === null)
+  g('first ever run sets no record', judgeTimed(mi(1560, 3), null) === null)
+
+  // A quick half mile must not beat a 3-mile pace.
+  g('a sprint does not beat a long run pace', judgeTimed(mi(210, 0.5), best) === null, String(judgeTimed(mi(210, 0.5), best)?.kind))
+  // But a slightly shorter run at a better pace counts.
+  g('2.8 miles quicker does count', judgeTimed(mi(1400, 2.8), best)?.kind === 'e1rm')
+
+  g('zero distance is rejected', judgeTimed(mi(1560, 0), best) === null)
+  g('zero duration is rejected', judgeTimed(mi(0, 3), best) === null)
+
+  const hit = judgeTimed(mi(1560, 3), best)
+  g('pace reads as mm:ss', Boolean(hit?.text.includes('8:40')), hit?.text ?? '')
 }
 
 console.log('\n' + (fail === 0 ? 'ALL RECORD CHECKS PASSED' : `*** ${fail} FAILURES ***`))

@@ -124,6 +124,63 @@ export function judgeSet(set: Lift, best: PersonalBest | null): RecordHit | null
   return null
 }
 
+/* -------------------------------------------------------------------------- */
+
+export interface TimedEffort {
+  durationSeconds: number
+  /** Null when the client only logged time. */
+  distanceMi: number | null
+}
+
+/**
+ * A record for running and rowing, which cannot be judged on time alone.
+ *
+ * A longer session is not a better one — the programs here prescribe fixed 10
+ * and 20 minute slots, so "longest ever" would reward nothing but having more
+ * time that day. What improves is ground covered and the pace it was covered
+ * at, and neither is computable from a duration by itself. So: no distance, no
+ * record. That is why the duration field now has a distance beside it.
+ */
+export function judgeTimed(effort: TimedEffort, best: TimedEffort | null): RecordHit | null {
+  const { durationSeconds, distanceMi } = effort
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return null
+  if (distanceMi == null || !Number.isFinite(distanceMi) || distanceMi <= 0) return null
+  if (!best || best.distanceMi == null || best.distanceMi <= 0) return null
+
+  const paceNow = durationSeconds / distanceMi
+  const paceBefore = best.durationSeconds / best.distanceMi
+  const fmt = (secPerMi: number) => {
+    const m = Math.floor(secPerMi / 60)
+    const s = Math.round(secPerMi % 60)
+    return `${m}:${String(s).padStart(2, '0')}`
+  }
+
+  // Faster over a distance at least as long. Beating a 5-mile pace over half a
+  // mile is not the same achievement, so the distance has to hold up.
+  if (paceNow < paceBefore && distanceMi >= best.distanceMi * 0.9) {
+    return {
+      kind: 'e1rm',
+      celebrate: true,
+      value: round(paceNow),
+      previous: round(paceBefore),
+      text: `${round(distanceMi)} miles at ${fmt(paceNow)} per mile — your quickest yet, down from ${fmt(paceBefore)}.`,
+    }
+  }
+
+  // Further than ever, regardless of pace.
+  if (distanceMi > best.distanceMi) {
+    return {
+      kind: 'reps',
+      celebrate: true,
+      value: round(distanceMi),
+      previous: round(best.distanceMi),
+      text: `${round(distanceMi)} miles — furthest you've gone, up from ${round(best.distanceMi)}.`,
+    }
+  }
+
+  return null
+}
+
 /**
  * The best single record from a whole session, per exercise.
  *

@@ -1,0 +1,25 @@
+{
+  "name": "AJM Fit",
+  "short_name": "AJM Fit",
+  "description": "Your training and nutrition, in one place.",
+  "start_url": "/studio",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "icons": [
+    {
+      "src": "/AJMfit.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/AJMfit.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

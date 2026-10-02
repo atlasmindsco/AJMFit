@@ -28,6 +28,15 @@ export const metadata: Metadata = {
     "You're already showing up. Let's make it count. Custom training programs, accountability coaching, and real results with AJM Fit.",
   keywords: ['personal training', 'online coaching', 'fitness', 'AJM Fit', 'home workouts', 'ISSA certified'],
   alternates: { canonical: '/' },
+  // Installable to the home screen, which in a gym means no browser chrome,
+  // no address bar eating the top of the screen, and the app where a client
+  // reaches for it rather than three taps into a browser.
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    title: 'AJM Fit',
+    statusBarStyle: 'black-translucent',
+  },
   icons: {
     icon: '/favicon.png',
     apple: '/favicon.png',
