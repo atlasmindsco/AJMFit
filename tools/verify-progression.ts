@@ -1,4 +1,4 @@
-import { nextTarget, sessionFatigue, experienceFrom, isBodyweightMovement,
+import { nextTarget, sessionFatigue, experienceFrom, experienceKnown, isBodyweightMovement,
   type ExperienceLevel, type ProgressionGoal } from '../lib/progression.ts'
 import type { ExerciseSession } from '../lib/workout.ts'
 
@@ -165,3 +165,25 @@ console.log('\nPREFILL: THE NUMBERS THAT LAND IN THE SET ROW\n')
 }
 
 console.log('\n' + (fail === 0 ? 'ALL PROGRESSION CHECKS PASSED (incl. prefill)' : `*** ${fail} FAILURES ***`))
+
+console.log('\nABSENCE OF EVIDENCE IS NOT EVIDENCE\n')
+{
+  // Gating the intensity panel on experienceFrom() === 'beginner' hid drop
+  // sets from all nine clients, because every one has null experience answers.
+  g('no answers at all -> not known', experienceKnown(null, null) === false)
+  g('empty strings -> not known', experienceKnown('', '') === false)
+  g('undefined -> not known', experienceKnown(undefined, undefined) === false)
+  g('zero years -> not known', experienceKnown(null, '0') === false)
+
+  g('"new" IS an answer', experienceKnown('new', null) === true)
+  g('"returning" IS an answer', experienceKnown('returning', null) === true)
+  g('"consistent" IS an answer', experienceKnown('consistent', null) === true)
+  g('3 years IS an answer', experienceKnown(null, 3) === true)
+  g('half a year IS an answer', experienceKnown(null, '0.5') === true)
+
+  // The fallback itself must not change: guessing small is right for load.
+  g('still defaults to beginner for increments', experienceFrom(null, null) === 'beginner')
+  g('and still reads real answers', experienceFrom(null, 3) === 'advanced')
+}
+
+console.log('\n' + (fail === 0 ? 'ALL PROGRESSION CHECKS PASSED (incl. prefill + known)' : `*** ${fail} FAILURES ***`))

@@ -37,6 +37,7 @@ import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type P
 import {
   PROGRESSION,
   experienceFrom,
+  experienceKnown,
   isBodyweightMovement,
   nextTarget,
   parseRepRange,
@@ -414,6 +415,14 @@ export default function ProgramsPage() {
   /** Last six sessions per exercise. One session cannot tell a stall from a bad day. */
   const [exHistory, setExHistory] = useState<Record<string, ExerciseSession[]>>({})
   const [level, setLevel] = useState<ExperienceLevel>('beginner')
+  /** Whether onboarding actually told us the training age, or we defaulted. */
+  const [levelKnown, setLevelKnown] = useState(false)
+  /**
+   * Treat someone as a beginner for the purpose of HIDING things only when we
+   * were told they are one. All nine clients have null experience answers, so
+   * gating on level alone took drop sets away from the entire platform.
+   */
+  const treatAsBeginner = levelKnown && level === 'beginner'
   const [rirByExercise, setRirByExercise] = useState<Record<string, number>>({})
   /** Used only to spot a client typing their own weight into a load field. */
   const [bodyWeightLb, setBodyWeightLb] = useState<number | null>(null)
@@ -546,6 +555,9 @@ export default function ProgramsPage() {
 
         setLevel(
           experienceFrom(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
+        )
+        setLevelKnown(
+          experienceKnown(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
         )
 
         if (program) {
@@ -2271,18 +2283,18 @@ export default function ProgramsPage() {
                                       {sessionActive && (() => {
                                         const coaching = cuesFor(displayName)
                                         const firstTime = exerciseHist.length === 0
-                                        if (!coaching || !(level === 'beginner' || firstTime)) return null
+                                        if (!coaching || !(treatAsBeginner || firstTime)) return null
                                         return (
                                           <div className="mt-2 mb-3 px-3 py-2.5 rounded-control bg-brand-blue/[0.07] border border-brand-blue/20">
                                             <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
-                                              {firstTime && level !== 'beginner' ? 'First time on this one' : 'Get these right'}
+                                              {firstTime && !treatAsBeginner ? 'First time on this one' : 'Get these right'}
                                             </p>
                                             <ul className="space-y-1">
                                               {coaching.cues.slice(0, 2).map((cue, i) => (
                                                 <li key={i} className="text-white/75 text-xs font-body leading-relaxed">{cue}</li>
                                               ))}
                                             </ul>
-                                            {level === 'beginner' && (
+                                            {treatAsBeginner && (
                                               <p className="text-state-warning/90 text-xs font-body leading-relaxed mt-2">
                                                 Watch out: {coaching.mistake}
                                               </p>
@@ -2690,7 +2702,7 @@ export default function ProgramsPage() {
                                       {!explosive && currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
                                         <div className="mt-3 flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5">
                                           <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
-                                            {level === 'beginner' ? 'Could you have done more?' : 'Reps left in the tank?'}
+                                            {treatAsBeginner ? 'Could you have done more?' : 'Reps left in the tank?'}
                                           </span>
                                           {[0, 1, 2, 3].map((n) => {
                                             const on = rirByExercise[logKey] === n
@@ -2747,7 +2759,7 @@ export default function ProgramsPage() {
                                           exercise for a client who should not be
                                           using it. It was used 8 times in 432
                                           sets by anyone. */}
-                                      {!timed && !explosive && level !== 'beginner' && (
+                                      {!timed && !explosive && !treatAsBeginner && (
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">

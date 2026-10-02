@@ -81,6 +81,27 @@ const CUTBACK_FRACTION = 0.1
 const LAYOFF_DAYS = 14
 const LONG_LAYOFF_DAYS = 28
 
+/**
+ * Did onboarding actually tell us anything about training age?
+ *
+ * `experienceFrom` falls back to 'beginner' when it knows nothing, which is the
+ * right call for load increments — guessing small is safe. It is the wrong call
+ * for hiding features, and that distinction got lost: gating the intensity
+ * panel on `level !== 'beginner'` hid drop sets, rest-pause and partials from
+ * every client on the platform, because all nine have null experience answers.
+ *
+ * Absence of evidence is not evidence. Anything that takes a tool AWAY asks
+ * this first.
+ */
+export function experienceKnown(
+  experience: string | undefined | null,
+  yearsTraining: string | number | undefined | null
+): boolean {
+  const years = Number(yearsTraining)
+  if (yearsTraining != null && yearsTraining !== '' && Number.isFinite(years) && years > 0) return true
+  return experience === 'consistent' || experience === 'returning' || experience === 'new'
+}
+
 /** Map whatever onboarding collected onto a training age. */
 export function experienceFrom(
   experience: string | undefined | null,
