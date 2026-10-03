@@ -21,6 +21,7 @@ import {
   fetchExerciseHistory as dbFetchExerciseHistory,
   fetchTimedHistory as dbFetchTimedHistory,
   fetchTrainedDays as dbFetchTrainedDays,
+  type SwapReason,
   type ExerciseSession,
   type LastSet,
   type WorkoutHistoryRow,
@@ -1286,14 +1287,18 @@ export default function ProgramsPage() {
               if (userId) dbRemoveSwap(userId, swapFor).catch((err) => console.error('[Swap remove] Failed:', err))
               setSwapFor(null)
             }}
-            onPick={(alt, forever) => {
+            onPick={(alt, forever, reason) => {
               setSwappedExercises((prev) => ({ ...prev, [`${selectedDay}-${swapFor}`]: alt }))
               // A swap is usually "the rack is busy right now", so it lasts
               // this session unless the client says otherwise. It used to be
               // saved for every future occurrence of that exercise, forever,
               // with no way to undo it short of finding the menu again.
-              if (forever && userId) {
-                dbSaveSwap(userId, swapFor, alt).catch((err) => console.error('[Swap save] Failed:', err))
+              // A permanent swap is stored as before. A session-only swap is
+              // ALSO stored when the reason was pain, because that is a
+              // coaching signal rather than a preference and it is the one
+              // thing here the coach must not miss.
+              if ((forever || reason === 'hurts') && userId) {
+                dbSaveSwap(userId, swapFor, alt, reason).catch((err) => console.error('[Swap save] Failed:', err))
               }
               setSwapFor(null)
             }}
@@ -3508,7 +3513,7 @@ function SwapSheet({
   isSwapped: boolean
   onClose: () => void
   onReset: () => void
-  onPick: (alt: string, forever: boolean) => void
+  onPick: (alt: string, forever: boolean, reason: SwapReason | null) => void
 }) {
   const [reason, setReason] = useState<'busy' | 'missing' | 'hurts' | null>(null)
   const [forever, setForever] = useState(false)
@@ -3564,7 +3569,7 @@ function SwapSheet({
           {alternatives.map((alt) => (
             <button
               key={alt}
-              onClick={() => onPick(alt, forever)}
+              onClick={() => onPick(alt, forever, reason)}
               className={`w-full px-3.5 py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
                 current === alt ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
               }`}

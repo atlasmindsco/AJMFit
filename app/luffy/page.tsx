@@ -6,7 +6,8 @@ import { fetchActiveBlocks, type Assignment } from '@/lib/programs'
 import { blockProgress } from '@/lib/blocks'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
-import { fetchClients, tierLabel, relativeTime, type ClientRow } from '@/lib/admin'
+import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingNutritionProposals, type ClientRow } from '@/lib/admin'
+import type { StalledLift } from '@/lib/coach-signals'
 import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
 import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
 import { fetchFeedback, type Feedback } from '@/lib/feedback'
@@ -30,18 +31,22 @@ export default function AdminDashboard() {
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [checkIns, setCheckIns] = useState<CheckIn[]>([])
   const [blocks, setBlocks] = useState<Map<string, Assignment>>(new Map())
+  const [stalls, setStalls] = useState<Map<string, StalledLift[]>>(new Map())
+  const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f, ci, bl] = await Promise.all([
+        const [s, c, f, ci, bl, st, pr] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
           fetchAllCheckIns().catch(() => []),
           fetchActiveBlocks().catch(() => new Map()),
+          fetchStalledLifts().catch(() => new Map()),
+          fetchPendingNutritionProposals().catch(() => new Map()),
         ])
         if (!active) return
         setStats(s)
@@ -49,6 +54,8 @@ export default function AdminDashboard() {
         setFeedback(f)
         setCheckIns(ci)
         setBlocks(bl)
+        setStalls(st)
+        setProposals(pr)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -128,6 +135,8 @@ export default function AdminDashboard() {
                         coached: tier === 'accelerator' || tier === 'full-experience',
                         lastWorkoutAt: client.last_workout_at,
                         checkIns: checkIns.filter((ci) => ci.user_id === client.id),
+                        signedUpAt: client.created_at,
+                        stalledLifts: stalls.get(client.id) ?? [],
                         blockEndsInDays: (() => {
                           const b = blocks.get(client.id)
                           return b ? blockProgress(b.assigned_at, b.block_weeks).daysLeft : null
@@ -154,6 +163,16 @@ export default function AdminDashboard() {
                               <span>
                                 <span className={`block text-xs font-display font-bold ${meta.tone}`}>{meta.label}</span>
                                 <span className="block text-white/30 text-2xs font-body">{reason}</span>
+                                {/* A queued nutrition change rides alongside
+                                    rather than competing for the status, which
+                                    stays one-per-client. The cron files these
+                                    weekly and the only place they showed was a
+                                    separate tab. */}
+                                {proposals.has(client.id) && (
+                                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-brand-orange/15 text-brand-orange text-[9px] font-display font-bold uppercase tracking-wide">
+                                    Nutrition change waiting
+                                  </span>
+                                )}
                               </span>
                             </span>
                           </td>

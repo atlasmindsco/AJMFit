@@ -79,6 +79,13 @@ export default function MessagesPage() {
     setInput('')
     try {
       await dbSendMessage(selected, body, true)
+      // Tell the client. Not awaited: the message is already saved, and a mail
+      // failure must not make a sent message look unsent.
+      void fetch('/api/admin/client-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selected, excerpt: body }),
+      }).catch(() => {})
       await loadThread(selected)
       void loadThreads()
     } catch {

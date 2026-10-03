@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { notifyCoachReply } from '@/lib/notify-client'
 
 export const runtime = 'nodejs'
 
@@ -54,6 +55,12 @@ export async function POST(request: Request) {
     from_trainer: true,
     body: `On your check-in:\n\n${response}`,
   })
+
+  // Tell them it happened. Without this the coach writes a considered reply
+  // and the client finds out by chance, which makes real work look like none.
+  // Deliberately not awaited into the response path beyond this: a mail
+  // failure must not make the coach think their reply did not save.
+  await notifyCoachReply({ userId: ci.user_id, excerpt: response, aboutCheckIn: true })
 
   return NextResponse.json({ ok: true })
 }

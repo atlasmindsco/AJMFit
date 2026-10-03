@@ -10,10 +10,17 @@ import { weekOf, previousWeekOf, type CheckIn } from '@/lib/check-ins'
  * Order matters: a client can be several of these at once, and the status shown
  * is the one that most needs the coach to do something.
  */
-export type ClientStatus = 'review_needed' | 'at_risk' | 'needs_attention' | 'check_in_due' | 'on_track'
+export type ClientStatus =
+  | 'review_needed'
+  | 'never_started'
+  | 'at_risk'
+  | 'needs_attention'
+  | 'check_in_due'
+  | 'on_track'
 
 export const STATUS_META: Record<ClientStatus, { label: string; tone: string; dot: string }> = {
   review_needed: { label: 'Review needed', tone: 'text-brand-blue', dot: 'bg-brand-blue' },
+  never_started: { label: 'Never started', tone: 'text-state-danger', dot: 'bg-state-danger' },
   at_risk: { label: 'At risk', tone: 'text-state-danger', dot: 'bg-state-danger' },
   needs_attention: { label: 'Needs attention', tone: 'text-state-warning', dot: 'bg-state-warning' },
   check_in_due: { label: 'Check-in due', tone: 'text-white/60', dot: 'bg-white/40' },
@@ -34,6 +41,20 @@ export interface StatusInput {
    * the dead end this whole feature exists to remove.
    */
   blockEndsInDays?: number | null
+  /**
+   * When this client signed up, so a brand-new account is not confused with
+   * someone who paid and then never came back.
+   */
+  signedUpAt?: string | null
+  /**
+   * Lifts the progression engine has called stuck or declining.
+   *
+   * The engine works this out every time a client opens the exercise and has
+   * never told the coach. It is the only signal here that catches a client who
+   * turns up reliably and gets nowhere — every other number about them looks
+   * fine, which is exactly why they quit without warning.
+   */
+  stalledLifts?: Array<{ exerciseName: string; verdict: string }>
 }
 
 export interface StatusResult {
@@ -45,11 +66,26 @@ export interface StatusResult {
 const daysSince = (iso: string | null): number | null =>
   iso == null ? null : Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
 
+/**
+ * A new account gets this long to log its first session before it is a problem.
+ *
+ * Shorter than the 10-day quiet rule on purpose. Someone who has trained for
+ * two months and then stopped has a motivation or life problem and the program
+ * is waiting for them. Someone who has never started usually has a SETUP
+ * problem — they could not find it, the program was not assigned, the first
+ * session did not make sense — and every day that goes unanswered makes it
+ * less likely they ever begin. The fix is also completely different, which is
+ * why the two share a severity but not a status.
+ */
+const NEVER_STARTED_GRACE_DAYS = 3
+
 export function clientStatus({
   coached,
   lastWorkoutAt,
   checkIns,
   blockEndsInDays,
+  signedUpAt,
+  stalledLifts,
 }: StatusInput): StatusResult {
   const sorted = [...checkIns].sort((a, b) => b.week_of.localeCompare(a.week_of))
   const thisWeek = weekOf()
@@ -66,9 +102,17 @@ export function clientStatus({
     }
   }
 
-  // 2. Gone quiet. Ten days covers a missed week plus grace on any split.
+  // 2. Never began. Distinct from going quiet because the conversation is
+  // different: "did you get stuck setting up" rather than "how's it going".
   if (sinceWorkout == null) {
-    return { status: 'at_risk', reason: 'Has never logged a workout' }
+    const age = daysSince(signedUpAt ?? null)
+    if (age != null && age < NEVER_STARTED_GRACE_DAYS) {
+      return { status: 'on_track', reason: `Joined ${age === 0 ? 'today' : `${age}d ago`}, not started yet` }
+    }
+    return {
+      status: 'never_started',
+      reason: age == null ? 'Has never logged a workout' : `Joined ${age} days ago, never trained`,
+    }
   }
   if (sinceWorkout >= 10) {
     return { status: 'at_risk', reason: `No workout logged in ${sinceWorkout} days` }
@@ -108,11 +152,36 @@ export function clientStatus({
       return { status: 'needs_attention', reason: 'Weight flat for three weeks' }
     }
   }
+
+  // 5. Training hard and going nowhere.
+  //
+  // Below the check-in signals because those carry a client's own words, which
+  // outrank an inference. Above the "quiet 5 days" nudge because this one does
+  // not resolve itself: a client who is turning up is not going to notice the
+  // plateau, and will quit over it without ever mentioning it.
+  const declining = (stalledLifts ?? []).filter((l) => l.verdict === 'cut_back')
+  if (declining.length > 0) {
+    return {
+      status: 'needs_attention',
+      reason:
+        declining.length === 1
+          ? `${declining[0].exerciseName} going backwards`
+          : `${declining.length} lifts going backwards`,
+    }
+  }
+  const stuck = (stalledLifts ?? []).filter((l) => l.verdict === 'change_exercise')
+  if (stuck.length > 0) {
+    return {
+      status: 'needs_attention',
+      reason: stuck.length === 1 ? `${stuck[0].exerciseName} stalled` : `${stuck.length} lifts stalled`,
+    }
+  }
+
   if (sinceWorkout >= 5) {
     return { status: 'needs_attention', reason: `Last workout ${sinceWorkout} days ago` }
   }
 
-  // 5. Nothing wrong, but this week's check-in has not arrived yet.
+  // 6. Nothing wrong, but this week's check-in has not arrived yet.
   if (coached && !sorted.some((c) => c.week_of === thisWeek)) {
     return { status: 'check_in_due', reason: 'No check-in for this week yet' }
   }
@@ -123,6 +192,7 @@ export function clientStatus({
 /** Sort key so the dashboard leads with whatever needs the coach first. */
 export const STATUS_ORDER: ClientStatus[] = [
   'review_needed',
+  'never_started',
   'at_risk',
   'needs_attention',
   'check_in_due',

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { stalledLifts, historyFromSets, type StalledLift } from '@/lib/coach-signals'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -178,4 +179,66 @@ export function relativeTime(iso: string | null): string {
   const days = Math.floor(hours / 24)
   if (days < 7) return `${days}d ago`
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+/**
+ * Stalled and declining lifts for every client, in one pass.
+ *
+ * The progression engine already works this out per exercise on the client's
+ * own screen, and it has never reached the coach. A client who turns up
+ * reliably and gets nowhere is the hardest one to spot -- they are never
+ * quiet, they never miss, and every surface-level number about them looks
+ * fine -- which makes this the signal most worth carrying across.
+ *
+ * Deliberately one query rather than per-client: the dashboard already loads
+ * every client in a single pass and should not acquire an N+1 to add a column.
+ */
+export async function fetchStalledLifts(): Promise<Map<string, StalledLift[]>> {
+  // Only recent sessions can produce a current verdict, and the progression
+  // engine treats anything past a fortnight as a layoff rather than a stall.
+  // Ninety days of history is enough to see a trend into that window.
+  const since = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10)
+
+  const { data: workouts } = await db
+    .from('workouts')
+    .select('id, date, started_at')
+    .gte('date', since)
+  const rows = (workouts ?? []) as Array<{ id: string; date: string | null; started_at: string }>
+  if (rows.length === 0) return new Map()
+
+  const dateOfWorkout: Record<string, string> = {}
+  for (const w of rows) dateOfWorkout[w.id] = w.date || w.started_at.slice(0, 10)
+
+  const { data: sets } = await db
+    .from('workout_sets')
+    .select('user_id, exercise_name, weight, reps, rir, workout_id, is_intensity_set')
+    .in('workout_id', Object.keys(dateOfWorkout))
+
+  const byUser = historyFromSets((sets ?? []) as never, dateOfWorkout)
+  const out = new Map<string, StalledLift[]>()
+  for (const [userId, history] of Object.entries(byUser)) {
+    const lifts = stalledLifts({ history })
+    if (lifts.length > 0) out.set(userId, lifts)
+  }
+  return out
+}
+
+/**
+ * Nutrition target changes proposed by the weekly review and still waiting.
+ *
+ * The cron already queues these; the only coach-facing surface is a separate
+ * Nutrition tab, so a proposal can sit for a week without anyone seeing it.
+ */
+export async function fetchPendingNutritionProposals(): Promise<Map<string, { created_at: string }>> {
+  const { data } = await db
+    .from('nutrition_adjustments')
+    .select('user_id, created_at, status')
+    .eq('status', 'proposed')
+    .order('created_at', { ascending: true })
+  const out = new Map<string, { created_at: string }>()
+  for (const r of (data ?? []) as Array<{ user_id: string; created_at: string }>) {
+    // Oldest first, so the first seen per client is the longest wait.
+    if (!out.has(r.user_id)) out.set(r.user_id, { created_at: r.created_at })
+  }
+  return out
 }

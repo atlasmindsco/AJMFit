@@ -83,7 +83,23 @@ export async function GET(request: Request) {
   const trainedRecently = new Set(((recentWorkouts ?? []) as Array<{ user_id: string }>).map((w) => w.user_id))
   const quietIds = activeIds.filter((id) => !trainedRecently.has(id))
 
+  // Leave a trace either way.
+  //
+  // This job is the only thing in the system that reaches the coach without
+  // him choosing to look, and until now there was no way to tell whether it
+  // had run. Two client messages sat unread with no way to distinguish "the
+  // digest reported them and it was missed" from "the digest never fired" —
+  // two problems with completely different fixes.
+  const heartbeat = async (summary: string) => {
+    try {
+      await admin.from('cron_runs').insert({ job: 'digest', summary, ok: true })
+    } catch {
+      // A missing log must never stop the digest going out.
+    }
+  }
+
   if (!unreadRows.length && !pendingRows.length && !checkInRows.length && !quietIds.length) {
+    await heartbeat('nothing waiting')
     return NextResponse.json({ ok: true, sent: false, reason: 'nothing waiting' })
   }
 
@@ -204,8 +220,14 @@ export async function GET(request: Request) {
     })
   } catch (e) {
     console.error('[cron/digest] email failed', e)
+    try {
+      await admin.from('cron_runs').insert({ job: 'digest', summary: `send failed: ${headline}`, ok: false })
+    } catch {
+      // Nothing more to do; the error is already logged.
+    }
     return NextResponse.json({ ok: false, error: 'send failed' }, { status: 502 })
   }
+  await heartbeat(headline)
 
   return NextResponse.json({ ok: true, sent: true, threads: sorted.length, applications: pendingRows.length })
 }

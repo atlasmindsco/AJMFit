@@ -304,7 +304,14 @@ export async function fetchWorkoutsThisWeek(userId: string): Promise<number> {
   return count ?? 0
 }
 
-export async function saveSwap(userId: string, originalName: string, swappedName: string) {
+export type SwapReason = 'busy' | 'missing' | 'hurts'
+
+export async function saveSwap(
+  userId: string,
+  originalName: string,
+  swappedName: string,
+  reason?: SwapReason | null
+) {
   const { error } = await db
     .from('exercise_swaps')
     .upsert(
@@ -312,10 +319,31 @@ export async function saveSwap(userId: string, originalName: string, swappedName
         user_id: userId,
         original_exercise_name: originalName,
         swapped_exercise_name: swappedName,
+        // The swap sheet already asks why and used to throw the answer away.
+        // "hurts" is the earliest and cheapest injury signal in the app.
+        reason: reason ?? null,
       },
       { onConflict: 'user_id,original_exercise_name' }
     )
   if (error) throw error
+}
+
+/**
+ * Swaps a client made because something hurt.
+ *
+ * Read by the coach dashboard. This is the only true interrupt in the whole
+ * intervention model: everything else can wait for the daily digest, and pain
+ * cannot.
+ */
+export async function fetchPainSwaps(sinceDays = 30): Promise<Array<{ user_id: string; original_exercise_name: string; created_at: string }>> {
+  const since = new Date(Date.now() - sinceDays * 86400000).toISOString()
+  const { data } = await db
+    .from('exercise_swaps')
+    .select('user_id, original_exercise_name, created_at')
+    .eq('reason', 'hurts')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+  return (data ?? []) as Array<{ user_id: string; original_exercise_name: string; created_at: string }>
 }
 
 export async function removeSwap(userId: string, originalName: string) {
