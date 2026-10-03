@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { getCurrentUserId } from '@/lib/current-user'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MacroRing from '@/components/ui/MacroRing'
+import UnitPickerSheet from '@/components/studio/UnitPickerSheet'
 import { fadeIn } from '@/lib/animations'
 
 const BarcodeScanner = dynamic(() => import('@/components/studio/BarcodeScanner'), { ssr: false })
@@ -87,6 +88,7 @@ export default function NutritionPage() {
   /** Amount and unit are chosen separately; the stored serving string is built from them. */
   const [servingAmount, setServingAmount] = useState('1')
   const [servingUnit, setServingUnit] = useState<UnitKey>('g')
+  const [unitSheetOpen, setUnitSheetOpen] = useState(false)
   const [scanningMealId, setScanningMealId] = useState<string | null>(null)
   const lookupAbortRef = useRef<AbortController | null>(null)
   const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -431,6 +433,19 @@ export default function NutritionPage() {
         setAnalysisError(`Barcode ${barcode} not found, try the photo or type the product name.`)
         return
       }
+      // Product identified, nutrition missing. Prefill the name so only the
+      // numbers off the packet have to be typed — this used to come back as
+      // zeros and get logged as a food with no calories in it.
+      if (res.status === 422) {
+        const info = await res.json().catch(() => ({}))
+        if (info.foodName) {
+          setAddForm((prev) => ({ ...prev, name: info.foodName }))
+        }
+        setAnalysisError(
+          `Found ${info.foodName ?? 'the product'}, but there's no nutrition on file for it. Type the numbers off the packet.`
+        )
+        return
+      }
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}))
         throw new Error(errJson.error ?? `Lookup failed (${res.status})`)
@@ -488,6 +503,29 @@ export default function NutritionPage() {
           onClose={() => setScanningMealId(null)}
         />
       )}
+      <AnimatePresence>
+        {unitSheetOpen && (
+          <UnitPickerSheet
+            title="Measure in"
+            selectedKey={servingUnit}
+            options={unitsFor(addForm.name).map((u) => ({
+              key: u,
+              label: UNITS[u].label,
+              detail: null,
+              calories: null,
+            }))}
+            onPick={(key) => {
+              const u = key as UnitKey
+              unitTouchedRef.current = true
+              setServingUnit(u)
+              const n = Number(servingAmount)
+              if (Number.isFinite(n) && n > 0) applyServing(formatServing(n, u))
+              setUnitSheetOpen(false)
+            }}
+            onClose={() => setUnitSheetOpen(false)}
+          />
+        )}
+      </AnimatePresence>
       {searchMealId && userId && (() => {
         const searchMeal = meals.find((m) => m.id === searchMealId)
         if (!searchMeal) return null
@@ -976,23 +1014,19 @@ export default function NutritionPage() {
                                         }}
                                         className="w-20 shrink-0 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                       />
-                                      <select
-                                        value={servingUnit}
-                                        onChange={(e) => {
-                                          const u = e.target.value as UnitKey
-                                          unitTouchedRef.current = true
-                                          setServingUnit(u)
-                                          const n = Number(servingAmount)
-                                          if (Number.isFinite(n) && n > 0) applyServing(formatServing(n, u))
-                                        }}
-                                        className="flex-1 min-w-0 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      {/* Opens a readable list rather than the
+                                          phone's scrolling wheel of truncated
+                                          labels. */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setUnitSheetOpen(true)}
+                                        className="flex-1 min-w-0 flex items-center justify-between gap-2 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body text-left hover:border-brand-navy/25 focus:outline-none focus:border-brand-blue/50 transition-colors duration-150"
                                       >
-                                        {unitsFor(addForm.name).map((u) => (
-                                          <option key={u} value={u}>
-                                            {UNITS[u].label}
-                                          </option>
-                                        ))}
-                                      </select>
+                                        <span className="truncate text-brand-navy">{UNITS[servingUnit].label}</span>
+                                        <svg className="w-3.5 h-3.5 text-brand-slate shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                        </svg>
+                                      </button>
                                     </div>
                                     {/* One-tap amounts, sized to the unit: grams
                                         offer 10/20/30, cups offer quarters. */}

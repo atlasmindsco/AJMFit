@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { addFoodLog, fetchRecentFoods, type FoodLogRow, type MealRow, type RecentFood } from '@/lib/nutrition'
 import { servingChoices, formatServing, type ServingChoice } from '@/lib/servings'
+import UnitPickerSheet from '@/components/studio/UnitPickerSheet'
 
 interface FoodServing {
   label: string
@@ -84,6 +85,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<FoodHit | null>(null)
   const [unitIdx, setUnitIdx] = useState(0)
+  const [unitSheetOpen, setUnitSheetOpen] = useState(false)
   const [qtyText, setQtyText] = useState('1')
   const [saving, setSaving] = useState(false)
   const [justAdded, setJustAdded] = useState<string | null>(null)
@@ -333,21 +335,30 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               </div>
 
               <div className="space-y-3">
-                <label className="block">
-                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Measure in</span>
-                  <select
-                    value={unitIdx}
-                    onChange={(e) => pickUnit(Number(e.target.value))}
+                {/* Tapping this opens a list you can read, rather than the
+                    operating system's scrolling wheel of truncated labels. */}
+                <div>
+                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Serving size</span>
+                  <button
+                    onClick={() => setUnitSheetOpen(true)}
                     disabled={choices.length < 2}
-                    className="mt-1.5 w-full px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-60"
+                    className="mt-1.5 w-full flex items-center justify-between gap-3 px-3 py-3 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-left hover:border-brand-navy/20 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-60 transition-colors duration-150"
                   >
-                    {choices.map((c, i) => (
-                      <option key={c.unit} value={i}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <span className="min-w-0">
+                      <span className="block text-base font-body text-brand-navy truncate">{choice?.label ?? '—'}</span>
+                      {choice && choice.gramsPerUnit > 0 && choice.unit !== 'g' && (
+                        <span className="block text-brand-slate text-xs font-body mt-0.5">
+                          {Math.round(choice.gramsPerUnit)} g each
+                        </span>
+                      )}
+                    </span>
+                    {choices.length > 1 && (
+                      <svg className="w-4 h-4 text-brand-slate shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
 
                 <div>
                   <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">
@@ -490,6 +501,31 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
           )}
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {unitSheetOpen && selected && (
+          <UnitPickerSheet
+            title="Serving size"
+            selectedKey={choice?.unit ?? ''}
+            options={choices.map((c) => ({
+              key: c.unit,
+              label: c.label,
+              detail: c.gramsPerUnit > 0 && c.unit !== 'g' ? `${Math.round(c.gramsPerUnit)} g each` : null,
+              // What one of this unit is actually worth, so the choice can be
+              // made on the number that matters rather than on the word.
+              calories: selected.per100
+                ? `${Math.round((selected.per100.calories * c.gramsPerUnit) / 100)} cal each`
+                : null,
+            }))}
+            onPick={(key) => {
+              const idx = choices.findIndex((c) => c.unit === key)
+              if (idx >= 0) pickUnit(idx)
+              setUnitSheetOpen(false)
+            }}
+            onClose={() => setUnitSheetOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -379,25 +379,153 @@ interface OffResponse {
   status_verbose?: string
 }
 
-function offMacro(
-  nutriments: OffNutriments,
-  servingKey: keyof OffNutriments,
-  per100Key: keyof OffNutriments,
-  servingGrams: number | undefined
-): number {
-  const direct = nutriments[servingKey]
-  if (typeof direct === 'number' && !Number.isNaN(direct)) return direct
-  const per100 = nutriments[per100Key]
-  if (typeof per100 === 'number' && !Number.isNaN(per100) && servingGrams && servingGrams > 0) {
-    return (per100 * servingGrams) / 100
+const num = (v: unknown): number | null =>
+  typeof v === 'number' && Number.isFinite(v) ? v : null
+
+/**
+ * Pull a gram weight out of Open Food Facts' free-text serving size.
+ *
+ * `serving_quantity` is the parsed number and it is missing on a good share of
+ * products, while `serving_size` still says "1 bagel (95 g)" or "90.0g" in
+ * words. Reading it recovers a real serving for those.
+ *
+ * A bare number with no unit is refused. OFF has entries whose serving_size is
+ * just "13", and that could be grams, slices or pieces — guessing grams there
+ * would quietly invent a serving weight and scale every macro by it.
+ */
+export function parseServingGrams(text: string | undefined): number | null {
+  const s = String(text ?? '').toLowerCase()
+  if (!s.trim()) return null
+  // Prefer a weight in parentheses: "1 bagel (95 g)".
+  const paren = s.match(/\(\s*(\d+(?:\.\d+)?)\s*(g|gram|ml)\b/)
+  if (paren) return parseFloat(paren[1])
+  const plain = s.match(/(\d+(?:\.\d+)?)\s*(g|gram|ml)\b/)
+  if (plain) return parseFloat(plain[1])
+  const oz = s.match(/(\d+(?:\.\d+)?)\s*(oz|ounce)/)
+  if (oz) return Math.round(parseFloat(oz[1]) * 28.35 * 10) / 10
+  return null
+}
+
+export interface OffMacroSet {
+  calories: number
+  protein: number
+  carbs: number
+  fats: number
+  /** What the numbers describe: one label serving, or 100 g. */
+  basis: 'serving' | 'per100'
+  /** Grams in that basis, when known. */
+  grams: number | null
+}
+
+/**
+ * Read all four macros on ONE basis, or report that there are none.
+ *
+ * The old version decided per macro and fell back to 0. Two things went wrong
+ * with that, and a client scanning a protein bagel hit both.
+ *
+ * It returned ZERO for "no data". Across a sample of Open Food Facts, 17.5% of
+ * products carry per-100g values and no serving weight — for every one of
+ * those the app logged 0 calories and 0 protein, silently, and the client's
+ * daily total was wrong by a whole food. A missing number must never arrive as
+ * a confident nought.
+ *
+ * And deciding per macro allowed a product with `energy-kcal_serving` but only
+ * `proteins_100g` to report calories for one bagel beside protein for 100
+ * grams of bagel. Picking one basis for the whole product makes the four
+ * numbers describe the same quantity of food, which is the minimum for them to
+ * mean anything together.
+ */
+export function offMacros(nutriments: OffNutriments, servingGrams: number | null): OffMacroSet | null {
+  const perServing = {
+    calories: num(nutriments['energy-kcal_serving']),
+    protein: num(nutriments.proteins_serving),
+    carbs: num(nutriments.carbohydrates_serving),
+    fats: num(nutriments.fat_serving),
   }
-  return 0
+  const per100 = {
+    calories: num(nutriments['energy-kcal_100g']),
+    protein: num(nutriments.proteins_100g),
+    carbs: num(nutriments.carbohydrates_100g),
+    fats: num(nutriments.fat_100g),
+  }
+
+  /**
+   * Calories from the macros, when the label gives macros but no energy.
+   *
+   * Atwater factors — 4 per gram of protein and carbohydrate, 9 for fat. Real
+   * products do carry per-serving energy alongside per-100g macros, and
+   * refusing those outright would have thrown away data we can work out.
+   */
+  const derive = (m: { protein: number | null; carbs: number | null; fats: number | null }) =>
+    (m.protein ?? 0) * 4 + (m.carbs ?? 0) * 4 + (m.fats ?? 0) * 9
+
+  const macroCount = (m: typeof perServing) =>
+    [m.protein, m.carbs, m.fats].filter((v) => v != null).length
+
+  // Real data means either stated calories plus a macro, or enough macros to
+  // work the calories out.
+  const usable = (m: typeof perServing) =>
+    (m.calories != null && macroCount(m) >= 1) || macroCount(m) >= 2
+
+  if (usable(perServing)) {
+    return {
+      calories: perServing.calories ?? derive(perServing),
+      protein: perServing.protein ?? 0,
+      carbs: perServing.carbs ?? 0,
+      fats: perServing.fats ?? 0,
+      basis: 'serving',
+      grams: servingGrams,
+    }
+  }
+
+  if (usable(per100)) {
+    // A known serving weight lets us scale to the serving the label describes.
+    if (servingGrams && servingGrams > 0) {
+      const f = servingGrams / 100
+      return {
+        calories: (per100.calories ?? derive(per100)) * f,
+        protein: (per100.protein ?? 0) * f,
+        carbs: (per100.carbs ?? 0) * f,
+        fats: (per100.fats ?? 0) * f,
+        basis: 'serving',
+        grams: servingGrams,
+      }
+    }
+    // No serving weight: report per 100 g and SAY so, rather than returning
+    // zeros. The client can then pick the amount they actually ate.
+    return {
+      calories: per100.calories ?? derive(per100),
+      protein: per100.protein ?? 0,
+      carbs: per100.carbs ?? 0,
+      fats: per100.fats ?? 0,
+      basis: 'per100',
+      grams: 100,
+    }
+  }
+
+  return null
 }
 
 export class BarcodeNotFoundError extends Error {
   constructor(barcode: string) {
     super(`Product not found for barcode ${barcode}`)
     this.name = 'BarcodeNotFoundError'
+  }
+}
+
+/**
+ * The barcode resolved, but the product has no usable nutrition.
+ *
+ * Distinct from not-found because the answer to the client is different: we
+ * know what they scanned and can prefill the name, they just have to read the
+ * macros off the packet. Previously this came back as zeros.
+ */
+export class BarcodeNoNutritionError extends Error {
+  readonly foodName: string
+  constructor(foodName: string) {
+    super(`No nutrition data for ${foodName}`)
+    this.name = 'BarcodeNoNutritionError'
+    this.foodName = foodName
   }
 }
 
@@ -426,30 +554,38 @@ export async function lookupBarcode(barcode: string): Promise<RecognizedFood> {
 
   const product = json.product
   const nutriments = product.nutriments ?? {}
-  const servingGrams = product.serving_quantity ?? nutriments.serving_quantity
+  // serving_quantity is the parsed figure and is often absent even when the
+  // label text still names a weight, so fall back to reading the text.
+  const servingGrams =
+    num(product.serving_quantity) ?? num(nutriments.serving_quantity) ?? parseServingGrams(product.serving_size)
 
-  const calories = offMacro(nutriments, 'energy-kcal_serving', 'energy-kcal_100g', servingGrams)
-  const protein = offMacro(nutriments, 'proteins_serving', 'proteins_100g', servingGrams)
-  const carbs = offMacro(nutriments, 'carbohydrates_serving', 'carbohydrates_100g', servingGrams)
-  const fats = offMacro(nutriments, 'fat_serving', 'fat_100g', servingGrams)
+  const macros = offMacros(nutriments, servingGrams)
 
   const baseName = product.product_name_en || product.product_name || 'Scanned product'
   const foodName = product.brands ? `${product.brands} ${baseName}`.trim() : baseName
-  const servingSize = product.serving_size || (servingGrams ? `${servingGrams}g` : '1 serving')
+
+  // Found the product, but nobody has filled in its nutrition. Saying so beats
+  // logging a bagel as nothing at all.
+  if (!macros) throw new BarcodeNoNutritionError(foodName)
+
+  const servingSize =
+    macros.basis === 'per100'
+      ? '100 g'
+      : product.serving_size || (servingGrams ? `${servingGrams}g` : '1 serving')
 
   return {
     foodName,
     servingSize,
-    calories: Math.round(calories),
-    protein: Number(protein.toFixed(1)),
-    carbs: Number(carbs.toFixed(1)),
-    fats: Number(fats.toFixed(1)),
+    calories: Math.round(macros.calories),
+    protein: Number(macros.protein.toFixed(1)),
+    carbs: Number(macros.carbs.toFixed(1)),
+    fats: Number(macros.fats.toFixed(1)),
     source: 'off',
     confidence: 'high',
     components: [
       {
         name: baseName,
-        grams: Math.round(servingGrams ?? 0),
+        grams: Math.round(macros.grams ?? 0),
         source: 'off',
       },
     ],
