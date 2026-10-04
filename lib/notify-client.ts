@@ -125,4 +125,83 @@ export async function notifyCoachReply(input: {
   }
 }
 
+/**
+ * A reminder, sent once.
+ *
+ * Email rather than push, deliberately. Server push needs VAPID keys and a
+ * stored subscription per client, and — more to the point — permission is only
+ * ever asked inside the workout screen, so the clients who most need a nudge
+ * are exactly the ones who have never been asked. Four of eleven have never
+ * opened a workout at all. Email reaches everyone today.
+ *
+ * Every message names one thing to do. None of them counts the misses, and none
+ * of them is signed as though Anthony wrote it: a templated line in his voice
+ * spends the trust that makes his real messages land.
+ */
+export async function sendReminder(input: {
+  userId: string
+  kind: NotifyKind
+  occurrenceKey: string
+  daysQuiet: number
+  /** Next session's name, when the rotation knows it. */
+  nextSession?: string | null
+  /** Their best set last time out, for the day-7 message. */
+  lastLift?: { exercise: string; weight: number; reps: number } | null
+}): Promise<boolean> {
+  // Claim first. If another run already sent this, the insert fails and we
+  // stop here rather than sending a second copy.
+  const claimed = await claim(input.userId, input.kind, 'email', input.occurrenceKey)
+  if (!claimed) return false
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const admin = createAdminClient() as any
+    const { data: u } = await admin.from('users').select('name, email').eq('id', input.userId).maybeSingle()
+    const email = (u?.email as string) || ''
+    if (!email) return false
+    const first = String(u?.name ?? '').split(' ')[0]
+    const hi = first ? `${escapeHtml(first)}, ` : ''
+    const session = input.nextSession ? escapeHtml(input.nextSession) : 'Your next session'
+
+    let subject: string
+    let body: string
+    let cta = { href: `${SITE}/studio`, label: 'Open your workout' }
+
+    if (input.kind === 'quiet_4d') {
+      subject = `${input.nextSession ?? 'Your next session'} is still next`
+      body = `
+        <p style="margin:0 0 12px;color:#475569;font-size:15px;line-height:1.6;">${hi}${session} is still next up.</p>
+        <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">Nothing's lost — your program picks up exactly where you left it.</p>`
+    } else if (input.kind === 'quiet_7d') {
+      subject = "It's been a week"
+      // The one fact worth carrying: their own best lift. Already computed for
+      // the progression engine, and it turns a guilt trigger into a reason.
+      const lift = input.lastLift
+        ? `<p style="margin:0 0 12px;color:#1B2D50;font-size:15px;line-height:1.6;">Last time out you hit <strong>${escapeHtml(input.lastLift.exercise)} ${input.lastLift.weight} lb × ${input.lastLift.reps}</strong>.</p>`
+        : ''
+      body = `
+        <p style="margin:0 0 12px;color:#475569;font-size:15px;line-height:1.6;">${hi}it's been a week since your last session.</p>
+        ${lift}
+        <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">${session} is waiting whenever you're ready.</p>`
+    } else {
+      subject = 'Weekly check-in'
+      cta = { href: `${SITE}/studio/check-in`, label: 'Check in' }
+      body = `
+        <p style="margin:0 0 12px;color:#475569;font-size:15px;line-height:1.6;">${hi}how did the week go?</p>
+        <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">Two minutes, and it's what Anthony uses to decide what changes next week.</p>`
+    }
+
+    await sendMail({
+      to: email,
+      subject,
+      text: `${subject}\n\n${cta.href}`,
+      html: shell(subject, body, cta),
+    })
+    return true
+  } catch (err) {
+    console.error('[notify-client] reminder failed:', err)
+    return false
+  }
+}
+
 export { claim as claimNotification }

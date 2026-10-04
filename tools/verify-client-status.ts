@@ -20,11 +20,20 @@ const g = (label: string, ok: boolean, detail = '') => {
 const ago = (d: number) => new Date(Date.now() - d * 86400000).toISOString()
 const day = (d: number) => ago(d).slice(0, 10)
 
-/** Monday of the week N weeks back, matching weekOf(). */
+/**
+ * Monday of the week N weeks back, matching weekOf().
+ *
+ * Formatted from LOCAL parts, not toISOString(). The first version used
+ * toISOString and passed all day, then failed after about 8pm Eastern, when
+ * the UTC date rolls over and the helper starts naming a different Monday from
+ * the product. A test that only fails in the evening is worse than one that
+ * never passes.
+ */
 const weekBack = (n: number) => {
   const d = new Date()
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - n * 7)
-  return d.toISOString().slice(0, 10)
+  const pad = (x: number) => String(x).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
 const ci = (over: Partial<CheckIn> = {}): CheckIn =>
