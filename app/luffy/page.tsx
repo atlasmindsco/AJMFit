@@ -6,7 +6,7 @@ import { fetchActiveBlocks, type Assignment } from '@/lib/programs'
 import { blockProgress } from '@/lib/blocks'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
-import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingNutritionProposals, type ClientRow } from '@/lib/admin'
+import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingNutritionProposals, fetchRecentWins, type ClientRow, type RecentWin } from '@/lib/admin'
 import type { StalledLift } from '@/lib/coach-signals'
 import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
 import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
@@ -33,13 +33,14 @@ export default function AdminDashboard() {
   const [blocks, setBlocks] = useState<Map<string, Assignment>>(new Map())
   const [stalls, setStalls] = useState<Map<string, StalledLift[]>>(new Map())
   const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
+  const [wins, setWins] = useState<RecentWin[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f, ci, bl, st, pr] = await Promise.all([
+        const [s, c, f, ci, bl, st, pr, rw] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
@@ -47,6 +48,7 @@ export default function AdminDashboard() {
           fetchActiveBlocks().catch(() => new Map()),
           fetchStalledLifts().catch(() => new Map()),
           fetchPendingNutritionProposals().catch(() => new Map()),
+          fetchRecentWins().catch(() => []),
         ])
         if (!active) return
         setStats(s)
@@ -56,6 +58,7 @@ export default function AdminDashboard() {
         setBlocks(bl)
         setStalls(st)
         setProposals(pr)
+        setWins(rw)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -214,6 +217,29 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Recent wins.
+          Replaces the per-PR email, which fired on every record across every
+          client and told the coach something good that needed no action. A
+          dashboard showing only problems is one you avoid opening. */}
+      {wins.length > 0 && (
+        <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-card">
+          <div className="px-6 py-5 border-b border-white/[0.06]">
+            <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Recent Wins</h2>
+          </div>
+          <div className="px-6 py-2">
+            {wins.map((w) => (
+              <div key={`${w.userId}-${w.exerciseName}-${w.at}`} className="py-3 border-b border-white/[0.04] last:border-0 flex items-baseline gap-3">
+                <span className="text-white text-sm font-body font-medium shrink-0">{w.name}</span>
+                <span className="text-white/50 text-sm font-body min-w-0 truncate">
+                  {w.exerciseName} &mdash; {w.weight} lb &times; {w.reps}
+                </span>
+                <span className="text-white/25 text-2xs font-body ml-auto shrink-0">{relativeTime(w.at)}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Beta feedback */}
       <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-card">

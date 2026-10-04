@@ -21,6 +21,7 @@ const client = (over: Partial<ClientSnapshot> = {}): ClientSnapshot => ({
   lastWorkoutDate: '2026-10-01',
   signedUpAt: '2026-01-01T00:00:00Z',
   checkInWeeks: [],
+  trainingDays: null,
   prefs: { ...DEFAULT_PREFS },
   ...over,
 })
@@ -179,5 +180,51 @@ console.log('\nDATES AND TIMEZONES\n')
   g('a bad timezone still gives an hour', localHourFor('Not/AZone', lateUtc) === 2)
 }
 
+
+console.log('\nTRAINING DAYS\n')
+{
+  // 2026-10-06 is a Tuesday (weekday 2).
+  const tueThuSat = client({ trainingDays: [2, 4, 6], lastWorkoutDate: '2026-10-05' })
+  g('a training day reminds', dueReminder(tueThuSat, '2026-10-06')?.kind === 'training_day')
+  g('a rest day is silent', dueReminder(tueThuSat, '2026-10-07') === null)
+
+  // A reminder to do what you have just done is how an app teaches you to
+  // ignore it.
+  const done = client({ trainingDays: [2, 4, 6], lastWorkoutDate: '2026-10-06' })
+  g('already trained today -> silent', dueReminder(done, '2026-10-06') === null)
+
+  // Nobody asked: silence rather than guessing wrong four days a week.
+  g('no schedule -> no training reminder',
+    dueReminder(client({ trainingDays: null, lastWorkoutDate: '2026-10-05' }), '2026-10-06') === null)
+  g('declined to say -> still silent',
+    dueReminder(client({ trainingDays: [], lastWorkoutDate: '2026-10-05' }), '2026-10-06') === null)
+
+  g('keyed by the day', dueReminder(tueThuSat, '2026-10-06')?.occurrenceKey === '2026-10-06')
+
+  // "You train Tuesdays and it is Tuesday" is more specific than "you have not
+  // trained for four days", so it wins.
+  const alsoQuiet = client({ trainingDays: [2], lastWorkoutDate: '2026-10-02' })
+  g('training day outranks the quiet ladder', dueReminder(alsoQuiet, '2026-10-06')?.kind === 'training_day')
+
+  const off = client({ trainingDays: [2], lastWorkoutDate: '2026-10-05', prefs: { ...DEFAULT_PREFS, training: false } })
+  g('the training switch silences it', dueReminder(off, '2026-10-06') === null)
+}
+
+console.log('\nWEEKLY SUMMARY\n')
+{
+  // 2026-10-05 is a Monday.
+  const trained = client({ lastWorkoutDate: '2026-10-03', sessionsThisWeek: 4, sessionsLastWeek: 3 })
+  g('Monday with sessions sends', dueReminder(trained, '2026-10-05')?.kind === 'weekly_summary')
+  g('keyed by the week', dueReminder(trained, '2026-10-05')?.occurrenceKey === '2026-10-05')
+  g('Tuesday sends no summary', dueReminder(trained, '2026-10-06')?.kind !== 'weekly_summary')
+
+  // Telling someone who did not train that they did not train is the guilt
+  // message this ladder exists to avoid; the quiet rungs already cover them.
+  const idle = client({ lastWorkoutDate: '2026-09-20', sessionsThisWeek: 0, sessionsLastWeek: 0 })
+  g('no sessions -> no summary', dueReminder(idle, '2026-10-05')?.kind !== 'weekly_summary')
+
+  const off = client({ lastWorkoutDate: '2026-10-03', sessionsThisWeek: 4, prefs: { ...DEFAULT_PREFS, progress: false } })
+  g('the progress switch silences it', dueReminder(off, '2026-10-05')?.kind !== 'weekly_summary')
+}
 console.log('\n' + (fail === 0 ? 'ALL REMINDER CHECKS PASSED' : `*** ${fail} FAILURES ***`))
 if (fail > 0) process.exitCode = 1

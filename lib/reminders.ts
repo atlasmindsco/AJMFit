@@ -10,7 +10,7 @@
  * eleven live clients, a correct day's run should be quiet for most of them.
  */
 
-export type ReminderKind = 'quiet_4d' | 'quiet_7d' | 'check_in_due'
+export type ReminderKind = 'quiet_4d' | 'quiet_7d' | 'check_in_due' | 'training_day' | 'weekly_summary'
 
 export interface ReminderPrefs {
   training: boolean
@@ -36,6 +36,18 @@ export interface ClientSnapshot {
   signedUpAt: string | null
   /** Monday-keyed weeks this client has already checked in for. */
   checkInWeeks: string[]
+  /**
+   * Days of the week they intend to train: 0=Sunday .. 6=Saturday.
+   *
+   * Null means nobody ever asked, which is every client who picked a program
+   * before this existed. The reminder stays silent rather than guessing: a
+   * client who trains Tue/Thu/Sat would otherwise be wrong-footed four days a
+   * week until they muted the app.
+   */
+  trainingDays: number[] | null
+  /** Sessions logged in the last 7 days and the 7 before that. */
+  sessionsThisWeek?: number
+  sessionsLastWeek?: number
   prefs: ReminderPrefs
 }
 
@@ -115,6 +127,24 @@ function tooManyMissed(client: ClientSnapshot, today: string): boolean {
  */
 export function dueReminder(client: ClientSnapshot, today: string): DueReminder | null {
   const { prefs } = client
+  const weekday = new Date(`${today}T00:00:00Z`).getUTCDay() // 0 = Sunday
+
+  // --- Today is a training day ---------------------------------------------
+  //
+  // Above the quiet ladder because it is the more specific statement: "you
+  // train Tuesdays and it is Tuesday" beats "you have not trained for four
+  // days". Silent when they already trained today, because a reminder to do
+  // what you have just done is how an app teaches you to ignore it.
+  if (prefs.training && client.trainingDays && client.trainingDays.includes(weekday)) {
+    if (client.lastWorkoutDate !== today) {
+      return {
+        userId: client.userId,
+        kind: 'training_day',
+        occurrenceKey: today,
+        daysQuiet: client.lastWorkoutDate ? daysBetween(client.lastWorkoutDate, today) : 0,
+      }
+    }
+  }
 
   // --- The quiet ladder ----------------------------------------------------
   //
@@ -137,6 +167,28 @@ export function dueReminder(client: ClientSnapshot, today: string): DueReminder 
     }
   }
 
+  // --- The weekly summary --------------------------------------------------
+  //
+  // Monday morning, and ONLY when there is something to compare against.
+  //
+  // "Here is what you did" is a report and goes unread; "four sessions, your
+  // best week yet" is news. A client with no sessions in either week gets
+  // nothing at all — telling someone who did not train that they did not train
+  // is the guilt message this whole ladder exists to avoid, and the quiet
+  // rungs above already have them covered.
+  if (prefs.progress && weekday === 1) {
+    // Only when they actually trained. Nothing to celebrate and nothing to
+    // compare means nothing to send.
+    if ((client.sessionsThisWeek ?? 0) > 0) {
+      return {
+        userId: client.userId,
+        kind: 'weekly_summary',
+        occurrenceKey: mondayOf(today),
+        daysQuiet: 0,
+      }
+    }
+  }
+
   // --- The weekly check-in -------------------------------------------------
   //
   // Only coached clients, because nothing asks a Blueprint client to check in
@@ -149,7 +201,6 @@ export function dueReminder(client: ClientSnapshot, today: string): DueReminder 
   // a week forever at a client 168 days into an Accelerator subscription with
   // no sessions at all. He needs a person, and the coach is already told.
   if (prefs.check_ins && client.coached && client.lastWorkoutDate && !tooManyMissed(client, today)) {
-    const weekday = new Date(`${today}T00:00:00Z`).getUTCDay() // 0 = Sunday
     const isSunday = weekday === 0
     const isMonday = weekday === 1
     if (isSunday || isMonday) {

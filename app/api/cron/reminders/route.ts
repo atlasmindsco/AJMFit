@@ -46,11 +46,16 @@ export async function GET(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
 
-  const [{ data: users }, { data: apps }, { data: prefRows }, { data: checkIns }] = await Promise.all([
+  const [{ data: users }, { data: apps }, { data: prefRows }, { data: checkIns }, { data: assignments }] = await Promise.all([
     admin.from('users').select('id, name, status, timezone, created_at'),
     admin.from('applications').select('user_id, tier').order('created_at', { ascending: false }),
     admin.from('notification_prefs').select('*'),
     admin.from('check_ins').select('user_id, week_of'),
+    admin
+      .from('program_assignments')
+      .select('user_id, training_days, assigned_at')
+      .is('ended_at', null)
+      .order('assigned_at', { ascending: false }),
   ])
 
   const active = ((users ?? []) as Array<{ id: string; status: string; timezone: string | null; created_at: string }>)
@@ -68,6 +73,12 @@ export async function GET(request: Request) {
   const prefsOf: Record<string, ReminderPrefs> = {}
   for (const p of (prefRows ?? []) as Array<ReminderPrefs & { user_id: string }>) {
     prefsOf[p.user_id] = { training: p.training, check_ins: p.check_ins, progress: p.progress, send_hour: p.send_hour }
+  }
+
+  const trainingDaysOf: Record<string, number[] | null> = {}
+  for (const a of (assignments ?? []) as Array<{ user_id: string; training_days: number[] | null }>) {
+    // Newest first, so the first seen per client is their current program.
+    if (!(a.user_id in trainingDaysOf)) trainingDaysOf[a.user_id] = a.training_days ?? null
   }
 
   const weeksOf: Record<string, string[]> = {}
@@ -92,10 +103,21 @@ export async function GET(request: Request) {
   const logged = new Set(((sets ?? []) as Array<{ workout_id: string }>).map((s) => s.workout_id))
 
   const lastWorkout: Record<string, string> = {}
+  // Sessions in the last 7 days and the 7 before that, for the weekly
+  // summary's comparison — which is the only thing that makes it worth
+  // sending at all.
+  const sessionCounts: Record<string, { now: number; before: number }> = {}
+  const dayAgo = (n: number) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10)
+  const weekAgo = dayAgo(7)
+  const fortnightAgo = dayAgo(14)
+
   for (const w of workoutRows) {
     if (!logged.has(w.id)) continue
     const d = w.date || w.started_at.slice(0, 10)
     if (!lastWorkout[w.user_id] || d > lastWorkout[w.user_id]) lastWorkout[w.user_id] = d
+    const c = (sessionCounts[w.user_id] ??= { now: 0, before: 0 })
+    if (d >= weekAgo) c.now++
+    else if (d >= fortnightAgo) c.before++
   }
 
   const results: Array<{ user: string; kind: string; sent: boolean }> = []
@@ -114,6 +136,9 @@ export async function GET(request: Request) {
       lastWorkoutDate: lastWorkout[u.id] ?? null,
       signedUpAt: u.created_at,
       checkInWeeks: weeksOf[u.id] ?? [],
+      trainingDays: trainingDaysOf[u.id] ?? null,
+      sessionsThisWeek: sessionCounts[u.id]?.now ?? 0,
+      sessionsLastWeek: sessionCounts[u.id]?.before ?? 0,
       prefs,
     }
 
@@ -145,6 +170,8 @@ export async function GET(request: Request) {
       daysQuiet: due.daysQuiet,
       nextSession,
       lastLift,
+      sessionsThisWeek: sessionCounts[u.id]?.now ?? 0,
+      sessionsLastWeek: sessionCounts[u.id]?.before ?? 0,
     })
     results.push({ user: u.id.slice(0, 8), kind: due.kind, sent })
   }

@@ -25,12 +25,14 @@ export async function POST(request: Request) {
 
   // 2. Validate input.
   let goal: string, location: string, days: number, splitKey: string | undefined
+  let trainingDays: unknown = null
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string; trainingDays?: unknown }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
     splitKey = body.splitKey
+    trainingDays = Array.isArray(body.trainingDays) ? body.trainingDays : null
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
@@ -45,6 +47,18 @@ export async function POST(request: Request) {
   if (!GOALS.includes(goal as BlueprintGoal) || !LOCATIONS.includes(location as BlueprintLocation) || !split) {
     return NextResponse.json({ error: 'Invalid choices' }, { status: 400 })
   }
+
+  // Never trust the shape off the wire: a stray 7 or a duplicate would sit in
+  // the column forever and silently never match a weekday.
+  const cleanDays = Array.isArray(trainingDays)
+    ? Array.from(
+        new Set(
+          trainingDays
+            .map((d) => Number(d))
+            .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
+        )
+      ).sort((a, b) => a - b)
+    : null
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
@@ -91,6 +105,10 @@ export async function POST(request: Request) {
     user_id: dbUser.id,
     program_id: program.id,
     notes: `Blueprint self-select: ${goal} / ${days}d ${split} / ${location}`,
+    // Which weekdays they intend to train, so a workout reminder can name a
+    // real day. Null when they skipped the question, and the reminder then
+    // stays silent rather than being wrong four days a week.
+    training_days: cleanDays,
   })
   if (aErr) return NextResponse.json({ error: aErr.message }, { status: 500 })
 

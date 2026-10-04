@@ -41,6 +41,7 @@ export default function BlueprintPicker({
   const [location, setLocation] = useState<BlueprintLocation | null>(null)
   const [days, setDays] = useState<number | null>(null)
   const [splitKey, setSplitKey] = useState<string | null>(null)
+  const [trainingDays, setTrainingDays] = useState<number[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -61,7 +62,9 @@ export default function BlueprintPicker({
       const res = await fetch('/api/studio/blueprint/assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, location, days, splitKey: chosenSplit }),
+        // Empty means they skipped it, and null tells the reminder to stay
+        // silent rather than guess.
+        body: JSON.stringify({ goal, location, days, splitKey: chosenSplit, trainingDays: trainingDays.length ? trainingDays : null }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
       if (!res.ok || !data.ok || !data.programId) throw new Error(data.error || 'Could not set up your program.')
@@ -119,14 +122,70 @@ export default function BlueprintPicker({
     </motion.div>
   )
 
+  /**
+   * Which days of the week they intend to train.
+   *
+   * A program here is a rotation, not a calendar, which is the right model —
+   * but it means the app has never known which DAYS someone trains, so a
+   * workout reminder would be guessing. Asked here because the client is
+   * already choosing between a 4-day and a 5-day split, so it is one more tap
+   * in context rather than a settings screen they will never open.
+   *
+   * Optional on purpose. Skipping it means no workout reminder, which is
+   * better than a wrong one four days a week.
+   */
+  const dayPicker = () => {
+    const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+    const full = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const toggle = (d: number) =>
+      setTrainingDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort((a, b) => a - b)))
+    return (
+      <div className="mb-5">
+        <p className="text-white/70 text-sm font-body mb-1">Which days will you train?</p>
+        <p className="text-white/35 text-xs font-body mb-3">
+          Optional. We&rsquo;ll remind you on those days and stay quiet on the rest.
+        </p>
+        <div className="grid grid-cols-7 gap-1.5">
+          {names.map((n, d) => {
+            const on = trainingDays.includes(d)
+            return (
+              <button
+                key={d}
+                onClick={() => toggle(d)}
+                aria-label={full[d]}
+                aria-pressed={on}
+                className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
+                  on
+                    ? 'bg-brand-blue/[0.15] border-brand-blue/50 text-white'
+                    : 'bg-white/[0.03] border-white/[0.08] text-white/40 hover:bg-white/[0.06]'
+                }`}
+              >
+                {n}
+              </button>
+            )
+          })}
+        </div>
+        {days !== null && trainingDays.length > 0 && trainingDays.length !== days && (
+          <p className="text-state-warning/80 text-xs font-body mt-2">
+            You picked a {days}-day program and {trainingDays.length}{' '}
+            {trainingDays.length === 1 ? 'day' : 'days'}. That&rsquo;s fine &mdash; the program just rotates at your pace.
+          </p>
+        )}
+      </div>
+    )
+  }
+
   const startButton = (disabled: boolean) => (
-    <button
-      onClick={start}
-      disabled={disabled || submitting}
-      className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-    >
-      {submitting ? 'Setting up…' : 'Start Training'}
-    </button>
+    <>
+      {dayPicker()}
+      <button
+        onClick={start}
+        disabled={disabled || submitting}
+        className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+      >
+        {submitting ? 'Setting up…' : 'Start Training'}
+      </button>
+    </>
   )
 
   return (

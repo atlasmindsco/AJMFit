@@ -19,7 +19,14 @@ const escapeHtml = (s: string) =>
 
 const SITE = 'https://ajmfit.com'
 
-export type NotifyKind = 'coach_reply' | 'check_in_reply' | 'quiet_4d' | 'quiet_7d' | 'check_in_due'
+export type NotifyKind =
+  | 'coach_reply'
+  | 'check_in_reply'
+  | 'quiet_4d'
+  | 'quiet_7d'
+  | 'check_in_due'
+  | 'training_day'
+  | 'weekly_summary'
 
 /**
  * Record that something was sent, and refuse to send it twice.
@@ -147,6 +154,9 @@ export async function sendReminder(input: {
   nextSession?: string | null
   /** Their best set last time out, for the day-7 message. */
   lastLift?: { exercise: string; weight: number; reps: number } | null
+  /** Sessions this week and last, for the weekly summary's comparison. */
+  sessionsThisWeek?: number
+  sessionsLastWeek?: number
 }): Promise<boolean> {
   // Claim first. If another run already sent this, the insert fails and we
   // stop here rather than sending a second copy.
@@ -183,6 +193,28 @@ export async function sendReminder(input: {
         <p style="margin:0 0 12px;color:#475569;font-size:15px;line-height:1.6;">${hi}it's been a week since your last session.</p>
         ${lift}
         <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">${session} is waiting whenever you're ready.</p>`
+    } else if (input.kind === 'training_day') {
+      subject = `${input.nextSession ?? 'Training'} today`
+      body = `
+        <p style="margin:0 0 12px;color:#475569;font-size:15px;line-height:1.6;">${hi}today's a training day.</p>
+        <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">${session} is up next.</p>`
+    } else if (input.kind === 'weekly_summary') {
+      // Only ever sent when they trained, and the comparison is the whole
+      // point: "here is what you did" is a report nobody opens twice.
+      const now = input.sessionsThisWeek ?? 0
+      const before = input.sessionsLastWeek ?? 0
+      const verdict =
+        before === 0
+          ? `${now} ${now === 1 ? 'session' : 'sessions'} last week.`
+          : now > before
+            ? `${now} ${now === 1 ? 'session' : 'sessions'} last week, up from ${before}.`
+            : now === before
+              ? `${now} ${now === 1 ? 'session' : 'sessions'} last week, same as the week before.`
+              : `${now} ${now === 1 ? 'session' : 'sessions'} last week, down from ${before}.`
+      subject = verdict
+      body = `
+        <p style="margin:0 0 12px;color:#1B2D50;font-size:17px;line-height:1.5;font-weight:bold;">${escapeHtml(verdict)}</p>
+        <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">${session} starts the new week.</p>`
     } else {
       subject = 'Weekly check-in'
       cta = { href: `${SITE}/studio/check-in`, label: 'Check in' }

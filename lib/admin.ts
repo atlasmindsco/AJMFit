@@ -242,3 +242,52 @@ export async function fetchPendingNutritionProposals(): Promise<Map<string, { cr
   }
   return out
 }
+
+export interface RecentWin {
+  userId: string
+  name: string
+  exerciseName: string
+  weight: number
+  reps: number
+  at: string
+}
+
+/**
+ * Records set in the last week, newest first.
+ *
+ * Replaces the per-PR email to the coach, which fired on every weight record
+ * across every client. A dashboard that only ever shows problems is one you
+ * avoid opening; this is the column that makes it a place worth looking.
+ */
+export async function fetchRecentWins(days = 7, limit = 8): Promise<RecentWin[]> {
+  const since = new Date(Date.now() - days * 86400000).toISOString()
+  const { data } = await db
+    .from('exercise_prs')
+    .select('user_id, exercise_name, weight, reps, set_at')
+    .gte('set_at', since)
+    .order('set_at', { ascending: false })
+    .limit(limit)
+  const rows = (data ?? []) as Array<{
+    user_id: string
+    exercise_name: string
+    weight: number
+    reps: number
+    set_at: string
+  }>
+  if (rows.length === 0) return []
+
+  const { data: users } = await db
+    .from('users')
+    .select('id, name')
+    .in('id', Array.from(new Set(rows.map((r) => r.user_id))))
+  const nameOf = new Map(((users ?? []) as Array<{ id: string; name: string }>).map((u) => [u.id, u.name]))
+
+  return rows.map((r) => ({
+    userId: r.user_id,
+    name: nameOf.get(r.user_id) ?? 'Unknown',
+    exerciseName: r.exercise_name,
+    weight: Number(r.weight),
+    reps: Number(r.reps),
+    at: r.set_at,
+  }))
+}

@@ -66,22 +66,18 @@ export async function POST(request: Request) {
     }
   }
 
-  try {
-    await sendMail({
-      to: COACH_EMAIL,
-      replyTo: clientEmail || undefined,
-      subject: `New PR: ${name} — ${exerciseName} ${weight} lbs`,
-      html: `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1B2D50">
-        <p style="font-size:20px;margin:0 0 6px"><strong>${name}</strong> just hit a personal record!</p>
-        <p style="font-size:18px;margin:0 0 12px"><strong>${exerciseName}</strong> — ${weight} lbs${reps ? ` × ${reps}` : ''}${
-          previousWeight ? ` <span style="color:#64748B">(previous best ${previousWeight} lbs)</span>` : ''
-        }</p>
-        <p style="color:#64748B;margin:0">Shoot them a quick message to celebrate the win.</p>
-      </div>`,
-    })
-  } catch (e) {
-    console.error('[pr-notify] email failed', e)
-  }
+  // The coach is NOT emailed about this any more.
+  //
+  // It fired on every weight record across every client — at fifty clients
+  // that is several a day, each one telling Anthony something good that needs
+  // no action from him. A notification with nothing to do is the kind that
+  // teaches you to stop opening the ones that matter.
+  //
+  // Records now appear in Recent Wins on the dashboard instead: the same
+  // information, in the place he goes to decide who to talk to, rather than in
+  // his inbox interrupting him to say nothing is wrong.
+  void COACH_EMAIL
+  void previousWeight
 
   return NextResponse.json({ ok: true })
 }
