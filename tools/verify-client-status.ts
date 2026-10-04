@@ -151,5 +151,29 @@ console.log('\nBLUEPRINT CLIENTS ARE NOT CHASED FOR CHECK-INS\n')
   g('a coached client is asked', coached.status !== 'on_track', coached.status)
 }
 
+
+console.log('\nTHE TIER PROMISE IS CHECKED\n')
+{
+  const hoursAgo = (h: number) => new Date(Date.now() - h * 3600000).toISOString()
+  const unanswered = (h: number) => [ci({ coach_response: null, submitted_at: hoursAgo(h) })]
+
+  // Accelerator sells 48 hours; Full Experience 24. Both were shown to the
+  // client and neither was ever checked.
+  const inTime = clientStatus({ ...base, checkIns: unanswered(20), responseHours: 48 })
+  g('inside the window reads normally', !inTime.reason.includes('promised'), inTime.reason)
+
+  const late = clientStatus({ ...base, checkIns: unanswered(72), responseHours: 48 })
+  g('past 48h says so', late.reason.includes('past the 48h promised'), late.reason)
+
+  const lateFE = clientStatus({ ...base, checkIns: unanswered(36), responseHours: 24 })
+  g('Full Experience is held to 24h', lateFE.reason.includes('past the 24h promised'), lateFE.reason)
+  g('and the same wait is fine on 48h',
+    !clientStatus({ ...base, checkIns: unanswered(36), responseHours: 48 }).reason.includes('promised'))
+
+  // Blueprint promises best effort, so there is nothing to be late against.
+  const bp = clientStatus({ ...base, checkIns: unanswered(200), responseHours: null })
+  g('Blueprint is never "late"', !bp.reason.includes('promised'), bp.reason)
+  g('but still shows as review needed', bp.status === 'review_needed')
+}
 console.log('\n' + (fail === 0 ? 'ALL CLIENT STATUS CHECKS PASSED' : `*** ${fail} FAILURES ***`))
 if (fail > 0) process.exitCode = 1

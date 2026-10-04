@@ -55,6 +55,11 @@ export interface StatusInput {
    * fine, which is exactly why they quit without warning.
    */
   stalledLifts?: Array<{ exerciseName: string; verdict: string }>
+  /**
+   * Hours this client's tier promised a reply within, from TIER_EXPERIENCE.
+   * Null for Blueprint, which promises best effort.
+   */
+  responseHours?: number | null
 }
 
 export interface StatusResult {
@@ -62,6 +67,9 @@ export interface StatusResult {
   /** One line naming the actual trigger, so the coach knows why without digging. */
   reason: string
 }
+
+const hoursSince = (iso: string | null): number | null =>
+  iso == null ? null : Math.floor((Date.now() - new Date(iso).getTime()) / 3600000)
 
 const daysSince = (iso: string | null): number | null =>
   iso == null ? null : Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
@@ -86,6 +94,7 @@ export function clientStatus({
   blockEndsInDays,
   signedUpAt,
   stalledLifts,
+  responseHours,
 }: StatusInput): StatusResult {
   const sorted = [...checkIns].sort((a, b) => b.week_of.localeCompare(a.week_of))
   const thisWeek = weekOf()
@@ -93,12 +102,23 @@ export function clientStatus({
   const sinceWorkout = daysSince(lastWorkoutAt)
 
   // 1. Waiting on the coach beats everything — this is the coach's own backlog.
+  //
+  // Measured against what the TIER promised, not a flat number. Accelerator
+  // sells a reply within 48 hours and Full Experience within 24; both are
+  // displayed to the client and neither was ever checked, so the promise could
+  // be broken with nothing anywhere saying so.
   const awaiting = sorted.find((c) => !c.coach_response)
   if (awaiting) {
     const d = daysSince(awaiting.submitted_at) ?? 0
+    const hrs = hoursSince(awaiting.submitted_at)
+    const overdue = responseHours != null && hrs != null && hrs > responseHours
     return {
       status: 'review_needed',
-      reason: d <= 0 ? 'Checked in today' : `Checked in ${d}d ago, no reply yet`,
+      reason: overdue
+        ? `Checked in ${d}d ago — past the ${responseHours}h promised`
+        : d <= 0
+          ? 'Checked in today'
+          : `Checked in ${d}d ago, no reply yet`,
     }
   }
 

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { stalledLifts, historyFromSets, type StalledLift } from '@/lib/coach-signals'
+import type { BriefSession } from '@/lib/client-brief'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -290,4 +291,74 @@ export async function fetchRecentWins(days = 7, limit = 8): Promise<RecentWin[]>
     reps: Number(r.reps),
     at: r.set_at,
   }))
+}
+
+/**
+ * Raw training history for building check-in and monthly briefs.
+ *
+ * One query pair for everyone rather than per client: the whole dataset is a
+ * few hundred rows, and the check-ins screen already loads every client in a
+ * single pass.
+ */
+export async function fetchBriefSource(days = 70): Promise<{
+  sessionsByUser: Map<string, string[]>
+  liftsByUser: Map<string, BriefSession[]>
+}> {
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
+  const { data: workouts } = await db
+    .from('workouts')
+    .select('id, user_id, date, started_at')
+    .gte('date', since)
+  const rows = (workouts ?? []) as Array<{ id: string; user_id: string; date: string | null; started_at: string }>
+
+  const sessionsByUser = new Map<string, string[]>()
+  const dateOf: Record<string, string> = {}
+  const userOf: Record<string, string> = {}
+  for (const w of rows) {
+    const d = w.date || w.started_at.slice(0, 10)
+    dateOf[w.id] = d
+    userOf[w.id] = w.user_id
+    const list = sessionsByUser.get(w.user_id) ?? []
+    list.push(d)
+    sessionsByUser.set(w.user_id, list)
+  }
+
+  const liftsByUser = new Map<string, BriefSession[]>()
+  if (rows.length > 0) {
+    const { data: sets } = await db
+      .from('workout_sets')
+      .select('workout_id, exercise_name, weight, reps, is_intensity_set')
+      .in('workout_id', rows.map((w) => w.id))
+
+    // Top set per exercise per session, which is what the brief compares.
+    const best = new Map<string, BriefSession>()
+    for (const s of (sets ?? []) as Array<{
+      workout_id: string
+      exercise_name: string
+      weight: number | null
+      reps: number | null
+      is_intensity_set: boolean | null
+    }>) {
+      if (s.is_intensity_set) continue
+      const w = Number(s.weight)
+      const r = Number(s.reps)
+      if (!Number.isFinite(w) || !Number.isFinite(r) || w <= 0 || r <= 0) continue
+      const date = dateOf[s.workout_id]
+      const user = userOf[s.workout_id]
+      if (!date || !user) continue
+      const key = `${user}|${date}|${s.exercise_name}`
+      const cur = best.get(key)
+      if (!cur || w > cur.topWeight) {
+        best.set(key, { date, exerciseName: s.exercise_name, topWeight: w, topReps: r })
+      }
+    }
+    best.forEach((lift, key) => {
+      const user = key.split('|')[0]
+      const list = liftsByUser.get(user) ?? []
+      list.push(lift)
+      liftsByUser.set(user, list)
+    })
+  }
+
+  return { sessionsByUser, liftsByUser }
 }

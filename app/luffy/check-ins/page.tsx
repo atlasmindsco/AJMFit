@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fetchAllCheckIns, previousWeekOf, type CheckIn } from '@/lib/check-ins'
+import { fetchBriefSource } from '@/lib/admin'
+import { buildBrief, type BriefSession } from '@/lib/client-brief'
 
 interface ClientLite {
   id: string
@@ -47,15 +49,21 @@ export default function CoachCheckInsPage() {
   const [loading, setLoading] = useState(true)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [sending, setSending] = useState<string | null>(null)
+  const [source, setSource] = useState<{ sessionsByUser: Map<string, string[]>; liftsByUser: Map<string, BriefSession[]> }>({
+    sessionsByUser: new Map(),
+    liftsByUser: new Map(),
+  })
 
   const load = async () => {
     const supabase = createClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const db = supabase as any
-    const [all, { data: users }] = await Promise.all([
+    const [all, { data: users }, src] = await Promise.all([
       fetchAllCheckIns().catch(() => []),
       db.from('users').select('id, name, email'),
+      fetchBriefSource().catch(() => ({ sessionsByUser: new Map(), liftsByUser: new Map() })),
     ])
+    setSource(src)
     setCheckIns(all)
     setClients(new Map(((users ?? []) as ClientLite[]).map((u) => [u.id, u])))
     setLoading(false)
@@ -90,6 +98,48 @@ export default function CoachCheckInsPage() {
 
   const daysWaiting = (iso: string) =>
     Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+
+  /**
+   * The seven days this check-in covers, against the seven before it.
+   *
+   * Windowed on the check-in's own week rather than "the last 7 days", so a
+   * reply written three days late still describes the week the client was
+   * actually reporting on.
+   */
+  const briefFor = (c: CheckIn) => {
+    const client = clients.get(c.user_id)
+    if (!client) return null
+    const prev = checkIns.find((x) => x.user_id === c.user_id && x.week_of === previousWeekOf(c.week_of))
+
+    const weekStart = c.week_of
+    const weekEnd = new Date(`${c.week_of}T00:00:00Z`)
+    weekEnd.setUTCDate(weekEnd.getUTCDate() + 7)
+    const end = weekEnd.toISOString().slice(0, 10)
+    const priorStart = previousWeekOf(c.week_of)
+
+    const inRange = (d: string, from: string, to: string) => d >= from && d < to
+    const sessions = (source.sessionsByUser.get(c.user_id) ?? []).filter((d) => inRange(d, weekStart, end))
+    const priorSessions = (source.sessionsByUser.get(c.user_id) ?? []).filter((d) => inRange(d, priorStart, weekStart))
+    const lifts = (source.liftsByUser.get(c.user_id) ?? []).filter((l) => inRange(l.date, weekStart, end))
+    const priorLifts = (source.liftsByUser.get(c.user_id) ?? []).filter((l) => inRange(l.date, priorStart, weekStart))
+
+    return buildBrief({
+      clientName: client.name ?? 'there',
+      windowDays: 7,
+      sessionDates: sessions,
+      priorSessionDates: priorSessions,
+      lifts,
+      priorLifts,
+      weightNow: c.weight_lb,
+      weightBefore: prev?.weight_lb ?? null,
+      energy: c.energy,
+      nutritionAdherence: c.nutrition_adherence,
+      sleep: c.sleep_quality,
+      hunger: c.hunger,
+      win: c.win,
+      obstacle: c.obstacle,
+    })
+  }
 
   const card = (c: CheckIn, isAwaiting: boolean) => {
     const client = clients.get(c.user_id)
@@ -167,6 +217,41 @@ export default function CoachCheckInsPage() {
 
         {isAwaiting ? (
           <>
+            {/* Their numbers, assembled.
+                Reviewing a check-in properly takes ten to fifteen minutes, and
+                most of that is opening four screens to find what is already
+                known. Software cannot make the DECIDING faster; it can remove
+                the gathering, which is the part with no coaching in it. */}
+            {(() => {
+              const brief = briefFor(c)
+              if (!brief) return null
+              return (
+                <div className="mb-3 px-4 py-3 rounded-control bg-white/[0.03] border border-white/[0.07]">
+                  <p className={labelCls}>Their week</p>
+                  <ul className="mt-1.5 space-y-1">
+                    {brief.facts.map((f, i) => (
+                      <li key={i} className="text-white/70 text-sm font-body leading-relaxed">
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  {brief.flags.length > 0 && (
+                    <p className="text-state-warning text-xs font-body mt-2.5">
+                      {brief.flags.join(' · ')}
+                    </p>
+                  )}
+                  {brief.draft && !(drafts[c.id] ?? '').trim() && (
+                    <button
+                      onClick={() => setDrafts((d) => ({ ...d, [c.id]: brief.draft! + ' ' }))}
+                      className="mt-3 px-3 py-1.5 rounded-control bg-brand-blue/15 text-brand-blue text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-150"
+                    >
+                      Start from these facts
+                    </button>
+                  )}
+                </div>
+              )
+            })()}
+
             <textarea
               rows={3}
               value={drafts[c.id] ?? ''}

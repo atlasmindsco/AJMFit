@@ -129,12 +129,31 @@ export async function GET(request: Request) {
     .map((uid) => ({ uid, ...threads[uid] }))
     .sort((a, b) => new Date(a.oldest).getTime() - new Date(b.oldest).getTime())
 
-  const section = (title: string, rows: string[]) =>
-    rows.length
-      ? `<p style="margin:24px 0 8px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${title}</p>${rows.join(
-          ''
-        )}`
+  /**
+   * Five names, then a count.
+   *
+   * At eleven clients every section fits. At fifty, with a normal spread of
+   * drift, "gone quiet" alone is fifteen to twenty names every morning — and a
+   * daily email of twenty names is one you stop reading, which costs more than
+   * it ever saved. The digest is the only thing in this system that reaches
+   * the coach without him choosing to look, so staying under fifteen seconds
+   * to read matters more than being complete.
+   *
+   * Rows arrive already sorted by urgency, so the five shown are the five that
+   * matter.
+   */
+  const SECTION_CAP = 5
+  const section = (title: string, rows: string[]) => {
+    if (!rows.length) return ''
+    const shown = rows.slice(0, SECTION_CAP)
+    const hidden = rows.length - shown.length
+    const more = hidden
+      ? `<p style="margin:8px 0 0;color:#94a3b8;font-size:13px;">+ ${hidden} more — see the dashboard</p>`
       : ''
+    return `<p style="margin:24px 0 8px;color:#F76B16;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${title}</p>${shown.join(
+      ''
+    )}${more}`
+  }
 
   const messageRows = sorted.map((t) => {
     const u = byId.get(t.uid)

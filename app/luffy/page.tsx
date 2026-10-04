@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingNutritionProposals, fetchRecentWins, type ClientRow, type RecentWin } from '@/lib/admin'
 import type { StalledLift } from '@/lib/coach-signals'
+import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
 import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
 import { fetchFeedback, type Feedback } from '@/lib/feedback'
@@ -140,6 +141,8 @@ export default function AdminDashboard() {
                         checkIns: checkIns.filter((ci) => ci.user_id === client.id),
                         signedUpAt: client.created_at,
                         stalledLifts: stalls.get(client.id) ?? [],
+                        // Hold the coach to what the tier actually sold.
+                        responseHours: tier ? TIER_EXPERIENCE[tier].responseHours : null,
                         blockEndsInDays: (() => {
                           const b = blocks.get(client.id)
                           return b ? blockProgress(b.assigned_at, b.block_weeks).daysLeft : null
