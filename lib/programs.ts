@@ -79,6 +79,28 @@ export async function fetchActiveBlocks(): Promise<Map<string, Assignment>> {
   return out
 }
 
+/**
+ * When this client first started this program, or null if they never have.
+ *
+ * The EARLIEST assignment, not the current one: a client who switched away and
+ * came back should keep the sessions from their first run at it. Used to bound
+ * the rotation's history and the day-rename migration to one program's life.
+ */
+export async function fetchAssignmentStart(
+  userId: string,
+  programId: string
+): Promise<string | null> {
+  const { data } = await db
+    .from('program_assignments')
+    .select('assigned_at')
+    .eq('user_id', userId)
+    .eq('program_id', programId)
+    .order('assigned_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+  return ((data as { assigned_at: string } | null)?.assigned_at) ?? null
+}
+
 /** Blocks a client has finished, newest first, for the progress screen. */
 export async function fetchCompletedBlocks(userId: string, limit = 6): Promise<Assignment[]> {
   const { data } = await db

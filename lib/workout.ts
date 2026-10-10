@@ -148,14 +148,34 @@ export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<W
  * Deliberately not `fetchWorkoutHistory`: that one is capped at 12 rows for a
  * display list, and a 6-day program needs more than 12 to find a lap boundary.
  * This fetches names and timestamps only, so it stays cheap.
+ *
+ * `since` is the current program's assignment time, and it is what stops a
+ * previous program's history closing out this program's lap. The rotation
+ * matches sessions to days by NAME, and day names repeat across programs:
+ * "Upper A" appears in eleven of the sixty-eight. One client has seventeen
+ * sessions logged under a Lean Out program they left in September, three of
+ * whose day names their current program also uses.
+ *
+ * It changes no client's answer today — simulated against all nine with an
+ * open assignment — but it closes the hole that renaming a day would open: a
+ * client who names a day after one they trained months ago on something else
+ * would otherwise inherit its sessions as already done.
  */
-export async function fetchTrainedDays(userId: string, limit = 60): Promise<TrainedDay[]> {
-  const { data: workouts } = await db
+export async function fetchTrainedDays(
+  userId: string,
+  limit = 60,
+  since?: string | null
+): Promise<TrainedDay[]> {
+  let query = db
     .from('workouts')
     .select('id, day_name, ended_at')
     .eq('user_id', userId)
     .not('ended_at', 'is', null)
     .not('day_name', 'is', null)
+  // started_at, not ended_at: a session begun under this program and finished
+  // after midnight still belongs to it.
+  if (since) query = query.gte('started_at', since)
+  const { data: workouts } = await query
     .order('ended_at', { ascending: false })
     .limit(limit)
   const rows = (workouts ?? []) as Array<{ id: string; day_name: string; ended_at: string }>

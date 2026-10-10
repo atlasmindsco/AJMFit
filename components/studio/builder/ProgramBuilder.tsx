@@ -30,12 +30,18 @@ export default function ProgramBuilder({
   initial,
   library,
   saving,
+  editing = false,
   onSave,
   onCancel,
 }: {
   initial: BuilderProgram
   library: LibraryExercise[]
   saving: boolean
+  /**
+   * Editing a saved program rather than building a new one. Only then can a
+   * day have history behind it, and only then is renaming worth a word.
+   */
+  editing?: boolean
   onSave: (program: BuilderProgram, activate: boolean) => void
   onCancel: () => void
 }) {
@@ -95,8 +101,17 @@ export default function ProgramBuilder({
           value={day.name}
           onChange={(e) => setDay(openDay, { ...day, name: e.target.value })}
           placeholder="Name this day"
-          className="w-full px-3 py-3 mb-4 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+          className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
         />
+        {/* Workout rows store the day's NAME, so a rename without a migration
+            would orphan every session logged under the old one. It does
+            migrate — saying so is what stops the rename feeling risky. */}
+        {editing && day.key && (
+          <p className="text-white/30 text-2xs font-body mt-1.5 mb-4">
+            Rename it freely &mdash; your logged sessions come with it.
+          </p>
+        )}
+        {!(editing && day.key) && <div className="mb-4" />}
 
         {day.exercises.length === 0 ? (
           <p className="text-white/30 text-sm font-body text-center py-10">
@@ -203,22 +218,34 @@ export default function ProgramBuilder({
 
       <div className="space-y-2">
         {program.days.map((d, i) => (
-          <button
-            key={i}
-            onClick={() => setOpenDay(i)}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-card bg-surface-raised border border-white/[0.10] text-left hover:border-white/[0.18] transition-colors duration-200"
+          <div
+            key={d.key ?? `new-${i}`}
+            className="flex items-center gap-2 px-4 py-3.5 rounded-card bg-surface-raised border border-white/[0.10] hover:border-white/[0.18] transition-colors duration-200"
           >
-            <span className="text-white/25 text-xs font-display font-bold w-5 shrink-0">{i + 1}</span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-white text-sm font-display font-bold">{d.name || `Day ${i + 1}`}</span>
-              <span className="block text-white/35 text-xs font-body mt-0.5">
-                {d.exercises.length === 0
-                  ? 'Rest day — tap to add exercises'
-                  : `${d.exercises.length} ${d.exercises.length === 1 ? 'exercise' : 'exercises'} · roughly ${estimateMinutes(d.exercises)} min`}
+            <button onClick={() => setOpenDay(i)} className="flex items-center gap-3 min-w-0 flex-1 text-left">
+              <span className="text-white/25 text-xs font-display font-bold w-5 shrink-0">{i + 1}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-white text-sm font-display font-bold truncate">{d.name || `Day ${i + 1}`}</span>
+                <span className="block text-white/35 text-xs font-body mt-0.5">
+                  {d.exercises.length === 0
+                    ? 'Rest day — tap to add exercises'
+                    : `${d.exercises.length} ${d.exercises.length === 1 ? 'exercise' : 'exercises'} · roughly ${estimateMinutes(d.exercises)} min`}
+                </span>
               </span>
-            </span>
-            <span className="text-white/20 shrink-0">&rsaquo;</span>
-          </button>
+            </button>
+            {/* Copying a 6-day program when you train four times a week should
+                not mean deleting thirty exercises one at a time. */}
+            {program.days.length > 1 && (
+              <button
+                onClick={() => setProgram((p) => ({ ...p, days: p.days.filter((_, j) => j !== i) }))}
+                className="w-7 h-7 rounded-full bg-white/[0.05] text-white/30 hover:text-state-danger shrink-0 active:scale-95 transition-all duration-150"
+                aria-label={`Remove ${d.name || `day ${i + 1}`}`}
+              >
+                &times;
+              </button>
+            )}
+            <span className="text-white/20 shrink-0" aria-hidden="true">&rsaquo;</span>
+          </div>
         ))}
       </div>
 

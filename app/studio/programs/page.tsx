@@ -28,16 +28,19 @@ import {
 } from '@/lib/workout'
 import { rotationState } from '@/lib/rotation'
 import ProgramBuilder from '@/components/studio/builder/ProgramBuilder'
+import StartFrom from '@/components/studio/builder/StartFrom'
 import {
   loadIntoBuilder,
   saveCustomProgram,
   activateCustomProgram,
   fetchMyCustomPrograms,
+  fetchLibraryPrograms,
   deleteCustomProgram,
   MAX_CUSTOM_PROGRAMS,
   type BuilderProgram,
   type CustomProgramRow,
 } from '@/lib/custom-program'
+import { emptyWeek, genericWeek, type BuilderTemplate } from '@/lib/builder-templates'
 import { alertRestOver, primeRestAudio, primeRestNotifications } from '@/lib/rest-alert'
 import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
@@ -62,6 +65,7 @@ import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import {
   completeBlock,
+  fetchAssignmentStart,
   fetchMyBlock,
   fetchMyProgram,
   gatherReviewInputs,
@@ -136,7 +140,7 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
   },
 }
 
-type ProgramView = 'preview' | 'workout' | 'exercise' | 'builder' | 'myPrograms'
+type ProgramView = 'preview' | 'workout' | 'exercise' | 'builder' | 'myPrograms' | 'startFrom'
 
 interface SetRow {
   weight: string
@@ -402,6 +406,13 @@ export default function ProgramsPage() {
   const [builderDraft, setBuilderDraft] = useState<BuilderProgram | null>(null)
   const [builderEditingId, setBuilderEditingId] = useState<string | null>(null)
   const [builderSaving, setBuilderSaving] = useState(false)
+  /**
+   * The draft exactly as it was loaded, kept so a save can tell which days
+   * were renamed and carry their workout history across.
+   */
+  const [builderOriginal, setBuilderOriginal] = useState<BuilderProgram | null>(null)
+  /** Set after a save that moved history, so the client is told rather than left guessing. */
+  const [builderMoved, setBuilderMoved] = useState<number | null>(null)
   const [myPrograms, setMyPrograms] = useState<CustomProgramRow[]>([])
   /** The program currently loaded, so it can be copied into the builder. */
   const [assignedProgramId, setAssignedProgramId] = useState<string | null>(null)
@@ -498,7 +509,11 @@ export default function ProgramsPage() {
     let today = plan.findIndex((d) => d.exercises.length > 0)
     if (uid) {
       try {
-        const trained = await dbFetchTrainedDays(uid)
+        // Bounded to this program's own life. Day names repeat across the
+        // library — "Upper A" is in eleven of the sixty-eight — so without the
+        // boundary a previous program's sessions can close out this one's lap.
+        const since = await fetchAssignmentStart(uid, programId)
+        const trained = await dbFetchTrainedDays(uid, 60, since)
         const state = rotationState(
           plan.map((d) => d.name),
           plan.map((d) => d.exercises.length > 0),
@@ -717,28 +732,69 @@ export default function ProgramsPage() {
    */
   const openBuilder = async (sourceProgramId: string | null, editingId: string | null) => {
     try {
+      let draft: BuilderProgram
       if (sourceProgramId) {
-        const draft = await loadIntoBuilder(sourceProgramId)
-        if (!draft) return
-        setBuilderDraft(editingId ? draft : { ...draft, name: `${draft.name} (my version)`.slice(0, 80) })
+        // Day keys only when editing. A copy shares its day names with the
+        // original, and treating a rename on the copy as a rename of those
+        // names would rewrite history belonging to a program the client is not
+        // editing — see loadIntoBuilder.
+        const loaded = await loadIntoBuilder(sourceProgramId, { keepKeys: Boolean(editingId) })
+        if (!loaded) return
+        draft = editingId ? loaded : { ...loaded, name: `${loaded.name} (my version)`.slice(0, 80) }
       } else {
-        setBuilderDraft({
-          name: 'My program',
-          days: Array.from({ length: 4 }, (_, i) => ({ name: `Day ${i + 1}`, exercises: [] })),
-        })
+        draft = { name: 'My program', days: genericWeek(4) }
       }
+      setBuilderDraft(draft)
+      setBuilderOriginal(editingId ? draft : null)
       setBuilderEditingId(editingId)
+      setBuilderMoved(null)
       setView('builder')
     } catch (err) {
       console.error('[Builder] Could not open:', err)
     }
   }
 
+  /**
+   * Open the fork screen.
+   *
+   * Loads the client's programs first so the limit is known before the doors
+   * are offered: finding out you are at the cap after choosing a split and
+   * filling three days would be the worst possible moment to be told.
+   */
+  const openStartFrom = async () => {
+    if (userId) {
+      try {
+        setMyPrograms(await fetchMyCustomPrograms(userId))
+      } catch (err) {
+        console.error('[Builder] Could not list programs:', err)
+      }
+    }
+    setView('startFrom')
+  }
+
+  /** The from-scratch path: a named, empty week at the chosen day count. */
+  const openBlankBuilder = (template: BuilderTemplate | null, days: number) => {
+    setBuilderDraft({
+      name: 'My program',
+      days: template ? emptyWeek(template) : genericWeek(days),
+    })
+    setBuilderOriginal(null)
+    setBuilderEditingId(null)
+    setBuilderMoved(null)
+    setView('builder')
+  }
+
   const handleBuilderSave = async (program: BuilderProgram, activate: boolean) => {
     if (!userId) return
     setBuilderSaving(true)
     try {
-      const id = await saveCustomProgram({ userId, program, programId: builderEditingId ?? undefined })
+      const { programId: id, sessionsMoved } = await saveCustomProgram({
+        userId,
+        program,
+        programId: builderEditingId ?? undefined,
+        original: builderOriginal ?? undefined,
+      })
+      setBuilderMoved(sessionsMoved > 0 ? sessionsMoved : null)
       if (activate) {
         await activateCustomProgram(userId, id)
         await applyLoadedProgram(id, userId)
@@ -749,7 +805,11 @@ export default function ProgramsPage() {
         setView('myPrograms')
       }
       setBuilderDraft(null)
+      setBuilderOriginal(null)
       setBuilderEditingId(null)
+      // A rename on the program they are ON changes which day is today, and
+      // the loaded plan is now stale against it.
+      if (!activate && assignedProgramId === id) await applyLoadedProgram(id, userId)
     } catch (err) {
       console.error('[Builder] Save failed:', err)
     } finally {
@@ -1632,10 +1692,10 @@ export default function ProgramsPage() {
                     {assignedProgramId && (
                       <div className="flex gap-2">
                         <button
-                          onClick={() => openBuilder(assignedProgramId, null)}
+                          onClick={() => { setBuilderMoved(null); void openStartFrom() }}
                           className="flex-1 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
                         >
-                          Customize this program
+                          Build my own
                         </button>
                         <button
                           onClick={openMyPrograms}
@@ -3170,6 +3230,21 @@ export default function ProgramsPage() {
           )}
 
           {/* ════════ VIEW 4: PROGRAM BUILDER ════════ */}
+          {/* ════════ VIEW 6: WHERE A PROGRAM COMES FROM ════════ */}
+          {view === 'startFrom' && (
+            <motion.div key="startFrom" {...slideIn}>
+              <StartFrom
+                followingId={assignedProgramId}
+                followingName={currentProgram?.name ?? null}
+                atLimit={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
+                loadLibrary={fetchLibraryPrograms}
+                onCopy={(id) => openBuilder(id, null)}
+                onScratch={openBlankBuilder}
+                onCancel={() => setView('preview')}
+              />
+            </motion.div>
+          )}
+
           {view === 'builder' && builderDraft && (
             <motion.div key="builder" {...slideIn}>
               <div className="flex items-center gap-2 mb-4">
@@ -3184,6 +3259,7 @@ export default function ProgramsPage() {
                 initial={builderDraft}
                 library={exerciseDB}
                 saving={builderSaving}
+                editing={Boolean(builderEditingId)}
                 onSave={handleBuilderSave}
                 onCancel={() => { setBuilderDraft(null); setView('preview') }}
               />
@@ -3206,6 +3282,16 @@ export default function ProgramsPage() {
               </div>
 
               <h2 className="font-display font-extrabold text-xl text-white tracking-tight mb-4">My programs</h2>
+
+              {/* Renaming a day moves its logged sessions across, because the
+                  rotation matches them by name. Silence here would look like
+                  the history had been lost. */}
+              {builderMoved !== null && (
+                <p className="text-state-success/90 text-xs font-body mb-4 px-3.5 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
+                  Saved. {builderMoved} logged {builderMoved === 1 ? 'session' : 'sessions'} moved across to the
+                  renamed {builderMoved === 1 ? 'day' : 'days'}, so nothing is lost.
+                </p>
+              )}
 
               {myPrograms.length === 0 ? (
                 <p className="text-white/30 text-sm font-body text-center py-10">
@@ -3257,11 +3343,11 @@ export default function ProgramsPage() {
               )}
 
               <button
-                onClick={() => openBuilder(null, null)}
+                onClick={() => setView('startFrom')}
                 disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
                 className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/60 text-sm font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
               >
-                + Build one from scratch
+                + Build another
               </button>
               {myPrograms.length >= MAX_CUSTOM_PROGRAMS && (
                 <p className="text-white/30 text-xs font-body text-center mt-2">

@@ -15,6 +15,8 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { fetchAssignmentStart } from '@/lib/programs'
+import { renamesFor, planRenameOps, type Rename } from '@/lib/day-renames'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -43,11 +45,48 @@ export interface BuilderExercise {
 export interface BuilderDay {
   name: string
   exercises: BuilderExercise[]
+  /**
+   * Stable identity for a day that already exists in the database.
+   *
+   * Without it a rename is indistinguishable from deleting a day and adding
+   * another, which matters because one of those should carry workout history
+   * across and the other must not. Set only when EDITING a saved program —
+   * a copy has no history of its own to carry.
+   */
+  key?: string
 }
 
 export interface BuilderProgram {
   name: string
   days: BuilderDay[]
+}
+
+export interface LibraryProgram {
+  id: string
+  name: string
+  days_per_week: number | null
+  split: string | null
+}
+
+/**
+ * The AJM Fit programs, as starting points.
+ *
+ * Every signed-in client can read these — the policy rewrite in the custom
+ * programs migration kept that deliberately, because copying one is the whole
+ * point. Their own custom programs are excluded: those are reachable from My
+ * programs, and listing them here would offer "copy" where "edit" is meant.
+ */
+export async function fetchLibraryPrograms(): Promise<LibraryProgram[]> {
+  // eq('blueprint') rather than neq('custom'): a NULL source would slip
+  // through a <> comparison in Postgres, and the ownership constraint added
+  // with the custom-programs migration treats NULL source as not-custom.
+  const { data } = await db
+    .from('programs')
+    .select('id, name, days_per_week, split')
+    .eq('source', 'blueprint')
+    .order('days_per_week', { ascending: true })
+    .order('name', { ascending: true })
+  return (data ?? []) as LibraryProgram[]
 }
 
 /** The client's own programs, newest first. */
@@ -67,8 +106,17 @@ export async function fetchMyCustomPrograms(userId: string): Promise<CustomProgr
  * Works on ANY program the client can see — their own, or one of the 68 AJM
  * Fit ones. That is what makes "customise this program" the same code path as
  * "edit my program".
+ *
+ * `keepKeys` marks each day with its database id, which is what lets a later
+ * save tell a rename from a delete-and-add. Pass it when EDITING a saved
+ * program; leave it off when copying one, because a copy shares its day names
+ * with the original and migrating history on those names would rewrite the
+ * past of a program the client is not even editing.
  */
-export async function loadIntoBuilder(programId: string): Promise<BuilderProgram | null> {
+export async function loadIntoBuilder(
+  programId: string,
+  opts: { keepKeys?: boolean } = {}
+): Promise<BuilderProgram | null> {
   const { data: prog } = await db
     .from('programs')
     .select('id, name')
@@ -112,8 +160,64 @@ export async function loadIntoBuilder(programId: string): Promise<BuilderProgram
 
   return {
     name: prog.name as string,
-    days: dayRows.map((d) => ({ name: shortDayName(d.name), exercises: byDay.get(d.id) ?? [] })),
+    days: dayRows.map((d) => ({
+      name: shortDayName(d.name),
+      exercises: byDay.get(d.id) ?? [],
+      ...(opts.keepKeys ? { key: d.id } : {}),
+    })),
   }
+}
+
+/**
+ * Carry workout history across a renamed day.
+ *
+ * Workout rows store the day's name, not its id, and the rotation matches on
+ * that name — so a rename with no migration silently orphans every session
+ * logged under the old one. The green ticks vanish, the lap restarts, and
+ * "today" goes back to day one. Which is the whole reason renaming an active
+ * program needed deciding before it could be allowed.
+ *
+ * Bounded to sessions from this program's first assignment onward. A client
+ * who trained a Blueprint program with an "Upper A" day, then built their own
+ * with an "Upper A" day, then renamed it, must not have the Blueprint sessions
+ * relabelled — that would be rewriting the record of a program they are no
+ * longer on. In production one client has exactly that shape: seven "Upper A"
+ * sessions under a Lean Out program they left in September.
+ *
+ * Deliberately NOT bounded by `workouts.program_name`. That column holds a
+ * display string snapshotted at log time, and it has already drifted in
+ * production: one client's rows carry two different program names for a single
+ * uninterrupted assignment. It cannot identify a program.
+ */
+export async function migrateDayNames(input: {
+  userId: string
+  programId: string
+  renames: Rename[]
+}): Promise<number> {
+  const { userId, programId, renames } = input
+  if (renames.length === 0) return 0
+
+  // The earliest time this program was ever the client's. No assignment means
+  // it was never trained, so there is no history to carry. Shared with the
+  // rotation, which uses the same boundary for the same reason.
+  const since = await fetchAssignmentStart(userId, programId)
+  if (!since) return 0
+
+  const touched = new Set<string>()
+  for (const { from, to } of planRenameOps(renames)) {
+    const { data, error } = await db
+      .from('workouts')
+      .update({ day_name: to })
+      .eq('user_id', userId)
+      .eq('day_name', from)
+      .gte('started_at', since)
+      .select('id')
+    if (error) throw error
+    // Counted as rows, not as updates: a sentinel hop touches the same row
+    // twice and would otherwise be reported as two sessions moved.
+    for (const row of (data ?? []) as Array<{ id: string }>) touched.add(row.id)
+  }
+  return touched.size
 }
 
 /**
@@ -141,7 +245,12 @@ export async function saveCustomProgram(input: {
   program: BuilderProgram
   /** Omit to create; pass to overwrite an existing custom program. */
   programId?: string
-}): Promise<string> {
+  /**
+   * The draft as it was loaded, so renamed days can carry their history.
+   * Omit when creating — a new program has none.
+   */
+  original?: BuilderProgram
+}): Promise<{ programId: string; sessionsMoved: number }> {
   const { userId, program } = input
   const trainable = program.days.filter((d) => d.exercises.length > 0).length
 
@@ -174,7 +283,15 @@ export async function saveCustomProgram(input: {
     programId = data.id as string
   }
 
-  if (program.days.length === 0) return programId
+  // History moves only after the program content is safely written. A rename
+  // that succeeded against a save that then failed would leave history under a
+  // name the program no longer has — the exact orphaning this exists to stop.
+  const renames = input.original ? renamesFor(input.original.days, program.days) : []
+
+  if (program.days.length === 0) {
+    const sessionsMoved = await migrateDayNames({ userId, programId, renames })
+    return { programId, sessionsMoved }
+  }
 
   const { data: dayRows, error: dErr } = await db
     .from('program_days')
@@ -209,7 +326,8 @@ export async function saveCustomProgram(input: {
     if (eErr) throw eErr
   }
 
-  return programId
+  const sessionsMoved = await migrateDayNames({ userId, programId, renames })
+  return { programId, sessionsMoved }
 }
 
 /**
