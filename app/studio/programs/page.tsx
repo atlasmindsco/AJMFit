@@ -46,6 +46,7 @@ import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
 import { judgeSet, type RecordHit } from '@/lib/records'
 import { cuesFor } from '@/lib/cues'
+import { boxPlaceholder, canLogSet, toLog } from '@/lib/set-entry'
 import { normaliseLibraryImages } from '@/lib/exercise-images'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
@@ -109,6 +110,30 @@ interface ProgramExercise {
 }
 
 type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
+
+/**
+ * Tap a number box, get the whole number selected.
+ *
+ * The other half of the prefilled-input problem. A box showing a suggestion is
+ * empty underneath, so typing just works — but a set you already logged holds
+ * a real value, and editing 135 to 145 should not mean picking the caret out
+ * of the middle of it either.
+ *
+ * select() rather than setSelectionRange(), which throws on type="number" in
+ * Chrome and Safari. Deferred a frame because iOS places its own caret after
+ * the focus handler runs and would otherwise undo this immediately.
+ */
+const selectAllOnFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const el = e.currentTarget
+  if (!el.value) return
+  requestAnimationFrame(() => {
+    try {
+      el.select()
+    } catch {
+      /* Some browsers refuse selection on number inputs. Caret stays put. */
+    }
+  })
+}
 
 const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string; ring: string; bg: string; border: string; text: string; hint: string }> = {
   dropset: {
@@ -2309,6 +2334,7 @@ export default function ProgramsPage() {
                                                       : 'min'
                                                   }
                                                   value={typed}
+                                                  onFocus={selectAllOnFocus}
                                                   onChange={(e) => {
                                                     const v = e.target.value
                                                     setTimedLogs((prev) => ({ ...prev, [logKey]: v }))
@@ -2359,6 +2385,7 @@ export default function ProgramsPage() {
                                                     step="0.1"
                                                     placeholder="—"
                                                     value={distanceLogs[logKey] ?? ''}
+                                                    onFocus={selectAllOnFocus}
                                                     onChange={(e) => {
                                                       const v = e.target.value
                                                       setDistanceLogs((prev) => ({ ...prev, [logKey]: v }))
@@ -2693,13 +2720,16 @@ export default function ProgramsPage() {
                                         // typed, else what we suggest. The
                                         // suggestion is shown dimmed so it never
                                         // passes for something they entered.
-                                        const shownWeight = log.weight !== '' ? log.weight : suggested.weight
-                                        const shownReps = log.reps !== '' ? log.reps : suggested.reps
+                                        // What ticking the set commits: what they typed,
+                                        // else the suggestion. The BOX shows only what they
+                                        // typed — see lib/set-entry.ts for why.
+                                        const weightEntry = { typed: log.weight, suggestion: suggested.weight }
+                                        const repsEntry = { typed: log.reps, suggestion: suggested.reps }
+                                        const shownWeight = toLog(weightEntry)
+                                        const shownReps = toLog(repsEntry)
                                         const isSuggestion = !log.logged && log.weight === '' && log.reps === ''
                                         const isActive = si === activeSet
-                                        const canLog = needsWeight
-                                          ? shownWeight !== '' && shownReps !== ''
-                                          : shownReps !== ''
+                                        const canLog = canLogSet(needsWeight ? weightEntry : null, repsEntry)
                                         const setWeight = Number(shownWeight) || 0
                                         const setBeatsPR = filled && pr != null && setWeight > pr.weight
                                         const setTimerKey = `${logKey}-set${si}`
@@ -2850,24 +2880,36 @@ export default function ProgramsPage() {
                                           <div key={si} className={`rounded-control mb-1 ${isActive && !filled ? 'bg-white/[0.04] px-1.5 py-1.5' : ''}`}>
                                             <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
                                               <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
+                                              {/* The suggestion is a PLACEHOLDER, not a value.
+                                                  It used to be a real value, which meant tapping
+                                                  in put the caret inside "115" and typing gave
+                                                  you "1115" or "1151" — you had to select the
+                                                  number before you could replace it, on every
+                                                  set of every exercise. Alex hit this on his
+                                                  first session. As a placeholder it reads the
+                                                  same, logs the same (logThisSet still commits
+                                                  shownWeight when nothing is typed), and a tap
+                                                  puts you in an empty box ready to type. */}
                                               {needsWeight && (
                                                 <input
                                                   type="number"
                                                   inputMode="numeric"
-                                                  placeholder={prevWeight ?? 'lbs'}
-                                                  value={shownWeight}
+                                                  placeholder={boxPlaceholder(weightEntry, prevWeight, 'lbs')}
+                                                  value={log.weight}
+                                                  onFocus={selectAllOnFocus}
                                                   onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone}`}
+                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-white/35' : 'placeholder:text-white/20'}`}
                                                   aria-label={`Set ${si + 1} weight in pounds`}
                                                 />
                                               )}
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder={prevReps ?? (explosive ? 'efforts' : 'reps')}
-                                                value={shownReps}
+                                                placeholder={boxPlaceholder(repsEntry, prevReps, explosive ? 'efforts' : 'reps')}
+                                                value={log.reps}
+                                                onFocus={selectAllOnFocus}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone}`}
+                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-white/35' : 'placeholder:text-white/20'}`}
                                                 aria-label={`Set ${si + 1} ${explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
@@ -3112,6 +3154,7 @@ export default function ProgramsPage() {
                                                     inputMode="numeric"
                                                     placeholder="lbs"
                                                     value={iLog.weight}
+                                                    onFocus={selectAllOnFocus}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
                                                     className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     style={{ borderColor: iLog.done ? `${meta.color}55` : undefined }}
