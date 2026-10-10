@@ -16,6 +16,8 @@ import { useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import ExercisePickerSheet from './ExercisePickerSheet'
 import ExerciseConfigSheet from './ExerciseConfigSheet'
+import ProgramReview from './ProgramReview'
+import { reviewProgram, volumeOf, healthSummary } from '@/lib/program-health'
 import {
   canSave,
   defaultPrescription,
@@ -49,6 +51,8 @@ export default function ProgramBuilder({
   const [openDay, setOpenDay] = useState<number | null>(null)
   const [picking, setPicking] = useState(false)
   const [configuring, setConfiguring] = useState<number | null>(null)
+  /** The review sheet, and whether saving from it should also activate. */
+  const [reviewing, setReviewing] = useState<{ activate: boolean } | null>(null)
 
   const byName = useMemo(() => {
     const m = new Map(library.map((e) => [e.name, e]))
@@ -57,6 +61,36 @@ export default function ProgramBuilder({
 
   const block = canSave(program)
   const day = openDay != null ? program.days[openDay] : null
+
+  const health = useMemo(() => {
+    const input = {
+      days: program.days.map((d) => ({
+        name: d.name,
+        exercises: d.exercises.map((e) => ({
+          exerciseName: e.exerciseName,
+          sets: e.sets,
+          restSeconds: e.restSeconds,
+        })),
+      })),
+    }
+    return { findings: reviewProgram(input, byName), volume: volumeOf(input, byName) }
+  }, [program, byName])
+
+  const trainingDays = program.days.filter((d) => d.exercises.length > 0).length
+  const warnCount = health.findings.filter((f) => f.severity === 'warn').length
+
+  /**
+   * Save, but show the review first when something is worth saying.
+   *
+   * Only WARNINGS interrupt. A note is an observation, and stopping someone on
+   * their way out of the door to mention that eight sets of legs is on the
+   * light side would teach them to tap past this screen without reading it,
+   * which is the one outcome that makes the check worthless.
+   */
+  const attemptSave = (activate: boolean) => {
+    if (warnCount > 0) setReviewing({ activate })
+    else onSave(program, activate)
+  }
 
   const setDay = (index: number, next: BuilderDay) =>
     setProgram((p) => ({ ...p, days: p.days.map((d, i) => (i === index ? next : d)) }))
@@ -259,7 +293,28 @@ export default function ProgramBuilder({
 
       {!block.ok && <p className="text-state-warning/90 text-xs font-body mt-4 text-center">{block.reason}</p>}
 
-      <div className="flex gap-2 mt-5">
+      {/* A live second pair of eyes. Always reachable, never in the way —
+          tapping it opens the full review with the volume bars. */}
+      {block.ok && (
+        <button
+          onClick={() => setReviewing({ activate: false })}
+          className="w-full mt-4 px-4 py-3 rounded-card bg-white/[0.03] border border-white/[0.07] text-left hover:bg-white/[0.06] transition-colors duration-200"
+        >
+          <span className="flex items-center gap-2">
+            <span
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                warnCount > 0 ? 'bg-state-warning' : 'bg-state-success'
+              }`}
+            />
+            <span className="flex-1 text-white/60 text-xs font-body">
+              {healthSummary(health.findings) ?? 'Looks balanced — all six groups covered'}
+            </span>
+            <span className="text-white/25 text-xs shrink-0">Review &rsaquo;</span>
+          </span>
+        </button>
+      )}
+
+      <div className="flex gap-2 mt-3">
         <button
           onClick={onCancel}
           className="px-5 py-3.5 rounded-control bg-white/[0.06] text-white/70 text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
@@ -267,20 +322,38 @@ export default function ProgramBuilder({
           Cancel
         </button>
         <button
-          onClick={() => onSave(program, false)}
+          onClick={() => attemptSave(false)}
           disabled={!block.ok || saving}
           className="flex-1 py-3.5 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           Save
         </button>
         <button
-          onClick={() => onSave(program, true)}
+          onClick={() => attemptSave(true)}
           disabled={!block.ok || saving}
           className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Saving…' : 'Save & start'}
         </button>
       </div>
+
+      <AnimatePresence>
+        {reviewing && (
+          <ProgramReview
+            findings={health.findings}
+            volume={health.volume}
+            trainingDays={trainingDays}
+            saving={saving}
+            activate={reviewing.activate}
+            onSave={() => {
+              const activate = reviewing.activate
+              setReviewing(null)
+              onSave(program, activate)
+            }}
+            onBack={() => setReviewing(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
