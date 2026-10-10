@@ -27,6 +27,17 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import { rotationState } from '@/lib/rotation'
+import ProgramBuilder from '@/components/studio/builder/ProgramBuilder'
+import {
+  loadIntoBuilder,
+  saveCustomProgram,
+  activateCustomProgram,
+  fetchMyCustomPrograms,
+  deleteCustomProgram,
+  MAX_CUSTOM_PROGRAMS,
+  type BuilderProgram,
+  type CustomProgramRow,
+} from '@/lib/custom-program'
 import { alertRestOver, primeRestAudio, primeRestNotifications } from '@/lib/rest-alert'
 import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
@@ -124,7 +135,7 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
   },
 }
 
-type ProgramView = 'preview' | 'workout' | 'exercise'
+type ProgramView = 'preview' | 'workout' | 'exercise' | 'builder' | 'myPrograms'
 
 interface SetRow {
   weight: string
@@ -386,6 +397,13 @@ export default function ProgramsPage() {
   const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(EMPTY_WEEKLY_PLAN)
   /** Where the client is in the rotation. -1 until the program loads. */
   const [todayIndex, setTodayIndex] = useState(-1)
+  /** The program open in the builder, and which saved program it edits. */
+  const [builderDraft, setBuilderDraft] = useState<BuilderProgram | null>(null)
+  const [builderEditingId, setBuilderEditingId] = useState<string | null>(null)
+  const [builderSaving, setBuilderSaving] = useState(false)
+  const [myPrograms, setMyPrograms] = useState<CustomProgramRow[]>([])
+  /** The program currently loaded, so it can be copied into the builder. */
+  const [assignedProgramId, setAssignedProgramId] = useState<string | null>(null)
   /** Set while the End Workout prompt is open, carrying the session tally. */
   const [confirmEnd, setConfirmEnd] = useState<{ logged: number; planned: number } | null>(null)
   /** Sets written down but not yet saved to the server. */
@@ -494,6 +512,7 @@ export default function ProgramsPage() {
 
     setWeeklyPlan(plan)
     setTodayIndex(today)
+    setAssignedProgramId(programId)
     setCurrentProgram(loaded.program)
     setProgramLocation(loaded.location)
     setProgramGoal(loaded.goal)
@@ -686,6 +705,66 @@ export default function ProgramsPage() {
   }, [])
 
   const selected = selectedDay !== null ? weeklyPlan[selectedDay] : null
+
+  /**
+   * Open the builder on a copy of a program.
+   *
+   * The same code path serves "customise the one I'm following" and "edit my
+   * own": loadIntoBuilder reads any program the client can see, so copying an
+   * AJM Fit program and editing a custom one are one operation with a
+   * different programId.
+   */
+  const openBuilder = async (sourceProgramId: string | null, editingId: string | null) => {
+    try {
+      if (sourceProgramId) {
+        const draft = await loadIntoBuilder(sourceProgramId)
+        if (!draft) return
+        setBuilderDraft(editingId ? draft : { ...draft, name: `${draft.name} (my version)`.slice(0, 80) })
+      } else {
+        setBuilderDraft({
+          name: 'My program',
+          days: Array.from({ length: 4 }, (_, i) => ({ name: `Day ${i + 1}`, exercises: [] })),
+        })
+      }
+      setBuilderEditingId(editingId)
+      setView('builder')
+    } catch (err) {
+      console.error('[Builder] Could not open:', err)
+    }
+  }
+
+  const handleBuilderSave = async (program: BuilderProgram, activate: boolean) => {
+    if (!userId) return
+    setBuilderSaving(true)
+    try {
+      const id = await saveCustomProgram({ userId, program, programId: builderEditingId ?? undefined })
+      if (activate) {
+        await activateCustomProgram(userId, id)
+        await applyLoadedProgram(id, userId)
+        setSelectedDay(null)
+        setView('preview')
+      } else {
+        setMyPrograms(await fetchMyCustomPrograms(userId))
+        setView('myPrograms')
+      }
+      setBuilderDraft(null)
+      setBuilderEditingId(null)
+    } catch (err) {
+      console.error('[Builder] Save failed:', err)
+    } finally {
+      setBuilderSaving(false)
+    }
+  }
+
+  const openMyPrograms = async () => {
+    if (!userId) return
+    try {
+      setMyPrograms(await fetchMyCustomPrograms(userId))
+    } catch (err) {
+      console.error('[Builder] Could not list programs:', err)
+    }
+    setView('myPrograms')
+  }
 
   /** True while this day's workout is running. */
   const sessionActive = selectedDay !== null && Boolean(workoutStartTime[selectedDay])
@@ -1541,6 +1620,30 @@ export default function ProgramsPage() {
                     >
                       View Program
                     </button>
+
+                    {/* Make it yours.
+                        Copying the program you are already on beats building
+                        from a blank week on every measure: a handful of swaps
+                        instead of twenty-five decisions, something that works
+                        on screen from the first second, and history that
+                        carries straight over because it keys on exercise name
+                        rather than on the program. */}
+                    {assignedProgramId && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openBuilder(assignedProgramId, null)}
+                          className="flex-1 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                        >
+                          Customize this program
+                        </button>
+                        <button
+                          onClick={openMyPrograms}
+                          className="px-4 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/45 text-xs font-display font-bold uppercase tracking-wide hover:text-white/80 transition-colors duration-200"
+                        >
+                          My programs
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -3062,6 +3165,108 @@ export default function ProgramsPage() {
                   )}
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {/* ════════ VIEW 4: PROGRAM BUILDER ════════ */}
+          {view === 'builder' && builderDraft && (
+            <motion.div key="builder" {...slideIn}>
+              <div className="flex items-center gap-2 mb-4">
+                <button
+                  onClick={() => { setBuilderDraft(null); setView('preview') }}
+                  className="text-white/40 hover:text-white/70 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                >
+                  ‹ Back
+                </button>
+              </div>
+              <ProgramBuilder
+                initial={builderDraft}
+                library={exerciseDB}
+                saving={builderSaving}
+                onSave={handleBuilderSave}
+                onCancel={() => { setBuilderDraft(null); setView('preview') }}
+              />
+            </motion.div>
+          )}
+
+          {/* ════════ VIEW 5: MY PROGRAMS ════════ */}
+          {view === 'myPrograms' && (
+            <motion.div key="myPrograms" {...slideIn}>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <button
+                  onClick={() => setView('preview')}
+                  className="text-white/40 hover:text-white/70 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                >
+                  ‹ Back
+                </button>
+                <span className="text-white/25 text-2xs font-body">
+                  {myPrograms.length} of {MAX_CUSTOM_PROGRAMS}
+                </span>
+              </div>
+
+              <h2 className="font-display font-extrabold text-xl text-white tracking-tight mb-4">My programs</h2>
+
+              {myPrograms.length === 0 ? (
+                <p className="text-white/30 text-sm font-body text-center py-10">
+                  Nothing saved yet. Customize the program you&rsquo;re on, or build one from scratch.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {myPrograms.map((p) => (
+                    <div key={p.id} className="rounded-card bg-surface-raised border border-white/[0.10] px-4 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-white text-sm font-display font-bold truncate">{p.name}</span>
+                          <span className="block text-white/35 text-xs font-body mt-0.5">
+                            {p.days_per_week ?? 0} {p.days_per_week === 1 ? 'day' : 'days'} a week
+                          </span>
+                        </span>
+                        <button
+                          onClick={() => openBuilder(p.id, p.id)}
+                          className="shrink-0 px-3 py-2 rounded-control bg-white/[0.06] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!userId) return
+                            await activateCustomProgram(userId, p.id)
+                            await applyLoadedProgram(p.id, userId)
+                            setSelectedDay(null)
+                            setView('preview')
+                          }}
+                          className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
+                        >
+                          Use
+                        </button>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (!userId) return
+                          await deleteCustomProgram(p.id)
+                          setMyPrograms(await fetchMyCustomPrograms(userId))
+                        }}
+                        className="mt-2 text-white/25 hover:text-state-danger text-2xs font-body transition-colors duration-150"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => openBuilder(null, null)}
+                disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
+                className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/60 text-sm font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
+              >
+                + Build one from scratch
+              </button>
+              {myPrograms.length >= MAX_CUSTOM_PROGRAMS && (
+                <p className="text-white/30 text-xs font-body text-center mt-2">
+                  Delete one to make room.
+                </p>
+              )}
             </motion.div>
           )}
 
