@@ -27,8 +27,11 @@ export default function StartFrom({
   followingName,
   followingId,
   atLimit,
+  savedCount,
   onCopy,
   onScratch,
+  onPickReadyMade,
+  onMyPrograms,
   onCancel,
   loadLibrary,
 }: {
@@ -37,8 +40,18 @@ export default function StartFrom({
   followingId: string | null
   /** True when they already hold the maximum number of programs. */
   atLimit: boolean
+  /** How many programs they have already built. */
+  savedCount: number
   onCopy: (programId: string) => void
   onScratch: (template: BuilderTemplate | null, days: number) => void
+  /**
+   * The Blueprint goal/location/days flow — a ready-made program, no building.
+   * Omitted for a coached client with no program yet: Anthony writes theirs,
+   * and offering to self-serve a Blueprint template there would quietly route
+   * them around the coaching they are paying for.
+   */
+  onPickReadyMade?: () => void
+  onMyPrograms: () => void
   onCancel: () => void
   loadLibrary: () => Promise<LibraryProgram[]>
 }) {
@@ -97,22 +110,61 @@ export default function StartFrom({
       {/* ------------------------------------------------------------ door */}
       {step === 'door' && (
         <>
-          <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">Build your own</h2>
+          <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">Change your program</h2>
           <p className="text-white/45 text-sm font-body mt-1.5 mb-6 leading-relaxed">
-            Your program, your exercises. Everything else keeps working &mdash; your logs, your weights, your
-            progression targets.
+            Take a ready-made one, or build your own. Either way your logs, your weights and your
+            progression targets carry straight over.
+          </p>
+
+          {savedCount > 0 && (
+            <button
+              onClick={onMyPrograms}
+              className="w-full flex items-center gap-3 px-5 py-3.5 mb-5 rounded-card bg-brand-blue/[0.10] border border-brand-blue/30 text-left hover:bg-brand-blue/[0.16] transition-colors duration-200 active:scale-[0.99]"
+            >
+              <span className="flex-1 min-w-0">
+                <span className="block font-display font-bold text-sm text-white">
+                  My programs ({savedCount})
+                </span>
+                <span className="block text-white/40 text-xs font-body mt-0.5">
+                  Switch to one you already built, or edit it.
+                </span>
+              </span>
+              <span className="text-brand-blue shrink-0">&rsaquo;</span>
+            </button>
+          )}
+
+          {onPickReadyMade && (
+            <>
+              <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2.5">
+                Ready-made
+              </p>
+              <Door
+                primary
+                title="Pick a different AJM Fit program"
+                sub="Answer three questions and get a complete program built by Anthony. Nothing to assemble."
+                onClick={onPickReadyMade}
+              />
+            </>
+          )}
+
+          <p
+            className={`text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2.5 ${
+              onPickReadyMade ? 'mt-6' : ''
+            }`}
+          >
+            Build your own
           </p>
 
           {atLimit && (
-            <p className="text-state-warning/90 text-xs font-body mb-4">
-              You&rsquo;re holding the maximum number of programs. Delete one from My programs to build another.
+            <p className="text-state-warning/90 text-xs font-body mb-3">
+              You&rsquo;re holding the maximum number of built programs. Delete one from My programs to build
+              another.
             </p>
           )}
 
           <div className="space-y-2.5">
             {followingId && (
               <Door
-                primary
                 title="Start from the one I&rsquo;m on"
                 sub={`Copy ${followingName ?? 'your current program'} and change what you like. Easiest, and it trains properly straight away.`}
                 onClick={() => onCopy(followingId)}
@@ -121,7 +173,7 @@ export default function StartFrom({
             )}
             <Door
               title="Start from another AJM Fit program"
-              sub="Pick any of the programs in the library as your starting point."
+              sub="Use any program in the library as your starting point, then change it."
               onClick={() => setStep('pickLibrary')}
               disabled={atLimit}
             />

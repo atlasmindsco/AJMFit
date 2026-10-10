@@ -416,6 +416,8 @@ export default function ProgramsPage() {
   const [myPrograms, setMyPrograms] = useState<CustomProgramRow[]>([])
   /** The program currently loaded, so it can be copied into the builder. */
   const [assignedProgramId, setAssignedProgramId] = useState<string | null>(null)
+  /** 'custom' when the client built the program they are on themselves. */
+  const [programSource, setProgramSource] = useState<string | null>(null)
   /** Set while the End Workout prompt is open, carrying the session tally. */
   const [confirmEnd, setConfirmEnd] = useState<{ logged: number; planned: number } | null>(null)
   /** Sets written down but not yet saved to the server. */
@@ -532,6 +534,7 @@ export default function ProgramsPage() {
     setCurrentProgram(loaded.program)
     setProgramLocation(loaded.location)
     setProgramGoal(loaded.goal)
+    setProgramSource(loaded.source)
     setHasAssigned(true)
   }, [])
 
@@ -799,6 +802,11 @@ export default function ProgramsPage() {
         await activateCustomProgram(userId, id)
         await applyLoadedProgram(id, userId)
         setSelectedDay(null)
+        // A Blueprint client with no program yet reaches the builder from the
+        // picker screen, and the picker outranks everything in the render
+        // order — leave this set and they land back on it having just built
+        // and started a program.
+        setShowPicker(false)
         setView('preview')
       } else {
         setMyPrograms(await fetchMyCustomPrograms(userId))
@@ -1306,11 +1314,61 @@ export default function ProgramsPage() {
     )
   }
 
+  /* The builder, for a client who has no program to anchor it to.
+     Four of thirteen users had no route to it at all: both screens below
+     return before `view` is consulted, so the fork living inside the main
+     layout was unreachable for anyone without a program.
+     It has to cover the whole flow, not just the fork. The first version
+     matched only view === 'startFrom', so the moment one of those clients
+     picked a door and `view` became 'builder' they fell straight back
+     through to the picker — the builder was unreachable one click in. */
+  if ((showPicker || !hasAssigned) && (view === 'startFrom' || view === 'builder')) {
+    return (
+      <div className="py-8">
+        {view === 'builder' && builderDraft ? (
+          <ProgramBuilder
+            initial={builderDraft}
+            library={exerciseDB}
+            saving={builderSaving}
+            editing={Boolean(builderEditingId)}
+            /* Always activates. Saving without starting is a choice that only
+               makes sense when you already have a program to keep training. */
+            onSave={(program) => void handleBuilderSave(program, true)}
+            onCancel={() => { setBuilderDraft(null); void openStartFrom() }}
+          />
+        ) : (
+          <StartFrom
+            followingId={null}
+            followingName={null}
+            atLimit={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
+            savedCount={myPrograms.length}
+            loadLibrary={fetchLibraryPrograms}
+            onCopy={(id) => openBuilder(id, null)}
+            onScratch={openBlankBuilder}
+            onPickReadyMade={showPicker ? () => setView('preview') : undefined}
+            onMyPrograms={openMyPrograms}
+            onCancel={() => setView('preview')}
+          />
+        )}
+      </div>
+    )
+  }
+
   // Blueprint member with no program yet → pick-your-program flow.
   if (showPicker) {
     return (
       <div className="py-8">
         <BlueprintPicker onDone={handlePickerDone} beginner={isBeginnerFlow} />
+        {/* The picker used to be the only way out of this screen, so a client
+            who wanted to build rather than choose had nowhere to go. */}
+        <div className="max-w-xl mx-auto mt-6 text-center">
+          <button
+            onClick={() => { setBuilderMoved(null); void openStartFrom() }}
+            className="text-white/40 hover:text-white/70 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+          >
+            Or build your own program
+          </button>
+        </div>
       </div>
     )
   }
@@ -1320,13 +1378,21 @@ export default function ProgramsPage() {
   // through to the placeholder and showed a program that did not exist.
   if (!hasAssigned) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
         <EmptyState
           title="No program assigned yet"
           line="Coach Anthony is putting yours together. He'll message you when it's ready."
           actionLabel="Message Anthony"
           actionHref="/studio/messages"
         />
+        {/* Waiting is not the only option. Two coached clients have sat on
+            this screen with no program — one of them for 168 days. */}
+        <button
+          onClick={() => { setBuilderMoved(null); void openStartFrom() }}
+          className="text-white/40 hover:text-white/70 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+        >
+          Or build your own in the meantime
+        </button>
       </div>
     )
   }
@@ -1503,14 +1569,21 @@ export default function ProgramsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {programLocation !== null && (
-                <button
-                  onClick={() => setShowPicker(true)}
-                  className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
-                >
-                  Change Program
-                </button>
-              )}
+              {/* The one front door for changing programs, ready-made or your
+                  own. It used to go straight to the Blueprint picker, so the
+                  builder was reachable only from two quiet buttons at the
+                  bottom of the Overview tab, below the fold, under the big
+                  blue CTA that looks like the end of the page. Nobody found
+                  them — including Anthony.
+                  Also no longer gated on programLocation: a custom program has
+                  no location, so the moment a client started training their
+                  own build, the button that got them there disappeared. */}
+              <button
+                onClick={() => { setBuilderMoved(null); void openStartFrom() }}
+                className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
+              >
+                Change Program
+              </button>
               <span className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
               </span>
@@ -1625,7 +1698,7 @@ export default function ProgramsPage() {
                       <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
                       {[
                         { label: 'Program', value: currentProgram.name },
-                        { label: 'Type', value: 'Sample routine' },
+                        { label: 'Type', value: programSource === 'custom' ? 'Built by you' : 'Sample routine' },
                         { label: 'Level', value: currentProgram.level },
                         { label: 'Training days', value: `${weeklyPlan.filter((d) => d.exercises.length > 0).length} / week` },
                       ].map((item) => (
@@ -3237,9 +3310,12 @@ export default function ProgramsPage() {
                 followingId={assignedProgramId}
                 followingName={currentProgram?.name ?? null}
                 atLimit={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
+                savedCount={myPrograms.length}
                 loadLibrary={fetchLibraryPrograms}
                 onCopy={(id) => openBuilder(id, null)}
                 onScratch={openBlankBuilder}
+                onPickReadyMade={() => { setView('preview'); setShowPicker(true) }}
+                onMyPrograms={openMyPrograms}
                 onCancel={() => setView('preview')}
               />
             </motion.div>
@@ -3320,6 +3396,7 @@ export default function ProgramsPage() {
                             await activateCustomProgram(userId, p.id)
                             await applyLoadedProgram(p.id, userId)
                             setSelectedDay(null)
+                            setShowPicker(false)
                             setView('preview')
                           }}
                           className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
