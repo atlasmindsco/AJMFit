@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import ProgramLibrary from '@/components/admin/ProgramLibrary'
+import { normaliseLibraryImages } from '@/lib/exercise-images'
 
 
 interface ExerciseDB {
@@ -57,7 +58,7 @@ export default function ProgramsPage() {
       fetch('/exercises/exercises.json')
         .then((res) => res.json())
         .then((data: ExerciseDB[]) => {
-          setExerciseDB(data)
+          setExerciseDB(normaliseLibraryImages(data))
           setLibLoading(false)
         })
         .catch(() => setLibLoading(false))

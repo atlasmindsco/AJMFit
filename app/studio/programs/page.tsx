@@ -43,6 +43,7 @@ import { enqueue, flushQueue, queueSize } from '@/lib/set-queue'
 import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
 import { judgeSet, type RecordHit } from '@/lib/records'
 import { cuesFor } from '@/lib/cues'
+import { normaliseLibraryImages } from '@/lib/exercise-images'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
 import { loadAssignedProgram, type BlueprintGoal, type BlueprintLocation, type PlanDay, type PlanProgram } from '@/lib/blueprint'
@@ -988,7 +989,7 @@ export default function ProgramsPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
-      .then((data: ExerciseDB[]) => setExerciseDB(data))
+      .then((data: ExerciseDB[]) => setExerciseDB(normaliseLibraryImages(data)))
       .catch((err) => console.error('[ExerciseDB] Failed to load:', err))
   }, [])
 

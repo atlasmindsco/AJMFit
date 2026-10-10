@@ -8,7 +8,7 @@
 
 export interface LibraryExercise {
   name: string
-  /** Full paths, straight from the library file. Not derivable from the name. */
+  /** Absolute URLs, straight from the library file. See lib/exercise-images.ts. */
   images: string[]
   primaryMuscles: string[]
   equipment: string

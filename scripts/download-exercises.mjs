@@ -22,6 +22,15 @@ const REPO_RAW = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/mai
 const EXERCISES_JSON_URL = `${REPO_RAW}/dist/exercises.json`
 const CONCURRENCY = 8
 
+// Must match EXERCISE_DB_COMMIT in lib/exercise-images.ts. Pinned to a commit,
+// not a branch: a branch URL means an upstream rename silently breaks every
+// image at once, with no deploy of ours to blame it on.
+const IMAGE_CDN_COMMIT = 'f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5'
+const IMAGE_CDN_BASE = `https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@${IMAGE_CDN_COMMIT}/exercises`
+
+// The local copies are now only useful offline — production reads the CDN.
+const WITH_LOCAL_IMAGES = process.argv.includes('--with-images')
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -74,17 +83,23 @@ async function main() {
   let skipped = 0
   let failed = 0
 
-  const imageJobs = allExercises.flatMap((ex) =>
-    (ex.images || []).map((imgPath) => ({
-      exercise: ex,
-      imgPath,
-      // e.g. "Ab_Roller/0.jpg" → "Ab_Roller-0.jpg"
-      localName: imgPath.replace('/', '-'),
-      url: `${REPO_RAW}/exercises/${imgPath}`,
-    }))
-  )
+  const imageJobs = !WITH_LOCAL_IMAGES
+    ? []
+    : allExercises.flatMap((ex) =>
+        (ex.images || []).map((imgPath) => ({
+          exercise: ex,
+          imgPath,
+          // e.g. "Ab_Roller/0.jpg" → "Ab_Roller-0.jpg"
+          localName: imgPath.replace('/', '-'),
+          url: `${REPO_RAW}/exercises/${imgPath}`,
+        }))
+      )
 
-  console.log(`Downloading ${imageJobs.length} images (${CONCURRENCY} concurrent)...`)
+  if (!WITH_LOCAL_IMAGES) {
+    console.log('Skipping images — the app reads them from the CDN. Pass --with-images for local copies.')
+  } else {
+    console.log(`Downloading ${imageJobs.length} images (${CONCURRENCY} concurrent)...`)
+  }
 
   await mapConcurrent(
     imageJobs,
@@ -112,7 +127,12 @@ async function main() {
 
   console.log(`Images done — ${downloaded} downloaded, ${skipped} skipped, ${failed} failed`)
 
-  // 3. Write cleaned JSON with local image paths
+  // 3. Write cleaned JSON with CDN image URLs.
+  //
+  // It used to write local paths, which was the bug: public/exercises/images/
+  // is gitignored and nothing on Vercel runs this script, so every stored
+  // path 404'd in production. The images now come from the dataset itself via
+  // jsDelivr, pinned to a commit. Keep this in step with lib/exercise-images.ts.
   const cleaned = allExercises.map((ex) => ({
     id: ex.id,
     name: ex.name,
@@ -124,7 +144,7 @@ async function main() {
     secondaryMuscles: ex.secondaryMuscles || [],
     instructions: ex.instructions || [],
     category: ex.category || 'strength',
-    images: (ex.images || []).map((p) => `/exercises/images/${p.replace('/', '-')}`),
+    images: (ex.images || []).map((p) => `${IMAGE_CDN_BASE}/${p}`),
   }))
 
   await writeFile(JSON_PATH, JSON.stringify(cleaned, null, 2))

@@ -147,9 +147,10 @@ export default function ExercisePickerSheet({
                   >
                     <div className="w-12 h-12 rounded-control overflow-hidden bg-[#0A0A0A] shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      {/* Paths come from the library file. The first guess
-                          here derived them from the exercise name, which is
-                          wrong: "3/4 Sit-Up" maps to "3_4_Sit-Up-0.jpg". */}
+                      {/* Absolute URLs from the library file — see
+                          lib/exercise-images.ts for why they are not local.
+                          A missing image leaves the dark square, which is
+                          quieter than a broken-image glyph. */}
                       {ex.images?.[0] && (
                         <img src={ex.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
                       )}
