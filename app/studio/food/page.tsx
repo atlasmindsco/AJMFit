@@ -16,6 +16,7 @@ import {
   type FoodPreferences,
 } from '@/lib/food-preferences'
 import { filterMeals, swapsFor, type Meal, type MealSlot } from '@/lib/meal-library'
+import { ingredientsFor } from '@/lib/meal-portions'
 import { OFF_PLAN_GUIDANCE, SITUATIONS, portionsFor } from '@/lib/portions'
 import { fetchNutritionSetup } from '@/lib/nutrition'
 import type { Sex } from '@/lib/nutrition-goals'
@@ -128,10 +129,11 @@ export default function FoodPage() {
           <button
             key={value}
             onClick={() => setTab(value)}
-            className={`px-4 py-2 rounded-control text-sm font-body font-medium whitespace-nowrap transition-colors ${
+            aria-pressed={tab === value}
+            className={`px-4 py-2.5 rounded-control text-sm font-display font-bold whitespace-nowrap border transition-colors ${
               tab === value
-                ? 'bg-brand-navy text-white'
-                : 'bg-brand-navy/[0.05] text-brand-navy/60 hover:bg-brand-navy/[0.09]'
+                ? 'bg-brand-navy border-brand-navy text-white shadow-sm'
+                : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
             }`}
           >
             {label}
@@ -272,16 +274,22 @@ export default function FoodPage() {
             </div>
           )}
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-4">
+          {/* Meal type.
+              These were 12px medium text at 60% opacity on a 5% tint — the
+              unselected ones barely registered as buttons, let alone as the
+              thing that switches the whole list. Reported as "really hard to
+              see". Now bold, uppercase, full-strength navy, on a tint with a
+              border, and bigger tap targets. */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             {SLOTS.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setSlot(s.value)}
-                className={`px-3.5 py-1.5 rounded-control text-xs font-body font-medium transition-colors ${
+                aria-pressed={slot === s.value}
+                className={`px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
                   slot === s.value
-                    ? 'bg-brand-blue text-white'
-                    : 'bg-brand-navy/[0.05] text-brand-navy/60 hover:bg-brand-navy/[0.09]'
+                    ? 'bg-brand-blue border-brand-blue text-white shadow-sm'
+                    : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
                 }`}
               >
                 {s.label}
@@ -289,10 +297,11 @@ export default function FoodPage() {
             ))}
             <button
               onClick={() => setQuickOnly((q) => !q)}
-              className={`ml-auto px-3.5 py-1.5 rounded-control text-xs font-body font-medium transition-colors ${
+              aria-pressed={quickOnly}
+              className={`ml-auto px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
                 quickOnly
-                  ? 'bg-brand-navy text-white'
-                  : 'bg-brand-navy/[0.05] text-brand-navy/60 hover:bg-brand-navy/[0.09]'
+                  ? 'bg-brand-navy border-brand-navy text-white shadow-sm'
+                  : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
               }`}
             >
               10 min or less
@@ -417,6 +426,7 @@ function MealCard({
   onToggle: () => void
 }) {
   const swaps = open ? swapsFor(meal, prefs) : []
+  const portions = ingredientsFor(meal.id)
   return (
     <div className="bg-white rounded-card border border-brand-navy/[0.06] p-4">
       <div className="flex items-start justify-between gap-3">
@@ -429,6 +439,22 @@ function MealCard({
         <span className="font-display font-bold text-brand-navy text-sm">{meal.calories} cal</span>
         <span className="text-brand-blue text-xs font-body font-semibold">{meal.protein}g protein</span>
       </div>
+
+      {/* How much of each thing. The card used to give a name and a macro line
+          and leave the client to guess whether that meant a small pot of
+          yoghurt or a large one — and the macros beside it only hold at one
+          portion size. These are the amounts those numbers are computed FROM,
+          so the two cannot disagree. */}
+      {portions.length > 0 && (
+        <ul className="mt-2.5 space-y-1">
+          {portions.map((x, i) => (
+            <li key={i} className="flex items-baseline gap-2 text-xs font-body">
+              <span className="font-display font-bold text-brand-navy shrink-0 tabular-nums">{x.amount}</span>
+              <span className="text-brand-navy/70 leading-snug">{x.food}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <button
         onClick={onToggle}
         className="mt-2.5 text-brand-slate hover:text-brand-navy text-xs font-body underline underline-offset-2 transition-colors"
