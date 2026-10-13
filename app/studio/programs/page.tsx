@@ -36,6 +36,8 @@ import {
   fetchMyCustomPrograms,
   fetchLibraryPrograms,
   deleteCustomProgram,
+  duplicateCustomProgram,
+  renameCustomProgram,
   MAX_CUSTOM_PROGRAMS,
   type BuilderProgram,
   type CustomProgramRow,
@@ -47,6 +49,9 @@ import { acquireWakeLock, releaseWakeLock, hasWakeLock } from '@/lib/wake-lock'
 import { judgeSet, type RecordHit } from '@/lib/records'
 import { cuesFor } from '@/lib/cues'
 import { boxPlaceholder, canLogSet, toLog } from '@/lib/set-entry'
+import { restSecondsAfterSet } from '@/lib/supersets'
+import { supabase } from '@/lib/supabase'
+import { submitFeedback } from '@/lib/feedback'
 import { normaliseLibraryImages } from '@/lib/exercise-images'
 import BlueprintPicker from '@/components/studio/BlueprintPicker'
 import EmptyState from '@/components/ui/EmptyState'
@@ -438,6 +443,8 @@ export default function ProgramsPage() {
   const [builderOriginal, setBuilderOriginal] = useState<BuilderProgram | null>(null)
   /** Set after a save that moved history, so the client is told rather than left guessing. */
   const [builderMoved, setBuilderMoved] = useState<number | null>(null)
+  /** The program being renamed in place on My programs. */
+  const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null)
   const [myPrograms, setMyPrograms] = useState<CustomProgramRow[]>([])
   /** The program currently loaded, so it can be copied into the builder. */
   const [assignedProgramId, setAssignedProgramId] = useState<string | null>(null)
@@ -798,6 +805,59 @@ export default function ProgramsPage() {
       }
     }
     setView('startFrom')
+  }
+
+  /**
+   * Save a rename, or quietly drop it.
+   *
+   * A blank name is treated as a cancel rather than an error: the field is
+   * already the only thing on screen, and refusing to close it over an empty
+   * string would trap someone who tapped Rename by mistake.
+   */
+  const commitRename = async () => {
+    const pending = renaming
+    if (!pending || !userId) { setRenaming(null); return }
+    const name = pending.name.trim().slice(0, 80)
+    setRenaming(null)
+    const current = myPrograms.find((p) => p.id === pending.id)?.name
+    if (!name || name === current) return
+    try {
+      await renameCustomProgram(pending.id, name)
+      setMyPrograms(await fetchMyCustomPrograms(userId))
+      // The header shows the name of the program they are ON, so it goes stale
+      // the moment that is the one being renamed.
+      if (assignedProgramId === pending.id) {
+        setCurrentProgram((prev) => (prev ? { ...prev, name } : prev))
+      }
+    } catch (err) {
+      console.error('[Builder] Rename failed:', err)
+    }
+  }
+
+  /**
+   * "I searched for this and the library had nothing."
+   *
+   * Goes to the same feedback table as the feedback button, so it lands on
+   * Anthony's dashboard beside everything else rather than in a new inbox
+   * nobody checks. The page is tagged so he can tell an exercise request from
+   * a bug report at a glance.
+   */
+  const requestExercise = async (term: string) => {
+    let name = ''
+    if (userId) {
+      const { data } = await supabase
+        .from('users')
+        .select('name')
+        .eq('id', userId)
+        .maybeSingle<{ name: string }>()
+      name = data?.name ?? ''
+    }
+    await submitFeedback({
+      userId,
+      name,
+      page: 'exercise-request',
+      message: `Couldn't find "${term}" in the exercise library.`,
+    })
   }
 
   /** The from-scratch path: a named, empty week at the chosen day count. */
@@ -1359,6 +1419,7 @@ export default function ProgramsPage() {
             /* Always activates. Saving without starting is a choice that only
                makes sense when you already have a program to keep training. */
             onSave={(program) => void handleBuilderSave(program, true)}
+            onRequestExercise={requestExercise}
             onCancel={() => { setBuilderDraft(null); void openStartFrom() }}
           />
         ) : (
@@ -2008,6 +2069,10 @@ export default function ProgramsPage() {
                           // always open: there is nothing to collapse it to.
                           const isOpen = sessionActive || expandedWorkoutExercise === exercise.name
                           const logKey = `${selectedDay}-${exercise.name}`
+                          // Where the superset round ends, and therefore where
+                          // the rest actually belongs.
+                          const lastInGroup =
+                            group.exercises[group.exercises.length - 1].exercise.name === exercise.name
                           const intensityEnabled = intensityOn[logKey] ?? false
                           const selectedTechnique = intensityChoice[logKey] ?? null
                           const workingSetCount = intensityEnabled ? Math.max(1, exercise.sets - 1) : exercise.sets
@@ -2612,7 +2677,12 @@ export default function ProgramsPage() {
                                               }
                                               if (next >= prescribed && si < currentLogs.length - 1) {
                                                 const restKey = `${selectedDay}-${exercise.name}`
-                                                startRestTimer(`${logKey}-set${si}`, restTimers[restKey] ?? parseRestSeconds(exercise.rest))
+                                                const secs = restSecondsAfterSet({
+                                                  prescribed: restTimers[restKey] ?? parseRestSeconds(exercise.rest),
+                                                  isSuperset: group.isSuperset,
+                                                  isLastInGroup: lastInGroup,
+                                                })
+                                                if (secs > 0) startRestTimer(`${logKey}-set${si}`, secs)
                                               }
                                             }
                                             return (
@@ -2840,8 +2910,16 @@ export default function ProgramsPage() {
                                           setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
                                           commitSet(si, updated)
                                           if (!isLastSet) {
+                                            // Zero between superset partners. Resting 90 seconds
+                                            // between the two movements you are meant to do back
+                                            // to back would make the pairing decorative.
                                             const restKey = `${selectedDay}-${exercise.name}`
-                                            startRestTimer(setTimerKey, restTimers[restKey] ?? parseRestSeconds(exercise.rest))
+                                            const secs = restSecondsAfterSet({
+                                              prescribed: restTimers[restKey] ?? parseRestSeconds(exercise.rest),
+                                              isSuperset: group.isSuperset,
+                                              isLastInGroup: lastInGroup,
+                                            })
+                                            if (secs > 0) startRestTimer(setTimerKey, secs)
                                           }
                                         }
 
@@ -3380,6 +3458,7 @@ export default function ProgramsPage() {
                 saving={builderSaving}
                 editing={Boolean(builderEditingId)}
                 onSave={handleBuilderSave}
+                onRequestExercise={requestExercise}
                 onCancel={() => { setBuilderDraft(null); setView('preview') }}
               />
             </motion.div>
@@ -3422,7 +3501,21 @@ export default function ProgramsPage() {
                     <div key={p.id} className="rounded-card bg-surface-raised border border-white/[0.10] px-4 py-3.5">
                       <div className="flex items-center gap-3">
                         <span className="min-w-0 flex-1">
-                          <span className="block text-white text-sm font-display font-bold truncate">{p.name}</span>
+                          {renaming?.id === p.id ? (
+                            // Inline, not a modal: renaming is one field and a
+                            // dialog for one field is a dialog too many.
+                            <input
+                              autoFocus
+                              value={renaming.name}
+                              onChange={(e) => setRenaming({ id: p.id, name: e.target.value })}
+                              onKeyDown={(e) => { if (e.key === 'Enter') void commitRename(); if (e.key === 'Escape') setRenaming(null) }}
+                              onBlur={() => void commitRename()}
+                              className="w-full px-2.5 py-1.5 rounded-control bg-white/[0.06] border border-brand-blue/40 text-white text-sm font-display font-bold focus:outline-none"
+                              aria-label="Program name"
+                            />
+                          ) : (
+                            <span className="block text-white text-sm font-display font-bold truncate">{p.name}</span>
+                          )}
                           <span className="block text-white/35 text-xs font-body mt-0.5">
                             {p.days_per_week ?? 0} {p.days_per_week === 1 ? 'day' : 'days'} a week
                           </span>
@@ -3447,16 +3540,39 @@ export default function ProgramsPage() {
                           Use
                         </button>
                       </div>
-                      <button
-                        onClick={async () => {
-                          if (!userId) return
-                          await deleteCustomProgram(p.id)
-                          setMyPrograms(await fetchMyCustomPrograms(userId))
-                        }}
-                        className="mt-2 text-white/25 hover:text-state-danger text-2xs font-body transition-colors duration-150"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center gap-4 mt-2">
+                        <button
+                          onClick={() => { setRenaming({ id: p.id, name: p.name }); }}
+                          className="text-white/25 hover:text-white/70 text-2xs font-body transition-colors duration-150"
+                        >
+                          Rename
+                        </button>
+                        {/* Try a variation without losing what works: duplicate
+                            the 5-day, cut it to 4, keep both. A duplicate is a
+                            program, not a switch — nothing changes about what
+                            they are training until they hit Use. */}
+                        <button
+                          onClick={async () => {
+                            if (!userId || myPrograms.length >= MAX_CUSTOM_PROGRAMS) return
+                            await duplicateCustomProgram(userId, p.id)
+                            setMyPrograms(await fetchMyCustomPrograms(userId))
+                          }}
+                          disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
+                          className="text-white/25 hover:text-white/70 disabled:opacity-40 text-2xs font-body transition-colors duration-150"
+                        >
+                          Duplicate
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!userId) return
+                            await deleteCustomProgram(p.id)
+                            setMyPrograms(await fetchMyCustomPrograms(userId))
+                          }}
+                          className="text-white/25 hover:text-state-danger text-2xs font-body transition-colors duration-150"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

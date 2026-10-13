@@ -16,7 +16,7 @@
 
 import { supabase } from '@/lib/supabase'
 import { fetchAssignmentStart } from '@/lib/programs'
-import { renamesFor, planRenameOps, type Rename } from '@/lib/day-renames'
+import { renamesFor, planRenameOps, nextCopyName, type Rename } from '@/lib/day-renames'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -40,6 +40,11 @@ export interface BuilderExercise {
   reps: string
   restSeconds: number
   notes?: string | null
+  /**
+   * Shared id for everything in one superset, null when it stands alone.
+   * Becomes the A1/A2 series letters the execution view already parses.
+   */
+  supersetGroup?: string | null
 }
 
 export interface BuilderDay {
@@ -134,7 +139,7 @@ export async function loadIntoBuilder(
 
   const { data: exs } = await db
     .from('program_exercises')
-    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, notes')
+    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, notes, superset_group')
     .in('program_day_id', dayRows.map((d) => d.id))
     .order('order_index', { ascending: true })
 
@@ -146,6 +151,7 @@ export async function loadIntoBuilder(
     reps: string | null
     rest_seconds: number | null
     notes: string | null
+    superset_group: string | null
   }>) {
     const list = byDay.get(e.program_day_id) ?? []
     list.push({
@@ -154,6 +160,7 @@ export async function loadIntoBuilder(
       reps: e.reps ?? '8-12',
       restSeconds: e.rest_seconds ?? 60,
       notes: e.notes,
+      supersetGroup: e.superset_group,
     })
     byDay.set(e.program_day_id, list)
   }
@@ -319,6 +326,7 @@ export async function saveCustomProgram(input: {
       reps: e.reps,
       rest_seconds: e.restSeconds,
       notes: e.notes ?? null,
+      superset_group: e.supersetGroup ?? null,
     }))
   )
   if (exerciseRows.length) {
@@ -359,6 +367,31 @@ export async function activateCustomProgram(userId: string, programId: string): 
 export async function deleteCustomProgram(programId: string): Promise<void> {
   const { error } = await db.from('programs').delete().eq('id', programId)
   if (error) throw error
+}
+
+/**
+ * Copy one of the client's own programs.
+ *
+ * The honest way to try something without losing what works: duplicate the
+ * 5-day, cut it to 4, keep both, train whichever suits the week. Deliberately
+ * NOT a copy of the assignment — a duplicate is a program, not a switch, and
+ * nothing changes about what they are training until they say so.
+ *
+ * The copy carries no day keys, so renaming a day on it migrates nothing. Its
+ * history starts when it is first assigned, which is what the rename boundary
+ * already assumes.
+ */
+export async function duplicateCustomProgram(userId: string, programId: string): Promise<string> {
+  const source = await loadIntoBuilder(programId)
+  if (!source) throw new Error('Could not read that program')
+  // Their existing names, so a second duplicate becomes "(copy 2)" rather than
+  // a second row with an identical name and no way to tell them apart.
+  const mine = await fetchMyCustomPrograms(userId)
+  const { programId: copy } = await saveCustomProgram({
+    userId,
+    program: { ...source, name: nextCopyName(source.name, mine.map((p) => p.name)) },
+  })
+  return copy
 }
 
 export async function renameCustomProgram(programId: string, name: string): Promise<void> {

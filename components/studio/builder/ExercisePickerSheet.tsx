@@ -27,6 +27,7 @@ export default function ExercisePickerSheet({
   openOnGroup,
   onAdd,
   onClose,
+  onRequestExercise,
 }: {
   library: LibraryExercise[]
   /** Names already in this day, so a duplicate is obvious rather than silent. */
@@ -34,12 +35,30 @@ export default function ExercisePickerSheet({
   openOnGroup: string | null
   onAdd: (exercise: LibraryExercise) => void
   onClose: () => void
+  /** Send what they searched for to Anthony, when the library has nothing. */
+  onRequestExercise: (term: string) => Promise<void>
 }) {
   const [search, setSearch] = useState('')
   const [group, setGroup] = useState<string | null>(openOnGroup)
   const [equipment, setEquipment] = useState('any')
   const [type, setType] = useState('any')
   const [justAdded, setJustAdded] = useState<string[]>([])
+  /** Which search terms have already been sent, so one tap is one message. */
+  const [requestedTerms, setRequestedTerms] = useState<string[]>([])
+  const requested = requestedTerms.includes(search.trim().toLowerCase())
+
+  const onRequest = async () => {
+    const term = search.trim()
+    if (!term || requested) return
+    // Recorded optimistically. A failed send is not worth an error state here
+    // — the client's actual job is finding an exercise, not filing a ticket.
+    setRequestedTerms((prev) => [...prev, term.toLowerCase()])
+    try {
+      await onRequestExercise(term)
+    } catch {
+      /* swallowed on purpose */
+    }
+  }
 
   const results = useMemo(
     () => filterLibrary(library, { search, group, equipment, type }),
@@ -132,8 +151,26 @@ export default function ExercisePickerSheet({
             <div className="p-8 text-center">
               <p className="text-white/40 text-sm font-body">Nothing matches that.</p>
               <p className="text-white/25 text-xs font-body mt-1">
-                Try fewer filters. If it genuinely isn&rsquo;t here, tell Anthony and he&rsquo;ll add it.
+                Try fewer filters. If it genuinely isn&rsquo;t here, Anthony can add it.
               </p>
+              {/* "Tell Anthony" used to be advice with nothing behind it — the
+                  client had to go and find the messages screen, so nobody did,
+                  and the one person who knows what is missing from an 873
+                  exercise library never heard about it. One tap now. */}
+              {search.trim().length > 1 && (
+                <button
+                  onClick={onRequest}
+                  disabled={requested}
+                  className="mt-4 px-4 py-2.5 rounded-control bg-brand-blue/15 border border-brand-blue/30 text-brand-blue text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 disabled:opacity-50 active:scale-[0.98] transition-all duration-150"
+                >
+                  {requested ? 'Sent to Anthony ✓' : `Ask Anthony to add "${search.trim().slice(0, 28)}"`}
+                </button>
+              )}
+              {requested && (
+                <p className="text-white/30 text-2xs font-body mt-2">
+                  He&rsquo;ll see it with the rest of your feedback.
+                </p>
+              )}
             </div>
           ) : (
             <>

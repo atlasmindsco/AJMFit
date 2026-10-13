@@ -18,6 +18,7 @@ import ExercisePickerSheet from './ExercisePickerSheet'
 import ExerciseConfigSheet from './ExerciseConfigSheet'
 import ProgramReview from './ProgramReview'
 import { reviewProgram, volumeOf, healthSummary } from '@/lib/program-health'
+import { seriesLabels, canPair, newSupersetId } from '@/lib/supersets'
 import {
   canSave,
   defaultPrescription,
@@ -35,6 +36,7 @@ export default function ProgramBuilder({
   editing = false,
   onSave,
   onCancel,
+  onRequestExercise,
 }: {
   initial: BuilderProgram
   library: LibraryExercise[]
@@ -46,6 +48,8 @@ export default function ProgramBuilder({
   editing?: boolean
   onSave: (program: BuilderProgram, activate: boolean) => void
   onCancel: () => void
+  /** Tell Anthony the library is missing something. */
+  onRequestExercise: (term: string) => Promise<void>
 }) {
   const [program, setProgram] = useState<BuilderProgram>(initial)
   const [openDay, setOpenDay] = useState<number | null>(null)
@@ -117,9 +121,48 @@ export default function ProgramBuilder({
     setDay(openDay, { ...day, exercises: next })
   }
 
+  /**
+   * Pair an exercise with the one below it, or unpair it.
+   *
+   * Pairing with the NEXT exercise rather than offering a picker, because that
+   * is how a superset is written on paper and it keeps partners adjacent —
+   * which is what makes the day read correctly in the workout screen.
+   */
+  const togglePair = (i: number) => {
+    if (openDay == null || !day) return
+    const list = [...day.exercises]
+    const mine = list[i].supersetGroup
+    const theirs = list[i + 1]?.supersetGroup
+
+    if (mine && mine === theirs) {
+      // Already paired with the next one: break this exercise out. Anything
+      // left alone in the group stops being a superset on its own.
+      const remaining = list.filter((e, j) => j !== i && e.supersetGroup === mine)
+      list[i] = { ...list[i], supersetGroup: null }
+      if (remaining.length === 1) {
+        const j = list.findIndex((e) => e.supersetGroup === mine)
+        if (j !== -1) list[j] = { ...list[j], supersetGroup: null }
+      }
+      setDay(openDay, { ...day, exercises: list })
+      return
+    }
+
+    if (i + 1 >= list.length) return
+    // Join the next exercise's group if it has one and has room, else start one.
+    const target = theirs ?? null
+    const size = target ? list.filter((e) => e.supersetGroup === target).length : 1
+    if (target && !canPair(size)) return
+    const id = target ?? newSupersetId(list.map((e) => e.supersetGroup))
+    list[i] = { ...list[i], supersetGroup: id }
+    list[i + 1] = { ...list[i + 1], supersetGroup: id }
+    setDay(openDay, { ...day, exercises: list })
+  }
+
   /* ---------------------------------------------------------------- day view */
   if (day && openDay != null) {
     const minutes = estimateMinutes(day.exercises)
+    // The A1/A2 letters, exactly as the workout screen will show them.
+    const labels = seriesLabels(day.exercises)
     return (
       <div className="max-w-xl mx-auto pb-24">
         <div className="flex items-center gap-3 mb-4">
@@ -153,10 +196,27 @@ export default function ProgramBuilder({
           </p>
         ) : (
           <div className="space-y-2">
-            {day.exercises.map((ex, i) => (
-              <div key={`${ex.exerciseName}-${i}`} className="rounded-card bg-surface-raised border border-white/[0.10] px-3.5 py-3">
+            {day.exercises.map((ex, i) => {
+              const pairedWithNext =
+                Boolean(ex.supersetGroup) && ex.supersetGroup === day.exercises[i + 1]?.supersetGroup
+              const pairedWithPrev =
+                Boolean(ex.supersetGroup) && ex.supersetGroup === day.exercises[i - 1]?.supersetGroup
+              const inSuperset = pairedWithNext || pairedWithPrev
+              return (
+              <div
+                key={`${ex.exerciseName}-${i}`}
+                className={`rounded-card bg-surface-raised border px-3.5 py-3 ${
+                  inSuperset ? 'border-state-success/30' : 'border-white/[0.10]'
+                } ${pairedWithPrev ? 'mt-1' : ''}`}
+              >
                 <div className="flex items-start gap-3">
-                  <span className="text-white/25 text-xs font-display font-bold mt-1 w-4 shrink-0">{i + 1}</span>
+                  <span
+                    className={`text-xs font-display font-bold mt-1 w-4 shrink-0 ${
+                      inSuperset ? 'text-state-success' : 'text-white/25'
+                    }`}
+                  >
+                    {inSuperset ? labels[i] : i + 1}
+                  </span>
                   <button
                     onClick={() => setConfiguring(i)}
                     className="flex-1 min-w-0 text-left"
@@ -195,9 +255,31 @@ export default function ProgramBuilder({
                     &times;
                   </button>
                 </div>
+
+                {/* Pair with the one below. Offered on every exercise but the
+                    last, because a superset needs something to pair WITH. */}
+                {i < day.exercises.length - 1 && (
+                  <button
+                    onClick={() => togglePair(i)}
+                    className={`mt-2 ml-7 px-2.5 py-1 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-colors duration-150 ${
+                      pairedWithNext
+                        ? 'bg-state-success/15 text-state-success hover:bg-state-success/25'
+                        : 'bg-white/[0.05] text-white/35 hover:text-white/70'
+                    }`}
+                  >
+                    {pairedWithNext ? 'Superset ✓' : 'Superset with next'}
+                  </button>
+                )}
               </div>
-            ))}
+              )
+            })}
           </div>
+        )}
+
+        {day.exercises.some((e) => e.supersetGroup) && (
+          <p className="text-white/30 text-2xs font-body mt-3 leading-relaxed">
+            Supersets run back to back with no rest between them. You rest after the last one.
+          </p>
         )}
 
         <button
@@ -220,6 +302,7 @@ export default function ProgramBuilder({
               alreadyAdded={day.exercises.map((e) => e.exerciseName)}
               openOnGroup={dominantGroup(day.exercises.map((e) => e.exerciseName), byName)}
               onAdd={addExercise}
+              onRequestExercise={onRequestExercise}
               onClose={() => setPicking(false)}
             />
           )}

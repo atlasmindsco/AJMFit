@@ -85,3 +85,24 @@ export function planRenameOps(renames: Rename[]): Rename[] {
 
   return [...ops, ...deferred]
 }
+
+/**
+ * "Push Pull Legs" → "Push Pull Legs (copy)" → "Push Pull Legs (copy 2)".
+ *
+ * Capped at the column's 80 characters, trimming the NAME rather than the
+ * suffix, so a long name still ends in something that reads as a copy instead
+ * of being cut off mid-word with no marker at all.
+ */
+export function nextCopyName(name: string, existing: string[] = []): string {
+  const base = name.replace(/\s*\(copy(?:\s+\d+)?\)$/i, '').trim() || 'My program'
+  const taken = new Set(existing.map((n) => n.toLowerCase()))
+  const fit = (suffix: string) => `${base.slice(0, 80 - suffix.length)}${suffix}`
+
+  const first = fit(' (copy)')
+  if (!taken.has(first.toLowerCase())) return first
+  for (let i = 2; i < 100; i++) {
+    const next = fit(` (copy ${i})`)
+    if (!taken.has(next.toLowerCase())) return next
+  }
+  return fit(` (copy ${Date.now() % 1000})`)
+}

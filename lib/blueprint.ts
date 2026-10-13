@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { BlueprintGoal, BlueprintLocation } from '@/lib/splits'
+import { seriesLabels } from '@/lib/supersets'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -107,13 +108,18 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
 
   const weeklyPlan: PlanDay[] = dayRows.map((d, i) => {
     const list = (byDay.get(d.id) ?? []).sort((a, b) => a.order_index - b.order_index)
+    // A1/A2 for anything paired, plain A/B/C otherwise. The execution view has
+    // always grouped by these letters and shown a Superset badge for a shared
+    // one; nothing ever produced them, because this line handed out a letter
+    // per position regardless of superset_group. The 68 seeded programs carry
+    // no groups, so they are unaffected.
+    const labels = seriesLabels(list.map((e) => ({ supersetGroup: e.superset_group })))
     const exercises: PlanExercise[] = list.map((e, xi) => ({
       name: e.exercise_name,
       sets: e.sets ?? 3,
       reps: e.reps ?? '10',
       rest: e.rest_seconds ? `${e.rest_seconds}s` : '60s',
-      // Blueprint programs have no supersets, so a plain A/B/C per exercise.
-      series: String.fromCharCode(65 + xi),
+      series: labels[xi],
     }))
     return {
       day: `Day ${i + 1}`,
