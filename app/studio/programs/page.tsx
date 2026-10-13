@@ -50,6 +50,7 @@ import { judgeSet, type RecordHit } from '@/lib/records'
 import { cuesFor } from '@/lib/cues'
 import { boxPlaceholder, canLogSet, toLog } from '@/lib/set-entry'
 import { restSecondsAfterSet } from '@/lib/supersets'
+import { isHold, parseHoldSeconds, HOLD_PRESETS, holdLabel } from '@/lib/holds'
 import { supabase } from '@/lib/supabase'
 import { submitFeedback } from '@/lib/feedback'
 import { normaliseLibraryImages } from '@/lib/exercise-images'
@@ -2084,7 +2085,12 @@ export default function ProgramsPage() {
                           // A run is not a set of anything. Timed work gets a
                           // duration field instead of weight-by-reps rows, so
                           // the set list is deliberately empty for it.
-                          const timed = isTimedPrescription(exercise.reps)
+                          // A plank is held, not repeated — and "60 sec" looks
+                          // timed to the check above, which would collapse
+                          // three planks into one stopwatch. A hold keeps its
+                          // set rows and swaps the rep box for seconds.
+                          const hold = isHold(matchedExercises.get(exercise.name) ?? null)
+                          const timed = isTimedPrescription(exercise.reps) && !hold
                           // Sprints, jumps and throws are prescribed in reps, so
                           // they reach the set grid and get asked how much weight
                           // they sprinted with. The hybrid athlete on Complete
@@ -2120,11 +2126,17 @@ export default function ProgramsPage() {
                             weight: target?.suggestedWeight != null ? String(target.suggestedWeight) : '',
                             // An explosive slot has no load, but the prescribed
                             // effort count is still worth putting in the box.
-                            reps: explosive
-                              ? String(parseRepRange(exercise.reps)?.min ?? '')
-                              : target?.suggestedReps != null
-                                ? String(target.suggestedReps)
-                                : '',
+                            // A hold is prescribed in seconds, so the box should
+                            // propose seconds. The progression engine reads
+                            // "45 sec" as a rep range and would otherwise
+                            // suggest adding a rep to a plank.
+                            reps: hold
+                              ? String(parseHoldSeconds(exercise.reps) ?? '')
+                              : explosive
+                                ? String(parseRepRange(exercise.reps)?.min ?? '')
+                                : target?.suggestedReps != null
+                                  ? String(target.suggestedReps)
+                                  : '',
                           }
                           /** The set the client is on: the first one not yet confirmed. */
                           const activeSet = currentLogs.findIndex((l) => !l.logged)
@@ -2777,7 +2789,7 @@ export default function ProgramsPage() {
                                           {needsWeight && (
                                             <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
                                           )}
-                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">{explosive ? 'Efforts' : 'Reps'}</span>
+                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">{hold ? 'Seconds' : explosive ? 'Efforts' : 'Reps'}</span>
                                           <span />
                                         </div>
                                       )}
@@ -2983,12 +2995,12 @@ export default function ProgramsPage() {
                                               <input
                                                 type="number"
                                                 inputMode="numeric"
-                                                placeholder={boxPlaceholder(repsEntry, prevReps, explosive ? 'efforts' : 'reps')}
+                                                placeholder={boxPlaceholder(repsEntry, prevReps, hold ? 'secs' : explosive ? 'efforts' : 'reps')}
                                                 value={log.reps}
                                                 onFocus={selectAllOnFocus}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
                                                 className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-white/35' : 'placeholder:text-white/20'}`}
-                                                aria-label={`Set ${si + 1} ${explosive ? 'efforts' : 'reps'}`}
+                                                aria-label={`Set ${si + 1} ${hold ? 'seconds held' : explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
@@ -3032,6 +3044,29 @@ export default function ProgramsPage() {
                                               >
                                                 Log set {si + 1}
                                               </button>
+                                            )}
+
+                                            {/* One tap for a plank, rather than
+                                                a number pad for a round number.
+                                                Only on the set being worked on,
+                                                so a five-set exercise does not
+                                                turn into five rows of buttons. */}
+                                            {hold && isActive && !filled && (
+                                              <div className="flex flex-wrap gap-1.5 ml-8 mr-10 mt-1.5 mb-1">
+                                                {HOLD_PRESETS.map((secs) => (
+                                                  <button
+                                                    key={secs}
+                                                    onClick={() => handleLogChange('reps', String(secs))}
+                                                    className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                      shownReps === String(secs)
+                                                        ? 'bg-brand-blue text-white'
+                                                        : 'bg-white/[0.05] text-white/50 hover:text-white'
+                                                    }`}
+                                                  >
+                                                    {holdLabel(secs)}
+                                                  </button>
+                                                ))}
+                                              </div>
                                             )}
 
                                             {bodyweightLooking && (
@@ -3270,7 +3305,7 @@ export default function ProgramsPage() {
                                           row session read "Target: 20 min reps". */}
                                       {!timed && (
                                         <p className="text-white/20 text-2xs font-body mt-2 text-center">
-                                          Target: {exercise.reps} {explosive ? 'efforts' : 'reps'}
+                                          Target: {exercise.reps}{hold ? '' : explosive ? ' efforts' : ' reps'}
                                         </p>
                                       )}
 

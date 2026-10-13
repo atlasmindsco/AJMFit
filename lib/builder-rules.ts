@@ -6,6 +6,8 @@
  * doing and one that makes you fix every row.
  */
 
+import { isHold, formatHold, DEFAULT_HOLD_SECONDS } from '@/lib/holds'
+
 export interface LibraryExercise {
   name: string
   /** Absolute URLs, straight from the library file. See lib/exercise-images.ts. */
@@ -100,6 +102,8 @@ export function filterLibrary(all: LibraryExercise[], f: PickerFilters): Library
  */
 export function defaultRestSeconds(e: LibraryExercise): number {
   if (e.category === 'cardio' || e.category === 'stretching') return 0
+  // A plank is not a heavy single. 45s is enough to go again.
+  if (isHold(e)) return 45
   if (e.category === 'plyometrics' || e.category === 'olympic weightlifting') return 120
   if (e.mechanic === 'isolation') return 60
   // Compound: heavier with a bar than with a machine.
@@ -111,6 +115,10 @@ export function defaultRestSeconds(e: LibraryExercise): number {
 export function defaultPrescription(e: LibraryExercise): { sets: number; reps: string } {
   if (e.category === 'cardio') return { sets: 1, reps: '20 min' }
   if (e.category === 'stretching') return { sets: 1, reps: '30 sec' }
+  // Held, not repeated. "3 x 12" of a plank is nonsense, and it is what this
+  // produced until a client pointed it out. force === 'static' is the
+  // library's own field, covering Plank, Side Bridge and the isometric work.
+  if (isHold(e)) return { sets: 3, reps: formatHold(DEFAULT_HOLD_SECONDS) }
   if (e.category === 'plyometrics') return { sets: 4, reps: '3' }
   if (e.mechanic === 'isolation') return { sets: 3, reps: '12-15' }
   return { sets: 3, reps: '8-12' }

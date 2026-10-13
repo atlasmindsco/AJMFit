@@ -32,6 +32,26 @@ const LOCATIONS = [
   { key: 'home', label: 'Home', pick: (ex) => ex.home },
 ]
 
+/**
+ * Held, not repeated — read from the exercise library's own `force` field.
+ *
+ * Mirrors isHold / holdSecondsFromReps in lib/holds.ts, which this script
+ * cannot import. Three seconds a "rep", landing 2x10, 3x15 and 3x20 exactly on
+ * 30, 45 and 60 seconds. Keep the two in step.
+ */
+const EXERCISE_DB = JSON.parse(
+  readFileSync(new URL('../../public/exercises/exercises.json', import.meta.url), 'utf8')
+)
+const FORCE_BY_NAME = new Map(EXERCISE_DB.map((e) => [e.name, e.force]))
+const isStaticHold = (name) => FORCE_BY_NAME.get(name) === 'static'
+
+function holdPrescription(reps) {
+  const n = parseInt(String(reps ?? ''), 10)
+  if (!Number.isFinite(n)) return '45 sec'
+  const seconds = Math.min(120, Math.max(15, Math.round(n * 3)))
+  return seconds % 60 === 0 && seconds >= 60 ? `${seconds / 60} min` : `${seconds} sec`
+}
+
 // ---- build the full plan in memory (so dry-run shows exactly what will write) ----
 const plan = []
 for (const [goalKey, goal] of Object.entries(goals)) {
@@ -54,11 +74,16 @@ for (const [goalKey, goal] of Object.entries(goals)) {
           notes: notes || null,
           exercises: d.exercises.map((ex, xi) => {
             const scheme = goal.byRole[ex.role] || {}
+            const name = loc.pick(ex)
             return {
               order_index: xi + 1,
-              exercise_name: loc.pick(ex),
+              exercise_name: name,
               sets: scheme.sets ?? null,
-              reps: scheme.reps ?? null,
+              // A held exercise gets seconds, not a rep count. The plank's
+              // role is "core" like any crunch, so the goal scheme handed it
+              // 2x10 / 3x15 / 3x20 — 45 slots of nonsense across the 68
+              // programs, which is what a client reported.
+              reps: isStaticHold(name) ? holdPrescription(scheme.reps) : (scheme.reps ?? null),
               rest_seconds: scheme.rest_seconds ?? null,
               tempo: null,
               superset_group: null,

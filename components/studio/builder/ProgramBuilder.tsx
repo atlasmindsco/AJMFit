@@ -309,6 +309,7 @@ export default function ProgramBuilder({
           {configuring != null && day.exercises[configuring] && (
             <ExerciseConfigSheet
               exercise={day.exercises[configuring]}
+              library={byName(day.exercises[configuring].exerciseName)}
               onSave={(next) =>
                 setDay(openDay, {
                   ...day,

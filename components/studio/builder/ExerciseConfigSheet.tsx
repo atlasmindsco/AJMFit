@@ -14,27 +14,34 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { REP_PRESETS, REST_PRESETS } from '@/lib/builder-rules'
+import { HOLD_PRESETS, formatHold, isHold } from '@/lib/holds'
 import type { BuilderExercise } from '@/lib/custom-program'
 
 const restLabel = (s: number) => (s === 0 ? 'None' : s < 60 ? `${s}s` : s % 60 === 0 ? `${s / 60} min` : `${Math.floor(s / 60)}m ${s % 60}s`)
 
 export default function ExerciseConfigSheet({
   exercise,
+  library,
   onSave,
   onClose,
 }: {
   exercise: BuilderExercise
+  /** The library record, so a held exercise can be offered seconds. */
+  library: { force?: string | null } | null
   onSave: (next: BuilderExercise) => void
   onClose: () => void
 }) {
+  const hold = isHold(library)
   const [sets, setSets] = useState(exercise.sets)
   const [reps, setReps] = useState(exercise.reps)
   const [rest, setRest] = useState(exercise.restSeconds)
   const [notes, setNotes] = useState(exercise.notes ?? '')
-  const [customReps, setCustomReps] = useState(!REP_PRESETS.includes(exercise.reps))
+  const [customReps, setCustomReps] = useState(
+    !REP_PRESETS.includes(exercise.reps) && !HOLD_PRESETS.map(formatHold).includes(exercise.reps)
+  )
 
   const commit = () => {
-    onSave({ ...exercise, sets, reps: reps.trim() || '8-12', restSeconds: rest, notes: notes.trim() || null })
+    onSave({ ...exercise, sets, reps: reps.trim() || (hold ? formatHold(45) : '8-12'), restSeconds: rest, notes: notes.trim() || null })
     onClose()
   }
 
@@ -71,9 +78,14 @@ export default function ExerciseConfigSheet({
           </button>
         </div>
 
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Reps</p>
+        {/* A plank is held, not repeated. The library says which exercises
+            those are (force === 'static'), and asking for a rep count on one
+            is what Alex reported from a real session. */}
+        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">
+          {hold ? 'Hold for' : 'Reps'}
+        </p>
         <div className="flex flex-wrap gap-1.5">
-          {REP_PRESETS.map((r) => (
+          {(hold ? HOLD_PRESETS.map(formatHold) : REP_PRESETS).map((r) => (
             <button
               key={r}
               onClick={() => { setReps(r); setCustomReps(false) }}
@@ -97,7 +109,7 @@ export default function ExerciseConfigSheet({
           <input
             value={reps}
             onChange={(e) => setReps(e.target.value)}
-            placeholder="e.g. 5, or 20 min"
+            placeholder={hold ? "e.g. 75 sec" : "e.g. 5, or 20 min"}
             className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
           />
         )}
