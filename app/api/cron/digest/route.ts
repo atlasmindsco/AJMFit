@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendMail } from '@/lib/email'
+import { runNutritionReview } from '@/lib/nutrition-review-run'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,6 +36,11 @@ export async function GET(request: Request) {
   } else if (!request.headers.get('x-vercel-cron')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // The other two crons have had a dry mode from the start; this one did
+  // not, so the only way to check it was to send Anthony a real email — which
+  // is exactly what happened the first time it was exercised.
+  const dryRun = new URL(request.url).searchParams.get('dry') === '1'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
@@ -95,6 +101,32 @@ export async function GET(request: Request) {
       await admin.from('cron_runs').insert({ job: 'digest', summary, ok: true })
     } catch {
       // A missing log must never stop the digest going out.
+    }
+  }
+
+  // The weekly nutrition review rides along on Mondays.
+  //
+  // It used to be a third scheduled job, and three is more than Vercel's Hobby
+  // plan allows — the most likely reason none of the three has ever run, since
+  // cron_runs is empty while the endpoints themselves answer correctly. Two
+  // daily jobs work on every plan. The review's own route still exists for
+  // running it by hand.
+  if (new Date().getUTCDay() === 1) {
+    try {
+      const review = await runNutritionReview(admin)
+      await admin.from('cron_runs').insert({
+        job: 'nutrition-review',
+        summary: `${review.clients} reviewed, ${review.proposed} proposed, ${review.applied} applied, ${review.escalated} escalated`,
+        ok: true,
+      })
+    } catch (e) {
+      // The digest is the coach's daily picture and matters more than this.
+      console.error('[cron/digest] nutrition review failed', e)
+      try {
+        await admin.from('cron_runs').insert({ job: 'nutrition-review', summary: `failed: ${String(e)}`, ok: false })
+      } catch {
+        /* nothing more to do */
+      }
     }
   }
 
@@ -210,6 +242,10 @@ export async function GET(request: Request) {
   ]
     .filter(Boolean)
     .join(' · ')
+
+  if (dryRun) {
+    return NextResponse.json({ ok: true, dryRun: true, wouldSend: headline, applications: pendingRows.length })
+  }
 
   try {
     await sendMail({

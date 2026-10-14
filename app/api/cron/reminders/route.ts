@@ -40,8 +40,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const dryRun = new URL(request.url).searchParams.get('dry') === '1'
+  const url = new URL(request.url)
+  const dryRun = url.searchParams.get('dry') === '1'
+
+  // `?dry=1&hour=N` answers "who would this send to at 6pm" without waiting
+  // until 6pm. Dry run only, so it can never cause a real send at the wrong
+  // time. Without it the only way to check this job was to be awake when it
+  // ran, which is how it went months without anyone noticing it sent nothing.
   const now = new Date()
+  const hourOverride = dryRun ? Number(url.searchParams.get('hour')) : NaN
+  if (Number.isInteger(hourOverride) && hourOverride >= 0 && hourOverride <= 23) {
+    now.setUTCHours(now.getUTCHours() + (hourOverride - Number(
+      new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', hour: '2-digit', hour12: false }).format(now)
+    ) % 24))
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any
@@ -125,8 +137,19 @@ export async function GET(request: Request) {
 
   for (const u of active) {
     const prefs = prefsOf[u.id] ?? DEFAULT_PREFS
-    // Only at the client's chosen hour, in their own timezone.
-    if (localHourFor(u.timezone, now) !== prefs.send_hour) continue
+    // At or after their hour, not exactly on it.
+    //
+    // An equality test means one specific hour a day is the only moment a
+    // reminder can go out, so a run that is late, retried, or scheduled daily
+    // rather than hourly reaches nobody at all. Vercel only guarantees an
+    // approximate time, and on the Hobby plan a cron runs once a day at an
+    // hour it chooses — against `!==` that is a system that almost never
+    // fires. Sending at or after their hour works on either plan.
+    //
+    // Nobody gets two: sendReminder claims the occurrence key in
+    // notifications_sent before it sends, so a later run the same day finds
+    // the claim taken and stops.
+    if (localHourFor(u.timezone, now) < prefs.send_hour) continue
     considered++
 
     const tier = tierOf[u.id]

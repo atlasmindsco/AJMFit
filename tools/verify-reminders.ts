@@ -29,16 +29,22 @@ const client = (over: Partial<ClientSnapshot> = {}): ClientSnapshot => ({
 console.log('THE QUIET LADDER\n')
 {
   // Last workout 1 Oct 2026 (a Thursday).
+  //
+  // A rung stays REACHED rather than firing on one exact day. Days 5 and 6
+  // still return quiet_4d, and the send is stopped by the unique index on
+  // (user_id, kind, occurrence_key) rather than by this function going quiet —
+  // because a rung that exists for one day only is a rung a missed cron run
+  // skips for good.
   const rungs: Array<[string, number, string | null]> = [
     ['2026-10-01', 0, null],
     ['2026-10-02', 1, null],
     ['2026-10-03', 2, null],
     ['2026-10-04', 3, null],
     ['2026-10-05', 4, 'quiet_4d'],
-    ['2026-10-06', 5, null],
-    ['2026-10-07', 6, null],
+    ['2026-10-06', 5, 'quiet_4d'],
+    ['2026-10-07', 6, 'quiet_4d'],
     ['2026-10-08', 7, 'quiet_7d'],
-    ['2026-10-09', 8, null],
+    ['2026-10-09', 8, 'quiet_7d'],
     ['2026-10-11', 10, null],
     ['2026-10-21', 20, null],
   ]
@@ -173,7 +179,10 @@ console.log('\nDATES AND TIMEZONES\n')
   // A client five hours behind UTC is on the previous day late at night.
   const lateUtc = new Date('2026-10-06T02:00:00Z')
   g('New York is still on the 5th', localDateFor('America/New_York', lateUtc) === '2026-10-05', localDateFor('America/New_York', lateUtc))
-  g('UTC is on the 6th', localDateFor(null, lateUtc) === '2026-10-06')
+  // No timezone on the row now means the business timezone, not UTC. Every
+  // user row in production has a null timezone, and a UTC fallback put the
+  // 6pm 'evening' nudge at 2pm Eastern for all of them.
+  g('an unset timezone follows New York', localDateFor(null, lateUtc) === '2026-10-05', localDateFor(null, lateUtc))
   g('a bad timezone falls back safely', localDateFor('Not/AZone', lateUtc) === '2026-10-06')
 
   g('local hour in New York', localHourFor('America/New_York', lateUtc) === 22, String(localHourFor('America/New_York', lateUtc)))

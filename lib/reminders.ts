@@ -155,7 +155,20 @@ export function dueReminder(client: ClientSnapshot, today: string): DueReminder 
   if (prefs.training && client.lastWorkoutDate) {
     const quiet = daysBetween(client.lastWorkoutDate, today)
     if (quiet < QUIET_CEILING_DAYS) {
-      const rung = QUIET_RUNGS.find((r) => r.day === quiet)
+      // The highest rung they have REACHED, not the one they land on exactly.
+      //
+      // `r.day === quiet` meant a rung only existed for one day. Miss that day
+      // — a cron that does not run, a client whose local date rolls over
+      // differently, a run that fails and retries tomorrow — and the nudge is
+      // gone for good rather than late. With a once-daily job that is a real
+      // chance of silence every time.
+      //
+      // Sending once per quiet spell instead: the occurrence key is the last
+      // workout date, which is fixed for as long as they stay quiet, and each
+      // rung claims under its own kind. So day 4 sends quiet_4d, days 5 and 6
+      // find the claim taken, day 7 sends quiet_7d, and days 8 and 9 are quiet
+      // again.
+      const rung = [...QUIET_RUNGS].reverse().find((r) => quiet >= r.day)
       if (rung) {
         return {
           userId: client.userId,
@@ -236,7 +249,7 @@ export function mondayOf(date: string): string {
 
 /** Today's date in a client's own timezone, falling back to the server's. */
 export function localDateFor(timezone: string | null, now: Date = new Date()): string {
-  if (!timezone) return now.toISOString().slice(0, 10)
+  timezone = timezone || DEFAULT_TIMEZONE
   try {
     // en-CA gives YYYY-MM-DD, which is what every day-keyed table here uses.
     return new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(now)
@@ -246,8 +259,19 @@ export function localDateFor(timezone: string | null, now: Date = new Date()): s
 }
 
 /** The local hour for a client, so a reminder lands when they asked for it. */
+/**
+ * Where a client is, when nobody has said.
+ *
+ * Every one of the fourteen rows in production has a null timezone — nothing
+ * in the app asks — so the old UTC fallback meant the 18:00 "evening" nudge
+ * landed at 2pm Eastern for everyone. The coaching business and all its
+ * clients are US Eastern, so that is the honest default until a client sets
+ * their own.
+ */
+export const DEFAULT_TIMEZONE = 'America/New_York'
+
 export function localHourFor(timezone: string | null, now: Date = new Date()): number {
-  if (!timezone) return now.getUTCHours()
+  timezone = timezone || DEFAULT_TIMEZONE
   try {
     const h = new Intl.DateTimeFormat('en-GB', {
       timeZone: timezone,

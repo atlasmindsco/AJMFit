@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { evaluateClient, resolveTiers } from '@/lib/nutrition-evaluate'
+import { runNutritionReview } from '@/lib/nutrition-review-run'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -37,67 +37,8 @@ export async function GET(request: Request) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any
-
-    const { data: users, error } = await admin
-      .from('users')
-      .select(
-        'id, name, email, nutrition_goal_setup_complete, nutrition_goal, ' +
-          'current_weight, goal_weight, height, age, sex, activity_level, ' +
-          'job_activity, training_days_per_week, health_screen, nutrition_block_code, ' +
-          'daily_cal_target, protein_target, carb_target, fat_target, ' +
-          'custom_cal_target, custom_protein_target, custom_carb_target, custom_fat_target'
-      )
-      .eq('nutrition_goal_setup_complete', true)
-
-    if (error) {
-      console.error('[cron/nutrition-review] load failed', error)
-      return NextResponse.json({ error: 'Failed to load clients' }, { status: 500 })
-    }
-
-    const tiers = await resolveTiers(admin, (users ?? []).map((u: { id: string }) => u.id))
-
-    const summary: Array<Record<string, unknown>> = []
-    let proposed = 0
-    let applied = 0
-    let escalated = 0
-
-    for (const user of users ?? []) {
-      try {
-        const out = await evaluateClient(admin, { ...user, tier: tiers.get(user.id) ?? null }, { dryRun })
-        if (out.skipped) {
-          summary.push({ name: out.name, skipped: out.skipped })
-          continue
-        }
-        const r = out.result
-        summary.push({
-          name: out.name,
-          verdict: r.verdict,
-          escalation: r.escalation,
-          from: r.evidence.currentCalories,
-          to: r.newCalories,
-          rate: r.evidence.actualRatePct,
-          target: r.evidence.targetRatePct,
-          applied: out.applied,
-          coachNote: r.coachNote,
-        })
-        if (r.escalation) escalated++
-        else if (out.applied) applied++
-        else if (r.newCalories !== null) proposed++
-      } catch (e) {
-        console.error('[cron/nutrition-review] client failed', user.id, e)
-        summary.push({ name: user.name ?? user.id, error: String(e) })
-      }
-    }
-
-    return NextResponse.json({
-      ok: true,
-      dryRun,
-      clients: (users ?? []).length,
-      proposed,
-      applied,
-      escalated,
-      summary,
-    })
+    const out = await runNutritionReview(admin, { dryRun })
+    return NextResponse.json({ ok: true, dryRun, ...out })
   } catch (err) {
     console.error('[cron/nutrition-review] error', err)
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
