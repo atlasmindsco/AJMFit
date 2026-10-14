@@ -26,7 +26,9 @@ const navTabs = [
   // "Food" above is the tracker. This is the guidance: what to eat, how much,
   // and what to do in a restaurant. Kept as a separate destination because
   // folding it into the tracker is how the tracker became the whole product.
-  { label: 'Meals', href: '/studio/food' },
+  /* "Meals" pointed at /studio/food while the primary "Food" tab pointed at
+     /studio/nutrition. One destination now, so this entry is gone rather than
+     renamed — a second way into the same screen is a second thing to scan. */
   { label: 'Check-in', href: '/studio/check-in' },
   { label: 'Progress', href: '/studio/progress' },
   { label: 'Schedule', href: '/studio/schedule' },

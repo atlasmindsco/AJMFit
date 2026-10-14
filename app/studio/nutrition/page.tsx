@@ -33,6 +33,7 @@ import {
   type TargetChangeNote,
   type RecentFood,
 } from '@/lib/nutrition'
+import FoodGuide, { type FoodGuideTab } from '@/components/studio/nutrition/FoodGuide'
 import {
   calculateBMR,
   calculateMaintenanceCalories,
@@ -64,6 +65,51 @@ function formatTime(time: string | null) {
   return `${displayHour}:${m} ${ampm}`
 }
 
+
+type NutritionSection = 'today' | FoodGuideTab
+
+/**
+ * One row of tabs for the whole of nutrition.
+ *
+ * There were three destinations: the tracker at /studio/nutrition, the food
+ * guide at /studio/food, and the target wizard. Worse, the nav item called
+ * "Food" opened the tracker while the one called "Meals" opened the guide —
+ * two labels pointing at each other's screens. Setting targets is a wizard and
+ * stays its own route; these two are browsing and belong together.
+ */
+function NutritionTabs({
+  section,
+  onSection,
+}: {
+  section: NutritionSection
+  onSection: (s: NutritionSection) => void
+}) {
+  const tabs: Array<[NutritionSection, string]> = [
+    ['today', 'Today'],
+    ['meals', 'Meal ideas'],
+    ['portions', 'Portions'],
+    ['situations', 'Eating out'],
+  ]
+  return (
+    <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
+      {tabs.map(([value, label]) => (
+        <button
+          key={value}
+          onClick={() => onSection(value)}
+          aria-pressed={section === value}
+          className={`shrink-0 px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
+            section === value
+              ? 'bg-brand-navy border-brand-navy text-white shadow-sm'
+              : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function NutritionPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
@@ -89,6 +135,7 @@ export default function NutritionPage() {
   const [servingAmount, setServingAmount] = useState('1')
   const [servingUnit, setServingUnit] = useState<UnitKey>('g')
   const [unitSheetOpen, setUnitSheetOpen] = useState(false)
+  const [section, setSection] = useState<NutritionSection>('today')
   const [scanningMealId, setScanningMealId] = useState<string | null>(null)
   const lookupAbortRef = useRef<AbortController | null>(null)
   const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -495,6 +542,17 @@ export default function NutritionPage() {
 
   const weekMax = Math.max(targets.calories * 1.2, ...weekly.map((d) => d.calories))
 
+  // The "what to eat" half. One row of tabs across the whole nutrition area,
+  // rather than a second destination with a name that pointed at this one.
+  if (section !== 'today') {
+    return (
+      <div className="max-w-5xl mx-auto">
+        <NutritionTabs section={section} onSection={setSection} />
+        <FoodGuide tab={section} onTab={(t) => setSection(t)} />
+      </div>
+    )
+  }
+
   return (
     <div>
       {scanningMealId && (
@@ -538,6 +596,8 @@ export default function NutritionPage() {
           />
         )
       })()}
+
+      <NutritionTabs section={section} onSection={setSection} />
 
       <div className="mb-4 flex items-center justify-end">
         <a
@@ -680,9 +740,9 @@ export default function NutritionPage() {
       )}
 
       {/* The tracker answers "how much". This is the way through to "what". */}
-      <a
-        href="/studio/food"
-        className="flex items-center justify-between gap-4 mb-6 p-4 rounded-card bg-brand-blue/[0.05] border border-brand-blue/20 hover:bg-brand-blue/[0.08] transition-colors"
+      <button
+        onClick={() => setSection('meals')}
+        className="w-full text-left flex items-center justify-between gap-4 mb-6 p-4 rounded-card bg-brand-blue/[0.05] border border-brand-blue/20 hover:bg-brand-blue/[0.08] transition-colors"
       >
         <div className="min-w-0">
           <p className="font-display font-bold text-brand-navy text-sm">Not sure what to eat?</p>
@@ -694,7 +754,7 @@ export default function NutritionPage() {
         <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-wide">
           Open
         </span>
-      </a>
+      </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8 space-y-4">
