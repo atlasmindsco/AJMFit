@@ -345,11 +345,32 @@ export async function saveCustomProgram(input: {
  * always expressed "one active program".
  */
 export async function activateCustomProgram(userId: string, programId: string): Promise<void> {
-  await db
+  // `.select()` so the row count comes back. Without it this was a write that
+  // could do nothing and say nothing: PostgREST reports an RLS-filtered update
+  // as a successful update of zero rows, so for months starting a custom
+  // program left the previous one open and returned cleanly. One client ended
+  // up following two programs at once.
+  const { data: ended, error: endErr } = await db
     .from('program_assignments')
     .update({ ended_at: new Date().toISOString() })
     .eq('user_id', userId)
     .is('ended_at', null)
+    .select('id')
+  if (endErr) throw endErr
+
+  const { data: stillOpen } = await db
+    .from('program_assignments')
+    .select('id')
+    .eq('user_id', userId)
+    .is('ended_at', null)
+  if ((stillOpen ?? []).length > 0) {
+    // Refuse rather than add a second open program. Two live assignments make
+    // block progress, the rotation boundary and the coach dashboard disagree
+    // about what the client is even doing.
+    throw new Error(
+      `Could not end the current program (${(ended ?? []).length} ended, ${(stillOpen ?? []).length} still open).`
+    )
+  }
 
   const { error } = await db
     .from('program_assignments')

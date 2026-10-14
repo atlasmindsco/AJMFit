@@ -50,12 +50,20 @@ export async function completeBlock(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   review: any
 ): Promise<void> {
-  const { error } = await db
+  // `.select()` so a write that changes nothing is visible. This silently did
+  // nothing from the day it shipped — no client could write to
+  // program_assignments at all — which is why every block in production shows
+  // completed_at as null and no one has ever been offered a next program.
+  const { data, error } = await db
     .from('program_assignments')
     .update({ completed_at: new Date().toISOString(), review })
     .eq('id', assignmentId)
     .is('completed_at', null)
+    .select('id')
   if (error) throw error
+  if ((data ?? []).length === 0) {
+    throw new Error('Block completion recorded nothing — the row was already closed, or the write was refused.')
+  }
 }
 
 /**
