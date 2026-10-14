@@ -35,6 +35,13 @@ export default function PlanPanel({
         ))}
       </ul>
 
+      {/* When the program gets looked at again. The client is paying for the
+          cadence as much as the program, and it was the one part of the deal
+          the app knew and never said. */}
+      <p className="mt-3 text-white/35 text-2xs font-body">
+        <span className="text-white/50">Your program:</span> {t.programReview.toLowerCase()}.
+      </p>
+
       {t.weeklyCheckIn && (
         <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between gap-4">
           <div className="min-w-0">

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendMail } from '@/lib/email'
 import { runNutritionReview } from '@/lib/nutrition-review-run'
+import { TIER_EXPERIENCE } from '@/lib/tiers'
+import type { Tier } from '@/lib/stripe/catalog'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -88,6 +90,30 @@ export async function GET(request: Request) {
     .gte('date', cutoff)
   const trainedRecently = new Set(((recentWorkouts ?? []) as Array<{ user_id: string }>).map((w) => w.user_id))
   const quietIds = activeIds.filter((id) => !trainedRecently.has(id))
+
+  // Which of the quiet ones are owed the first move.
+  //
+  // "Anthony reaches out when something slips" is a Full Experience promise,
+  // and until now it was a sentence on a panel with nothing behind it —
+  // coachInitiates was declared and never read. A list of eight quiet names
+  // is a prompt; a list that says which two of them are a commitment is the
+  // promise actually being kept.
+  const { data: tierRows } = await admin
+    .from('applications')
+    .select('user_id, tier, created_at')
+    .in('user_id', quietIds.length ? quietIds : ['00000000-0000-0000-0000-000000000000'])
+    .order('created_at', { ascending: false })
+  const tierOf = new Map<string, Tier>()
+  for (const r of (tierRows ?? []) as Array<{ user_id: string; tier: Tier }>) {
+    if (!tierOf.has(r.user_id)) tierOf.set(r.user_id, r.tier)
+  }
+  const owedOutreach = (id: string) => {
+    const tier = tierOf.get(id)
+    return Boolean(tier && TIER_EXPERIENCE[tier]?.coachInitiates)
+  }
+  // Those clients first: they are the ones where silence is a broken promise
+  // rather than a client drifting.
+  quietIds.sort((a, b) => Number(owedOutreach(b)) - Number(owedOutreach(a)))
 
   // Leave a trace either way.
   //
@@ -230,7 +256,7 @@ export async function GET(request: Request) {
     const u = byId.get(id)
     return `<div style="padding:12px 0;border-bottom:1px solid #eef1f5;">
       <div style="color:#1B2D50;font-size:15px;font-weight:bold;">${escapeHtml(u?.name ?? 'Unknown client')}
-        <span style="font-weight:normal;color:#94a3b8;font-size:13px;"> · no workout in 10+ days</span></div>
+        <span style="font-weight:normal;color:#94a3b8;font-size:13px;"> · no workout in 10+ days</span>${owedOutreach(id) ? '<span style="color:#C2410C;font-size:13px;font-weight:bold;"> · you reach out first</span>' : ''}</div>
     </div>`
   })
 
