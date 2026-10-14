@@ -34,6 +34,7 @@ import {
   type RecentFood,
 } from '@/lib/nutrition'
 import FoodGuide, { type FoodGuideTab } from '@/components/studio/nutrition/FoodGuide'
+import Recommends from '@/components/studio/nutrition/Recommends'
 import {
   calculateBMR,
   calculateMaintenanceCalories,
@@ -66,7 +67,7 @@ function formatTime(time: string | null) {
 }
 
 
-type NutritionSection = 'today' | FoodGuideTab
+type NutritionSection = 'today' | FoodGuideTab | 'recommends'
 
 /**
  * One row of tabs for the whole of nutrition.
@@ -89,6 +90,9 @@ function NutritionTabs({
     ['meals', 'Meal ideas'],
     ['portions', 'Portions'],
     ['situations', 'Eating out'],
+    // Last, and named for the person rather than the product category. A tab
+    // called "Supplements" reads as inventory; a shortlist reads as advice.
+    ['recommends', 'AJM recommends'],
   ]
   return (
     <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
@@ -548,7 +552,11 @@ export default function NutritionPage() {
     return (
       <div className="max-w-5xl mx-auto">
         <NutritionTabs section={section} onSection={setSection} />
-        <FoodGuide tab={section} onTab={(t) => setSection(t)} />
+        {section === 'recommends' ? (
+          <Recommends />
+        ) : (
+          <FoodGuide tab={section} onTab={(t) => setSection(t)} />
+        )}
       </div>
     )
   }
