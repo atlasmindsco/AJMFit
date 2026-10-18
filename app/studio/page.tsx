@@ -9,6 +9,9 @@ import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import PlanPanel from '@/components/studio/PlanPanel'
 import BillingPanel from '@/components/studio/BillingPanel'
 import { isCoached } from '@/lib/tiers'
+import AttentionStack from '@/components/studio/AttentionStack'
+import { topAttention } from '@/lib/attention'
+import { fetchMyBlock, blockProgressDaysLeft } from '@/lib/programs'
 import { fetchCheckInForWeek, weekOf } from '@/lib/check-ins'
 import type { Tier } from '@/lib/stripe/catalog'
 import { fadeIn } from '@/lib/animations'
@@ -81,6 +84,12 @@ export default function ClientDashboard() {
   const [hasEverTrained, setHasEverTrained] = useState(true)
   const [weekStreak, setWeekStreak] = useState(0)
   const [checkInDone, setCheckInDone] = useState(false)
+  // The block, for 'your block ends in N days' and for whether they have ever
+  // said which days they train. The only input the homepage did not already
+  // have — everything else the stack needs was being fetched already.
+  const [blockDaysLeft, setBlockDaysLeft] = useState<number | null>(null)
+  const [trainingDaysSet, setTrainingDaysSet] = useState(true)
+  const [lastWorkoutDate, setLastWorkoutDate] = useState<string | null>(null)
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const [setupState, setSetupState] = useState({ intakeDone: false, startingStatsDone: false, nutritionDone: false, welcomeCallBooked: false, programAssigned: false })
 
@@ -94,7 +103,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn] =
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn, myBlock] =
           await Promise.all([
             fetchTargets(id),
             fetchTodaysLogs(id),
@@ -112,6 +121,7 @@ export default function ClientDashboard() {
             fetchNutritionSetup(id).catch(() => null),
             hasBookedOnboarding(id).catch(() => false),
             fetchCheckInForWeek(id, weekOf()).catch(() => null),
+            fetchMyBlock(id).catch(() => null),
           ])
         if (!active) return
         setTargets(t)
@@ -127,6 +137,9 @@ export default function ClientDashboard() {
         setHasEverTrained(history.length > 0)
         setWeekStreak(streak)
         setCheckInDone(!!thisWeekCheckIn)
+        setBlockDaysLeft(blockProgressDaysLeft(myBlock))
+        setTrainingDaysSet(myBlock?.training_days != null)
+        setLastWorkoutDate(history[0]?.date ?? null)
         setSetupState({
           intakeDone: !!onboarding,
           startingStatsDone: (metrics ?? []).some((m) => m.weight_lb != null),
@@ -263,6 +276,41 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Anything worth knowing before they start.
+          Above Today's Training because it is context for the session, and
+          never about the session itself — that card is directly below and is
+          better than anything this could say about it. Renders nothing at all
+          when there is nothing to say, which for half the active clients is
+          the honest answer, and then the start button moves back up. */}
+      {!loading && (
+        <AttentionStack
+          cards={topAttention({
+            coached: isCoached(tier as Tier),
+            // Not loaded on this screen yet, so the card simply never fires.
+            // Better an absent card than one driven by a guess.
+            unreadFromCoach: 0,
+            checkInDoneThisWeek: isCoached(tier as Tier) ? checkInDone : null,
+            hasProgram: !!myProgram,
+            blockDaysLeft,
+            daysSinceLastWorkout: lastWorkoutDate
+              ? Math.floor((Date.now() - new Date(`${lastWorkoutDate}T00:00:00`).getTime()) / 86400000)
+              : null,
+            trainingDaysSet,
+            lastPr: recentPRs[0]
+              ? {
+                  exercise: recentPRs[0].exercise_name,
+                  weight: Number(recentPRs[0].weight),
+                  reps: Number(recentPRs[0].reps),
+                  daysAgo: Math.floor((Date.now() - new Date(recentPRs[0].set_at).getTime()) / 86400000),
+                }
+              : null,
+            // A week of logged food is needed and this screen holds one day.
+            proteinRatio: null,
+            recommendation: null,
+          })}
+        />
+      )}
 
       {/* Today's training.
           First card on the page, because it is the question the client opened

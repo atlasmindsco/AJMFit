@@ -20,6 +20,13 @@ export interface Assignment {
   assigned_at: string
   ended_at: string | null
   block_weeks: number
+  /**
+   * Which weekdays this client trains, 0 = Sunday. Null on every open
+   * assignment in production: the question is optional in the picker and
+   * everyone skips it, which is why there is no weekly goal to count against
+   * and why the reminders cannot say "it is Tuesday and you train Tuesdays".
+   */
+  training_days: number[] | null
   completed_at: string | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   review: any | null
@@ -275,4 +282,21 @@ export async function fetchMyProgram(userId: string): Promise<Program | null> {
   if (!a) return null
   const { data: p } = await db.from('programs').select('*').eq('id', a.program_id).maybeSingle()
   return (p as Program) ?? null
+}
+
+/**
+ * Days left in a block, or null when there is no block.
+ *
+ * A thin wrapper so the homepage does not have to import blockProgress and
+ * know that a null assignment means no block — it is asking one question.
+ */
+export function blockProgressDaysLeft(block: Assignment | null): number | null {
+  if (!block || block.completed_at) return null
+  const started = new Date(block.assigned_at).getTime()
+  const ends = started + block.block_weeks * 7 * 86400000
+  // Negative when the block is already past its end, which several are —
+  // completing one could never be recorded until recently, so blocks have been
+  // running on. Clamping to zero would tell a client whose eight weeks ended
+  // three weeks ago that it "finishes today".
+  return Math.ceil((ends - Date.now()) / 86400000)
 }

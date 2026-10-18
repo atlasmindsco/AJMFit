@@ -2872,7 +2872,15 @@ export default function ProgramsPage() {
 
                                             if (w && r && needsWeight) {
                                               const best = pr ? { weight: pr.weight, reps: pr.reps } : null
-                                              const hit = judgeSet({ weight: w, reps: r }, best)
+                                              // A held exercise has no record here. The rep field is
+                                              // seconds on a plank, so "25 lb × 10" is not ten reps,
+                                              // it is a ten-second hold — and exercise_prs stores a
+                                              // record as weight × reps with nowhere to put a
+                                              // duration. Three plank PRs reached production this
+                                              // way before the hold fix, one of them a client's most
+                                              // recent. A record for a hold is a real feature and
+                                              // this is not it.
+                                              const hit = hold ? null : judgeSet({ weight: w, reps: r }, best)
                                               if (hit) {
                                                 setSessionRecords((prevRecs) => {
                                                   const rest = prevRecs.filter((x) => x.exerciseName !== displayName)
