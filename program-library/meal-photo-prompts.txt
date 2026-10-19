@@ -1,0 +1,163 @@
+AJM FIT — MEAL PHOTO PROMPTS
+============================================================
+
+44 prompts, one per meal. Paste each into an image generator, save the
+result as the filename shown, then upload it at /luffy/meals.
+
+Keep the style line identical across all 44 — that consistency is the
+whole reason for generating these rather than searching for stock.
+
+Square, about 800x800. Anything over 3 MB is refused.
+
+
+------------------------------------------------------------
+BREAKFAST  (11)
+------------------------------------------------------------
+
+b1.jpg
+overhead photo of greek yogurt with berries and honey, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b2.jpg
+overhead photo of three-egg scramble with spinach and toast, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b3.jpg
+overhead photo of protein oats with banana and peanut butter, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b4.jpg
+overhead photo of cottage cheese with pineapple, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b5.jpg
+overhead photo of smoked salmon on rye with cream cheese, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b6.jpg
+overhead photo of tofu scramble with peppers, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b7.jpg
+overhead photo of overnight oats with whey and chia, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b8.jpg
+overhead photo of turkey and egg white wrap, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+b9.jpg
+overhead photo of chocolate protein smoothie with oats, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v1.jpg
+overhead photo of chia pudding with pea protein and berries, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v2.jpg
+overhead photo of peanut butter and banana protein smoothie, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+LUNCH  (11)
+------------------------------------------------------------
+
+l1.jpg
+overhead photo of chicken, rice and broccoli, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l2.jpg
+overhead photo of tuna salad on greens with crackers, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l3.jpg
+overhead photo of turkey chilli, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l4.jpg
+overhead photo of lentil and chickpea curry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l5.jpg
+overhead photo of chicken caesar wrap, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l6.jpg
+overhead photo of beef and black bean burrito bowl, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l7.jpg
+overhead photo of prawn and vegetable stir fry with noodles, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l8.jpg
+overhead photo of tempeh buddha bowl, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+l9.jpg
+overhead photo of egg salad sandwich with side salad, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v3.jpg
+overhead photo of falafel and quinoa salad bowl, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v4.jpg
+overhead photo of black bean and corn salad with avocado, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+DINNER  (11)
+------------------------------------------------------------
+
+d1.jpg
+overhead photo of grilled salmon, potatoes and asparagus, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d2.jpg
+overhead photo of lean beef stir fry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d3.jpg
+overhead photo of chicken thigh traybake with sweet potato, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d4.jpg
+overhead photo of turkey meatballs with pasta and marinara, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d5.jpg
+overhead photo of cod with white beans and greens, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d6.jpg
+overhead photo of black bean and sweet potato chilli, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d7.jpg
+overhead photo of pork loin with rice and green beans, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d8.jpg
+overhead photo of chicken fajitas with tortillas, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d9.jpg
+overhead photo of tofu and vegetable curry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v5.jpg
+overhead photo of seitan stir fry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v6.jpg
+overhead photo of red lentil dahl with brown rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+SNACKS  (11)
+------------------------------------------------------------
+
+s1.jpg
+overhead photo of whey shake with water, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s2.jpg
+overhead photo of apple with peanut butter, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s3.jpg
+overhead photo of beef jerky, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s4.jpg
+overhead photo of greek yogurt with almonds, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s5.jpg
+overhead photo of three hard-boiled eggs, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s6.jpg
+overhead photo of protein bar, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s7.jpg
+overhead photo of edamame with sea salt, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s8.jpg
+overhead photo of cottage cheese with cucumber, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s9.jpg
+overhead photo of hummus with carrots and pitta, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v7.jpg
+overhead photo of roasted chickpeas, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v8.jpg
+overhead photo of pea protein shake with water, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+============================================================
+TIP: most tools let you generate several at once. If yours keeps a
+style between images, do them in one session so the lighting matches.
