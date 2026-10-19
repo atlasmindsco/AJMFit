@@ -17,6 +17,7 @@ import {
 } from '@/lib/food-preferences'
 import { filterMeals, swapsFor, type Meal, type MealSlot } from '@/lib/meal-library'
 import { ingredientsFor } from '@/lib/meal-portions'
+import { fetchMealImages } from '@/lib/meal-images'
 import { OFF_PLAN_GUIDANCE, SITUATIONS, portionsFor } from '@/lib/portions'
 import { fetchNutritionSetup } from '@/lib/nutrition'
 import type { Sex } from '@/lib/nutrition-goals'
@@ -47,6 +48,10 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [prefs, setPrefs] = useState<FoodPreferences>(DEFAULT_PREFERENCES)
+  // Meal photographs, keyed by meal id. A meal without one simply renders the
+  // card it rendered before, so a half-finished set degrades into "some cards
+  // have photos" rather than into broken image icons.
+  const [mealImages, setMealImages] = useState<Map<string, string>>(new Map())
   const [draft, setDraft] = useState<FoodPreferences>(DEFAULT_PREFERENCES)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -66,8 +71,14 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
         return
       }
       try {
-        const [p, setup] = await Promise.all([fetchPreferences(id), fetchNutritionSetup(id)])
+        const [p, setup, pics] = await Promise.all([
+          fetchPreferences(id),
+          fetchNutritionSetup(id),
+          // One listing for all 44 rather than a probe per card.
+          fetchMealImages(),
+        ])
         if (!active) return
+        setMealImages(pics)
         setPrefs(p)
         setDraft(p)
         if (setup.sex) setSex(setup.sex as Sex)
@@ -303,6 +314,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {meals.map((m) => (
                 <MealCard
+                  imageUrl={mealImages.get(m.id) ?? null}
                   key={m.id}
                   meal={m}
                   prefs={prefs}
@@ -399,17 +411,33 @@ function MealCard({
   meal,
   prefs,
   open,
+  imageUrl,
   onToggle,
 }: {
   meal: Meal
   prefs: FoodPreferences
   open: boolean
+  /** The photograph, when one has been uploaded for this meal. */
+  imageUrl: string | null
   onToggle: () => void
 }) {
   const swaps = open ? swapsFor(meal, prefs) : []
   const portions = ingredientsFor(meal.id)
   return (
-    <div className="bg-white rounded-card border border-brand-navy/[0.06] p-4">
+    <div className="bg-white rounded-card border border-brand-navy/[0.06] overflow-hidden">
+      {/* The photograph, when there is one. A meal without a picture keeps the
+          card it had before rather than showing a placeholder, so a
+          half-finished set reads as "some have photos" instead of broken. */}
+      {imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          className="w-full h-36 object-cover bg-brand-navy/[0.04]"
+        />
+      )}
+      <div className="p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="font-body font-semibold text-brand-navy text-sm leading-snug">{meal.name}</p>
         <span className="shrink-0 text-brand-slate text-2xs font-body">
@@ -458,6 +486,7 @@ function MealCard({
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }
