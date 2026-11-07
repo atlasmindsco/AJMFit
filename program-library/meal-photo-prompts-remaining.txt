@@ -1,0 +1,128 @@
+AJM FIT - MEAL PHOTOS STILL TO GENERATE
+Generated 2026-10-18. 24 left of 44.
+
+These ids are the real ones from the meal library. Ignore the numbering
+on the contact sheet - it invented l10, l11, d10, d11, s10, s11, which
+do not exist. The last two in each slot are vegan meals: v3/v4 lunch,
+v5/v6 dinner, v7/v8 snacks.
+
+------------------------------------------------------------
+l6.jpg  -  Beef and black bean burrito bowl
+
+overhead photo of beef and black bean burrito bowl, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+l7.jpg  -  Prawn and vegetable stir fry with noodles
+
+overhead photo of prawn and vegetable stir fry with noodles, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d2.jpg  -  Lean beef stir fry with rice
+
+overhead photo of lean beef stir fry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d4.jpg  -  Turkey meatballs with pasta and marinara
+
+overhead photo of turkey meatballs with pasta and marinara, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d5.jpg  -  Cod with white beans and greens
+
+overhead photo of cod with white beans and greens, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d6.jpg  -  Black bean and sweet potato chilli
+
+overhead photo of black bean and sweet potato chilli, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d7.jpg  -  Pork loin with rice and green beans
+
+overhead photo of pork loin with rice and green beans, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d8.jpg  -  Chicken fajitas with tortillas
+
+overhead photo of chicken fajitas with tortillas, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+d9.jpg  -  Tofu and vegetable curry with rice
+
+overhead photo of tofu and vegetable curry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s1.jpg  -  Whey shake with water
+
+overhead photo of whey shake with water, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s2.jpg  -  Apple with peanut butter
+
+overhead photo of apple with peanut butter, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s3.jpg  -  Beef jerky
+
+overhead photo of beef jerky, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s4.jpg  -  Greek yoghurt with almonds
+
+overhead photo of greek yoghurt with almonds, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s5.jpg  -  Three hard-boiled eggs
+
+overhead photo of three hard-boiled eggs, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s6.jpg  -  Protein bar
+
+overhead photo of protein bar, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s7.jpg  -  Edamame with sea salt
+
+overhead photo of edamame with sea salt, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s8.jpg  -  Cottage cheese with cucumber
+
+overhead photo of cottage cheese with cucumber, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+s9.jpg  -  Hummus with carrots and pitta
+
+overhead photo of hummus with carrots and pitta, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v3.jpg  -  Falafel and quinoa salad bowl
+
+overhead photo of falafel and quinoa salad bowl, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v4.jpg  -  Black bean and corn salad with avocado
+
+overhead photo of black bean and corn salad with avocado, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v5.jpg  -  Seitan stir fry with rice
+
+overhead photo of seitan stir fry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v6.jpg  -  Red lentil dahl with brown rice
+
+overhead photo of red lentil dahl with brown rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v7.jpg  -  Roasted chickpeas
+
+overhead photo of roasted chickpeas, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+------------------------------------------------------------
+v8.jpg  -  Pea protein shake with water
+
+overhead photo of pea protein shake with water, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
