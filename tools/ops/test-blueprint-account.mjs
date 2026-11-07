@@ -14,9 +14,12 @@
  * code makes that free). Everything downstream of the password being set is
  * what this script lets you test.
  *
- * No subscriptions row on purpose: tier then resolves from the application,
- * which is the same fallback the real beta accounts use, and it keeps a fake
- * subscription out of billing reports.
+ * It does create a subscriptions row. The first version of this script left
+ * it out, reasoning that tier would fall back to the application — it does,
+ * for fetchMyTier, but the studio gates membership on the subscription
+ * separately, so the account landed on "Start your membership" and could
+ * never reach the program picker. Marked with a fake stripe id so it is
+ * obvious in any billing query that it is not real money.
  *
  *   node tools/ops/test-blueprint-account.mjs --email=dummy@ajmfit.test
  *   node tools/ops/test-blueprint-account.mjs --email=dummy@ajmfit.test --remove
@@ -58,7 +61,7 @@ if (args.remove) {
 
   if (user) {
     // Children first: anything pointing at the user row would block the delete.
-    for (const table of ['program_assignments', 'applications', 'onboarding_forms']) {
+    for (const table of ['program_assignments', 'applications', 'onboarding_forms', 'subscriptions']) {
       const { error } = await sb.from(table).delete().eq('user_id', user.id)
       if (error) console.warn(`  (${table}: ${error.message})`)
     }
@@ -83,14 +86,14 @@ const password = `ajm-${randomBytes(9).toString('base64url')}`
 
 console.log(`\n  create  ${email}`)
 console.log(`  name    ${name}`)
-console.log(`  tier    blueprint (from an accepted application, no subscription)`)
+console.log(`  tier    blueprint (accepted application + active subscription)`)
 console.log(`  login   password set, email pre-confirmed\n`)
 
 requireConfirm(args, `create the test Blueprint account ${email}`)
 
 const { data: user, error: uErr } = await sb
   .from('users')
-  .insert({ name, email, status: 'pending' })
+  .insert({ name, email, status: 'active' })
   .select('id')
   .single()
 if (uErr) fail(uErr.message)
@@ -106,6 +109,18 @@ const { error: aErr } = await sb.from('applications').insert({
   reviewed_at: new Date().toISOString(),
 })
 if (aErr) fail(aErr.message)
+
+// The studio checks for an active subscription before it will show anything,
+// so without this the account only ever sees the membership paywall.
+const { error: sErr } = await sb.from('subscriptions').insert({
+  user_id: user.id,
+  stripe_customer_id: 'cus_TEST_ACCOUNT',
+  stripe_subscription_id: `sub_TEST_${Date.now()}`,
+  tier: 'blueprint',
+  billing_cycle: 'monthly',
+  status: 'active',
+})
+if (sErr) fail(sErr.message)
 
 const { data: authUser, error: authErr } = await sb.auth.admin.createUser({
   email,
