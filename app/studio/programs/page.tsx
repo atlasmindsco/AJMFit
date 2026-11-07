@@ -1445,17 +1445,15 @@ export default function ProgramsPage() {
   if (showPicker) {
     return (
       <div className="py-8">
-        <BlueprintPicker onDone={handlePickerDone} beginner={isBeginnerFlow} />
-        {/* The picker used to be the only way out of this screen, so a client
-            who wanted to build rather than choose had nowhere to go. */}
-        <div className="max-w-xl mx-auto mt-6 text-center">
-          <button
-            onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-            className="text-white/40 hover:text-white/70 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
-          >
-            Or build your own program
-          </button>
-        </div>
+        {/* The way out lives inside the picker now. It used to be grey text
+            under the card, which on a phone sits below four splits' worth of
+            options — out of sight at the moment someone decides none of them
+            fits. Same route, somewhere it can actually be seen. */}
+        <BlueprintPicker
+          onDone={handlePickerDone}
+          beginner={isBeginnerFlow}
+          onBuildOwn={() => { setBuilderMoved(null); void openStartFrom() }}
+        />
       </div>
     )
   }

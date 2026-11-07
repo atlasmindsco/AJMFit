@@ -24,6 +24,7 @@ export default function BlueprintPicker({
   firstName,
   onDone,
   beginner = false,
+  onBuildOwn,
 }: {
   firstName?: string
   onDone: (programId: string) => void
@@ -34,6 +35,17 @@ export default function BlueprintPicker({
    * days flow, which meant every fix had to be made twice.
    */
   beginner?: boolean
+  /**
+   * Leave the ready-made flow and build a program by hand.
+   *
+   * This existed before as grey text under the card, which is to say it did
+   * not exist: the split step can be four options tall, so on a phone the way
+   * out was below the fold at the exact moment someone decides none of these
+   * is what they want. It belongs inside the card, at every step, because
+   * "none of these" can happen at any of them — including the day counts that
+   * never show a split choice at all.
+   */
+  onBuildOwn?: () => void
 }) {
   // Beginners start on Location because Goal is decided for them.
   const [step, setStep] = useState(beginner ? 1 : 0)
@@ -326,6 +338,26 @@ export default function BlueprintPicker({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Build your own — always available, whatever step and whatever day
+            count. Dashed so it never reads as a fourth split to choose
+            between, but a full-width target rather than a line of small text,
+            because the point is that it is findable. */}
+        {onBuildOwn && !submitting && (
+          <div className="mt-5 pt-5 border-t border-white/[0.08]">
+            <button
+              onClick={onBuildOwn}
+              className="w-full text-left px-5 py-4 rounded-card border border-dashed border-white/[0.18] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.30] active:scale-[0.99] transition-all duration-200"
+            >
+              <span className="font-display font-bold text-base text-white/80">
+                None of these? Build your own
+              </span>
+              <span className="block text-white/40 text-xs font-body mt-0.5">
+                Choose your own exercises, sets and reps — any number of days.
+              </span>
+            </button>
+          </div>
+        )}
 
         {/* Back */}
         {step > firstStep && !submitting && (
