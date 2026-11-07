@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <!--
+      MOTIVATIONAL REEL — 12s, 1080x1920
+
+      Four hard cuts, one line each, built for a cold scroll. Deliberately
+      the shortest template here: this format earns attention in the first
+      second or not at all.
+
+      Swap the four lines marked EDIT. Keep them SHORT — four words or so.
+      Each holds 2.6s, which clears the reading floor with room, and a longer
+      line would overrun the canvas at 120px. See ../../brand/DESIGN.md.
+
+      Drop a clip into assets/ and this gets much stronger: see the commented
+      <video> below.
+    -->
+    <style>
+      :root {
+        --ground: #111111;
+        --ink: #FFFFFF;
+        --ink-dim: rgba(255, 255, 255, 0.68);
+        --orange: #F76B16;
+        --font-display: "Archivo Black", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { width: 100%; height: 100%; position: relative; overflow: hidden; background: var(--ground); }
+      .line { position: absolute; left: 0; right: 0; text-align: center; }
+
+      #glow {
+        position: absolute; left: 50%; top: 50%;
+        width: 1800px; height: 1800px; margin: -900px 0 0 -900px;
+        background: radial-gradient(circle, rgba(247,107,22,0.24) 0%, rgba(247,107,22,0.07) 40%, rgba(247,107,22,0) 70%);
+      }
+      #brandmark {
+        position: absolute; top: 70px; left: 50%; margin-left: -100px;
+        width: 200px; height: 200px; object-fit: contain; display: block;
+      }
+
+      /* One statement, dead centre, big. Four words at 120px is about
+         960px wide — right at the edge of the 1080 canvas, so keep them short. */
+      .beat {
+        top: 820px;
+        font-family: var(--font-display);
+        font-size: 120px; line-height: 1.04; letter-spacing: -0.03em;
+        color: var(--ink); text-transform: uppercase;
+      }
+      .beat em { font-style: normal; color: var(--orange); }
+
+      #closeUrl {
+        top: 1180px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 50px; letter-spacing: 0.16em;
+        color: var(--orange); text-transform: uppercase;
+        padding-left: 0.16em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12"
+         data-width="1080" data-height="1920" data-fps="30">
+
+      <div id="glow" class="clip" data-start="0" data-duration="12" data-track-index="0"></div>
+      <img id="brandmark" class="clip" src="assets/logo.png" alt="AJM Fit" data-start="0" data-duration="12" data-track-index="1" />
+
+      <!--
+        To put real footage behind this, drop a file in assets/ and uncomment.
+        Keep it muted unless it carries sound you want: a <video> needs
+        data-has-audio="true" to keep its audio, and the renderer must never
+        be asked to play(), pause() or seek it.
+
+        <video id="bg" class="clip" src="assets/training.mp4" muted
+               data-start="0" data-duration="12" data-track-index="2"></video>
+      -->
+
+      <!-- EDIT — four short statements, 2.6s each -->
+      <div id="beat1" class="line beat clip" data-start="0.2" data-duration="2.6" data-track-index="3">Nobody is<br />coming</div>
+      <div id="beat2" class="line beat clip" data-start="3.0" data-duration="2.6" data-track-index="4">It&rsquo;s <em>you</em><br />and the bar</div>
+      <div id="beat3" class="line beat clip" data-start="5.8" data-duration="2.6" data-track-index="5">Show up<br /><em>anyway</em></div>
+      <div id="beat4" class="line beat clip" data-start="8.6" data-duration="3.4" data-track-index="6">Every set<br /><em>counts</em></div>
+
+      <div id="closeUrl" class="line clip" data-start="9.4" data-duration="2.6" data-track-index="7">ajmfit.com</div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#glow", { opacity: 0.6, scale: 0.92 },
+        { opacity: 1, scale: 1.08, duration: 11.4, ease: "sine.inOut" }, 0);
+
+      /* Lit at frame 0: the thumbnail. */
+      tl.fromTo("#brandmark", { scale: 0.94, transformOrigin: "50% 50%" },
+        { scale: 1, duration: 0.8, ease: "power3.out" }, 0);
+
+      /* Hard cuts, not crossfades. Each line punches in and snaps out; the
+         format lives on the cut landing with the beat of whatever track gets
+         laid over it. */
+      const beats = [
+        { el: "#beat1", at: 0.2 },
+        { el: "#beat2", at: 3.0 },
+        { el: "#beat3", at: 5.8 },
+        { el: "#beat4", at: 8.6 },
+      ];
+      beats.forEach((b, i) => {
+        tl.fromTo(b.el,
+          { opacity: 0, scale: 1.14 },
+          { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, b.at);
+        /* The last one holds to the end instead of snapping away. */
+        if (i < beats.length - 1) {
+          tl.to(b.el, { opacity: 0, scale: 0.95, duration: 0.2, ease: "power2.in" }, b.at + 2.4);
+        }
+      });
+
+      tl.fromTo("#closeUrl", { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 9.45);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

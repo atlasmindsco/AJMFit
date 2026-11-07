@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <!--
+      COACHING TIP — 20s, 1080x1920
+
+      One idea, three points, Anthony's name on it. Swap the five text nodes
+      marked EDIT and re-render; nothing else needs touching.
+
+      Every constraint here is explained in ../../brand/DESIGN.md. The short
+      version: Archivo Black never takes a font-weight, secondary text never
+      goes below 0.60 alpha, the logo is lit at frame 0, and each timed
+      element is a direct child of the root.
+    -->
+    <style>
+      :root {
+        --ground: #111111;
+        --raised: #1C1C1C;
+        --ink: #FFFFFF;
+        --ink-dim: rgba(255, 255, 255, 0.68);
+        --orange: #F76B16;
+        --font-display: "Archivo Black", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { width: 100%; height: 100%; position: relative; overflow: hidden; background: var(--ground); }
+      .line { position: absolute; left: 0; right: 0; text-align: center; }
+
+      #glow {
+        position: absolute; left: 50%; top: 48%;
+        width: 1700px; height: 1700px; margin: -850px 0 0 -850px;
+        background: radial-gradient(circle, rgba(247,107,22,0.20) 0%, rgba(247,107,22,0.06) 40%, rgba(247,107,22,0) 70%);
+      }
+      #brandmark {
+        position: absolute; top: 64px; left: 50%; margin-left: -115px;
+        width: 230px; height: 230px; object-fit: contain; display: block;
+      }
+
+      #eyebrow {
+        top: 350px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 30px; letter-spacing: 0.34em;
+        color: var(--orange); text-transform: uppercase;
+        padding-left: 0.34em;
+      }
+      #tip {
+        top: 430px;
+        font-family: var(--font-display);
+        font-size: 88px; line-height: 1.1; letter-spacing: -0.025em;
+        color: var(--ink); text-transform: uppercase;
+      }
+
+      /* Three points. Left-aligned inside a centred column: a bulleted list
+         that is also centre-aligned is unreadable. */
+      .point {
+        position: absolute; left: 110px; width: 860px;
+        text-align: left;
+        font-family: var(--font-body); font-weight: 600;
+        font-size: 42px; line-height: 1.35;
+        color: var(--ink-dim);
+        padding: 30px 34px 30px 96px;
+        background: var(--raised);
+        border-radius: 22px;
+        border-left: 5px solid var(--orange);
+      }
+      .point b { color: var(--ink); font-weight: 800; }
+      .point::before {
+        content: attr(data-n);
+        position: absolute; left: 34px; top: 30px;
+        font-family: var(--font-display);
+        font-size: 42px; color: var(--orange);
+      }
+      #point1 { top: 820px; }
+      #point2 { top: 1010px; }
+      #point3 { top: 1200px; }
+
+      #signoff {
+        top: 1480px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 40px; letter-spacing: 0.16em;
+        color: var(--ground); text-transform: uppercase;
+      }
+      #signoff span {
+        display: inline-block;
+        padding: 22px 58px 22px calc(58px + 0.16em);
+        border-radius: 999px; background: var(--orange);
+      }
+      #handle {
+        top: 1620px;
+        font-family: var(--font-body); font-weight: 700;
+        font-size: 36px; letter-spacing: 0.14em;
+        color: var(--ink-dim); text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="20"
+         data-width="1080" data-height="1920" data-fps="30">
+
+      <div id="glow" class="clip" data-start="0" data-duration="20" data-track-index="0"></div>
+      <img id="brandmark" class="clip" src="assets/logo.png" alt="AJM Fit" data-start="0" data-duration="20" data-track-index="1" />
+
+      <!-- EDIT 1 -->
+      <div id="eyebrow" class="line clip" data-start="0.4" data-duration="19.6" data-track-index="2">Coach&rsquo;s tip</div>
+      <!-- EDIT 2 — keep to three short lines; see the canvas rule -->
+      <div id="tip" class="line clip" data-start="0.6" data-duration="19.4" data-track-index="3">Stop adding<br />weight every<br />single week</div>
+
+      <!-- EDIT 3, 4, 5 -->
+      <div id="point1" class="point clip" data-n="1" data-start="4.0" data-duration="16.0" data-track-index="4">Work to the <b>top of the rep range</b> on every set first.</div>
+      <div id="point2" class="point clip" data-n="2" data-start="7.2" data-duration="12.8" data-track-index="5">Only then add weight, and <b>start again at the bottom</b>.</div>
+      <div id="point3" class="point clip" data-n="3" data-start="10.4" data-duration="9.6" data-track-index="6">Leave <b>1 to 3 reps in reserve</b>. Hard, not a grind.</div>
+
+      <div id="signoff" class="line clip" data-start="14.0" data-duration="6.0" data-track-index="7"><span>Coached by Anthony</span></div>
+      <div id="handle" class="line clip" data-start="14.3" data-duration="5.7" data-track-index="8">ajmfit.com</div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#glow", { opacity: 0.5, scale: 0.9 },
+        { opacity: 1, scale: 1.06, duration: 19.4, ease: "sine.inOut" }, 0);
+
+      /* Lit at frame 0 — that frame is the social thumbnail. */
+      tl.fromTo("#brandmark", { scale: 0.93, transformOrigin: "50% 50%" },
+        { scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+
+      tl.fromTo("#eyebrow", { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.45);
+      tl.fromTo("#tip", { opacity: 0, y: 38, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power4.out" }, 0.65);
+
+      /* The points land one at a time so the viewer reads rather than scans.
+         3.2s apart: an 11-word line needs about 2.85s on screen. */
+      ["#point1", "#point2", "#point3"].forEach((p, i) => {
+        tl.fromTo(p, { opacity: 0, x: -34 },
+          { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 4.0 + i * 3.2);
+      });
+
+      tl.fromTo("#signoff", { opacity: 0, y: 26, scale: 0.92 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.7)" }, 14.05);
+      tl.fromTo("#handle", { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 14.35);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

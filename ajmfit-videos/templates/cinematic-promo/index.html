@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #111111;
+        --ink: #FFFFFF;
+        /* Not lower than this: 0.42 measured 2.97:1 on #111 and failed AA. */
+        --ink-dim: rgba(255, 255, 255, 0.68);
+        --orange: #F76B16;
+        /* Archivo Black is bundled and resolves by name; plain "Archivo" is
+           not. One weight only, so nothing sets font-weight on it. */
+        --font-display: "Archivo Black", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px; height: 1920px;
+        overflow: hidden; background: var(--ground);
+      }
+      #root {
+        width: 100%; height: 100%;
+        position: relative; overflow: hidden;
+        background: var(--ground);
+      }
+
+      /* Every timed element is a direct child of the root and owns one
+         timeline row — including the screenshots, which are <img class="clip">
+         rather than images wrapped in a timed div. */
+      .line { position: absolute; left: 0; right: 0; text-align: center; }
+
+      #glow {
+        position: absolute; left: 50%; top: 52%;
+        width: 1750px; height: 1750px; margin: -875px 0 0 -875px;
+        background: radial-gradient(circle,
+          rgba(247,107,22,0.20) 0%,
+          rgba(247,107,22,0.06) 40%,
+          rgba(247,107,22,0) 70%);
+      }
+
+      /* The real mark. It arrived as a webp on solid white with no alpha,
+         which would have been a white box on this ground; assets/logo.png is
+         the cut-out made with `hyperframes remove-background`. */
+      #brandmark {
+        position: absolute;
+        top: 64px; left: 50%; margin-left: -115px;
+        width: 230px; height: 230px;
+        object-fit: contain; display: block;
+      }
+
+      /* ── opening ── */
+      #hook {
+        top: 700px;
+        font-family: var(--font-display);
+        font-size: 104px; line-height: 1.06; letter-spacing: -0.025em;
+        color: var(--ink); text-transform: uppercase;
+      }
+      #hookSub {
+        top: 1090px;
+        font-family: var(--font-body); font-weight: 600;
+        font-size: 42px; letter-spacing: 0.05em;
+        color: var(--ink-dim);
+      }
+
+      /* ── the screens ── */
+      .cap {
+        top: 336px;
+        font-family: var(--font-display);
+        font-size: 60px; line-height: 1.16; letter-spacing: -0.02em;
+        color: var(--ink); text-transform: uppercase;
+      }
+      .sub {
+        top: 462px;
+        font-family: var(--font-body); font-weight: 600;
+        font-size: 36px; letter-spacing: 0.03em;
+        color: var(--ink-dim);
+      }
+      /* A plain device frame: the screenshot IS the element, so the rounding
+         and the hairline live on the image itself rather than on a wrapper
+         that would claim a timeline row of its own. */
+      .shot {
+        position: absolute;
+        top: 560px; left: 50%; margin-left: -272px;
+        width: 544px; height: 1178px;
+        border-radius: 40px;
+        border: 5px solid rgba(255, 255, 255, 0.16);
+        object-fit: cover; object-position: top center;
+        display: block;
+        background: #000;
+      }
+
+      /* ── close ── */
+      #ctaLine {
+        top: 760px;
+        font-family: var(--font-display);
+        font-size: 100px; letter-spacing: -0.02em;
+        color: var(--ink); text-transform: uppercase; line-height: 1.08;
+      }
+      #ctaUrl {
+        top: 1010px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 54px; letter-spacing: 0.16em;
+        color: var(--orange); text-transform: uppercase;
+        padding-left: 0.16em;
+      }
+      #ctaPill {
+        top: 1200px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 44px; letter-spacing: 0.16em;
+        /* Dark on orange. White measured 2.97:1 and AA needs 3:1. */
+        color: var(--ground); text-transform: uppercase;
+      }
+      #ctaPill span {
+        display: inline-block;
+        padding: 24px 64px 24px calc(64px + 0.16em);
+        border-radius: 999px; background: var(--orange);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="32"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <div id="glow" class="clip" data-start="0" data-duration="32" data-track-index="0"></div>
+      <img id="brandmark" class="clip" src="assets/logo.png" alt="AJM Fit" data-start="0" data-duration="32" data-track-index="1" />
+
+      <div id="hook" class="line clip" data-start="0" data-duration="4.6" data-track-index="2">Personal<br />training<br />that&nbsp;counts</div>
+      <div id="hookSub" class="line clip" data-start="0.9" data-duration="3.7" data-track-index="3">Every set. Every meal. Every week.</div>
+
+      <!-- Beat 1 — the dashboard -->
+      <div id="cap1" class="line cap clip" data-start="4.8" data-duration="6.4" data-track-index="4">Open it. Today&rsquo;s<br />session is ready.</div>
+      <div id="sub1" class="line sub clip" data-start="5.0" data-duration="6.2" data-track-index="5">No planning. Just press start.</div>
+      <img id="shot1" class="shot clip" src="assets/screen-home.jpg" alt="" data-start="4.9" data-duration="6.3" data-track-index="6" />
+
+      <!-- Beat 2 — the program -->
+      <div id="cap2" class="line cap clip" data-start="11.4" data-duration="6.4" data-track-index="7">68 programs.<br />Pick in three taps.</div>
+      <div id="sub2" class="line sub clip" data-start="11.6" data-duration="6.2" data-track-index="8">2 to 6 days. Gym or dumbbells at home.</div>
+      <img id="shot2" class="shot clip" src="assets/screen-program.jpg" alt="" data-start="11.5" data-duration="6.3" data-track-index="9" />
+
+      <!-- Beat 3 — the food -->
+      <div id="cap3" class="line cap clip" data-start="18.0" data-duration="6.4" data-track-index="10">Meals that fit<br />your numbers.</div>
+      <div id="sub3" class="line sub clip" data-start="18.2" data-duration="6.2" data-track-index="11">Real portions, weighed. Not guesswork.</div>
+      <img id="shot3" class="shot clip" src="assets/screen-meals.jpg" alt="" data-start="18.1" data-duration="6.3" data-track-index="12" />
+
+      <!-- Close: every line holds well past the 2 s a final line needs. -->
+      <div id="ctaLine" class="line clip" data-start="24.8" data-duration="7.2" data-track-index="13">Start&nbsp;today</div>
+      <div id="ctaUrl"  class="line clip" data-start="25.0" data-duration="7.0" data-track-index="14">ajmfit.com</div>
+      <div id="ctaPill" class="line clip" data-start="25.3" data-duration="6.7" data-track-index="15"><span>Coached by Anthony</span></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      /* A slow breath on the wash so no frame is dead flat. */
+      tl.fromTo("#glow",
+        { opacity: 0.5, scale: 0.9 },
+        { opacity: 1, scale: 1.06, duration: 31.4, ease: "sine.inOut" }, 0);
+
+      /* The mark settles in; it is never faded from zero at t=0, because
+         frame 0 is the thumbnail a social player shows before anyone
+         presses play. It lifts again on the close. */
+      tl.fromTo("#brandmark",
+        { scale: 0.93, transformOrigin: "50% 50%" },
+        { scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+      tl.to("#brandmark",
+        { scale: 1.1, duration: 0.9, ease: "back.out(1.4)" }, 24.8);
+
+      /* Opening claim. */
+      tl.fromTo("#hook",
+        { opacity: 0, y: 40, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power4.out" }, 0.3);
+      tl.fromTo("#hookSub",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 1.0);
+      tl.to(["#hook", "#hookSub"],
+        { opacity: 0, y: -30, duration: 0.45, ease: "power2.in" }, 4.15);
+
+      /* Three screen beats, identical shape so the rhythm is obvious: the
+         caption lands, the phone rises under it, both leave together. The
+         slow push on each screenshot keeps a still image from reading as a
+         freeze. */
+      const beats = [
+        { cap: "#cap1", sub: "#sub1", shot: "#shot1", at: 4.8,  out: 10.75 },
+        { cap: "#cap2", sub: "#sub2", shot: "#shot2", at: 11.4, out: 17.35 },
+        { cap: "#cap3", sub: "#sub3", shot: "#shot3", at: 18.0, out: 23.95 },
+      ];
+      for (const b of beats) {
+        tl.fromTo(b.cap,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, b.at);
+        tl.fromTo(b.sub,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, b.at + 0.2);
+        tl.fromTo(b.shot,
+          { opacity: 0, y: 70, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power4.out" }, b.at + 0.1);
+        tl.to(b.shot,
+          { scale: 1.035, duration: 5.2, ease: "none" }, b.at + 0.9);
+        tl.to([b.cap, b.sub, b.shot],
+          { opacity: 0, y: -34, duration: 0.42, ease: "power2.in" }, b.out);
+      }
+
+      /* Close. */
+      tl.fromTo("#ctaLine",
+        { opacity: 0, y: 40, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: "power4.out" }, 24.85);
+      tl.fromTo("#ctaUrl",
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 25.05);
+      tl.fromTo("#ctaPill",
+        { opacity: 0, y: 28, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.7)" }, 25.35);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

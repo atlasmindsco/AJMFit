@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #111111;
+        --ink: #FFFFFF;
+        /* Lifted from 0.42: the check measured 2.97:1 against #111 and WCAG
+           AA wants 3:1. Secondary text still reads as secondary. */
+        --ink-dim: rgba(255, 255, 255, 0.66);
+        --orange: #F76B16;
+        /* Archivo Black is bundled and resolves by name; plain "Archivo" is
+           not, which is what the first pass failed on. It ships at one
+           weight, so nothing below sets font-weight on it — asking for 800
+           sends the compiler to Google Fonts for a face already as heavy as
+           it gets. */
+        --font-display: "Archivo Black", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px; height: 1920px;
+        overflow: hidden; background: var(--ground);
+      }
+      #root {
+        width: 100%; height: 100%;
+        position: relative; overflow: hidden;
+        background: var(--ground);
+      }
+
+      /* Every timed element is a direct child of the root and owns one
+         timeline row. Nesting them stacked six rows of content onto one
+         lane, which is what the layout audit flagged. */
+      .line {
+        position: absolute; left: 0; right: 0;
+        text-align: center;
+      }
+
+      #brandmark {
+        top: 168px;
+        font-family: var(--font-display);
+        font-size: 42px; letter-spacing: 0.42em;
+        color: var(--ink); text-transform: uppercase;
+        padding-left: 0.42em;
+      }
+      #brandrule {
+        top: 248px;
+        height: 5px; width: 150px;
+        left: 50%; right: auto; margin-left: -75px;
+        background: var(--orange); border-radius: 3px;
+      }
+
+      #whoEyebrow {
+        top: 516px;
+        font-family: var(--font-body); font-weight: 700;
+        font-size: 30px; letter-spacing: 0.34em;
+        color: var(--ink-dim); text-transform: uppercase;
+        padding-left: 0.34em;
+      }
+      #whoName {
+        top: 566px;
+        font-family: var(--font-display);
+        font-size: 150px; letter-spacing: -0.02em;
+        color: var(--ink); text-transform: uppercase; line-height: 1;
+      }
+
+      #liftName {
+        top: 836px;
+        font-family: var(--font-body); font-weight: 700;
+        font-size: 56px; letter-spacing: 0.06em;
+        color: var(--ink); text-transform: uppercase;
+      }
+
+      #weightValue {
+        top: 996px;
+        font-family: var(--font-display);
+        font-size: 380px; letter-spacing: -0.04em;
+        color: var(--orange); line-height: 0.88;
+        font-variant-numeric: tabular-nums;
+      }
+      #weightUnits {
+        top: 1386px;
+        font-family: var(--font-body); font-weight: 700;
+        font-size: 64px; letter-spacing: 0.14em;
+        color: var(--ink); text-transform: uppercase;
+      }
+
+      #wasLine {
+        top: 1496px;
+        font-family: var(--font-body); font-weight: 600;
+        font-size: 38px; letter-spacing: 0.10em;
+        color: var(--ink-dim); text-transform: uppercase;
+      }
+
+      #badgePill {
+        top: 1618px;
+        font-family: var(--font-body); font-weight: 800;
+        font-size: 50px; letter-spacing: 0.18em;
+        /* Dark on orange, not white on orange. White measured 2.97:1 and AA
+           wants 3:1; the checker suggested a grey, which would be off
+           palette, so this reuses the ground colour and lands near 6:1. */
+        color: var(--ground); text-transform: uppercase;
+      }
+      #badgePill span {
+        display: inline-block;
+        padding: 26px 70px 26px calc(70px + 0.18em);
+        border-radius: 999px; background: var(--orange);
+      }
+
+      #glow {
+        position: absolute; left: 50%; top: 44%;
+        width: 1500px; height: 1500px; margin: -750px 0 0 -750px;
+        background: radial-gradient(circle,
+          rgba(247,107,22,0.26) 0%,
+          rgba(247,107,22,0.07) 38%,
+          rgba(247,107,22,0) 68%);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="10"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <div id="glow" class="clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+      <!-- The brand is on screen at frame 0 rather than faded up from
+           nothing: frame 0 is the thumbnail every social player shows before
+           anyone presses play, and an empty one reads as a broken upload. -->
+      <div id="brandmark" class="line clip" data-start="0" data-duration="10" data-track-index="1">AJM&nbsp;Fit</div>
+      <div id="brandrule" class="line clip" data-start="0" data-duration="10" data-track-index="2"></div>
+
+      <div id="whoEyebrow" class="line clip" data-start="1.1" data-duration="8.9" data-track-index="3">New Personal Record</div>
+      <div id="whoName" class="line clip" data-start="1.2" data-duration="8.8" data-track-index="4">Luis</div>
+
+      <div id="liftName" class="line clip" data-start="2.1" data-duration="7.9" data-track-index="5">Split Squat</div>
+
+      <div id="weightValue" class="line clip" data-start="2.9" data-duration="7.1" data-track-index="6">25</div>
+      <div id="weightUnits" class="line clip" data-start="2.9" data-duration="7.1" data-track-index="7">lb &times; 12</div>
+
+      <div id="wasLine" class="line clip" data-start="6.2" data-duration="3.8" data-track-index="8">Up from 25 lb</div>
+
+      <div id="badgePill" class="line clip" data-start="7.0" data-duration="3.0" data-track-index="9"><span>7 PRs this week</span></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      /* The count is a tweened object the timeline owns, so the number on
+         screen is a pure function of timeline time: frame 150 reads 35
+         whether it was rendered first, last, or on another machine. A
+         setInterval would not survive frame-by-frame seeking. */
+      const counter = { value: 25 };
+      const weightEl = document.getElementById("weightValue");
+
+      tl.fromTo("#glow",
+        { opacity: 0.55, scale: 0.88 },
+        { opacity: 1, scale: 1.04, duration: 9.4, ease: "sine.inOut" }, 0);
+
+      /* The wordmark is already visible, so only the rule draws on. */
+      tl.fromTo("#brandrule",
+        { scaleX: 0, transformOrigin: "50% 50%" },
+        { scaleX: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+
+      tl.fromTo("#whoEyebrow",
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 1.15);
+      tl.fromTo("#whoName",
+        { opacity: 0, y: 44, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: "power4.out" }, 1.25);
+
+      tl.fromTo("#liftName",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 2.2);
+
+      tl.fromTo("#weightValue",
+        { opacity: 0, scale: 0.90 },
+        { opacity: 1, scale: 1, duration: 0.6, ease: "power4.out" }, 3.0);
+      tl.fromTo("#weightUnits",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.2);
+
+      /* 25 to 35: the real jump, straight out of exercise_prs. */
+      tl.to(counter, {
+        value: 35, duration: 2.1, ease: "power2.out",
+        onUpdate: () => { weightEl.textContent = String(Math.round(counter.value)); },
+      }, 3.3);
+
+      /* A kick exactly where it lands on 35. */
+      tl.to("#weightValue", { scale: 1.07, duration: 0.16, ease: "power2.out" }, 5.40);
+      tl.to("#weightValue", { scale: 1.00, duration: 0.22, ease: "power2.inOut" }, 5.56);
+
+      tl.fromTo("#wasLine",
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.3);
+
+      tl.fromTo("#badgePill",
+        { opacity: 0, y: 30, scale: 0.90 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.7)" }, 7.1);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

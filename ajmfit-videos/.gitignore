@@ -1,0 +1,14 @@
+# Renders are large and reproducible from the templates.
+exports/**/*.mp4
+exports/**/*.mov
+
+# HyperFrames working state: caches, snapshots, check reports, history.
+**/.hyperframes/
+**/node_modules/
+
+# Source footage and music are large and usually licensed; keep them local.
+assets/training-footage/*
+assets/coaching-footage/*
+assets/music/*
+assets/voiceover/*
+!assets/*/README.md
