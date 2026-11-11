@@ -130,13 +130,13 @@ export const MEALS: Meal[] = [
   { id: 'd14', name: 'Halloumi and roasted vegetable couscous', slot: 'dinner', calories: 591, protein: 31, carbs: 52, fats: 29, prep: 25, contains: ['dairy'], allergens: ['dairy', 'wheat_gluten'] },
 
   // Snacks that carry real protein.
-  { id: 's10', name: 'Double whey shake with milk', slot: 'snack', calories: 365, protein: 57, carbs: 18, fats: 8, prep: 2, contains: ['dairy'], allergens: ['dairy'] },
+  { id: 's10', name: 'Chicken strips with salsa', slot: 'snack', calories: 270, protein: 47, carbs: 4, fats: 6, prep: 5, contains: ['poultry'], allergens: [] },
   { id: 's11', name: 'Skyr with protein granola', slot: 'snack', calories: 365, protein: 35, carbs: 37, fats: 9, prep: 2, contains: ['dairy'], allergens: ['dairy', 'tree_nuts'] },
   { id: 's12', name: 'Turkey and cheese roll-ups', slot: 'snack', calories: 363, protein: 54, carbs: 1, fats: 16, prep: 3, contains: ['poultry', 'dairy'], allergens: ['dairy'] },
 
   // Vegan, and carrying no soy, no sesame and no nuts -- the combination the
   // count above showed was down to two options a slot.
-  { id: 'v9', name: 'Chickpea and spinach curry with rice', slot: 'lunch', calories: 590, protein: 23, carbs: 90, fats: 16, prep: 20, contains: [], allergens: [] },
+  { id: 'v9', name: 'Jacket potato with baked beans and salad', slot: 'lunch', calories: 478, protein: 20, carbs: 95, fats: 2, prep: 12, contains: [], allergens: [] },
   { id: 'v10', name: 'Lentil bolognese with pasta', slot: 'dinner', calories: 610, protein: 29, carbs: 101, fats: 10, prep: 25, contains: [], allergens: ['wheat_gluten'] },
   { id: 'v11', name: 'Oat milk overnight oats with pea protein', slot: 'breakfast', calories: 481, protein: 30, carbs: 69, fats: 10, prep: 5, contains: [], allergens: [] },
   { id: 'v12', name: 'Roasted vegetable and butter bean traybake', slot: 'dinner', calories: 564, protein: 28, carbs: 78, fats: 17, prep: 30, contains: [], allergens: [] },

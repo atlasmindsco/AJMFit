@@ -293,8 +293,8 @@ export const PORTIONS: Record<string, Portion[]> = {
 
   // Snacks that carry real protein.
   s10: [
-    p('2 scoops', 'whey protein', 60, 'whey'),
-    p('250ml', 'semi-skimmed milk', 250, 'milk_semi'),
+    p('150g', 'cooked chicken breast', 150, 'chicken_breast'),
+    p('60g', 'salsa', 60, 'salsa'),
   ],
   s11: [
     p('280g', 'skyr', 280, 'skyr'),
@@ -307,11 +307,9 @@ export const PORTIONS: Record<string, Portion[]> = {
 
   // Vegan, and free of soy, sesame and nuts.
   v9: [
-    p('200g', 'chickpeas', 200, 'chickpeas'),
-    p('100g', 'spinach', 100, 'spinach'),
-    p('100g', 'tinned tomatoes', 100, 'tomatoes_tinned'),
-    p('130g', 'cooked rice', 130, 'rice_cooked'),
-    p('2 tsp', 'olive oil', 10, 'olive_oil'),
+    p('350g', 'baked potato', 350, 'potatoes'),
+    p('250g', 'baked beans', 250, 'beans_baked'),
+    p('80g', 'green salad', 80, 'salad_leaves'),
   ],
   v10: [
     p('70g', 'dry green lentils', 70, 'lentils_dry'),
