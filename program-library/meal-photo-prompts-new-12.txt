@@ -1,0 +1,90 @@
+AJM FIT - PHOTOS FOR THE TWELVE NEW MEALS
+=========================================
+
+Two sheets of six. Six per sheet is what produced the sharpest cells so
+far: forty-four in one image gave 139px each and was unusable, twenty-five
+gave 258px and was soft, six gave 512px and was good. Ask for the largest
+output the tool will give.
+
+Send each sheet back and it gets cut, checked against the meal it claims
+to be, and uploaded.
+
+
+============================================================
+SHEET A  -  the five quick dinners, plus one snack
+============================================================
+
+A single image containing 6 food photographs arranged as a 3 by 2 grid of
+equal square cells, no gaps, no labels, no text. Each cell is an overhead
+photo on a plain matte dark grey surface with soft even daylight from the
+left, shallow depth of field, no hands, no cutlery, no napkins,
+photorealistic. The six dishes, reading left to right then top to bottom:
+1) tinned salmon with rice and peas in a bowl, 2) sliced cooked chicken
+breast with a green salad and wholemeal pitta, 3) scrambled eggs with
+baked beans and wholemeal toast, 4) tofu and mixed stir fry vegetables in
+a bowl, 5) grilled halloumi with roasted vegetables and couscous,
+6) a chocolate protein shake in a tall glass with a jug of milk beside it.
+Make the output as large and high resolution as possible.
+
+  cell 1 -> d10.jpg   Tinned salmon with microwave rice and peas
+  cell 2 -> d11.jpg   Shop-cooked chicken with bagged salad and pitta
+  cell 3 -> d12.jpg   Eggs, beans and toast
+  cell 4 -> d13.jpg   Frozen stir fry vegetables with tofu
+  cell 5 -> d14.jpg   Halloumi and roasted vegetable couscous
+  cell 6 -> s10.jpg   Double whey shake with milk
+
+
+============================================================
+SHEET B  -  two snacks and the four vegan meals
+============================================================
+
+A single image containing 6 food photographs arranged as a 3 by 2 grid of
+equal square cells, no gaps, no labels, no text. Each cell is an overhead
+photo on a plain matte dark grey surface with soft even daylight from the
+left, shallow depth of field, no hands, no cutlery, no napkins,
+photorealistic. The six dishes, reading left to right then top to bottom:
+1) a bowl of thick white skyr topped with golden granola clusters,
+2) rolled slices of turkey breast with batons of cheddar on a dark plate,
+3) chickpea and spinach curry with white rice in a bowl, 4) lentil
+bolognese sauce over pasta in a bowl, 5) overnight oats with pea protein
+and mixed berries in a bowl, 6) a tray of roasted mixed vegetables with
+butter beans. Make the output as large and high resolution as possible.
+
+  cell 1 -> s11.jpg   Skyr with protein granola
+  cell 2 -> s12.jpg   Turkey and cheese roll-ups
+  cell 3 -> v9.jpg    Chickpea and spinach curry with rice
+  cell 4 -> v10.jpg   Lentil bolognese with pasta
+  cell 5 -> v11.jpg   Oat milk overnight oats with pea protein
+  cell 6 -> v12.jpg   Roasted vegetable and butter bean traybake
+
+
+============================================================
+IF YOU GENERATE THEM ONE AT A TIME INSTEAD
+============================================================
+
+Same style line on every one, save as the id shown, then drop all twelve
+onto /luffy/meals at once.
+
+d10.jpg  overhead photo of tinned salmon with rice and peas, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d11.jpg  overhead photo of sliced cooked chicken breast with green salad and wholemeal pitta, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d12.jpg  overhead photo of scrambled eggs with baked beans and wholemeal toast, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d13.jpg  overhead photo of tofu and mixed stir fry vegetables, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+d14.jpg  overhead photo of grilled halloumi with roasted vegetables and couscous, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s10.jpg  overhead photo of a chocolate protein shake in a tall glass with milk, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s11.jpg  overhead photo of thick white skyr topped with golden granola, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+s12.jpg  overhead photo of rolled turkey breast slices with cheddar batons, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v9.jpg   overhead photo of chickpea and spinach curry with white rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v10.jpg  overhead photo of lentil bolognese over pasta, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v11.jpg  overhead photo of overnight oats with pea protein and mixed berries, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
+
+v12.jpg  overhead photo of roasted mixed vegetables with butter beans in a tray, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
