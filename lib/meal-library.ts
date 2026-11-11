@@ -102,6 +102,44 @@ export const MEALS: Meal[] = [
   { id: 'v6', name: 'Red lentil dahl with brown rice', slot: 'dinner', calories: 523, protein: 26, carbs: 88, fats: 8, prep: 30, contains: [], allergens: [] },
   { id: 'v7', name: 'Roasted chickpeas', slot: 'snack', calories: 196, protein: 10, carbs: 31, fats: 4, prep: 2, contains: [], allergens: [] },
   { id: 'v8', name: 'Pea protein shake with water', slot: 'snack', calories: 120, protein: 24, carbs: 2, fats: 2, prep: 1, contains: [], allergens: [] },
+
+  // --- Filling four measured holes ---
+  //
+  // Counted across the 44 meals above, not guessed at:
+  //
+  //   1. NO dinner took under 15 minutes. Breakfast had ten such options and
+  //      snacks had ten; dinner had none. Dinner is the meal where a hard day
+  //      turns into a takeaway, and the library had nothing to offer it.
+  //   2. NO snack carried 35g of protein. In a lifting app that is backwards:
+  //      a snack is how someone closes a protein gap at 9pm.
+  //   3. A vegan avoiding soy saw two breakfasts and two dinners. Two is not
+  //      a choice, it is the same meal twice.
+  //   4. Vegetarian dinner stood at four.
+  //
+  // The quick dinners lean on tinned fish, a cooked chicken, frozen veg and
+  // a microwave rice pouch. That is deliberate: a fifteen-minute dinner made
+  // from scratch is still fifteen minutes someone does not have.
+
+  // Dinners you can make in ten minutes.
+  { id: 'd10', name: 'Tinned salmon with microwave rice and peas', slot: 'dinner', calories: 541, protein: 34, carbs: 70, fats: 13, prep: 7, contains: ['fish'], allergens: ['fish'] },
+  { id: 'd11', name: 'Shop-cooked chicken with bagged salad and pitta', slot: 'dinner', calories: 464, protein: 53, carbs: 37, fats: 10, prep: 5, contains: ['poultry'], allergens: ['wheat_gluten'] },
+  { id: 'd12', name: 'Eggs, beans and toast', slot: 'dinner', calories: 568, protein: 39, carbs: 60, fats: 18, prep: 8, contains: ['eggs'], allergens: ['eggs', 'wheat_gluten'] },
+  // Vegan as well as fast, which is why it carries no `contains` tags.
+  { id: 'd13', name: 'Frozen stir fry vegetables with tofu', slot: 'dinner', calories: 475, protein: 43, carbs: 30, fats: 24, prep: 9, contains: [], allergens: ['soy'] },
+  // The vegetarian dinner count was four; this makes five.
+  { id: 'd14', name: 'Halloumi and roasted vegetable couscous', slot: 'dinner', calories: 591, protein: 31, carbs: 52, fats: 29, prep: 25, contains: ['dairy'], allergens: ['dairy', 'wheat_gluten'] },
+
+  // Snacks that carry real protein.
+  { id: 's10', name: 'Double whey shake with milk', slot: 'snack', calories: 365, protein: 57, carbs: 18, fats: 8, prep: 2, contains: ['dairy'], allergens: ['dairy'] },
+  { id: 's11', name: 'Skyr with protein granola', slot: 'snack', calories: 365, protein: 35, carbs: 37, fats: 9, prep: 2, contains: ['dairy'], allergens: ['dairy', 'tree_nuts'] },
+  { id: 's12', name: 'Turkey and cheese roll-ups', slot: 'snack', calories: 363, protein: 54, carbs: 1, fats: 16, prep: 3, contains: ['poultry', 'dairy'], allergens: ['dairy'] },
+
+  // Vegan, and carrying no soy, no sesame and no nuts -- the combination the
+  // count above showed was down to two options a slot.
+  { id: 'v9', name: 'Chickpea and spinach curry with rice', slot: 'lunch', calories: 590, protein: 23, carbs: 90, fats: 16, prep: 20, contains: [], allergens: [] },
+  { id: 'v10', name: 'Lentil bolognese with pasta', slot: 'dinner', calories: 610, protein: 29, carbs: 101, fats: 10, prep: 25, contains: [], allergens: ['wheat_gluten'] },
+  { id: 'v11', name: 'Oat milk overnight oats with pea protein', slot: 'breakfast', calories: 481, protein: 30, carbs: 69, fats: 10, prep: 5, contains: [], allergens: [] },
+  { id: 'v12', name: 'Roasted vegetable and butter bean traybake', slot: 'dinner', calories: 564, protein: 28, carbs: 78, fats: 17, prep: 30, contains: [], allergens: [] },
 ]
 
 const has = (m: Meal, ...items: Ingredient[]) => items.some((i) => m.contains.includes(i))

@@ -254,6 +254,82 @@ export const PORTIONS: Record<string, Portion[]> = {
   ],
   v7: [p('50g', 'roasted chickpeas', 50, 'chickpeas_roasted')],
   v8: [p('1 scoop', 'pea protein', 30, 'pea_protein'), p('300ml', 'water', 300, 'water')],
+
+  /* ── The twelve added to fill measured gaps ─────────────────────
+     Written before the macros, not after: the numbers on each meal
+     are the sum of these portions through the verifier's own table,
+     so the two cannot disagree. */
+
+  // Ten-minute dinners.
+  d10: [
+    p('110g', 'tinned salmon, drained', 110, 'salmon_tinned'),
+    p('200g', 'cooked rice', 200, 'rice_cooked'),
+    p('100g', 'peas', 100, 'peas'),
+    p('1 tsp', 'olive oil', 5, 'olive_oil'),
+  ],
+  d11: [
+    p('150g', 'cooked chicken breast', 150, 'chicken_breast'),
+    p('80g', 'bagged salad', 80, 'salad_leaves'),
+    p('60g', 'wholemeal pitta', 60, 'pitta'),
+    p('15g', 'light mayonnaise', 15, 'mayo_light'),
+  ],
+  d12: [
+    p('3 large', 'eggs', 150, 'egg'),
+    p('200g', 'baked beans', 200, 'beans_baked'),
+    p('80g', 'wholemeal toast', 80, 'bread_wholemeal'),
+  ],
+  d13: [
+    p('300g', 'frozen stir fry vegetables', 300, 'mixed_veg'),
+    p('200g', 'firm tofu', 200, 'tofu_firm'),
+    p('15g', 'soy sauce', 15, 'soy_sauce'),
+    p('1 tsp', 'olive oil', 5, 'olive_oil'),
+  ],
+  d14: [
+    p('90g', 'halloumi', 90, 'halloumi'),
+    p('200g', 'roasted vegetables', 200, 'mixed_veg'),
+    p('150g', 'cooked couscous', 150, 'couscous_cooked'),
+    p('1 tsp', 'olive oil', 5, 'olive_oil'),
+  ],
+
+  // Snacks that carry real protein.
+  s10: [
+    p('2 scoops', 'whey protein', 60, 'whey'),
+    p('250ml', 'semi-skimmed milk', 250, 'milk_semi'),
+  ],
+  s11: [
+    p('280g', 'skyr', 280, 'skyr'),
+    p('40g', 'protein granola', 40, 'granola'),
+  ],
+  s12: [
+    p('150g', 'turkey breast slices', 150, 'turkey_breast'),
+    p('40g', 'cheddar', 40, 'cheddar'),
+  ],
+
+  // Vegan, and free of soy, sesame and nuts.
+  v9: [
+    p('200g', 'chickpeas', 200, 'chickpeas'),
+    p('100g', 'spinach', 100, 'spinach'),
+    p('100g', 'tinned tomatoes', 100, 'tomatoes_tinned'),
+    p('130g', 'cooked rice', 130, 'rice_cooked'),
+    p('2 tsp', 'olive oil', 10, 'olive_oil'),
+  ],
+  v10: [
+    p('70g', 'dry green lentils', 70, 'lentils_dry'),
+    p('150g', 'marinara', 150, 'marinara'),
+    p('150g', 'cooked pasta', 150, 'pasta_cooked'),
+    p('1 tsp', 'olive oil', 5, 'olive_oil'),
+  ],
+  v11: [
+    p('60g', 'oats', 60, 'oats'),
+    p('25g', 'pea protein', 25, 'pea_protein'),
+    p('250ml', 'oat milk', 250, 'oat_milk'),
+    p('80g', 'mixed berries', 80, 'berries'),
+  ],
+  v12: [
+    p('350g', 'mixed roasted vegetables', 350, 'mixed_veg'),
+    p('240g', 'butter beans', 240, 'white_beans'),
+    p('3 tsp', 'olive oil', 15, 'olive_oil'),
+  ],
 }
 
 /** "250g Greek yoghurt, 0% fat · 100g mixed berries · 1 tbsp honey" */

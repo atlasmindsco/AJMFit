@@ -24,6 +24,17 @@ const g = (label: string, ok: boolean, detail = '') => {
 /** Per 100g: calories, protein, carbs, fats. */
 const FOODS: Record<string, [number, number, number, number]> = {
   water: [0, 0, 0, 0],
+  // Added alongside the twelve meals that fill the measured gaps. The quick
+  // dinners lean on tinned fish, frozen veg and a cooked chicken, none of
+  // which the original forty-four needed.
+  salmon_tinned: [142, 21, 0, 6],
+  peas: [81, 5.4, 14, 0.4],
+  halloumi: [321, 22, 2.2, 25],
+  couscous_cooked: [112, 3.8, 23, 0.2],
+  oat_milk: [45, 0.8, 7.0, 1.5],
+  skyr: [63, 11, 4, 0.2],
+  cheddar: [402, 25, 1.3, 33],
+  beans_baked: [78, 4.8, 13, 0.5],
   // Dairy and eggs
   greek_yoghurt_0: [59, 10.2, 3.6, 0.4],
   cottage_cheese: [98, 11, 3.4, 4.3],
@@ -130,7 +141,8 @@ const macrosOf = (mealId: string) => {
 console.log('EVERY MEAL HAS PORTIONS\n')
 {
   const missing = MEALS.filter((m) => ingredientsFor(m.id).length === 0)
-  g('all 44 meals have portions', missing.length === 0, missing.map((m) => m.id).join(', '))
+  // Counted, not hardcoded: the label said 44 and the library has grown.
+  g(`all ${MEALS.length} meals have portions`, missing.length === 0, missing.map((m) => m.id).join(', '))
 
   const orphans = Object.keys(PORTIONS).filter((id) => !MEALS.some((m) => m.id === id))
   g('no portions for a meal that is gone', orphans.length === 0, orphans.join(', '))
