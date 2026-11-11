@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MEALS, type MealSlot } from '@/lib/meal-library'
 import { fetchMealImages, uploadMealImage, removeMealImage } from '@/lib/meal-images'
+import BulkMealUpload from '@/components/admin/BulkMealUpload'
 
 const SLOTS: Array<{ key: MealSlot; label: string }> = [
   { key: 'breakfast', label: 'Breakfast' },
@@ -55,6 +56,9 @@ export default function MealImagesAdmin() {
   }
 
   const done = MEALS.filter((m) => images.has(m.id)).length
+  // Plain array rather than the Map itself: this build targets ES5, where
+  // spreading a Map's iterator does not compile.
+  const haveIds = MEALS.filter((m) => images.has(m.id)).map((m) => m.id)
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -67,6 +71,11 @@ export default function MealImagesAdmin() {
           {loading ? 'Loading…' : `${done} of ${MEALS.length} have a photo`}
         </p>
       </header>
+
+      {/* Bulk first: it is the way in for a batch, and the per-meal buttons
+          below become what they should always have been — the way to replace
+          one picture, not the way to do forty-four. */}
+      {!loading && <BulkMealUpload haveIds={haveIds} onUploaded={() => void load()} />}
 
       {/* The whole reason to generate these rather than use stock: forty-four
           photographs from forty-four photographers look like a collage. One
