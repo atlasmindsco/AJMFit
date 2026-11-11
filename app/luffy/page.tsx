@@ -23,7 +23,7 @@ interface Stats {
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'text-brand-orange'
   if (tier.includes('Accelerator')) return 'text-brand-blue'
-  return 'text-white/50'
+  return 'text-ink-2'
 }
 
 export default function AdminDashboard() {
@@ -92,14 +92,14 @@ export default function AdminDashboard() {
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="font-display font-extrabold text-3xl md:text-4xl uppercase tracking-tight text-white">
           Dashboard
         </motion.h1>
-        <p className="text-white/40 font-body text-sm mt-2">{today}</p>
+        <p className="text-ink-3 font-body text-sm mt-2">{today}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
         {cards.map((stat, i) => (
           <motion.div key={stat.label} custom={i} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-            <p className="text-white/40 text-2xs font-display uppercase tracking-[0.15em]">{stat.label}</p>
+            <p className="text-ink-3 text-2xs font-display uppercase tracking-[0.15em]">{stat.label}</p>
             <p className="font-display font-extrabold text-3xl text-white tracking-tight mt-1">{stat.value}</p>
           </motion.div>
         ))}
@@ -116,11 +116,11 @@ export default function AdminDashboard() {
             {loading ? (
               <div className="p-8 flex justify-center"><div className="w-5 h-5 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" /></div>
             ) : clients.length === 0 ? (
-              <p className="p-8 text-white/30 text-sm font-body text-center">No clients yet.</p>
+              <p className="p-8 text-ink-4 text-sm font-body text-center">No clients yet.</p>
             ) : (
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-2xs font-display uppercase tracking-[0.2em] text-white/25 border-b border-white/[0.04]">
+                  <tr className="text-left text-2xs font-display uppercase tracking-[0.2em] text-ink-4 border-b border-white/[0.04]">
                     <th className="px-6 py-3 font-semibold">Name</th>
                     <th className="px-6 py-3 font-semibold">Tier</th>
                     <th className="px-6 py-3 font-semibold">Last Active</th>
@@ -159,16 +159,16 @@ export default function AdminDashboard() {
                         <tr key={client.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors duration-150">
                           <td className="px-6 py-4">
                             <span className="text-white text-sm font-body font-medium">{client.name}</span>
-                            <span className="block text-white/30 text-2xs font-body">{client.email}</span>
+                            <span className="block text-ink-4 text-2xs font-body">{client.email}</span>
                           </td>
                           <td className="px-6 py-4"><span className={`text-xs font-body ${getTierColor(tier)}`}>{tier}</span></td>
-                          <td className="px-6 py-4"><span className="text-white/40 text-xs font-body">{relativeTime(client.last_workout_at)}</span></td>
+                          <td className="px-6 py-4"><span className="text-ink-3 text-xs font-body">{relativeTime(client.last_workout_at)}</span></td>
                           <td className="px-6 py-4">
                             <span className="flex items-center gap-2">
                               <span className={`w-2 h-2 rounded-full shrink-0 ${meta.dot}`} />
                               <span>
                                 <span className={`block text-xs font-display font-bold ${meta.tone}`}>{meta.label}</span>
-                                <span className="block text-white/30 text-2xs font-body">{reason}</span>
+                                <span className="block text-ink-4 text-2xs font-body">{reason}</span>
                                 {/* A queued nutrition change rides alongside
                                     rather than competing for the status, which
                                     stays one-per-client. The cron files these
@@ -201,16 +201,16 @@ export default function AdminDashboard() {
           </div>
           <div className="p-4 space-y-2">
             {loading ? (
-              <p className="px-2 py-3 text-white/30 text-sm font-body">Loading…</p>
+              <p className="px-2 py-3 text-ink-4 text-sm font-body">Loading…</p>
             ) : pending.length === 0 ? (
-              <p className="px-2 py-3 text-white/40 text-sm font-body">No applications waiting. You&rsquo;re all caught up.</p>
+              <p className="px-2 py-3 text-ink-3 text-sm font-body">No applications waiting. You&rsquo;re all caught up.</p>
             ) : (
               pending.map((c) => (
                 <Link key={c.id} href="/luffy/clients" className="flex items-start gap-3 p-3 rounded-control hover:bg-white/[0.02] transition-colors duration-150">
                   <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-brand-orange" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/80 text-sm font-body leading-snug">{c.name}</p>
-                    <span className="text-2xs font-display uppercase tracking-[0.15em] text-white/30 mt-1 inline-block">
+                    <p className="text-ink text-sm font-body leading-snug">{c.name}</p>
+                    <span className="text-2xs font-display uppercase tracking-[0.15em] text-ink-4 mt-1 inline-block">
                       {tierLabel(c.application?.tier)} · review →
                     </span>
                   </div>
@@ -234,10 +234,10 @@ export default function AdminDashboard() {
             {wins.map((w) => (
               <div key={`${w.userId}-${w.exerciseName}-${w.at}`} className="py-3 border-b border-white/[0.04] last:border-0 flex items-baseline gap-3">
                 <span className="text-white text-sm font-body font-medium shrink-0">{w.name}</span>
-                <span className="text-white/50 text-sm font-body min-w-0 truncate">
+                <span className="text-ink-2 text-sm font-body min-w-0 truncate">
                   {w.exerciseName} &mdash; {w.weight} lb &times; {w.reps}
                 </span>
-                <span className="text-white/25 text-2xs font-body ml-auto shrink-0">{relativeTime(w.at)}</span>
+                <span className="text-ink-4 text-2xs font-body ml-auto shrink-0">{relativeTime(w.at)}</span>
               </div>
             ))}
           </div>
@@ -248,16 +248,16 @@ export default function AdminDashboard() {
       <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="mt-6 bg-white/[0.03] border border-white/[0.06] rounded-card">
         <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Beta Feedback</h2>
-          {feedback.length > 0 && <span className="text-xs text-white/30 font-body">{feedback.length}</span>}
+          {feedback.length > 0 && <span className="text-xs text-ink-4 font-body">{feedback.length}</span>}
         </div>
         <div className="p-4 space-y-2">
           {feedback.length === 0 ? (
-            <p className="px-2 py-3 text-white/40 text-sm font-body">No feedback yet.</p>
+            <p className="px-2 py-3 text-ink-3 text-sm font-body">No feedback yet.</p>
           ) : (
             feedback.slice(0, 12).map((f) => (
               <div key={f.id} className="p-3 rounded-control bg-white/[0.02]">
-                <p className="text-white/80 text-sm font-body">{f.message}</p>
-                <p className="text-white/30 text-2xs font-body mt-1">
+                <p className="text-ink text-sm font-body">{f.message}</p>
+                <p className="text-ink-4 text-2xs font-body mt-1">
                   {f.name || 'Member'}{f.page ? ` · ${f.page}` : ''} · {new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 </p>
               </div>

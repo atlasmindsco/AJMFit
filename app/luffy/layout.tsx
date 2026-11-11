@@ -165,10 +165,10 @@ export default function AdminLayout({
                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-control text-sm font-body font-medium transition-all duration-200 group ${
                   isActive
                     ? 'bg-brand-orange/10 text-brand-orange'
-                    : 'text-white/40 hover:text-white/80 hover:bg-white/[0.04]'
+                    : 'text-ink-3 hover:text-ink hover:bg-white/[0.04]'
                 }`}
               >
-                <span className={`${isActive ? 'text-brand-orange' : 'text-white/30 group-hover:text-white/60'} transition-colors duration-200`}>
+                <span className={`${isActive ? 'text-brand-orange' : 'text-ink-4 group-hover:text-ink-2'} transition-colors duration-200`}>
                   {item.icon}
                 </span>
                 {item.label}
@@ -181,7 +181,7 @@ export default function AdminLayout({
         <div className="px-4 py-5 border-t border-white/[0.06]">
           <Link
             href="/"
-            className="flex items-center gap-3 px-3.5 py-2.5 text-white/30 hover:text-white/60 text-sm font-body transition-colors duration-200"
+            className="flex items-center gap-3 px-3.5 py-2.5 text-ink-4 hover:text-ink-2 text-sm font-body transition-colors duration-200"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
@@ -198,7 +198,7 @@ export default function AdminLayout({
           {/* Mobile menu button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-white/50 hover:text-white transition-colors duration-200"
+            className="lg:hidden text-ink-2 hover:text-white transition-colors duration-200"
             aria-label="Open sidebar"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -211,7 +211,7 @@ export default function AdminLayout({
           {/* Right side */}
           <div className="flex items-center gap-5">
             {/* Notifications */}
-            <button className="relative text-white/40 hover:text-white/70 transition-colors duration-200">
+            <button className="relative text-ink-3 hover:text-ink-2 transition-colors duration-200">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
               </svg>
@@ -227,7 +227,7 @@ export default function AdminLayout({
             <button
               onClick={handleSignOut}
               title="Sign out"
-              className="text-white/40 hover:text-white/80 transition-colors duration-200"
+              className="text-ink-3 hover:text-ink transition-colors duration-200"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />

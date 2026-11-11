@@ -171,7 +171,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className={`text-2xs font-body ${isDark ? 'text-white/30' : 'text-brand-slate'}`}>Online now</span>
+            <span className={`text-2xs font-body ${isDark ? 'text-ink-4' : 'text-brand-slate'}`}>Online now</span>
           </div>
         </div>
       </div>
@@ -213,7 +213,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                     isUser
                       ? 'bg-brand-blue text-white rounded-card rounded-br-md'
                       : isDark
-                        ? 'bg-white/[0.08] text-white/85 rounded-card rounded-bl-md'
+                        ? 'bg-white/[0.08] text-ink rounded-card rounded-bl-md'
                         : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                   }`}>
                     {displayText || (
@@ -274,7 +274,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
             disabled={isStreaming}
             className={`flex-1 rounded-full px-4 py-2 text-sm font-body focus:outline-none transition-colors duration-200 ${
               isDark
-                ? 'bg-white/[0.06] text-white/70 placeholder:text-white/20 focus:bg-white/[0.08]'
+                ? 'bg-white/[0.06] text-ink-2 placeholder:text-ink-4 focus:bg-white/[0.08]'
                 : 'bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:bg-[#ECEEF2]'
             }`}
           />

@@ -82,7 +82,7 @@ export default function MembershipPaywall() {
           <h1 className="mt-5 font-display font-extrabold text-2xl sm:text-3xl uppercase tracking-tight text-white">
             Start your membership
           </h1>
-          <p className="mt-3 text-white/60 text-sm font-body leading-relaxed">
+          <p className="mt-3 text-ink-2 text-sm font-body leading-relaxed">
             You&rsquo;re in. Begin your 7-day free trial to unlock your custom plan, nutrition tracking,
             and direct access to Coach Anthony. No charge today, cancel anytime during the trial.
           </p>
@@ -97,14 +97,14 @@ export default function MembershipPaywall() {
             {loading ? 'Starting…' : 'Start 7-day free trial'}
           </button>
 
-          <p className="mt-4 text-white/30 text-xs font-body">
+          <p className="mt-4 text-ink-4 text-xs font-body">
             Secure checkout via Stripe.
           </p>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="mt-6 text-white/40 hover:text-white/70 text-sm font-body transition-colors duration-200"
+          className="mt-6 text-ink-3 hover:text-ink-2 text-sm font-body transition-colors duration-200"
         >
           Sign out
         </button>

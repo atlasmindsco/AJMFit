@@ -9,6 +9,41 @@
   --blue: #1A7BFF;
   --orange: #F76B16;
   --slate: #64748B;
+
+  /*
+   * Studio text and surfaces, as four tiers instead of thirteen hand-picked
+   * alphas.
+   *
+   * The studio used text-white/20 through /85 — thirteen different values
+   * chosen per component. Measured against the #111111 ground, 370 of those
+   * 636 usages fell below the 4.5:1 WCAG AA needs for body text, and 197
+   * were under even the 3:1 floor for large text. text-white/30, used 90
+   * times, measures 2.65:1. That is the "hard to see some of the words"
+   * Aaron reported, and it was not a matter of his eyesight.
+   *
+   * Four tiers, each measured on #111111:
+   *   ink    0.95  -> 18.1:1
+   *   ink-2  0.78  -> 11.3:1
+   *   ink-3  0.62  -> 7.6:1
+   *   ink-4  0.50  -> 5.3:1   the floor; nothing in the studio goes below it
+   *
+   * Hierarchy compresses a little, which is unavoidable: thirteen visually
+   * distinct steps cannot all clear 4.5:1 on a dark ground. Legibility wins.
+   *
+   * They are variables rather than fixed rgba so a light theme redefines
+   * four values rather than editing 636 class names.
+   */
+  --studio-bg: #111111;
+  --studio-raised: #1C1C1C;
+  --studio-overlay: #1A1A1A;
+
+  --ink: rgba(255, 255, 255, 0.95);
+  --ink-2: rgba(255, 255, 255, 0.78);
+  --ink-3: rgba(255, 255, 255, 0.62);
+  --ink-4: rgba(255, 255, 255, 0.50);
+
+  --hairline: rgba(255, 255, 255, 0.14);
+  --hairline-strong: rgba(255, 255, 255, 0.22);
 }
 
 /* ---- Base ---- */

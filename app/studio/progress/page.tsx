@@ -15,9 +15,9 @@ import {
 } from '@/lib/body-metrics'
 
 const inputCls =
-  'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+  'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
 
-const labelCls = 'text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]'
+const labelCls = 'text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]'
 
 /**
  * Where a client logs bodyweight and measurements and sees them move.
@@ -142,7 +142,7 @@ export default function ProgressPage() {
     <div className="max-w-2xl mx-auto">
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Progress</h1>
-        <p className="text-white/40 text-sm font-body mt-1">
+        <p className="text-ink-3 text-sm font-body mt-1">
           Weigh in once a week, same day, same time. One number on its own means nothing — the direction is what counts.
         </p>
       </header>
@@ -161,7 +161,7 @@ export default function ProgressPage() {
                 <p className={labelCls}>Current</p>
                 <p className="font-display font-extrabold text-3xl text-white tabular-nums mt-1">
                   {trend.latest}
-                  <span className="text-white/30 text-base font-body ml-1">lbs</span>
+                  <span className="text-ink-4 text-base font-body ml-1">lbs</span>
                 </p>
               </div>
               {trend.change28dLb != null && (
@@ -169,12 +169,12 @@ export default function ProgressPage() {
                   <p className={labelCls}>Last 28 days</p>
                   <p
                     className={`font-display font-extrabold text-2xl tabular-nums mt-1 ${
-                      trend.change28dLb === 0 ? 'text-white/50' : 'text-brand-orange'
+                      trend.change28dLb === 0 ? 'text-ink-2' : 'text-brand-orange'
                     }`}
                   >
                     {trend.change28dLb > 0 ? '+' : ''}
                     {trend.change28dLb}
-                    <span className="text-white/30 text-sm font-body ml-1">lbs</span>
+                    <span className="text-ink-4 text-sm font-body ml-1">lbs</span>
                   </p>
                 </div>
               )}
@@ -196,7 +196,7 @@ export default function ProgressPage() {
                 <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0" />
                 <div className="min-w-0">
                   <p className="text-white text-sm font-display font-bold">{m.label}</p>
-                  <p className="text-white/40 text-xs font-body mt-0.5 leading-relaxed">{m.detail}</p>
+                  <p className="text-ink-3 text-xs font-body mt-0.5 leading-relaxed">{m.detail}</p>
                 </div>
               </div>
             ))}
@@ -235,7 +235,7 @@ export default function ProgressPage() {
 
         <button
           onClick={() => setShowMeasurements((v) => !v)}
-          className="text-white/40 hover:text-white/70 text-xs font-body mt-3 transition-colors duration-200"
+          className="text-ink-3 hover:text-ink-2 text-xs font-body mt-3 transition-colors duration-200"
         >
           {showMeasurements ? '− Fewer measurements' : '+ More measurements (optional)'}
         </button>
@@ -281,7 +281,7 @@ export default function ProgressPage() {
           <div className="divide-y divide-white/[0.06]">
             {rows.slice(0, 12).map((r) => (
               <div key={r.id} className="px-5 py-3 flex items-center justify-between">
-                <span className="text-white/50 text-sm font-body">
+                <span className="text-ink-2 text-sm font-body">
                   {new Date(r.recorded_on + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'short',
                     month: 'short',
@@ -291,7 +291,7 @@ export default function ProgressPage() {
                 <span className="text-white text-sm font-body tabular-nums">
                   {r.weight_lb != null && <>{Number(r.weight_lb)} lbs</>}
                   {r.waist_in != null && (
-                    <span className="text-white/40 ml-3">waist {Number(r.waist_in)}&quot;</span>
+                    <span className="text-ink-3 ml-3">waist {Number(r.waist_in)}&quot;</span>
                   )}
                 </span>
               </div>

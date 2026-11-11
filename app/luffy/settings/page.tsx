@@ -9,8 +9,8 @@ import { fetchCoachSettings, saveCoachSettings, DEFAULT_COACH_SETTINGS, type Coa
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30'
-const labelCls = 'text-white/25 text-2xs font-display uppercase tracking-wide block mb-2'
+  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30'
+const labelCls = 'text-ink-4 text-2xs font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
   { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided, full app access' },
@@ -77,7 +77,7 @@ export default function SettingsPage() {
     <div className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
       <div>
         <p className="text-white font-body font-semibold text-sm">{label}</p>
-        <p className="text-white/25 text-xs font-body">{description}</p>
+        <p className="text-ink-4 text-xs font-body">{description}</p>
       </div>
       <button onClick={() => set(key, !s[key] as never)} className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${s[key] ? 'bg-brand-orange' : 'bg-white/[0.08]'}`}>
         <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200 ${s[key] ? 'left-[22px]' : 'left-0.5'}`} />
@@ -95,7 +95,7 @@ export default function SettingsPage() {
 
       <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-card p-1.5">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-white/30 hover:text-white/60'}`}>
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-ink-4 hover:text-ink-2'}`}>
             {tab.label}
           </button>
         ))}
@@ -135,7 +135,7 @@ export default function SettingsPage() {
             <div className="space-y-3">
               {TIERS.map((tier) => (
                 <div key={tier.name} className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
-                  <div><p className="text-white font-body font-semibold text-sm">{tier.name}</p><p className="text-white/25 text-xs font-body">{tier.features}</p></div>
+                  <div><p className="text-white font-body font-semibold text-sm">{tier.name}</p><p className="text-ink-4 text-xs font-body">{tier.features}</p></div>
                   <span className="text-brand-orange font-display font-bold text-lg">{tier.price}</span>
                 </div>
               ))}
@@ -164,9 +164,9 @@ export default function SettingsPage() {
               <p className="font-display font-extrabold text-3xl text-brand-orange">
                 {revenue === null ? ', ' : `$${(revenue / 100).toLocaleString()}`}
               </p>
-              <span className="text-white/30 text-xs font-display uppercase tracking-wide">this month</span>
+              <span className="text-ink-4 text-xs font-display uppercase tracking-wide">this month</span>
             </div>
-            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-white/80 text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.1] transition-colors duration-200">
+            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-ink text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.1] transition-colors duration-200">
               Manage payments in Stripe →
             </a>
           </div>

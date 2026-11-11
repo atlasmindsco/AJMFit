@@ -50,7 +50,7 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-6">
       <div className="flex items-baseline justify-between gap-4 mb-1">
         <h2 className="font-display font-bold text-white text-sm">Getting you set up</h2>
-        <span className="text-white/35 text-xs font-body tabular-nums">
+        <span className="text-ink-3 text-xs font-body tabular-nums">
           {doneCount} of {steps.length}
         </span>
       </div>
@@ -76,10 +76,10 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
                 ✓
               </span>
               <div className="min-w-0">
-                <p className={`text-sm font-body ${s.done ? 'text-white/35 line-through' : 'text-white/85'}`}>
+                <p className={`text-sm font-body ${s.done ? 'text-ink-3 line-through' : 'text-ink'}`}>
                   {s.label}
                 </p>
-                {!s.done && s.hint && <p className="text-white/35 text-xs font-body mt-0.5">{s.hint}</p>}
+                {!s.done && s.hint && <p className="text-ink-3 text-xs font-body mt-0.5">{s.hint}</p>}
                 {!s.done && s.coach && (
                   <p className="text-brand-blue text-xs font-body mt-0.5">Waiting on Anthony — nothing for you to do here.</p>
                 )}

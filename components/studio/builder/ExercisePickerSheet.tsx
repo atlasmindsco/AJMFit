@@ -92,7 +92,7 @@ export default function ExercisePickerSheet({
             <p className="font-display font-bold text-white text-sm flex-1">Add an exercise</p>
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-control bg-white/[0.08] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+              className="px-3 py-1.5 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
             >
               Done
             </button>
@@ -103,7 +103,7 @@ export default function ExercisePickerSheet({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search 873 exercises"
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
           />
 
           {/* Six buttons over seventeen muscles. */}
@@ -115,7 +115,7 @@ export default function ExercisePickerSheet({
                   key={g.key}
                   onClick={() => setGroup(on ? null : g.key)}
                   className={`shrink-0 px-3 py-2 rounded-control text-xs font-display font-bold transition-colors duration-150 ${
-                    on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-white/50 hover:text-white/80'
+                    on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
                   }`}
                 >
                   {g.label}
@@ -128,7 +128,7 @@ export default function ExercisePickerSheet({
             <select
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/80 text-xs font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-xs font-body focus:outline-none focus:border-brand-blue/50"
             >
               {EQUIPMENT_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -137,7 +137,7 @@ export default function ExercisePickerSheet({
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/80 text-xs font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-xs font-body focus:outline-none focus:border-brand-blue/50"
             >
               {TYPE_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -149,8 +149,8 @@ export default function ExercisePickerSheet({
         <div className="flex-1 overflow-y-auto">
           {results.length === 0 ? (
             <div className="p-8 text-center">
-              <p className="text-white/40 text-sm font-body">Nothing matches that.</p>
-              <p className="text-white/25 text-xs font-body mt-1">
+              <p className="text-ink-3 text-sm font-body">Nothing matches that.</p>
+              <p className="text-ink-4 text-xs font-body mt-1">
                 Try fewer filters. If it genuinely isn&rsquo;t here, Anthony can add it.
               </p>
               {/* "Tell Anthony" used to be advice with nothing behind it — the
@@ -167,7 +167,7 @@ export default function ExercisePickerSheet({
                 </button>
               )}
               {requested && (
-                <p className="text-white/30 text-2xs font-body mt-2">
+                <p className="text-ink-4 text-2xs font-body mt-2">
                   He&rsquo;ll see it with the rest of your feedback.
                 </p>
               )}
@@ -194,7 +194,7 @@ export default function ExercisePickerSheet({
                     </div>
                     <span className="min-w-0 flex-1">
                       <span className="block text-white text-sm font-body truncate">{ex.name}</span>
-                      <span className="block text-white/35 text-2xs font-body capitalize">
+                      <span className="block text-ink-3 text-2xs font-body capitalize">
                         {ex.primaryMuscles[0]} &middot; {ex.equipment} &middot; {ex.mechanic ?? ex.category}
                       </span>
                     </span>
@@ -211,7 +211,7 @@ export default function ExercisePickerSheet({
                 )
               })}
               {results.length > shown.length && (
-                <p className="px-4 py-4 text-white/30 text-xs font-body text-center">
+                <p className="px-4 py-4 text-ink-4 text-xs font-body text-center">
                   Showing {shown.length} of {results.length}. Narrow it down to see the rest.
                 </p>
               )}

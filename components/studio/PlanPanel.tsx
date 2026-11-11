@@ -24,13 +24,13 @@ export default function PlanPanel({
 
   return (
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-6">
-      <p className="text-white/70 text-sm font-body leading-relaxed">{t.headline}</p>
+      <p className="text-ink-2 text-sm font-body leading-relaxed">{t.headline}</p>
 
       <ul className="mt-3 space-y-1.5">
         {t.includes.map((line) => (
           <li key={line} className="flex items-start gap-2.5">
             <span className="mt-[7px] w-1 h-1 rounded-full bg-brand-orange shrink-0" />
-            <span className="text-white/50 text-xs font-body leading-relaxed">{line}</span>
+            <span className="text-ink-2 text-xs font-body leading-relaxed">{line}</span>
           </li>
         ))}
       </ul>
@@ -38,8 +38,8 @@ export default function PlanPanel({
       {/* When the program gets looked at again. The client is paying for the
           cadence as much as the program, and it was the one part of the deal
           the app knew and never said. */}
-      <p className="mt-3 text-white/35 text-2xs font-body">
-        <span className="text-white/50">Your program:</span> {t.programReview.toLowerCase()}.
+      <p className="mt-3 text-ink-3 text-2xs font-body">
+        <span className="text-ink-2">Your program:</span> {t.programReview.toLowerCase()}.
       </p>
 
       {t.weeklyCheckIn && (
@@ -48,7 +48,7 @@ export default function PlanPanel({
             <p className="font-display font-bold text-sm text-white">
               {checkInDone ? 'Check-in sent this week' : 'Your weekly check-in'}
             </p>
-            <p className="text-white/40 text-xs font-body mt-0.5">
+            <p className="text-ink-3 text-xs font-body mt-0.5">
               {checkInDone
                 ? t.responseHours
                   ? `Anthony replies within ${t.responseHours} hours.`

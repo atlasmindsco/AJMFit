@@ -19,8 +19,8 @@ export default function EmptyState({
 }) {
   return (
     <div className="text-center py-2">
-      <p className="font-display font-bold text-sm text-white/80">{title}</p>
-      {line && <p className="text-white/40 text-xs font-body mt-1 max-w-[34ch] mx-auto leading-relaxed">{line}</p>}
+      <p className="font-display font-bold text-sm text-ink">{title}</p>
+      {line && <p className="text-ink-3 text-xs font-body mt-1 max-w-[34ch] mx-auto leading-relaxed">{line}</p>}
       {actionLabel && actionHref && (
         <Link
           href={actionHref}

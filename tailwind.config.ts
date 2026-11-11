@@ -35,6 +35,21 @@ const config: Config = {
           warning: '#F59E0B',
           danger: '#EF4444',
         },
+        // Studio text, four measured tiers. See the note in app/globals.css:
+        // the thirteen hand-picked white alphas these replace put 370 of 636
+        // text usages below WCAG AA, which is what a client reported as
+        // "hard to see some of the words". Backed by CSS variables so a
+        // light theme is four redefinitions, not 636 edits.
+        ink: {
+          DEFAULT: 'var(--ink)',
+          2: 'var(--ink-2)',
+          3: 'var(--ink-3)',
+          4: 'var(--ink-4)',
+        },
+        hairline: {
+          DEFAULT: 'var(--hairline)',
+          strong: 'var(--hairline-strong)',
+        },
       },
       // Three radii, one per role. The codebase had six in active use, which is
       // why marketing (rounded-sm) and the studio (rounded-2xl) read as
@@ -48,9 +63,16 @@ const config: Config = {
       // than a normal face at the same nominal size — they read as fine print.
       // Half the studio's text sat at 12px or below. Each step moves up 1px.
       fontSize: {
-        '2xs': ['0.6875rem', { lineHeight: '0.9375rem' }], // 11px, was text-[10px]
-        xs: ['0.8125rem', { lineHeight: '1.125rem' }],     // 13px, was 12px
-        sm: ['0.9375rem', { lineHeight: '1.375rem' }],     // 15px, was 14px
+        // Raised again after a client said some words were too tiny to read.
+        // 2xs is used 245 times and xs 394 times, so these two numbers set
+        // the floor for most of the text in the product. 11px is below what
+        // anyone should have to read on a phone; 12px is the practical
+        // minimum and 14px is a comfortable small size. sm stays at 15px,
+        // which already reads fine and is used 499 times — raising it too
+        // would reflow half the product for a much smaller gain.
+        '2xs': ['0.75rem', { lineHeight: '1rem' }],        // 12px, was 11px
+        xs: ['0.875rem', { lineHeight: '1.25rem' }],       // 14px, was 13px
+        sm: ['0.9375rem', { lineHeight: '1.375rem' }],     // 15px
       },
       fontFamily: {
         display: ['var(--font-barlow-condensed)', 'sans-serif'],

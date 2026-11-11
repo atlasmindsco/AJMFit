@@ -101,16 +101,16 @@ export default function MessagesPage() {
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="font-display font-extrabold text-3xl uppercase tracking-tight text-white">
           Messages
         </motion.h1>
-        <p className="text-white/40 font-body text-sm mt-1">
+        <p className="text-ink-3 font-body text-sm mt-1">
           {totalUnread} unread &middot; {threads.length} clients
         </p>
       </div>
 
       <div className="flex gap-2 mb-6">
-        <button onClick={() => setActiveView('clients')} className={`px-5 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeView === 'clients' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'}`}>
+        <button onClick={() => setActiveView('clients')} className={`px-5 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeView === 'clients' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'}`}>
           Client Messages
         </button>
-        <button onClick={() => setActiveView('chea')} className={`px-5 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${activeView === 'chea' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'}`}>
+        <button onClick={() => setActiveView('chea')} className={`px-5 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${activeView === 'chea' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'}`}>
           <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center">
             <span className="text-white text-[6px] font-display font-bold">CH</span>
           </div>
@@ -129,17 +129,17 @@ export default function MessagesPage() {
             <div className="lg:col-span-4 border-r border-white/[0.06]">
               <div className="p-4 border-b border-white/[0.06]">
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search clients..." className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control pl-10 pr-4 py-2.5 text-sm text-white/70 font-body placeholder:text-white/20 focus:outline-none focus:border-brand-orange/30" />
+                  <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search clients..." className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control pl-10 pr-4 py-2.5 text-sm text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/30" />
                 </div>
               </div>
               <div className="overflow-y-auto max-h-[540px]">
                 {loading ? (
                   <div className="p-6 flex justify-center"><div className="w-5 h-5 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" /></div>
                 ) : visible.length === 0 ? (
-                  <p className="p-6 text-white/30 text-sm font-body text-center">No clients yet.</p>
+                  <p className="p-6 text-ink-4 text-sm font-body text-center">No clients yet.</p>
                 ) : (
                   visible.map((t) => (
                     <button key={t.userId} onClick={() => setSelected(t.userId)} className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-200 border-b border-white/[0.03] ${selected === t.userId ? 'bg-white/[0.04]' : 'hover:bg-white/[0.02]'}`}>
@@ -149,9 +149,9 @@ export default function MessagesPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="text-white text-sm font-body font-semibold truncate">{t.name}</p>
-                          <span className="text-white/20 text-2xs font-body shrink-0 ml-2">{t.lastAt ? formatMsgTime(t.lastAt) : ''}</span>
+                          <span className="text-ink-4 text-2xs font-body shrink-0 ml-2">{t.lastAt ? formatMsgTime(t.lastAt) : ''}</span>
                         </div>
-                        <p className="text-white/30 text-xs font-body truncate mt-0.5">{t.lastBody ?? 'No messages yet'}</p>
+                        <p className="text-ink-4 text-xs font-body truncate mt-0.5">{t.lastBody ?? 'No messages yet'}</p>
                       </div>
                       {t.unread > 0 && (
                         <div className="w-5 h-5 rounded-full bg-brand-orange flex items-center justify-center shrink-0">
@@ -174,19 +174,19 @@ export default function MessagesPage() {
                     </div>
                     <div>
                       <p className="text-white text-sm font-body font-semibold">{active.name}</p>
-                      <p className="text-white/30 text-2xs font-body">{active.email}</p>
+                      <p className="text-ink-4 text-2xs font-body">{active.email}</p>
                     </div>
                   </div>
 
                   <div className="flex-1 p-6 overflow-y-auto space-y-4 max-h-[460px]">
                     {messages.length === 0 ? (
-                      <p className="text-white/30 text-sm font-body text-center mt-8">No messages yet. Say hello.</p>
+                      <p className="text-ink-4 text-sm font-body text-center mt-8">No messages yet. Say hello.</p>
                     ) : (
                       messages.map((msg) => (
                         <div key={msg.id} className={`flex ${msg.from_trainer ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[75%] px-4 py-3 rounded-card ${msg.from_trainer ? 'bg-brand-blue text-white rounded-br-md' : 'bg-white/[0.06] text-white/80 rounded-bl-md'}`}>
+                          <div className={`max-w-[75%] px-4 py-3 rounded-card ${msg.from_trainer ? 'bg-brand-blue text-white rounded-br-md' : 'bg-white/[0.06] text-ink rounded-bl-md'}`}>
                             <p className="text-sm font-body leading-relaxed">{msg.body}</p>
-                            <p className={`text-2xs font-body mt-1 ${msg.from_trainer ? 'text-white/40' : 'text-white/20'}`}>{formatMsgTime(msg.created_at)}</p>
+                            <p className={`text-2xs font-body mt-1 ${msg.from_trainer ? 'text-ink-3' : 'text-ink-4'}`}>{formatMsgTime(msg.created_at)}</p>
                           </div>
                         </div>
                       ))
@@ -196,7 +196,7 @@ export default function MessagesPage() {
 
                   <div className="px-6 py-4 border-t border-white/[0.06]">
                     <div className="flex items-center gap-3">
-                      <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} type="text" placeholder="Type a message..." className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white/70 font-body placeholder:text-white/20 focus:outline-none focus:border-brand-orange/30" />
+                      <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} type="text" placeholder="Type a message..." className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/30" />
                       <button onClick={send} disabled={!input.trim() || sending} className="w-10 h-10 rounded-control bg-brand-orange flex items-center justify-center hover:bg-brand-orangedark active:scale-95 transition-all duration-200 disabled:opacity-30">
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
@@ -206,7 +206,7 @@ export default function MessagesPage() {
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-white/30 text-sm font-body">
+                <div className="flex-1 flex items-center justify-center text-ink-4 text-sm font-body">
                   {loading ? '' : 'Select a client to view the conversation.'}
                 </div>
               )}

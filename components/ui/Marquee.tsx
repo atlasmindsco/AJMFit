@@ -17,7 +17,7 @@ export default function Marquee() {
       <span className="font-display font-bold text-sm uppercase tracking-[0.2em]">
         {item}
       </span>
-      <span className="text-white/60 text-lg">◆</span>
+      <span className="text-ink-2 text-lg">◆</span>
     </span>
   ))
 

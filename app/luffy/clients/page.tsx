@@ -20,14 +20,14 @@ import ClientPhotos from '@/components/admin/ClientPhotos'
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
   if (tier.includes('Accelerator')) return 'bg-brand-blue/15 text-brand-blue'
-  return 'bg-white/[0.06] text-white/50'
+  return 'bg-white/[0.06] text-ink-2'
 }
 
 function getStatusBadge(status: UserStatus) {
   const map: Record<UserStatus, { label: string; className: string }> = {
     pending: { label: 'Pending', className: 'bg-amber-500/15 text-amber-400' },
     active: { label: 'Active', className: 'bg-emerald-500/15 text-emerald-400' },
-    paused: { label: 'Paused', className: 'bg-white/[0.06] text-white/40' },
+    paused: { label: 'Paused', className: 'bg-white/[0.06] text-ink-3' },
     cancelled: { label: 'Cancelled', className: 'bg-red-500/15 text-red-400' },
   }
   return map[status]
@@ -172,7 +172,7 @@ export default function ClientsPage() {
           >
             Clients
           </motion.h1>
-          <p className="text-white/40 font-body text-sm mt-1">
+          <p className="text-ink-3 font-body text-sm mt-1">
             {counts.active} active &middot; {counts.pending} pending &middot; {counts.paused} paused
           </p>
         </div>
@@ -182,11 +182,11 @@ export default function ClientsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${
-                filter === f ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                filter === f ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
               }`}
             >
               {f}
-              <span className={`text-2xs ${filter === f ? 'text-white/70' : 'text-white/30'}`}>{counts[f]}</span>
+              <span className={`text-2xs ${filter === f ? 'text-ink-2' : 'text-ink-4'}`}>{counts[f]}</span>
             </button>
           ))}
         </div>
@@ -198,7 +198,7 @@ export default function ClientsPage() {
         </div>
       ) : clients.length === 0 ? (
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-12 text-center">
-          <p className="text-white/40 font-body">No clients yet. Applications will appear here when submitted.</p>
+          <p className="text-ink-3 font-body">No clients yet. Applications will appear here when submitted.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -232,7 +232,7 @@ export default function ClientsPage() {
                             : 'bg-white/[0.06]'
                         }`}
                       >
-                        <span className={`text-xs font-display font-bold ${client.status !== 'paused' ? 'text-white' : 'text-white/40'}`}>
+                        <span className={`text-xs font-display font-bold ${client.status !== 'paused' ? 'text-white' : 'text-ink-3'}`}>
                           {client.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                         </span>
                       </div>
@@ -247,7 +247,7 @@ export default function ClientsPage() {
                           <span className={`text-2xs font-display font-bold px-2 py-0.5 rounded ${getTierColor(tierLabelStr)}`}>
                             {tierLabelStr}
                           </span>
-                          <span className="text-white/25 text-2xs font-body">{client.email}</span>
+                          <span className="text-ink-4 text-2xs font-body">{client.email}</span>
                         </div>
                       </div>
                     </div>
@@ -264,7 +264,7 @@ export default function ClientsPage() {
                           <button
                             onClick={() => handleDecline(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-2xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
                           >
                             Decline
                           </button>
@@ -297,17 +297,17 @@ export default function ClientsPage() {
                             className={`px-2.5 py-1.5 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-colors duration-200 disabled:opacity-50 ${
                               client.is_beta
                                 ? 'bg-brand-orange/15 border border-brand-orange/25 text-brand-orange'
-                                : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
+                                : 'bg-white/[0.04] border border-white/[0.08] text-ink-3 hover:text-ink-2'
                             }`}
                           >
                             Beta {client.is_beta ? 'On' : 'Off'}
                           </button>
                           <div className="hidden md:block text-right">
-                            <p className="text-white/30 text-2xs font-display uppercase tracking-wide">Last Workout</p>
-                            <p className="text-white/60 text-xs font-body mt-1">{relativeTime(client.last_workout_at)}</p>
+                            <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Last Workout</p>
+                            <p className="text-ink-2 text-xs font-body mt-1">{relativeTime(client.last_workout_at)}</p>
                           </div>
                           <svg
-                            className={`w-4 h-4 text-white/20 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`w-4 h-4 text-ink-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -324,51 +324,51 @@ export default function ClientsPage() {
                   {isExpanded && client.application && (
                     <div className="mt-5 pt-5 border-t border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Goals</p>
-                        <p className="text-white/70 text-sm font-body mt-1 leading-relaxed">{client.application.goals}</p>
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Goals</p>
+                        <p className="text-ink-2 text-sm font-body mt-1 leading-relaxed">{client.application.goals}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Equipment</p>
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Equipment</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {client.application.equipment.length > 0 ? (
                             client.application.equipment.map((eq) => (
-                              <span key={eq} className="bg-white/[0.04] text-white/60 text-2xs font-body px-2 py-0.5 rounded">
+                              <span key={eq} className="bg-white/[0.04] text-ink-2 text-2xs font-body px-2 py-0.5 rounded">
                                 {eq}
                               </span>
                             ))
                           ) : (
-                            <span className="text-white/40 text-2xs font-body">None listed</span>
+                            <span className="text-ink-3 text-2xs font-body">None listed</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Availability</p>
-                        <p className="text-white/70 text-sm font-body mt-1">{client.application.availability}</p>
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Availability</p>
+                        <p className="text-ink-2 text-sm font-body mt-1">{client.application.availability}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Billing</p>
-                        <p className="text-white/70 text-sm font-body mt-1 capitalize">{client.application.billing_cycle}</p>
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Billing</p>
+                        <p className="text-ink-2 text-sm font-body mt-1 capitalize">{client.application.billing_cycle}</p>
                       </div>
                       {client.application.health_limitations && (
                         <div className="sm:col-span-2">
-                          <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Health Limitations</p>
-                          <p className="text-white/70 text-sm font-body mt-1 leading-relaxed">{client.application.health_limitations}</p>
+                          <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Health Limitations</p>
+                          <p className="text-ink-2 text-sm font-body mt-1 leading-relaxed">{client.application.health_limitations}</p>
                         </div>
                       )}
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Phone</p>
-                        <p className="text-white/70 text-sm font-body mt-1">{client.phone ?? 'Not provided'}</p>
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Phone</p>
+                        <p className="text-ink-2 text-sm font-body mt-1">{client.phone ?? 'Not provided'}</p>
                       </div>
                       <div>
-                        <p className="text-white/25 text-2xs font-display uppercase tracking-wide">Applied</p>
-                        <p className="text-white/70 text-sm font-body mt-1">
+                        <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">Applied</p>
+                        <p className="text-ink-2 text-sm font-body mt-1">
                           {new Date(client.application.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
                       {client.application.referral && (
                         <div className="sm:col-span-2">
-                          <p className="text-white/25 text-2xs font-display uppercase tracking-wide">How they heard about us</p>
-                          <p className="text-white/70 text-sm font-body mt-1">{client.application.referral}</p>
+                          <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">How they heard about us</p>
+                          <p className="text-ink-2 text-sm font-body mt-1">{client.application.referral}</p>
                         </div>
                       )}
 
@@ -383,15 +383,15 @@ export default function ClientsPage() {
                               .filter((k) => (onboardingMap.get(client.id)!.answers[k] ?? '').toString().trim())
                               .map((k) => (
                                 <div key={k}>
-                                  <p className="text-white/25 text-2xs font-display uppercase tracking-wide">{ONBOARDING_LABELS[k]}</p>
-                                  <p className="text-white/70 text-sm font-body mt-0.5 leading-relaxed">
+                                  <p className="text-ink-4 text-2xs font-display uppercase tracking-wide">{ONBOARDING_LABELS[k]}</p>
+                                  <p className="text-ink-2 text-sm font-body mt-0.5 leading-relaxed">
                                     {String(onboardingMap.get(client.id)!.answers[k])}
                                   </p>
                                 </div>
                               ))}
                           </div>
                         ) : (
-                          <p className="text-white/35 text-sm font-body">Not filled out yet.</p>
+                          <p className="text-ink-3 text-sm font-body">Not filled out yet.</p>
                         )}
                       </div>
 
@@ -406,7 +406,7 @@ export default function ClientsPage() {
 
             {filtered.length === 0 && (
               <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-8 text-center">
-                <p className="text-white/40 font-body text-sm">No {filter} clients.</p>
+                <p className="text-ink-3 font-body text-sm">No {filter} clients.</p>
               </div>
             )}
           </div>
@@ -443,8 +443,8 @@ export default function ClientsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 rounded-control" style={{ backgroundColor: t.color }} />
                       <div>
-                        <p className="text-white/70 text-sm font-body">{t.tier}</p>
-                        <p className="text-white/25 text-xs font-body">{t.price} each</p>
+                        <p className="text-ink-2 text-sm font-body">{t.tier}</p>
+                        <p className="text-ink-4 text-xs font-body">{t.price} each</p>
                       </div>
                     </div>
                     <span className="font-display font-bold text-white text-lg">{t.count}</span>
@@ -465,13 +465,13 @@ export default function ClientsPage() {
               </div>
               <div className="p-5 space-y-3">
                 {pendingApplications.length === 0 ? (
-                  <p className="text-white/30 text-xs font-body text-center py-2">No pending applications</p>
+                  <p className="text-ink-4 text-xs font-body text-center py-2">No pending applications</p>
                 ) : (
                   pendingApplications.slice(0, 5).map((client) => (
                     <div key={client.id} className="flex items-center justify-between p-3 rounded-control bg-white/[0.02]">
                       <div className="min-w-0">
                         <p className="text-white text-sm font-body font-medium truncate">{client.name}</p>
-                        <p className="text-white/30 text-xs font-body">
+                        <p className="text-ink-4 text-xs font-body">
                           {new Date(client.application!.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &middot; {tierLabel(client.application!.tier)}
                         </p>
                       </div>
@@ -500,7 +500,7 @@ export default function ClientsPage() {
             <h2 className="font-display font-extrabold text-lg text-white tracking-tight">
               Decline {declineTarget.name.split(' ')[0]}&rsquo;s application
             </h2>
-            <p className="text-white/40 text-xs font-body mt-1 mb-4">
+            <p className="text-ink-3 text-xs font-body mt-1 mb-4">
               They&rsquo;ll get a polite email based on the reason you pick. Reply-to goes to your inbox.
             </p>
             <div className="space-y-2 mb-4">
@@ -514,10 +514,10 @@ export default function ClientsPage() {
                       : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.16]'
                   }`}
                 >
-                  <span className={`block text-sm font-body font-semibold ${declineReason === r.key ? 'text-brand-orange' : 'text-white/80'}`}>
+                  <span className={`block text-sm font-body font-semibold ${declineReason === r.key ? 'text-brand-orange' : 'text-ink'}`}>
                     {r.label}
                   </span>
-                  <span className="block text-white/35 text-xs font-body mt-0.5">{r.hint}</span>
+                  <span className="block text-ink-3 text-xs font-body mt-0.5">{r.hint}</span>
                 </button>
               ))}
             </div>
@@ -526,13 +526,13 @@ export default function ClientsPage() {
               onChange={(e) => setDeclineNote(e.target.value)}
               placeholder="Optional personal note (included in the email, in your words)"
               rows={2}
-              className="w-full px-3.5 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/80 text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50 resize-none"
+              className="w-full px-3.5 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 resize-none"
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setDeclineTarget(null)}
                 disabled={processing !== null}
-                className="px-4 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.08] transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

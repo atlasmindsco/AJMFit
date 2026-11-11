@@ -106,8 +106,8 @@ export default function BlueprintPicker({
           : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14]'
       }`}
     >
-      <span className={`font-display font-bold text-base ${active ? 'text-white' : 'text-white/80'}`}>{title}</span>
-      {sub && <span className="block text-white/40 text-xs font-body mt-0.5">{sub}</span>}
+      <span className={`font-display font-bold text-base ${active ? 'text-white' : 'text-ink'}`}>{title}</span>
+      {sub && <span className="block text-ink-3 text-xs font-body mt-0.5">{sub}</span>}
     </button>
   )
 
@@ -126,9 +126,9 @@ export default function BlueprintPicker({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5"
     >
-      <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]">Your program</p>
+      <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Your program</p>
       <p className="text-white font-display font-bold text-base mt-1">{title}</p>
-      <p className="text-white/40 text-xs font-body mt-1">
+      <p className="text-ink-3 text-xs font-body mt-1">
         {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()} · {days} days a week
       </p>
     </motion.div>
@@ -153,8 +153,8 @@ export default function BlueprintPicker({
       setTrainingDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort((a, b) => a - b)))
     return (
       <div className="mb-5">
-        <p className="text-white/70 text-sm font-body mb-1">Which days will you train?</p>
-        <p className="text-white/35 text-xs font-body mb-3">
+        <p className="text-ink-2 text-sm font-body mb-1">Which days will you train?</p>
+        <p className="text-ink-3 text-xs font-body mb-3">
           Optional. We&rsquo;ll remind you on those days and stay quiet on the rest.
         </p>
         <div className="grid grid-cols-7 gap-1.5">
@@ -169,7 +169,7 @@ export default function BlueprintPicker({
                 className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
                   on
                     ? 'bg-brand-blue/[0.15] border-brand-blue/50 text-white'
-                    : 'bg-white/[0.03] border-white/[0.08] text-white/40 hover:bg-white/[0.06]'
+                    : 'bg-white/[0.03] border-white/[0.08] text-ink-3 hover:bg-white/[0.06]'
                 }`}
               >
                 {n}
@@ -210,10 +210,10 @@ export default function BlueprintPicker({
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight mt-3">
           {firstName ? `Let's get you set up, ${firstName}` : "Let's set up your program"}
         </h1>
-        <p className="text-white/40 text-sm font-body mt-1">
+        <p className="text-ink-3 text-sm font-body mt-1">
           Answer {beginner ? 'two' : 'three'} questions to get your program
         </p>
-        <p className="text-white/30 text-xs font-body mt-2.5">
+        <p className="text-ink-4 text-xs font-body mt-2.5">
           {beginner
             ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
             : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split, plus hybrid tracks with running and conditioning • Gym or dumbbells at home'}
@@ -287,7 +287,7 @@ export default function BlueprintPicker({
           {step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-2">How many days a week?</h2>
-              <p className="text-white/40 text-xs font-body mb-4">
+              <p className="text-ink-3 text-xs font-body mb-4">
                 Pick what you can actually keep to. Consistency beats the perfect split.
               </p>
               <div className={`grid gap-2 mb-5 ${beginner ? 'grid-cols-2' : 'grid-cols-5'}`}>
@@ -302,7 +302,7 @@ export default function BlueprintPicker({
                     className={`py-4 rounded-card border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
                         ? 'bg-brand-blue/[0.12] border-brand-blue/50 text-white'
-                        : 'bg-white/[0.03] border-white/[0.08] text-white/70 hover:bg-white/[0.06]'
+                        : 'bg-white/[0.03] border-white/[0.08] text-ink-2 hover:bg-white/[0.06]'
                     }`}
                   >
                     {d}
@@ -349,10 +349,10 @@ export default function BlueprintPicker({
               onClick={onBuildOwn}
               className="w-full text-left px-5 py-4 rounded-card border border-dashed border-white/[0.18] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.30] active:scale-[0.99] transition-all duration-200"
             >
-              <span className="font-display font-bold text-base text-white/80">
+              <span className="font-display font-bold text-base text-ink">
                 None of these? Build your own
               </span>
-              <span className="block text-white/40 text-xs font-body mt-0.5">
+              <span className="block text-ink-3 text-xs font-body mt-0.5">
                 Choose your own exercises, sets and reps — any number of days.
               </span>
             </button>
@@ -370,7 +370,7 @@ export default function BlueprintPicker({
                 setStep((s) => Math.max(firstStep, s - 1))
               }
             }}
-            className="mt-4 flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors duration-200"
+            className="mt-4 flex items-center gap-1.5 text-ink-3 hover:text-ink-2 transition-colors duration-200"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />

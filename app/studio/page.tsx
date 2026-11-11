@@ -263,7 +263,7 @@ export default function ClientDashboard() {
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
             Welcome back{firstName ? `, ${firstName}` : ''}
           </h1>
-          <p className="text-white/40 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
+          <p className="text-ink-3 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
         </div>
         {!loading && weekStreak > 0 && (
           <div className="shrink-0 text-right">
@@ -319,11 +319,11 @@ export default function ClientDashboard() {
       <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="mb-6 bg-surface-raised rounded-card border border-white/[0.10] p-5">
         <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
         {loading ? (
-          <p className="text-white/30 text-sm font-body mt-1 mb-4">Loading…</p>
+          <p className="text-ink-4 text-sm font-body mt-1 mb-4">Loading…</p>
         ) : today ? (
           <>
             <p className="font-display font-extrabold text-xl text-white mt-2 leading-tight">{today.day.name}</p>
-            <p className="text-white/50 text-sm font-body mt-1">
+            <p className="text-ink-2 text-sm font-body mt-1">
               {today.day.muscles}
             </p>
             <div className="flex flex-wrap gap-1.5 mt-2.5 mb-3">
@@ -331,9 +331,9 @@ export default function ClientDashboard() {
                 {today.day.exercises.length} exercises
               </span>
               {today.day.duration && (
-                <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">{today.day.duration}</span>
+                <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body font-semibold">{today.day.duration}</span>
               )}
-              <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/60 text-2xs font-body font-semibold">
+              <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body font-semibold">
                 Day {today.index + 1}
               </span>
             </div>
@@ -344,14 +344,14 @@ export default function ClientDashboard() {
             <div className="space-y-1 mb-4">
               {today.day.exercises.slice(0, 3).map((ex) => (
                 <div key={ex.name} className="flex items-baseline gap-2 text-sm font-body">
-                  <span className="text-white/70 truncate">{ex.name}</span>
-                  <span className="text-white/25 text-xs ml-auto shrink-0 tabular-nums">
+                  <span className="text-ink-2 truncate">{ex.name}</span>
+                  <span className="text-ink-4 text-xs ml-auto shrink-0 tabular-nums">
                     {ex.sets} × {ex.reps}
                   </span>
                 </div>
               ))}
               {today.day.exercises.length > 3 && (
-                <p className="text-white/25 text-xs font-body">
+                <p className="text-ink-4 text-xs font-body">
                   + {today.day.exercises.length - 3} more
                 </p>
               )}
@@ -376,7 +376,7 @@ export default function ClientDashboard() {
           </>
         ) : tier === 'blueprint' ? (
           <>
-            <p className="text-white/50 text-sm font-body mt-1 mb-4">
+            <p className="text-ink-2 text-sm font-body mt-1 mb-4">
               Pick your program: goal, days per week, gym or home. Ready in seconds.
             </p>
             <Link
@@ -388,7 +388,7 @@ export default function ClientDashboard() {
           </>
         ) : (
           <>
-            <p className="text-white/50 text-sm font-body mt-1 mb-4">
+            <p className="text-ink-2 text-sm font-body mt-1 mb-4">
               Coach Anthony hasn&rsquo;t assigned your program yet. Browse the exercise library in the meantime.
             </p>
             <Link
@@ -429,7 +429,7 @@ export default function ClientDashboard() {
             </div>
             <div className="min-w-0">
               <p className="font-display font-bold text-sm text-white">Pick your training program</p>
-              <p className="text-white/45 text-xs font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
+              <p className="text-ink-3 text-xs font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
             </div>
           </div>
           <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
@@ -454,7 +454,7 @@ export default function ClientDashboard() {
             </div>
             <div className="min-w-0">
               <p className="font-display font-bold text-sm text-white">Start your first workout</p>
-              <p className="text-white/45 text-xs font-body mt-0.5">
+              <p className="text-ink-3 text-xs font-body mt-0.5">
                 Your program is ready. Open it, pick today&rsquo;s session, and log your first set — that&rsquo;s the whole thing.
               </p>
             </div>
@@ -480,7 +480,7 @@ export default function ClientDashboard() {
             </div>
             <div className="min-w-0">
               <p className="font-display font-bold text-sm text-white">Fill out your onboarding form</p>
-              <p className="text-white/45 text-xs font-body mt-0.5">Coach Anthony uses it to build your plan and prep your onboarding call. About 3 minutes.</p>
+              <p className="text-ink-3 text-xs font-body mt-0.5">Coach Anthony uses it to build your plan and prep your onboarding call. About 3 minutes.</p>
             </div>
           </div>
           <span className="shrink-0 text-brand-orange font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
@@ -504,10 +504,10 @@ export default function ClientDashboard() {
               {stat.icon}
             </div>
             <div>
-              <p className="text-white/40 text-2xs font-body uppercase tracking-wide">{stat.label}</p>
+              <p className="text-ink-3 text-2xs font-body uppercase tracking-wide">{stat.label}</p>
               <div className="flex items-baseline gap-1.5">
                 <span className="font-display font-extrabold text-2xl text-white tracking-tight">{stat.value}</span>
-                <span className="text-white/40 text-xs font-body">{stat.sub}</span>
+                <span className="text-ink-3 text-xs font-body">{stat.sub}</span>
               </div>
             </div>
           </motion.div>
@@ -522,7 +522,7 @@ export default function ClientDashboard() {
           <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className={cardHeader}>
               <h2 className="font-display font-bold text-sm text-white">Calories This Week</h2>
-              <span className="text-white/30 text-xs font-body">target {targets.calories.toLocaleString()}</span>
+              <span className="text-ink-4 text-xs font-body">target {targets.calories.toLocaleString()}</span>
             </div>
             <div className="p-5">
               {loading ? (
@@ -536,14 +536,14 @@ export default function ClientDashboard() {
                     const onTarget = d.calories > 0 && d.calories <= targets.calories
                     return (
                       <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
-                        <span className="text-white/50 text-2xs font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
+                        <span className="text-ink-2 text-2xs font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
                         <div className="w-full bg-white/[0.04] rounded-control flex items-end h-full">
                           <div
                             className={`w-full rounded-control ${onTarget ? 'bg-brand-blue' : 'bg-brand-orange'}`}
                             style={{ height: `${Math.max(h, d.calories > 0 ? 4 : 0)}%` }}
                           />
                         </div>
-                        <span className="text-white/40 text-2xs font-body">{dayLabel(d.date)}</span>
+                        <span className="text-ink-3 text-2xs font-body">{dayLabel(d.date)}</span>
                       </div>
                     )
                   })}
@@ -562,7 +562,7 @@ export default function ClientDashboard() {
             </div>
             <div className="p-5">
               {loading ? (
-                <p className="text-white/30 text-sm font-body">Loading…</p>
+                <p className="text-ink-4 text-sm font-body">Loading…</p>
               ) : recentPRs.length === 0 ? (
                 <EmptyState
                   title="Your first PR is one workout away"
@@ -576,13 +576,13 @@ export default function ClientDashboard() {
                     <div key={pr.exercise_name + pr.set_at} className="flex items-center justify-between">
                       <div>
                         <p className="font-body font-semibold text-white text-sm">{pr.exercise_name}</p>
-                        <p className="text-white/40 text-xs font-body">
+                        <p className="text-ink-3 text-xs font-body">
                           {new Date(pr.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           {pr.previous_weight ? ` · prev ${Number(pr.previous_weight)} lbs` : ''}
                         </p>
                       </div>
                       <span className="font-display font-extrabold text-white text-sm">
-                        {Number(pr.weight)} lbs <span className="text-white/40 text-xs font-body">× {pr.reps}</span>
+                        {Number(pr.weight)} lbs <span className="text-ink-3 text-xs font-body">× {pr.reps}</span>
                       </span>
                     </div>
                   ))}
@@ -601,7 +601,7 @@ export default function ClientDashboard() {
             </div>
             <div className="p-5">
               {loading ? (
-                <p className="text-white/30 text-sm font-body">Loading…</p>
+                <p className="text-ink-4 text-sm font-body">Loading…</p>
               ) : upcomingSessions.length === 0 ? (
                 <EmptyState
                   title="No calls booked"
@@ -618,7 +618,7 @@ export default function ClientDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-body font-medium truncate">{s.type || 'Session'}</p>
-                        <p className="text-white/40 text-2xs font-body mt-0.5">
+                        <p className="text-ink-3 text-2xs font-body mt-0.5">
                           {new Date(s.starts_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · {s.duration_min} min
                         </p>
                       </div>
@@ -642,7 +642,7 @@ export default function ClientDashboard() {
                 <Link href="/studio/setup-nutrition" className="text-brand-blue text-xs font-body hover:underline">
                   Macros →
                 </Link>
-                <span className="text-white/20">·</span>
+                <span className="text-ink-4">·</span>
                 <Link href="/studio/nutrition" className="text-brand-blue text-xs font-body hover:underline">
                   Log →
                 </Link>
@@ -651,7 +651,7 @@ export default function ClientDashboard() {
             <div className="p-5">
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/50 text-xs font-body uppercase tracking-wide">Calories</span>
+                  <span className="text-ink-2 text-xs font-body uppercase tracking-wide">Calories</span>
                   <span className="text-white text-sm font-body font-semibold">
                     {val(totals.calories.toLocaleString())} / {targets.calories.toLocaleString()} kcal
                   </span>
@@ -671,7 +671,7 @@ export default function ClientDashboard() {
                       </div>
                     </div>
                     <span className="font-body font-semibold text-white text-xs mt-2">{macro.name}</span>
-                    <span className="text-white/40 text-2xs font-body">Goal {macro.goal}g</span>
+                    <span className="text-ink-3 text-2xs font-body">Goal {macro.goal}g</span>
                   </div>
                 ))}
               </div>

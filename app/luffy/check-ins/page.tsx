@@ -12,13 +12,13 @@ interface ClientLite {
   email: string | null
 }
 
-const labelCls = 'text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]'
+const labelCls = 'text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]'
 
 /** 1-5 rating, coloured so a problem is visible without reading. */
 function Rating({ label, value }: { label: string; value: number | null }) {
   const tone =
     value == null
-      ? 'text-white/30'
+      ? 'text-ink-4'
       : value <= 2
       ? 'text-state-danger'
       : value === 3
@@ -29,7 +29,7 @@ function Rating({ label, value }: { label: string; value: number | null }) {
       <p className={labelCls}>{label}</p>
       <p className={`font-display font-extrabold text-xl tabular-nums mt-0.5 ${tone}`}>
         {value ?? '—'}
-        {value != null && <span className="text-white/25 text-xs font-body">/5</span>}
+        {value != null && <span className="text-ink-4 text-xs font-body">/5</span>}
       </p>
     </div>
   )
@@ -162,11 +162,11 @@ export default function CoachCheckInsPage() {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <p className="font-display font-bold text-white text-base">{client?.name ?? 'Unknown'}</p>
-            <p className="text-white/35 text-xs font-body mt-0.5">
+            <p className="text-ink-3 text-xs font-body mt-0.5">
               Week of{' '}
               {new Date(c.week_of + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               {isAwaiting && (
-                <span className={waited >= 3 ? 'text-state-danger' : 'text-white/35'}>
+                <span className={waited >= 3 ? 'text-state-danger' : 'text-ink-3'}>
                   {' '}
                   · waiting {waited === 0 ? 'today' : `${waited}d`}
                 </span>
@@ -181,7 +181,7 @@ export default function CoachCheckInsPage() {
             <p className="font-display font-extrabold text-xl text-white tabular-nums mt-0.5">
               {c.weight_lb != null ? Number(c.weight_lb) : '—'}
               {weightDelta != null && (
-                <span className={`text-xs font-body ml-1.5 ${weightDelta === 0 ? 'text-white/30' : 'text-brand-orange'}`}>
+                <span className={`text-xs font-body ml-1.5 ${weightDelta === 0 ? 'text-ink-4' : 'text-brand-orange'}`}>
                   {weightDelta > 0 ? '+' : ''}
                   {weightDelta}
                 </span>
@@ -203,13 +203,13 @@ export default function CoachCheckInsPage() {
             {c.win && (
               <div>
                 <p className={labelCls}>Win</p>
-                <p className="text-white/75 text-sm font-body mt-0.5 leading-relaxed">{c.win}</p>
+                <p className="text-ink text-sm font-body mt-0.5 leading-relaxed">{c.win}</p>
               </div>
             )}
             {c.obstacle && (
               <div>
                 <p className={labelCls}>Obstacle</p>
-                <p className="text-white/75 text-sm font-body mt-0.5 leading-relaxed">{c.obstacle}</p>
+                <p className="text-ink text-sm font-body mt-0.5 leading-relaxed">{c.obstacle}</p>
               </div>
             )}
           </div>
@@ -230,7 +230,7 @@ export default function CoachCheckInsPage() {
                   <p className={labelCls}>Their week</p>
                   <ul className="mt-1.5 space-y-1">
                     {brief.facts.map((f, i) => (
-                      <li key={i} className="text-white/70 text-sm font-body leading-relaxed">
+                      <li key={i} className="text-ink-2 text-sm font-body leading-relaxed">
                         {f}
                       </li>
                     ))}
@@ -257,7 +257,7 @@ export default function CoachCheckInsPage() {
               value={drafts[c.id] ?? ''}
               onChange={(e) => setDrafts((d) => ({ ...d, [c.id]: e.target.value }))}
               placeholder="What changes this week, and why. This goes to their messages too."
-              className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+              className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
             />
             <button
               onClick={() => respond(c.id)}
@@ -270,7 +270,7 @@ export default function CoachCheckInsPage() {
         ) : (
           <div className="pt-3 border-t border-white/[0.06]">
             <p className={labelCls}>Your reply</p>
-            <p className="text-white/60 text-sm font-body mt-1 whitespace-pre-wrap leading-relaxed">
+            <p className="text-ink-2 text-sm font-body mt-1 whitespace-pre-wrap leading-relaxed">
               {c.coach_response}
             </p>
           </div>
@@ -291,7 +291,7 @@ export default function CoachCheckInsPage() {
     <div className="max-w-3xl mx-auto">
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Check-ins</h1>
-        <p className="text-white/40 text-sm font-body mt-1">
+        <p className="text-ink-3 text-sm font-body mt-1">
           {awaiting.length === 0
             ? 'Nothing waiting on you.'
             : `${awaiting.length} waiting on a reply, longest first.`}
@@ -310,7 +310,7 @@ export default function CoachCheckInsPage() {
       {checkIns.length === 0 && (
         <div className="bg-surface-raised rounded-card border border-white/[0.10] p-8 text-center">
           <p className="text-white font-display font-bold text-sm">No check-ins yet</p>
-          <p className="text-white/40 text-sm font-body mt-1">
+          <p className="text-ink-3 text-sm font-body mt-1">
             They&rsquo;ll appear here as clients submit them each week.
           </p>
         </div>

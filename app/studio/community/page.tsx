@@ -73,7 +73,7 @@ export default function CommunityPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">Community</h1>
-          <p className="text-white/40 text-sm font-body mt-1">Share wins, ask questions, stay accountable.</p>
+          <p className="text-ink-3 text-sm font-body mt-1">Share wins, ask questions, stay accountable.</p>
         </div>
         <button onClick={() => setShowNew((v) => !v)} className="px-5 py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
           {showNew ? 'Close' : 'New Post'}
@@ -87,7 +87,7 @@ export default function CommunityPage() {
             <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
               <div className="flex gap-2 mb-3 flex-wrap">
                 {POST_CATEGORIES.map((c) => (
-                  <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-white/40'}`}>{c}</button>
+                  <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3'}`}>{c}</button>
                 ))}
               </div>
               <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-sm text-white font-body mb-2 focus:outline-none focus:border-brand-orange/40" />
@@ -103,7 +103,7 @@ export default function CommunityPage() {
           ) : posts.length === 0 ? (
             <div className="bg-surface-raised rounded-card border border-white/[0.10] p-8 text-center">
               <p className="text-white font-display font-bold text-sm">No posts yet</p>
-              <p className="text-white/40 text-sm font-body mt-1">Be the first to share a win or ask a question.</p>
+              <p className="text-ink-3 text-sm font-body mt-1">Be the first to share a win or ask a question.</p>
             </div>
           ) : (
             posts.map((p, i) => (
@@ -114,13 +114,13 @@ export default function CommunityPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-body font-semibold">{p.author_name ?? 'Member'}</p>
-                    <p className="text-white/30 text-2xs font-body">{p.category} · {timeAgo(p.created_at)}</p>
+                    <p className="text-ink-4 text-2xs font-body">{p.category} · {timeAgo(p.created_at)}</p>
                   </div>
                   {p.pinned && <span className="text-brand-orange text-2xs font-display font-bold uppercase">Pinned</span>}
                 </div>
                 <h3 className="text-white font-display font-bold text-sm">{p.title}</h3>
-                {p.body && <p className="text-white/60 text-sm font-body mt-1 leading-relaxed whitespace-pre-wrap">{p.body}</p>}
-                <button onClick={() => toggleComments(p.id)} className="mt-3 text-white/40 text-xs font-body hover:text-white/70">
+                {p.body && <p className="text-ink-2 text-sm font-body mt-1 leading-relaxed whitespace-pre-wrap">{p.body}</p>}
+                <button onClick={() => toggleComments(p.id)} className="mt-3 text-ink-3 text-xs font-body hover:text-ink-2">
                   {p.commentCount ? `${p.commentCount} comment${p.commentCount === 1 ? '' : 's'}` : 'Comment'} {openPost === p.id ? '▲' : '▼'}
                 </button>
                 {openPost === p.id && (
@@ -128,7 +128,7 @@ export default function CommunityPage() {
                     {comments.map((c) => (
                       <div key={c.id} className="flex gap-2.5">
                         <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-display font-bold">{initials(c.author_name ?? 'M')}</span></div>
-                        <div className="flex-1"><p className="text-white/80 text-xs font-body"><span className="font-semibold text-white">{c.author_name ?? 'Member'}</span> · {timeAgo(c.created_at)}</p><p className="text-white/60 text-sm font-body">{c.body}</p></div>
+                        <div className="flex-1"><p className="text-ink text-xs font-body"><span className="font-semibold text-white">{c.author_name ?? 'Member'}</span> · {timeAgo(c.created_at)}</p><p className="text-ink-2 text-sm font-body">{c.body}</p></div>
                       </div>
                     ))}
                     <div className="flex gap-2">
@@ -147,25 +147,25 @@ export default function CommunityPage() {
           <div className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Upcoming Events</h2></div>
             <div className="p-4 space-y-3">
-              {events.length === 0 ? <p className="text-white/40 text-sm font-body">No events scheduled.</p>
+              {events.length === 0 ? <p className="text-ink-3 text-sm font-body">No events scheduled.</p>
                 : events.map((e) => (
                   <div key={e.id}>
                     <p className="text-white text-sm font-body font-semibold">{e.title}</p>
-                    <p className="text-white/40 text-xs font-body">{e.type ? `${e.type} · ` : ''}{new Date(e.starts_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
+                    <p className="text-ink-3 text-xs font-body">{e.type ? `${e.type} · ` : ''}{new Date(e.starts_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
                   </div>
                 ))}
             </div>
           </div>
 
           <div className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Leaderboard</h2><p className="text-white/30 text-2xs font-body">Workouts this month</p></div>
+            <div className="px-5 py-4 border-b border-white/[0.10]"><h2 className="font-display font-bold text-sm text-white">Leaderboard</h2><p className="text-ink-4 text-2xs font-body">Workouts this month</p></div>
             <div className="p-4 space-y-2">
-              {leaders.length === 0 ? <p className="text-white/40 text-sm font-body">No workouts logged yet this month.</p>
+              {leaders.length === 0 ? <p className="text-ink-3 text-sm font-body">No workouts logged yet this month.</p>
                 : leaders.map((l, i) => (
                   <div key={l.name + i} className="flex items-center gap-3">
-                    <span className={`w-5 text-center text-xs font-display font-bold ${i === 0 ? 'text-brand-orange' : 'text-white/30'}`}>{i + 1}</span>
-                    <span className="flex-1 text-white/80 text-sm font-body truncate">{l.name}</span>
-                    <span className="text-white/50 text-xs font-body">{l.workouts}</span>
+                    <span className={`w-5 text-center text-xs font-display font-bold ${i === 0 ? 'text-brand-orange' : 'text-ink-4'}`}>{i + 1}</span>
+                    <span className="flex-1 text-ink text-sm font-body truncate">{l.name}</span>
+                    <span className="text-ink-2 text-xs font-body">{l.workouts}</span>
                   </div>
                 ))}
             </div>

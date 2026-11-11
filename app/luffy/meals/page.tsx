@@ -60,10 +60,10 @@ export default function MealImagesAdmin() {
     <div className="max-w-3xl mx-auto">
       <header className="mb-5">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Meal photos</h1>
-        <p className="text-white/45 text-sm font-body mt-1">
+        <p className="text-ink-3 text-sm font-body mt-1">
           Drop a picture on any meal. It appears on the Meal ideas tab straight away — no deploy.
         </p>
-        <p className="text-white/35 text-xs font-body mt-2 tabular-nums">
+        <p className="text-ink-3 text-xs font-body mt-2 tabular-nums">
           {loading ? 'Loading…' : `${done} of ${MEALS.length} have a photo`}
         </p>
       </header>
@@ -75,9 +75,9 @@ export default function MealImagesAdmin() {
         <p className="font-display font-bold text-white text-xs uppercase tracking-wide mb-2">
           Keep them consistent
         </p>
-        <p className="text-white/50 text-xs font-body leading-relaxed">
+        <p className="text-ink-2 text-xs font-body leading-relaxed">
           Use the same prompt shape for all forty-four, changing only the food. Something like:
-          <span className="block mt-2 p-2.5 rounded-control bg-white/[0.04] text-white/70 font-mono text-2xs leading-relaxed">
+          <span className="block mt-2 p-2.5 rounded-control bg-white/[0.04] text-ink-2 font-mono text-2xs leading-relaxed">
             overhead photo of [the meal], on a plain matte dark surface, soft even
             daylight, no hands, no cutlery, no text, square crop
           </span>
@@ -98,8 +98,8 @@ export default function MealImagesAdmin() {
         const slotDone = meals.filter((m) => images.has(m.id)).length
         return (
           <section key={slot.key} className="mb-6">
-            <h2 className="font-display font-bold text-white/40 text-2xs uppercase tracking-[0.15em] mb-2.5">
-              {slot.label} <span className="text-white/25">· {slotDone} of {meals.length}</span>
+            <h2 className="font-display font-bold text-ink-3 text-2xs uppercase tracking-[0.15em] mb-2.5">
+              {slot.label} <span className="text-ink-4">· {slotDone} of {meals.length}</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {meals.map((meal) => {
@@ -116,13 +116,13 @@ export default function MealImagesAdmin() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={url} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-white/20 text-2xs font-body">none</span>
+                        <span className="text-ink-4 text-2xs font-body">none</span>
                       )}
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <p className="text-white text-xs font-body leading-snug truncate">{meal.name}</p>
-                      <p className="text-white/25 text-2xs font-mono mt-0.5">{meal.id}</p>
+                      <p className="text-ink-4 text-2xs font-mono mt-0.5">{meal.id}</p>
                       <div className="flex items-center gap-3 mt-1.5">
                         <button
                           onClick={() => inputs.current[meal.id]?.click()}
@@ -137,7 +137,7 @@ export default function MealImagesAdmin() {
                               setBusy(meal.id)
                               try { await removeMealImage(meal.id); await load() } finally { setBusy(null) }
                             }}
-                            className="text-white/25 hover:text-state-danger text-2xs font-body transition-colors"
+                            className="text-ink-4 hover:text-state-danger text-2xs font-body transition-colors"
                           >
                             Remove
                           </button>

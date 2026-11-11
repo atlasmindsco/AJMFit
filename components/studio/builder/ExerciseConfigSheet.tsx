@@ -59,7 +59,7 @@ export default function ExerciseConfigSheet({
       >
         <p className="font-display font-extrabold text-lg text-white tracking-tight">{exercise.exerciseName}</p>
 
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Sets</p>
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Sets</p>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSets((s) => Math.max(1, s - 1))}
@@ -81,7 +81,7 @@ export default function ExerciseConfigSheet({
         {/* A plank is held, not repeated. The library says which exercises
             those are (force === 'static'), and asking for a rep count on one
             is what Alex reported from a real session. */}
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">
           {hold ? 'Hold for' : 'Reps'}
         </p>
         <div className="flex flex-wrap gap-1.5">
@@ -90,7 +90,7 @@ export default function ExerciseConfigSheet({
               key={r}
               onClick={() => { setReps(r); setCustomReps(false) }}
               className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
-                !customReps && reps === r ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-white/60 hover:text-white'
+                !customReps && reps === r ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
               {r}
@@ -99,7 +99,7 @@ export default function ExerciseConfigSheet({
           <button
             onClick={() => setCustomReps(true)}
             className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
-              customReps ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-white/60 hover:text-white'
+              customReps ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
             }`}
           >
             Other
@@ -110,18 +110,18 @@ export default function ExerciseConfigSheet({
             value={reps}
             onChange={(e) => setReps(e.target.value)}
             placeholder={hold ? "e.g. 75 sec" : "e.g. 5, or 20 min"}
-            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
           />
         )}
 
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Rest between sets</p>
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Rest between sets</p>
         <div className="flex flex-wrap gap-1.5">
           {REST_PRESETS.map((s) => (
             <button
               key={s}
               onClick={() => setRest(s)}
               className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
-                rest === s ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-white/60 hover:text-white'
+                rest === s ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
               {restLabel(s)}
@@ -130,12 +130,12 @@ export default function ExerciseConfigSheet({
         </div>
 
         <details className="mt-5">
-          <summary className="text-white/40 text-xs font-body cursor-pointer">Add a note</summary>
+          <summary className="text-ink-3 text-xs font-body cursor-pointer">Add a note</summary>
           <input
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. pause at the bottom"
-            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
           />
         </details>
 

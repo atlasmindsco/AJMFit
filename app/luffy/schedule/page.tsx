@@ -100,7 +100,7 @@ export default function SchedulePage() {
     <div className="p-6 lg:p-10 max-w-[1100px] mx-auto">
       <div className="mb-8">
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="font-display font-extrabold text-3xl uppercase tracking-tight text-white">Schedule</motion.h1>
-        <p className="text-white/40 font-body text-sm mt-1">{upcoming.length} upcoming session{upcoming.length === 1 ? '' : 's'}</p>
+        <p className="text-ink-3 font-body text-sm mt-1">{upcoming.length} upcoming session{upcoming.length === 1 ? '' : 's'}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -108,24 +108,24 @@ export default function SchedulePage() {
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6 h-fit">
           <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-5">Schedule a Session</h2>
           <div className="space-y-3">
-            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30">
+            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30">
               <option value="">Select client…</option>
               {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <div className="grid grid-cols-2 gap-3">
-              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
-              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
+              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
             </div>
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30">
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30">
               {SESSION_TYPES.map((t) => <option key={t}>{t}</option>)}
             </select>
             <div className="flex items-center gap-2">
-              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-white/80 font-body focus:outline-none focus:border-brand-orange/30" />
-              <span className="text-white/40 text-xs font-body">minutes</span>
+              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30" />
+              <span className="text-ink-3 text-xs font-body">minutes</span>
             </div>
             <label className="flex items-center gap-2.5 px-1 py-1 cursor-pointer select-none">
               <input type="checkbox" checked={form.zoom} onChange={(e) => setForm({ ...form, zoom: e.target.checked })} className="w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-brand-orange cursor-pointer" />
-              <span className="text-white/60 text-xs font-body">Generate a Zoom link for this session</span>
+              <span className="text-ink-2 text-xs font-body">Generate a Zoom link for this session</span>
             </label>
             {error && <p className="text-red-400/80 text-xs font-body">{error}</p>}
             <button onClick={add} disabled={creating || !form.user_id || !form.date || !form.time} className="w-full py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40">
@@ -143,8 +143,8 @@ export default function SchedulePage() {
           <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card">
             <div className="px-6 py-5 border-b border-white/[0.06]"><h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white">Upcoming</h2></div>
             <div className="p-4 space-y-2">
-              {loading ? <p className="px-2 py-3 text-white/30 text-sm font-body">Loading…</p>
-                : upcoming.length === 0 ? <p className="px-2 py-3 text-white/40 text-sm font-body">No upcoming sessions. Schedule one on the left.</p>
+              {loading ? <p className="px-2 py-3 text-ink-4 text-sm font-body">Loading…</p>
+                : upcoming.length === 0 ? <p className="px-2 py-3 text-ink-3 text-sm font-body">No upcoming sessions. Schedule one on the left.</p>
                 : upcoming.map((s) => (
                   <div key={s.id} className="flex items-center gap-4 p-3 rounded-control bg-white/[0.02]">
                     <div className="w-10 h-10 rounded-control bg-brand-orange/10 flex items-center justify-center shrink-0">
@@ -152,7 +152,7 @@ export default function SchedulePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-body font-medium truncate">{s.clientName}</p>
-                      <p className="text-white/30 text-xs font-body">{s.type} · {s.duration_min} min · {fmt(s.starts_at)}</p>
+                      <p className="text-ink-4 text-xs font-body">{s.type} · {s.duration_min} min · {fmt(s.starts_at)}</p>
                       {s.join_url && (
                         <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-brand-blue text-xs font-body hover:underline">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
@@ -162,7 +162,7 @@ export default function SchedulePage() {
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-control bg-emerald-500/10 text-emerald-400 text-2xs font-display font-bold uppercase hover:bg-emerald-500/20">Done</button>
-                      <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-control bg-white/[0.06] text-white/40 text-2xs font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
+                      <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-control bg-white/[0.06] text-ink-3 text-2xs font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
                     </div>
                   </div>
                 ))}
@@ -175,8 +175,8 @@ export default function SchedulePage() {
               <div className="p-4 space-y-1.5">
                 {past.slice(0, 10).map((s) => (
                   <div key={s.id} className="flex items-center justify-between p-2.5 rounded-control">
-                    <p className="text-white/50 text-sm font-body">{s.clientName} · {s.type}</p>
-                    <span className={`text-2xs font-display uppercase ${s.status === 'completed' ? 'text-emerald-400/70' : s.status === 'cancelled' ? 'text-white/25' : 'text-white/40'}`}>{s.status} · {fmt(s.starts_at)}</span>
+                    <p className="text-ink-2 text-sm font-body">{s.clientName} · {s.type}</p>
+                    <span className={`text-2xs font-display uppercase ${s.status === 'completed' ? 'text-emerald-400/70' : s.status === 'cancelled' ? 'text-ink-4' : 'text-ink-3'}`}>{s.status} · {fmt(s.starts_at)}</span>
                   </div>
                 ))}
               </div>

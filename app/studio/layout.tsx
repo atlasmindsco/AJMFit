@@ -176,7 +176,7 @@ export default function ClientPortalLayout({
                       className={`px-4 py-2 rounded-control text-sm font-body font-medium transition-all duration-200 ${
                         isActive
                           ? 'bg-white/[0.10] text-white'
-                          : 'text-white/40 hover:text-white/70 hover:bg-white/[0.06]'
+                          : 'text-ink-3 hover:text-ink-2 hover:bg-white/[0.06]'
                       }`}
                     >
                       {tab.label}
@@ -196,7 +196,7 @@ export default function ClientPortalLayout({
                   </span>
                 </div>
                 {firstName && (
-                  <span className="text-white/80 text-sm font-body hidden sm:block max-w-[140px] truncate">
+                  <span className="text-ink text-sm font-body hidden sm:block max-w-[140px] truncate">
                     {firstName}
                   </span>
                 )}
@@ -206,7 +206,7 @@ export default function ClientPortalLayout({
               <button
                 onClick={handleSignOut}
                 title="Sign out"
-                className="text-white/40 hover:text-white/80 transition-colors duration-200"
+                className="text-ink-3 hover:text-ink transition-colors duration-200"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
@@ -238,7 +238,7 @@ export default function ClientPortalLayout({
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
-                  isActive ? 'text-brand-blue' : 'text-white/40 active:text-white/70'
+                  isActive ? 'text-brand-blue' : 'text-ink-3 active:text-ink-2'
                 }`}
               >
                 {icon(tab.d)}
@@ -250,7 +250,7 @@ export default function ClientPortalLayout({
             onClick={() => setMobileMenuOpen((v) => !v)}
             aria-expanded={mobileMenuOpen}
             className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
-              mobileMenuOpen ? 'text-white' : 'text-white/40 active:text-white/70'
+              mobileMenuOpen ? 'text-white' : 'text-ink-3 active:text-ink-2'
             }`}
           >
             {icon('M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z')}
@@ -280,7 +280,7 @@ export default function ClientPortalLayout({
                     href={tab.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`block px-4 py-3 rounded-control text-sm font-body font-medium mb-1 ${
-                      isActive ? 'bg-white/[0.10] text-white' : 'text-white/60'
+                      isActive ? 'bg-white/[0.10] text-white' : 'text-ink-2'
                     }`}
                   >
                     {tab.label}

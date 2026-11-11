@@ -106,21 +106,21 @@ export default function LuffyNutritionPage() {
     <div className="max-w-4xl">
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Nutrition review</h1>
-        <p className="text-white/40 text-sm font-body mt-1">
+        <p className="text-ink-3 text-sm font-body mt-1">
           Proposals from the weekly review. Nothing here has changed a client&rsquo;s targets yet.
         </p>
       </header>
 
       {error && (
         <div className="mb-4 p-3.5 rounded-card bg-state-warning/10 border border-state-warning/30">
-          <p className="text-white/80 text-sm font-body">{error}</p>
+          <p className="text-ink text-sm font-body">{error}</p>
         </div>
       )}
 
       {rows.length === 0 ? (
         <div className="bg-surface-raised rounded-card border border-white/[0.10] p-10 text-center">
-          <p className="font-body text-sm text-white/70">Nothing waiting.</p>
-          <p className="text-white/35 text-xs font-body mt-1.5">
+          <p className="font-body text-sm text-ink-2">Nothing waiting.</p>
+          <p className="text-ink-3 text-xs font-body mt-1.5">
             The review runs weekly. Clients on track never appear here.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function LuffyNutritionPage() {
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="min-w-0">
                     <p className="font-display font-bold text-white text-sm">{r.client_name}</p>
-                    <p className="text-white/40 text-xs font-body mt-0.5">
+                    <p className="text-ink-3 text-xs font-body mt-0.5">
                       {VERDICT_LABEL[r.verdict] ?? r.verdict}
                       {r.escalation && ` · ${r.escalation.replace(/_/g, ' ')}`}
                     </p>
@@ -146,7 +146,7 @@ export default function LuffyNutritionPage() {
                   {r.new_cal !== null && (
                     <p className="shrink-0 font-display font-bold text-white text-sm">
                       {Math.round(Number(r.prev_cal))} → {Math.round(Number(r.new_cal))}
-                      <span className="text-white/40 font-body font-normal text-xs"> cal</span>
+                      <span className="text-ink-3 font-body font-normal text-xs"> cal</span>
                     </p>
                   )}
                 </div>
@@ -160,21 +160,21 @@ export default function LuffyNutritionPage() {
                     ['Hunger', e.hunger != null ? `${e.hunger}/5` : '—'],
                   ].map(([label, value]) => (
                     <div key={label} className="rounded-control bg-white/[0.03] px-3 py-2">
-                      <p className="text-white/35 text-2xs font-display uppercase tracking-wide">{label}</p>
-                      <p className="text-white/80 text-sm font-body font-medium">{value}</p>
+                      <p className="text-ink-3 text-2xs font-display uppercase tracking-wide">{label}</p>
+                      <p className="text-ink text-sm font-body font-medium">{value}</p>
                     </div>
                   ))}
                 </div>
 
                 {r.coach_note && (
-                  <p className="text-white/55 text-xs font-body leading-relaxed mb-3">{r.coach_note}</p>
+                  <p className="text-ink-2 text-xs font-body leading-relaxed mb-3">{r.coach_note}</p>
                 )}
 
                 <details className="mb-3">
-                  <summary className="text-white/35 text-xs font-body cursor-pointer hover:text-white/60">
+                  <summary className="text-ink-3 text-xs font-body cursor-pointer hover:text-ink-2">
                     What the client will read
                   </summary>
-                  <p className="text-white/60 text-xs font-body leading-relaxed mt-2 pl-3 border-l border-white/10">
+                  <p className="text-ink-2 text-xs font-body leading-relaxed mt-2 pl-3 border-l border-white/10">
                     {r.reason}
                   </p>
                 </details>
@@ -198,7 +198,7 @@ export default function LuffyNutritionPage() {
                   <button
                     onClick={() => decide(r, 'reject')}
                     disabled={busy === r.id}
-                    className="px-4 py-2 rounded-control bg-white/[0.06] text-white/70 font-display font-bold text-xs uppercase tracking-wide hover:bg-white/[0.12] disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 rounded-control bg-white/[0.06] text-ink-2 font-display font-bold text-xs uppercase tracking-wide hover:bg-white/[0.12] disabled:opacity-50 transition-colors"
                   >
                     Dismiss
                   </button>

@@ -118,16 +118,16 @@ export default function BriefPage() {
             <div className="w-10 h-10 rounded-control bg-brand-orange flex items-center justify-center">
               <span className="font-display font-bold text-sm tracking-tight">AJM</span>
             </div>
-            <span className="text-sm font-semibold tracking-[0.15em] uppercase text-white/50">Pricing Brief</span>
+            <span className="text-sm font-semibold tracking-[0.15em] uppercase text-ink-2">Pricing Brief</span>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
             Online Fitness Coaching<br />
             <span className="text-brand-orange">Pricing Benchmark Report</span>
           </h1>
-          <p className="mt-5 text-white/60 text-lg max-w-xl leading-relaxed">
+          <p className="mt-5 text-ink-2 text-lg max-w-xl leading-relaxed">
             Competitive analysis, platform value premium, and pricing recommendations for AJM FIT, 2025-2026.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3 text-sm text-white/40">
+          <div className="mt-8 flex flex-wrap gap-3 text-sm text-ink-3">
             <span className="bg-white/10 rounded-full px-4 py-1.5">Prepared April 2026</span>
             <span className="bg-white/10 rounded-full px-4 py-1.5">13 Sources Cited</span>
             <span className="bg-white/10 rounded-full px-4 py-1.5">Confidential</span>
@@ -481,7 +481,7 @@ export default function BriefPage() {
 
               <div className="mt-6 bg-brand-navy rounded-card p-7 text-white">
                 <h3 className="font-display font-bold text-lg mb-3">Why a $79 self-guided tier?</h3>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm text-white/80">
+                <div className="grid sm:grid-cols-2 gap-4 text-sm text-ink">
                   <div className="flex items-start gap-3">
                     <span className="text-brand-orange font-bold text-lg leading-none mt-0.5">1</span>
                     <p><strong className="text-white">Captures a new market.</strong> Price-sensitive prospects excluded by the $297 floor.</p>
@@ -585,7 +585,7 @@ export default function BriefPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-brand-navy text-white/40 py-8">
+      <footer className="bg-brand-navy text-ink-3 py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <span>Prepared for AJM FIT by Atlas Minds Co.</span>
           <span>Confidential, not for distribution</span>

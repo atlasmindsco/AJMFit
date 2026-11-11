@@ -9,8 +9,8 @@ import { fetchMyOnboarding, saveMyOnboarding, type OnboardingAnswers } from '@/l
 import { fetchMyTier } from '@/lib/scheduling'
 
 const inputCls =
-  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/60 transition-colors'
-const labelCls = 'block text-white/60 text-xs font-display font-bold uppercase tracking-[0.12em] mb-2'
+  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/60 transition-colors'
+const labelCls = 'block text-ink-2 text-xs font-display font-bold uppercase tracking-[0.12em] mb-2'
 
 /** Segmented picker for short option sets. */
 function Segmented({
@@ -32,7 +32,7 @@ function Segmented({
           className={`px-3.5 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors duration-150 ${
             value === o.key
               ? 'bg-brand-blue/15 border-brand-blue/50 text-brand-blue'
-              : 'bg-white/[0.03] border-white/[0.10] text-white/40 hover:text-white/70'
+              : 'bg-white/[0.03] border-white/[0.10] text-ink-3 hover:text-ink-2'
           }`}
         >
           {o.label}
@@ -128,7 +128,7 @@ export default function OnboardingFormPage() {
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">
           {alreadyFilled ? 'Answers updated' : 'All set'}
         </h1>
-        <p className="text-white/50 text-sm font-body mt-3 max-w-md mx-auto">
+        <p className="text-ink-2 text-sm font-body mt-3 max-w-md mx-auto">
           Coach Anthony has your answers and will review them before your onboarding call. Next step: book the call if you haven&rsquo;t yet.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
@@ -155,7 +155,7 @@ export default function OnboardingFormPage() {
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
           Onboarding Form
         </h1>
-        <p className="text-white/40 text-sm font-body mt-2 max-w-lg">
+        <p className="text-ink-3 text-sm font-body mt-2 max-w-lg">
           This is what Coach Anthony uses to prepare your plan and your onboarding call. Takes about 3 minutes. Be honest, there are no wrong answers.
         </p>
       </motion.div>

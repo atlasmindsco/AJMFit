@@ -113,7 +113,7 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
           <h3 className="font-display font-bold text-sm text-white tracking-tight">Scan Barcode</h3>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors duration-150"
+            className="text-ink-2 hover:text-white transition-colors duration-150"
             aria-label="Close scanner"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -148,9 +148,9 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
           {error ? (
             <p className="text-red-300 text-xs font-body">{error}</p>
           ) : status === 'starting' ? (
-            <p className="text-white/60 text-xs font-body">Starting camera...</p>
+            <p className="text-ink-2 text-xs font-body">Starting camera...</p>
           ) : (
-            <p className="text-white/60 text-xs font-body">Point the camera at a product barcode</p>
+            <p className="text-ink-2 text-xs font-body">Point the camera at a product barcode</p>
           )}
         </div>
       </div>

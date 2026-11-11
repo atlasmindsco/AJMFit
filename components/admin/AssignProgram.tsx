@@ -96,11 +96,11 @@ export default function AssignProgram({ userId }: { userId: string }) {
         Training program
       </p>
 
-      <p className="text-white/70 text-sm font-body mb-3">
+      <p className="text-ink-2 text-sm font-body mb-3">
         {current?.programs?.name ? (
           <>
             Currently on <span className="text-white font-semibold">{current.programs.name}</span>
-            <span className="text-white/35">
+            <span className="text-ink-3">
               {' '}
               · since {new Date(current.assigned_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
@@ -147,7 +147,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional note sent with it — why this program, what to focus on"
-        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-white/25 focus:outline-none focus:border-brand-blue/50"
+        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
       />
 
       {done && <p className="text-state-success text-xs font-body mt-2">{done}</p>}

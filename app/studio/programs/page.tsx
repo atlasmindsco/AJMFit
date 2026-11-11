@@ -1474,7 +1474,7 @@ export default function ProgramsPage() {
             this screen with no program — one of them for 168 days. */}
         <button
           onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-          className="text-white/40 hover:text-white/70 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+          className="text-ink-3 hover:text-ink-2 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
         >
           Or build your own in the meantime
         </button>
@@ -1524,7 +1524,7 @@ export default function ProgramsPage() {
                 </div>
                 <button
                   onClick={stopRestTimer}
-                  className="ml-auto px-3 py-2 rounded-control bg-white/[0.08] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                  className="ml-auto px-3 py-2 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                 >
                   Skip
                 </button>
@@ -1536,7 +1536,7 @@ export default function ProgramsPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide">Training</p>
+                  <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">Training</p>
                   <p className="text-white font-display font-bold text-lg leading-none tabular-nums">
                     {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
                     {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
@@ -1550,7 +1550,7 @@ export default function ProgramsPage() {
                 )}
                 <button
                   onClick={() => setConfirmEnd(tallySession())}
-                  className="ml-auto px-4 py-2 rounded-control bg-white/[0.08] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] hover:text-white active:scale-95 transition-all duration-150"
+                  className="ml-auto px-4 py-2 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] hover:text-white active:scale-95 transition-all duration-150"
                 >
                   End
                 </button>
@@ -1645,11 +1645,11 @@ export default function ProgramsPage() {
                 <h1 className="font-display font-extrabold text-xl text-white tracking-tight">
                   {currentProgram.name}
                 </h1>
-                <span className="text-2xs font-display font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
+                <span className="text-2xs font-display font-bold px-2 py-0.5 rounded bg-white/10 text-ink-2">
                   {currentProgram.level}
                 </span>
               </div>
-              <p className="text-white/40 text-sm font-body mt-1 max-w-md">
+              <p className="text-ink-3 text-sm font-body mt-1 max-w-md">
                 Your program. Train and log against it. Swap any exercise you can&rsquo;t do.
               </p>
             </div>
@@ -1665,7 +1665,7 @@ export default function ProgramsPage() {
                   own build, the button that got them there disappeared. */}
               <button
                 onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-                className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-white/60 uppercase tracking-wide hover:bg-white/[0.10] hover:text-white/80 transition-colors duration-200"
+                className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-ink-2 uppercase tracking-wide hover:bg-white/[0.10] hover:text-ink transition-colors duration-200"
               >
                 Change Program
               </button>
@@ -1688,7 +1688,7 @@ export default function ProgramsPage() {
                 <p className="font-display font-bold text-white text-sm">
                   Week {prog.week} of {prog.totalWeeks}
                 </p>
-                <p className="text-white/35 text-2xs font-body">
+                <p className="text-ink-3 text-2xs font-body">
                   {prog.isFinalWeek
                     ? 'Final week — results at the end'
                     : `${prog.daysLeft} days to go`}
@@ -1711,8 +1711,8 @@ export default function ProgramsPage() {
           const p = PROGRESSION[(programGoal ?? 'muscle') as ProgressionGoal]
           const item = (label: string, body: string) => (
             <div>
-              <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-[0.15em]">{label}</p>
-              <p className="text-white/60 text-xs font-body mt-1 leading-relaxed">{body}</p>
+              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">{label}</p>
+              <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">{body}</p>
             </div>
           )
           return (
@@ -1736,7 +1736,7 @@ export default function ProgramsPage() {
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'overview'
                         ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
-                        : 'text-white/30 hover:text-white/50'
+                        : 'text-ink-4 hover:text-ink-2'
                     }`}
                   >
                     Overview
@@ -1746,7 +1746,7 @@ export default function ProgramsPage() {
                     className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
                       previewTab === 'program'
                         ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
-                        : 'text-white/30 hover:text-white/50'
+                        : 'text-ink-4 hover:text-ink-2'
                     }`}
                   >
                     Program
@@ -1762,25 +1762,25 @@ export default function ProgramsPage() {
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
-                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
+                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
                       </div>
                       <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-white font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
                         </p>
-                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
+                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
                       </div>
                       <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
                         <p className="text-state-success font-display font-extrabold text-2xl tracking-tight">
                           {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
                         </p>
-                        <p className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide mt-1">Completed</p>
+                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Completed</p>
                       </div>
                     </div>
 
                     {/* Program details */}
                     <div className="space-y-3">
-                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
+                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
                       {[
                         { label: 'Program', value: currentProgram.name },
                         { label: 'Type', value: programSource === 'custom' ? 'Built by you' : 'Sample routine' },
@@ -1788,7 +1788,7 @@ export default function ProgramsPage() {
                         { label: 'Training days', value: `${weeklyPlan.filter((d) => d.exercises.length > 0).length} / week` },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
-                          <span className="text-white/50 text-sm font-body shrink-0">{item.label}</span>
+                          <span className="text-ink-2 text-sm font-body shrink-0">{item.label}</span>
                           <span className="text-white font-body font-semibold text-sm text-right">{item.value}</span>
                         </div>
                       ))}
@@ -1796,7 +1796,7 @@ export default function ProgramsPage() {
 
                     {/* Weekly split summary */}
                     <div className="space-y-2">
-                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
+                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
                       {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => {
                         const dayIndex = weeklyPlan.indexOf(day)
                         return (
@@ -1808,14 +1808,14 @@ export default function ProgramsPage() {
                             {/* `day.day` is the literal string "Day 1", so
                                 slicing it to 3 characters printed the word
                                 "Day" on every single row. */}
-                            <span className="text-white/40 text-xs font-body w-8 shrink-0 tabular-nums">{dayIndex + 1}</span>
+                            <span className="text-ink-3 text-xs font-body w-8 shrink-0 tabular-nums">{dayIndex + 1}</span>
                             <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-brand-blue transition-colors duration-200">{day.name}</span>
                             {dayIndex === todayIndex && (
                               <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-[9px] font-display font-bold uppercase tracking-wide shrink-0">
                                 Today
                               </span>
                             )}
-                            <span className="text-white/30 text-xs font-body ml-auto text-right">{day.muscles}</span>
+                            <span className="text-ink-4 text-xs font-body ml-auto text-right">{day.muscles}</span>
                             {day.completed ? (
                               <div className="w-5 h-5 rounded-full bg-state-success flex items-center justify-center shrink-0">
                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -1823,7 +1823,7 @@ export default function ProgramsPage() {
                                 </svg>
                               </div>
                             ) : (
-                              <svg className="w-4 h-4 text-white/20 group-hover:text-white/40 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <svg className="w-4 h-4 text-ink-4 group-hover:text-ink-3 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                               </svg>
                             )}
@@ -1851,13 +1851,13 @@ export default function ProgramsPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-                          className="flex-1 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                          className="flex-1 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
                         >
                           Build my own
                         </button>
                         <button
                           onClick={openMyPrograms}
-                          className="px-4 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/45 text-xs font-display font-bold uppercase tracking-wide hover:text-white/80 transition-colors duration-200"
+                          className="px-4 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-3 text-xs font-display font-bold uppercase tracking-wide hover:text-ink transition-colors duration-200"
                         >
                           My programs
                         </button>
@@ -1900,7 +1900,7 @@ export default function ProgramsPage() {
                             {/* Thumbnail or rest icon */}
                             {isRest ? (
                               <div className="w-14 h-14 rounded-control bg-white/[0.04] flex items-center justify-center shrink-0">
-                                <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <svg className="w-6 h-6 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                                 </svg>
                               </div>
@@ -1928,7 +1928,7 @@ export default function ProgramsPage() {
                             {/* Info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className={`font-display font-bold text-sm ${isRest ? 'text-white/30' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
+                                <p className={`font-display font-bold text-sm ${isRest ? 'text-ink-4' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
                                   {day.name}
                                 </p>
                                 {i === todayIndex && (
@@ -1937,7 +1937,7 @@ export default function ProgramsPage() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-white/30 text-xs font-body">
+                              <p className="text-ink-4 text-xs font-body">
                                 Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
                               </p>
                             </div>
@@ -1950,7 +1950,7 @@ export default function ProgramsPage() {
                                 </svg>
                               </div>
                             ) : !isRest ? (
-                              <svg className="w-5 h-5 text-white/20 group-hover:text-white/40 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <svg className="w-5 h-5 text-ink-4 group-hover:text-ink-3 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                               </svg>
                             ) : null}
@@ -1984,7 +1984,7 @@ export default function ProgramsPage() {
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
                     onClick={() => { setView('preview'); setSelectedDay(null) }}
-                    className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
+                    className="flex items-center gap-2 text-ink-3 hover:text-ink-2 transition-colors duration-200 mb-3"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -1992,7 +1992,7 @@ export default function ProgramsPage() {
                     <span className="text-xs font-display font-semibold uppercase tracking-wide">Back to Program</span>
                   </button>
                   <h2 className="font-display font-bold text-lg text-white">Workout Overview</h2>
-                  <p className="text-white/40 text-xs font-body mt-0.5">{selected.muscles}</p>
+                  <p className="text-ink-3 text-xs font-body mt-0.5">{selected.muscles}</p>
                 </div>
 
                 {/* Series-grouped exercises.
@@ -2028,10 +2028,10 @@ export default function ProgramsPage() {
                       ))}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide">
+                      <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
                         Exercise {focusIndex + 1} of {selected.exercises.length}
                       </p>
-                      <p className="text-white/25 text-2xs font-body">
+                      <p className="text-ink-4 text-2xs font-body">
                         {exerciseProgress.filter((p) => p.complete).length} done
                         {exerciseProgress.some((p) => p.skipped) &&
                           ` · ${exerciseProgress.filter((p) => p.skipped).length} skipped`}
@@ -2045,7 +2045,7 @@ export default function ProgramsPage() {
                     <div key={group.label}>
                       {/* Series header */}
                       <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em]">
+                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">
                           {group.label}
                         </p>
                         {group.isSuperset && (
@@ -2181,7 +2181,7 @@ export default function ProgramsPage() {
                                     </>
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                      <span className="text-white/20 text-xs font-display font-bold">{seriesPrefix}</span>
+                                      <span className="text-ink-4 text-xs font-display font-bold">{seriesPrefix}</span>
                                     </div>
                                   )}
                                 </button>
@@ -2211,7 +2211,7 @@ export default function ProgramsPage() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 mt-0.5">
-                                    <p className="text-white/35 text-xs font-body">
+                                    <p className="text-ink-3 text-xs font-body">
                                       Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
                                     </p>
                                     {pr && (
@@ -2236,7 +2236,7 @@ export default function ProgramsPage() {
                                     {dbMatch && (
                                       <button
                                         onClick={() => setDemoFor(exercise.name)}
-                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
+                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-ink-2 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
                                         aria-label="How to do this exercise"
                                       >
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -2247,7 +2247,7 @@ export default function ProgramsPage() {
                                     {alternatives.length > 0 && (
                                       <button
                                         onClick={() => setSwapFor(exercise.name)}
-                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
+                                        className="w-9 h-9 rounded-control bg-white/[0.06] flex items-center justify-center text-ink-2 hover:text-white hover:bg-white/[0.10] active:scale-95 transition-all duration-150"
                                         aria-label="Swap this exercise"
                                       >
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -2264,7 +2264,7 @@ export default function ProgramsPage() {
                                     <p className="text-brand-orange text-xs font-display font-bold">
                                       {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
                                     </p>
-                                    <svg className={`w-4 h-4 text-white/20 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <svg className={`w-4 h-4 text-ink-4 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                       <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                                     </svg>
                                   </button>
@@ -2286,7 +2286,7 @@ export default function ProgramsPage() {
                                       {pr && (
                                         <div className={`flex items-center justify-between rounded-control px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-state-warning/15 border border-state-warning/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
                                           <div className="flex items-center gap-2">
-                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-state-warning' : 'text-white/30'}`} viewBox="0 0 24 24" fill="currentColor">
+                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-state-warning' : 'text-ink-4'}`} viewBox="0 0 24 24" fill="currentColor">
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                             </svg>
                                             {isNewPR ? (
@@ -2294,16 +2294,16 @@ export default function ProgramsPage() {
                                                 New PR!
                                               </span>
                                             ) : (
-                                              <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
+                                              <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
                                                 Current PR
                                               </span>
                                             )}
                                           </div>
                                           <div className="text-right">
-                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-white/60'}`}>
+                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-ink-2'}`}>
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
-                                            <span className="text-white/20 text-2xs font-body ml-2">{pr.date}</span>
+                                            <span className="text-ink-4 text-2xs font-body ml-2">{pr.date}</span>
                                           </div>
                                         </div>
                                       )}
@@ -2318,10 +2318,10 @@ export default function ProgramsPage() {
                                         return (
                                           <div className="flex items-center justify-between rounded-control bg-white/[0.03] border border-white/[0.06] px-3 py-2 mt-2 mb-3">
                                             <div className="flex items-center gap-2">
-                                              <svg className="w-3.5 h-3.5 text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                              <svg className="w-3.5 h-3.5 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                               </svg>
-                                              <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">Rest Timer</span>
+                                              <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">Rest Timer</span>
                                             </div>
                                             {isEditingThis ? (
                                               <div className="flex items-center gap-1.5">
@@ -2335,7 +2335,7 @@ export default function ProgramsPage() {
                                                     className={`px-2 py-1 rounded text-2xs font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
                                                         ? 'bg-brand-blue text-white'
-                                                        : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                        : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                     }`}
                                                   >
                                                     {sec < 60 ? `${sec}s` : `${sec / 60}m`}
@@ -2345,7 +2345,7 @@ export default function ProgramsPage() {
                                             ) : (
                                               <button
                                                 onClick={() => setEditingRest(exercise.name)}
-                                                className="flex items-center gap-1.5 text-white/50 hover:text-white/80 transition-colors duration-200"
+                                                className="flex items-center gap-1.5 text-ink-2 hover:text-ink transition-colors duration-200"
                                               >
                                                 <span className="text-sm font-display font-bold">{customSec}s</span>
                                                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -2385,8 +2385,8 @@ export default function ProgramsPage() {
                                           return (
                                             <>
                                               {past[0]?.durationSeconds != null && (
-                                                <p className="text-white/40 text-2xs font-body mb-2">
-                                                  <span className="text-white/25">Last time: </span>
+                                                <p className="text-ink-3 text-2xs font-body mb-2">
+                                                  <span className="text-ink-4">Last time: </span>
                                                   {Math.round(past[0].durationSeconds / 60)} min
                                                 </p>
                                               )}
@@ -2394,7 +2394,7 @@ export default function ProgramsPage() {
                                                 className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
                                                   tt.isProgression
                                                     ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
-                                                    : 'bg-white/[0.03] border-white/[0.08] text-white/55'
+                                                    : 'bg-white/[0.03] border-white/[0.08] text-ink-2'
                                                 }`}
                                               >
                                                 {tt.text}
@@ -2436,9 +2436,9 @@ export default function ProgramsPage() {
                                                       })
                                                     }, 500)
                                                   }}
-                                                  className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                  className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
-                                                <span className="text-white/35 text-xs font-body">
+                                                <span className="text-ink-3 text-xs font-body">
                                                   minutes
                                                 </span>
                                               </div>
@@ -2486,18 +2486,18 @@ export default function ProgramsPage() {
                                                         })
                                                       }, 500)
                                                     }}
-                                                    className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-white/20 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     aria-label="Distance in miles, optional"
                                                   />
-                                                  <span className="text-white/35 text-xs font-body">
-                                                    miles <span className="text-white/20">(optional)</span>
+                                                  <span className="text-ink-3 text-xs font-body">
+                                                    miles <span className="text-ink-4">(optional)</span>
                                                   </span>
                                                 </div>
                                               )}
 
                                               {/* Pace, the moment both are in. */}
                                               {Number(typed) > 0 && Number(distanceLogs[logKey]) > 0 && (
-                                                <p className="text-white/40 text-2xs font-body mt-2">
+                                                <p className="text-ink-3 text-2xs font-body mt-2">
                                                   {(() => {
                                                     const sec = (Number(typed) * 60) / Number(distanceLogs[logKey])
                                                     return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')} per mile`
@@ -2514,7 +2514,7 @@ export default function ProgramsPage() {
                                         // jump; nothing about that is a good idea.
                                         if (isExplosiveMovement(displayName)) {
                                           return (
-                                            <div className="mb-2 px-3 py-2 rounded-control border border-white/[0.08] bg-white/[0.03] text-white/55 text-xs font-body leading-relaxed">
+                                            <div className="mb-2 px-3 py-2 rounded-control border border-white/[0.08] bg-white/[0.03] text-ink-2 text-xs font-body leading-relaxed">
                                               {explosiveGuidance(displayName)}
                                             </div>
                                           )
@@ -2548,17 +2548,17 @@ export default function ProgramsPage() {
                                             <div className="mb-2 mt-2 rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 space-y-1.5">
                                               {prevSets.length > 0 && (
                                                 <div className="flex items-baseline gap-3">
-                                                  <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Last</span>
-                                                  <span className="text-white/70 text-sm font-body tabular-nums">
+                                                  <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Last</span>
+                                                  <span className="text-ink-2 text-sm font-body tabular-nums">
                                                     {Number(prevSets[0].weight)} lb &middot; {prevSets.map((s) => s.reps).join(', ')}
                                                   </span>
                                                 </div>
                                               )}
                                               <div className="flex items-baseline gap-3">
-                                                <span className="text-white/25 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Today</span>
+                                                <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Today</span>
                                                 <span className={`text-base font-display font-bold tabular-nums ${t.addLoad ? 'text-brand-orange' : 'text-white'}`}>
                                                   {t.suggestedWeight != null ? `${t.suggestedWeight} lb` : 'Bodyweight'}
-                                                  {t.suggestedReps != null && <span className="text-white/50 font-body text-sm"> &times; {exercise.reps}</span>}
+                                                  {t.suggestedReps != null && <span className="text-ink-2 font-body text-sm"> &times; {exercise.reps}</span>}
                                                 </span>
                                                 {t.addLoad && (
                                                   <span className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide ml-auto shrink-0">
@@ -2608,7 +2608,7 @@ export default function ProgramsPage() {
                                                   ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
                                                   : t.attention
                                                     ? 'bg-state-warning/[0.10] border-state-warning/30 text-state-warning'
-                                                    : 'bg-white/[0.03] border-white/[0.08] text-white/55'
+                                                    : 'bg-white/[0.03] border-white/[0.08] text-ink-2'
                                               }`}
                                             >
                                               {t.text}
@@ -2635,7 +2635,7 @@ export default function ProgramsPage() {
                                             </p>
                                             <ul className="space-y-1">
                                               {coaching.cues.slice(0, 2).map((cue, i) => (
-                                                <li key={i} className="text-white/75 text-xs font-body leading-relaxed">{cue}</li>
+                                                <li key={i} className="text-ink text-xs font-body leading-relaxed">{cue}</li>
                                               ))}
                                             </ul>
                                             {treatAsBeginner && (
@@ -2697,7 +2697,7 @@ export default function ProgramsPage() {
                                             }
                                             return (
                                               <div key={si} className="flex items-center gap-3">
-                                                <span className={`text-xs font-display font-bold w-6 shrink-0 ${log.logged ? 'text-state-success' : 'text-white/30'}`}>
+                                                <span className={`text-xs font-display font-bold w-6 shrink-0 ${log.logged ? 'text-state-success' : 'text-ink-4'}`}>
                                                   {si + 1}
                                                 </span>
                                                 <div className="flex items-center gap-2 flex-wrap">
@@ -2710,7 +2710,7 @@ export default function ProgramsPage() {
                                                         className={`w-11 h-11 rounded-full border-2 flex items-center justify-center font-display font-bold text-sm transition-all duration-150 active:scale-90 ${
                                                           on
                                                             ? 'bg-state-success/25 border-state-success text-state-success'
-                                                            : 'bg-white/[0.03] border-white/[0.12] text-white/25 hover:border-white/25'
+                                                            : 'bg-white/[0.03] border-white/[0.12] text-ink-4 hover:border-white/25'
                                                         }`}
                                                         aria-label={`Set ${si + 1}, effort ${n + 1} of ${prescribed}${on ? ', done' : ''}`}
                                                       >
@@ -2735,7 +2735,7 @@ export default function ProgramsPage() {
                                               lib/conditioning.ts is waiting on. */}
                                           {currentLogs.every((l) => l.logged) && (
                                             <div className="flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 mt-1">
-                                              <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
+                                              <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">
                                                 How did they feel?
                                               </span>
                                               {[
@@ -2765,7 +2765,7 @@ export default function ProgramsPage() {
                                                   className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
                                                     rirByExercise[logKey] === q.key
                                                       ? 'bg-brand-blue text-white'
-                                                      : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                      : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                   }`}
                                                 >
                                                   {q.label}
@@ -2783,11 +2783,11 @@ export default function ProgramsPage() {
                                           sitting over a 20-minute row. */}
                                       {!explosive && currentLogs.length > 0 && (
                                         <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-2`}>
-                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                          <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
                                           {needsWeight && (
-                                            <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                            <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
                                           )}
-                                          <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">{hold ? 'Seconds' : explosive ? 'Efforts' : 'Reps'}</span>
+                                          <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">{hold ? 'Seconds' : explosive ? 'Efforts' : 'Reps'}</span>
                                           <span />
                                         </div>
                                       )}
@@ -2969,13 +2969,13 @@ export default function ProgramsPage() {
                                         const numberTone = filled
                                           ? 'text-white'
                                           : isSuggestion
-                                            ? 'text-white/35'
+                                            ? 'text-ink-3'
                                             : 'text-white'
 
                                         return (
                                           <div key={si} className={`rounded-control mb-1 ${isActive && !filled ? 'bg-white/[0.04] px-1.5 py-1.5' : ''}`}>
                                             <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
-                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-white/30'}`}>{si + 1}</span>
+                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-ink-4'}`}>{si + 1}</span>
                                               {/* The suggestion is a PLACEHOLDER, not a value.
                                                   It used to be a real value, which meant tapping
                                                   in put the caret inside "115" and typing gave
@@ -2994,7 +2994,7 @@ export default function ProgramsPage() {
                                                   value={log.weight}
                                                   onFocus={selectAllOnFocus}
                                                   onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-white/35' : 'placeholder:text-white/20'}`}
+                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                   aria-label={`Set ${si + 1} weight in pounds`}
                                                 />
                                               )}
@@ -3005,7 +3005,7 @@ export default function ProgramsPage() {
                                                 value={log.reps}
                                                 onFocus={selectAllOnFocus}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-white/35' : 'placeholder:text-white/20'}`}
+                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                 aria-label={`Set ${si + 1} ${hold ? 'seconds held' : explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
@@ -3066,7 +3066,7 @@ export default function ProgramsPage() {
                                                     className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
                                                       shownReps === String(secs)
                                                         ? 'bg-brand-blue text-white'
-                                                        : 'bg-white/[0.05] text-white/50 hover:text-white'
+                                                        : 'bg-white/[0.05] text-ink-2 hover:text-white'
                                                     }`}
                                                   >
                                                     {holdLabel(secs)}
@@ -3104,7 +3104,7 @@ export default function ProgramsPage() {
                                           wrong weight to ask it at. */}
                                       {!explosive && currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
                                         <div className="mt-3 flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5">
-                                          <span className="text-white/55 text-2xs font-display font-bold uppercase tracking-wide">
+                                          <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">
                                             {treatAsBeginner ? 'Could you have done more?' : 'Reps left in the tank?'}
                                           </span>
                                           {[0, 1, 2, 3].map((n) => {
@@ -3140,7 +3140,7 @@ export default function ProgramsPage() {
                                                 className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
                                                   on
                                                     ? 'bg-brand-blue text-white'
-                                                    : 'bg-white/[0.04] text-white/40 hover:text-white/70'
+                                                    : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                 }`}
                                               >
                                                 {n === 0 ? 'Nothing' : n === 3 ? '3+' : n}
@@ -3166,10 +3166,10 @@ export default function ProgramsPage() {
                                       <div className="mt-3 rounded-control bg-white/[0.02] border border-white/[0.06] p-3">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
-                                            <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <svg className="w-3.5 h-3.5 text-ink-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
-                                            <span className="text-white/60 text-2xs font-display font-bold uppercase tracking-wide">Intensity Technique</span>
+                                            <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">Intensity Technique</span>
                                           </div>
                                           <button
                                             onClick={() => {
@@ -3205,7 +3205,7 @@ export default function ProgramsPage() {
                                                   key={key}
                                                   onClick={() => setIntensityChoice((prev) => ({ ...prev, [logKey]: key }))}
                                                   className={`py-2 px-2 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
-                                                    isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/[0.05]'
+                                                    isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-ink-3 hover:text-ink-2 hover:bg-white/[0.05]'
                                                   }`}
                                                   style={
                                                     isSelected
@@ -3223,13 +3223,13 @@ export default function ProgramsPage() {
                                         {/* Intensity set logger */}
                                         {intensityEnabled && selectedTechnique && (
                                           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-                                            <p className="text-white/30 text-2xs font-body leading-relaxed mb-3">
+                                            <p className="text-ink-4 text-2xs font-body leading-relaxed mb-3">
                                               {TECHNIQUE_META[selectedTechnique].hint}
                                             </p>
                                             <div className="grid grid-cols-[32px_1fr_40px] gap-2 mb-1.5">
-                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
-                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
-                                              <span className="text-white/20 text-2xs font-display font-bold uppercase tracking-wide text-center">Fail</span>
+                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Fail</span>
                                             </div>
                                             {currentIntensityLogs.map((iLog, idx) => {
                                               const meta = TECHNIQUE_META[selectedTechnique]
@@ -3298,7 +3298,7 @@ export default function ProgramsPage() {
                                                 </div>
                                               )
                                             })}
-                                            <p className="text-white/20 text-2xs font-body mt-2 text-center">
+                                            <p className="text-ink-4 text-2xs font-body mt-2 text-center">
                                               To failure, check when complete
                                             </p>
                                           </div>
@@ -3310,7 +3310,7 @@ export default function ProgramsPage() {
                                           Rendered unconditionally, so a 20-minute
                                           row session read "Target: 20 min reps". */}
                                       {!timed && (
-                                        <p className="text-white/20 text-2xs font-body mt-2 text-center">
+                                        <p className="text-ink-4 text-2xs font-body mt-2 text-center">
                                           Target: {exercise.reps}{hold ? '' : explosive ? ' efforts' : ' reps'}
                                         </p>
                                       )}
@@ -3327,10 +3327,10 @@ export default function ProgramsPage() {
                                           onClick={() => setSwapFor(exercise.name)}
                                           className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10] transition-colors duration-200"
                                         >
-                                          <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                          <svg className="w-3.5 h-3.5 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                                           </svg>
-                                          <span className="text-white/40 text-2xs font-display font-bold uppercase tracking-wide">
+                                          <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
                                             {isSwapped ? 'Change substitute' : 'Swap exercise'}
                                           </span>
                                         </button>
@@ -3358,7 +3358,7 @@ export default function ProgramsPage() {
                       <button
                         onClick={() => goToExercise(focusIndex - 1)}
                         disabled={focusIndex === 0}
-                        className="px-4 py-3 rounded-control bg-white/[0.06] text-white/70 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-30 disabled:active:scale-100"
+                        className="px-4 py-3 rounded-control bg-white/[0.06] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-30 disabled:active:scale-100"
                       >
                         Back
                       </button>
@@ -3387,7 +3387,7 @@ export default function ProgramsPage() {
                           setSkipped((prev) => ({ ...prev, [key]: true }))
                           if (focusIndex < selected.exercises.length - 1) goToExercise(focusIndex + 1)
                         }}
-                        className="w-full py-2.5 text-white/30 text-2xs font-display font-bold uppercase tracking-wide hover:text-white/60 transition-colors duration-200"
+                        className="w-full py-2.5 text-ink-4 text-2xs font-display font-bold uppercase tracking-wide hover:text-ink-2 transition-colors duration-200"
                       >
                         Skip this exercise
                       </button>
@@ -3418,7 +3418,7 @@ export default function ProgramsPage() {
                       )}
                       <button
                         onClick={() => setConfirmEnd(tallySession())}
-                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
+                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-ink-2 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
                       >
                         End Workout
                       </button>
@@ -3488,7 +3488,7 @@ export default function ProgramsPage() {
               <div className="flex items-center gap-2 mb-4">
                 <button
                   onClick={() => { setBuilderDraft(null); setView('preview') }}
-                  className="text-white/40 hover:text-white/70 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                  className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
                 >
                   ‹ Back
                 </button>
@@ -3511,11 +3511,11 @@ export default function ProgramsPage() {
               <div className="flex items-center justify-between gap-3 mb-4">
                 <button
                   onClick={() => setView('preview')}
-                  className="text-white/40 hover:text-white/70 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                  className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
                 >
                   ‹ Back
                 </button>
-                <span className="text-white/25 text-2xs font-body">
+                <span className="text-ink-4 text-2xs font-body">
                   {myPrograms.length} of {MAX_CUSTOM_PROGRAMS}
                 </span>
               </div>
@@ -3533,7 +3533,7 @@ export default function ProgramsPage() {
               )}
 
               {myPrograms.length === 0 ? (
-                <p className="text-white/30 text-sm font-body text-center py-10">
+                <p className="text-ink-4 text-sm font-body text-center py-10">
                   Nothing saved yet. Customize the program you&rsquo;re on, or build one from scratch.
                 </p>
               ) : (
@@ -3557,13 +3557,13 @@ export default function ProgramsPage() {
                           ) : (
                             <span className="block text-white text-sm font-display font-bold truncate">{p.name}</span>
                           )}
-                          <span className="block text-white/35 text-xs font-body mt-0.5">
+                          <span className="block text-ink-3 text-xs font-body mt-0.5">
                             {p.days_per_week ?? 0} {p.days_per_week === 1 ? 'day' : 'days'} a week
                           </span>
                         </span>
                         <button
                           onClick={() => openBuilder(p.id, p.id)}
-                          className="shrink-0 px-3 py-2 rounded-control bg-white/[0.06] text-white/70 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                          className="shrink-0 px-3 py-2 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                         >
                           Edit
                         </button>
@@ -3584,7 +3584,7 @@ export default function ProgramsPage() {
                       <div className="flex items-center gap-4 mt-2">
                         <button
                           onClick={() => { setRenaming({ id: p.id, name: p.name }); }}
-                          className="text-white/25 hover:text-white/70 text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-ink-2 text-2xs font-body transition-colors duration-150"
                         >
                           Rename
                         </button>
@@ -3599,7 +3599,7 @@ export default function ProgramsPage() {
                             setMyPrograms(await fetchMyCustomPrograms(userId))
                           }}
                           disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
-                          className="text-white/25 hover:text-white/70 disabled:opacity-40 text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-ink-2 disabled:opacity-40 text-2xs font-body transition-colors duration-150"
                         >
                           Duplicate
                         </button>
@@ -3609,7 +3609,7 @@ export default function ProgramsPage() {
                             await deleteCustomProgram(p.id)
                             setMyPrograms(await fetchMyCustomPrograms(userId))
                           }}
-                          className="text-white/25 hover:text-state-danger text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-state-danger text-2xs font-body transition-colors duration-150"
                         >
                           Delete
                         </button>
@@ -3622,12 +3622,12 @@ export default function ProgramsPage() {
               <button
                 onClick={() => setView('startFrom')}
                 disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
-                className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-white/60 text-sm font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
+                className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-2 text-sm font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
               >
                 + Build another
               </button>
               {myPrograms.length >= MAX_CUSTOM_PROGRAMS && (
-                <p className="text-white/30 text-xs font-body text-center mt-2">
+                <p className="text-ink-4 text-xs font-body text-center mt-2">
                   Delete one to make room.
                 </p>
               )}
@@ -3642,7 +3642,7 @@ export default function ProgramsPage() {
                 <div className="px-5 py-4 border-b border-white/[0.10]">
                   <button
                     onClick={() => { setView('workout'); setSelectedExercise(null) }}
-                    className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors duration-200 mb-3"
+                    className="flex items-center gap-2 text-ink-3 hover:text-ink-2 transition-colors duration-200 mb-3"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -3679,7 +3679,7 @@ export default function ProgramsPage() {
                   {/* Setup section */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
+                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
                       <div className="grid grid-cols-3 gap-3">
                         <SetupCard icon="equipment" label="Equipment" value={selectedExerciseDB.equipment} />
                         <SetupCard icon="level" label="Level" value={selectedExerciseDB.level} />
@@ -3691,7 +3691,7 @@ export default function ProgramsPage() {
                   {/* Target muscles with MuscleMap */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
+                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
                       <div className="flex flex-col sm:flex-row gap-4 items-start">
                         <div className="w-full sm:w-48 shrink-0">
                           <MuscleMap
@@ -3719,7 +3719,7 @@ export default function ProgramsPage() {
                                 <div className="w-4 h-4 rounded-control bg-brand-blue" />
                               </div>
                               <div>
-                                <p className="text-white/70 font-body font-semibold text-sm capitalize">{m}</p>
+                                <p className="text-ink-2 font-body font-semibold text-sm capitalize">{m}</p>
                                 <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
@@ -3732,14 +3732,14 @@ export default function ProgramsPage() {
                   {/* Instructions */}
                   {selectedExerciseDB && selectedExerciseDB.instructions.length > 0 && (
                     <div>
-                      <h3 className="text-white/25 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
+                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
                       <ol className="space-y-3">
                         {selectedExerciseDB.instructions.map((step, i) => (
                           <li key={i} className="flex gap-3">
                             <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-2xs font-display font-bold mt-0.5">
                               {i + 1}
                             </span>
-                            <p className="text-white/60 text-sm font-body leading-relaxed">{step}</p>
+                            <p className="text-ink-2 text-sm font-body leading-relaxed">{step}</p>
                           </li>
                         ))}
                       </ol>
@@ -3759,14 +3759,14 @@ export default function ProgramsPage() {
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
             <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
             {history.length > 0 && (
-              <span className="text-white/30 text-2xs font-display font-bold uppercase tracking-wide">
+              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">
                 {history.length} logged
               </span>
             )}
           </div>
           <div className="p-4">
             {history.length === 0 ? (
-              <p className="text-white/40 text-sm font-body leading-relaxed px-1">
+              <p className="text-ink-3 text-sm font-body leading-relaxed px-1">
                 Your logged workouts will show up here. Start a session above and log your sets to build your history.
               </p>
             ) : (
@@ -3778,7 +3778,7 @@ export default function ProgramsPage() {
                   >
                     <div className="min-w-0">
                       <p className="text-white text-sm font-body font-semibold truncate">{w.day_name}</p>
-                      <p className="text-white/35 text-xs font-body mt-0.5">
+                      <p className="text-ink-3 text-xs font-body mt-0.5">
                         {formatHistoryDate(w)} &middot; {w.set_count} {w.set_count === 1 ? 'set' : 'sets'}
                         {w.duration_seconds ? ` · ${formatDuration(w.duration_seconds)}` : ''}
                       </p>
@@ -3805,7 +3805,7 @@ export default function ProgramsPage() {
             <h2 className="font-display font-bold text-sm text-white">Your Coach</h2>
           </div>
           <div className="p-5">
-            <p className="text-white/40 text-sm font-body leading-relaxed">
+            <p className="text-ink-3 text-sm font-body leading-relaxed">
               A personalized program built around your goals is on the way. In the meantime, follow this sample routine and message Coach Anthony anytime.
             </p>
             <a
@@ -3867,7 +3867,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
       >
         <button
           onClick={onDone}
-          className="absolute top-3 right-3 w-8 h-8 rounded-control bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.92] transition-all duration-200 flex items-center justify-center text-white/60 hover:text-white/90 pointer-events-auto"
+          className="absolute top-3 right-3 w-8 h-8 rounded-control bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.92] transition-all duration-200 flex items-center justify-center text-ink-2 hover:text-white/90 pointer-events-auto"
           aria-label="Close"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -3883,7 +3883,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         </motion.div>
         <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-state-warning">New PR!</p>
         <p className="text-white font-body font-semibold text-sm mt-1">{name}</p>
-        <p className="text-white/60 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
+        <p className="text-ink-2 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
       </motion.div>
     </div>
   )
@@ -3914,7 +3914,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
           style={{ opacity: showEnd ? 1 : 0 }}
         />
       )}
-      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-control text-[9px] font-display font-semibold text-white/70 uppercase tracking-wide backdrop-blur-sm">
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-control text-[9px] font-display font-semibold text-ink-2 uppercase tracking-wide backdrop-blur-sm">
         {showEnd && images[1] ? 'End' : 'Start'}
       </div>
     </div>
@@ -3926,24 +3926,24 @@ function SetupCard({ icon, label, value }: { icon: string; label: string; value:
     <div className="flex flex-col items-center gap-2 p-3 rounded-card bg-white/[0.06] border border-white/[0.10]">
       <div className="w-10 h-10 rounded-control bg-white/[0.06] flex items-center justify-center">
         {icon === 'equipment' && (
-          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-5 h-5 text-ink-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
           </svg>
         )}
         {icon === 'level' && (
-          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-5 h-5 text-ink-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
           </svg>
         )}
         {icon === 'category' && (
-          <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-5 h-5 text-ink-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
           </svg>
         )}
       </div>
       <div className="text-center">
-        <p className="text-white/25 text-[9px] font-display font-bold uppercase tracking-wide">{label}</p>
+        <p className="text-ink-4 text-[9px] font-display font-bold uppercase tracking-wide">{label}</p>
         <p className="text-white text-xs font-body font-semibold capitalize mt-0.5">{value}</p>
       </div>
     </div>
@@ -3993,7 +3993,7 @@ function BlockComplete({
           {review.weeks} weeks done
         </h2>
 
-        <p className="text-white/70 text-sm font-body leading-relaxed mb-5">{review.headline}</p>
+        <p className="text-ink-2 text-sm font-body leading-relaxed mb-5">{review.headline}</p>
 
         <div className="flex items-start gap-3 mb-5">
           {[
@@ -4003,7 +4003,7 @@ function BlockComplete({
           ].map(([value, label]) => (
             <div key={label} className="flex-1">
               <p className="font-display font-extrabold text-xl text-white tabular-nums">{value}</p>
-              <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">
+              <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">
                 {label}
               </p>
             </div>
@@ -4014,7 +4014,7 @@ function BlockComplete({
           <div className="rounded-control border border-white/[0.08] divide-y divide-white/[0.06] mb-5">
             {movers.map((l) => (
               <div key={l.exercise} className="flex items-center justify-between px-3.5 py-2.5 gap-3">
-                <span className="text-white/70 text-xs font-body truncate">{l.exercise}</span>
+                <span className="text-ink-2 text-xs font-body truncate">{l.exercise}</span>
                 <span
                   className={`shrink-0 text-xs font-body font-semibold tabular-nums ${
                     l.change > 0 ? 'text-state-success' : 'text-state-warning'
@@ -4028,7 +4028,7 @@ function BlockComplete({
         )}
 
         {review.weightChangeLb !== null && review.weightChangeLb !== 0 && (
-          <p className="text-white/45 text-xs font-body mb-5">
+          <p className="text-ink-3 text-xs font-body mb-5">
             Bodyweight {review.weightChangeLb > 0 ? 'up' : 'down'}{' '}
             {Math.abs(review.weightChangeLb)} lbs across the block.
           </p>
@@ -4036,7 +4036,7 @@ function BlockComplete({
 
         <div className="rounded-control bg-brand-blue/[0.08] border border-brand-blue/25 px-4 py-3.5 mb-6">
           <p className="font-display font-bold text-white text-sm">{next.title}</p>
-          <p className="text-white/60 text-xs font-body leading-relaxed mt-1">{next.detail}</p>
+          <p className="text-ink-2 text-xs font-body leading-relaxed mt-1">{next.detail}</p>
         </div>
 
         <div className="flex gap-2.5">
@@ -4048,7 +4048,7 @@ function BlockComplete({
           </button>
           <button
             onClick={onKeepGoing}
-            className="flex-1 py-3.5 bg-white/[0.06] text-white/70 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
+            className="flex-1 py-3.5 bg-white/[0.06] text-ink-2 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
           >
             Keep this one
           </button>
@@ -4105,17 +4105,17 @@ function SwapSheet({
         role="dialog"
         aria-label={`Swap ${exerciseName}`}
       >
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em]">Swap</p>
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em]">Swap</p>
         <h2 className="font-display font-extrabold text-xl text-white tracking-tight mt-1">{exerciseName}</h2>
 
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Why?</p>
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Why?</p>
         <div className="flex gap-1.5 flex-wrap">
           {reasons.map((r) => (
             <button
               key={r.key}
               onClick={() => setReason(r.key)}
               className={`px-3 py-2 rounded-control text-xs font-body transition-colors duration-150 ${
-                reason === r.key ? 'bg-brand-blue text-white' : 'bg-white/[0.06] text-white/60 hover:text-white'
+                reason === r.key ? 'bg-brand-blue text-white' : 'bg-white/[0.06] text-ink-2 hover:text-white'
               }`}
             >
               {r.label}
@@ -4133,7 +4133,7 @@ function SwapSheet({
           </p>
         )}
 
-        <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Instead, do</p>
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Instead, do</p>
         <div className="space-y-1.5">
           {alternatives.map((alt) => (
             <button
@@ -4160,7 +4160,7 @@ function SwapSheet({
             onChange={(e) => setForever(e.target.checked)}
             className="w-4 h-4 rounded accent-brand-blue"
           />
-          <span className="text-white/55 text-xs font-body">Use this every time, not just today</span>
+          <span className="text-ink-2 text-xs font-body">Use this every time, not just today</span>
         </label>
 
         <div className="flex gap-2 mt-5">
@@ -4218,7 +4218,7 @@ function DemoSheet({
           <h2 className="font-display font-extrabold text-lg text-white tracking-tight">{name}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white shrink-0 active:scale-95 transition-all duration-150"
+            className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-ink-2 hover:text-white shrink-0 active:scale-95 transition-all duration-150"
             aria-label="Close"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -4240,7 +4240,7 @@ function DemoSheet({
                 {m}
               </span>
             ))}
-            <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-white/55 text-2xs font-body capitalize">{data.equipment}</span>
+            <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body capitalize">{data.equipment}</span>
           </div>
         )}
 
@@ -4250,7 +4250,7 @@ function DemoSheet({
             was any good, written for someone holding a dumbbell. */}
         {coaching && (
           <div className="mt-5">
-            <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-wide mb-2">Get these right</p>
+            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-2">Get these right</p>
             <ul className="space-y-2">
               {coaching.cues.map((cue, i) => (
                 <li key={i} className="flex gap-2.5 text-white text-sm font-body leading-relaxed">
@@ -4261,7 +4261,7 @@ function DemoSheet({
             </ul>
             <div className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.08] border border-state-warning/20">
               <p className="text-state-warning text-2xs font-display font-bold uppercase tracking-wide mb-1">Common mistake</p>
-              <p className="text-white/70 text-sm font-body leading-relaxed">{coaching.mistake}</p>
+              <p className="text-ink-2 text-sm font-body leading-relaxed">{coaching.mistake}</p>
             </div>
           </div>
         )}
@@ -4273,8 +4273,8 @@ function DemoSheet({
             </summary>
             <ol className="space-y-2 mt-2">
               {data.instructions.map((step, i) => (
-                <li key={i} className="flex gap-2.5 text-white/55 text-sm font-body leading-relaxed">
-                  <span className="text-white/30 font-display font-bold shrink-0">{i + 1}</span>
+                <li key={i} className="flex gap-2.5 text-ink-2 text-sm font-body leading-relaxed">
+                  <span className="text-ink-4 font-display font-bold shrink-0">{i + 1}</span>
                   {step}
                 </li>
               ))}
@@ -4319,7 +4319,7 @@ function ConfirmEnd({
         aria-label="End workout"
       >
         <h2 className="font-display font-extrabold text-xl text-white tracking-tight">End this workout?</h2>
-        <p className="text-white/55 text-sm font-body leading-relaxed mt-2">
+        <p className="text-ink-2 text-sm font-body leading-relaxed mt-2">
           {short ? (
             <>
               You&rsquo;ve logged <span className="text-state-warning font-semibold">{logged} of {planned} sets</span>. Anything
@@ -4370,7 +4370,7 @@ function WorkoutComplete({
   const stat = (value: string, label: string) => (
     <div className="flex-1">
       <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
-      <p className="text-white/35 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
+      <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
     </div>
   )
 
@@ -4404,7 +4404,7 @@ function WorkoutComplete({
             </p>
             <ul className="space-y-1.5">
               {summary.records.map((r) => (
-                <li key={r.exerciseName} className="text-white/75 text-xs font-body leading-relaxed">
+                <li key={r.exerciseName} className="text-ink text-xs font-body leading-relaxed">
                   <span className="text-white font-semibold">{r.exerciseName}</span> &mdash; {r.text}
                 </li>
               ))}
@@ -4421,10 +4421,10 @@ function WorkoutComplete({
             </p>
             <ul className="space-y-1">
               {summary.improvements.slice(0, 4).map((line) => (
-                <li key={line} className="text-white/75 text-xs font-body">{line}</li>
+                <li key={line} className="text-ink text-xs font-body">{line}</li>
               ))}
               {summary.improvements.length > 4 && (
-                <li className="text-white/35 text-xs font-body">+ {summary.improvements.length - 4} more</li>
+                <li className="text-ink-3 text-xs font-body">+ {summary.improvements.length - 4} more</li>
               )}
             </ul>
           </div>
@@ -4434,15 +4434,15 @@ function WorkoutComplete({
             receptive to "take it easy"; the same sentence on every exercise
             during the session would read as nagging. */}
         {summary.fatigue && (
-          <p className="text-left text-white/55 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
+          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
             {summary.fatigue}
           </p>
         )}
 
         {/* Closes the loop rather than ending on a full stop. */}
         {summary.nextUp && (
-          <p className="text-white/40 text-xs font-body mb-5">
-            Next up: <span className="text-white/70 font-semibold">{summary.nextUp}</span>
+          <p className="text-ink-3 text-xs font-body mb-5">
+            Next up: <span className="text-ink-2 font-semibold">{summary.nextUp}</span>
           </p>
         )}
 

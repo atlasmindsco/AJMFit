@@ -44,7 +44,7 @@ export default function FeedbackButton() {
       <button
         onClick={() => setOpen((v) => !v)}
         title="Send feedback"
-        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 left-4 md:left-6 z-50 px-4 h-11 rounded-full bg-white/[0.08] backdrop-blur border border-white/[0.12] text-white/80 text-xs font-display font-bold uppercase tracking-wide flex items-center gap-2 hover:bg-white/[0.14] transition-colors duration-200"
+        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 left-4 md:left-6 z-50 px-4 h-11 rounded-full bg-white/[0.08] backdrop-blur border border-white/[0.12] text-ink text-xs font-display font-bold uppercase tracking-wide flex items-center gap-2 hover:bg-white/[0.14] transition-colors duration-200"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
@@ -59,7 +59,7 @@ export default function FeedbackButton() {
           ) : (
             <>
               <p className="text-white font-display font-bold text-sm">Beta feedback</p>
-              <p className="text-white/40 text-xs font-body mt-0.5 mb-3">Found a bug or have a suggestion? Tell us.</p>
+              <p className="text-ink-3 text-xs font-body mt-0.5 mb-3">Found a bug or have a suggestion? Tell us.</p>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -68,7 +68,7 @@ export default function FeedbackButton() {
                 className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-3 py-2 text-sm text-white font-body resize-none focus:outline-none focus:border-brand-orange/40"
               />
               <div className="flex justify-end gap-2 mt-3">
-                <button onClick={() => setOpen(false)} className="px-3 py-1.5 text-white/40 text-xs font-body hover:text-white/70">Cancel</button>
+                <button onClick={() => setOpen(false)} className="px-3 py-1.5 text-ink-3 text-xs font-body hover:text-ink-2">Cancel</button>
                 <button onClick={send} disabled={sending || !message.trim()} className="px-4 py-1.5 bg-brand-orange text-white text-xs font-display font-bold uppercase rounded-control disabled:opacity-40">{sending ? 'Sending…' : 'Send'}</button>
               </div>
             </>

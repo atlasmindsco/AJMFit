@@ -51,15 +51,15 @@ export default function AttentionStack({ cards }: { cards: AttentionCard[] }) {
             <span className="min-w-0 flex-1">
               <span className="block font-display font-bold text-white text-sm leading-snug">{card.title}</span>
               {card.detail && (
-                <span className="block text-white/45 text-xs font-body mt-0.5 leading-relaxed">{card.detail}</span>
+                <span className="block text-ink-3 text-xs font-body mt-0.5 leading-relaxed">{card.detail}</span>
               )}
             </span>
-            <span className="shrink-0 text-white/25 text-sm" aria-hidden="true">&rsaquo;</span>
+            <span className="shrink-0 text-ink-4 text-sm" aria-hidden="true">&rsaquo;</span>
           </Link>
           {card.dismissible && (
             <button
               onClick={() => setHidden((prev) => [...prev, card.kind])}
-              className="shrink-0 px-3 text-white/20 hover:text-white/60 transition-colors"
+              className="shrink-0 px-3 text-ink-4 hover:text-ink-2 transition-colors"
               aria-label={`Dismiss: ${card.title}`}
             >
               &times;
