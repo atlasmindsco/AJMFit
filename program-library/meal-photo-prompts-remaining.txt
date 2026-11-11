@@ -1,10 +1,12 @@
 AJM FIT - MEAL PHOTOS STILL TO GENERATE
-Generated 2026-10-18. 24 left of 44.
+Generated 2026-11-10.
 
-These ids are the real ones from the meal library. Ignore the numbering
-on the contact sheet - it invented l10, l11, d10, d11, s10, s11, which
-do not exist. The last two in each slot are vegan meals: v3/v4 lunch,
-v5/v6 dinner, v7/v8 snacks.
+Save each file as the id shown (b1.jpg, s7.jpg). Then drag all of them
+at once onto /luffy/meals - the bulk drop zone matches them by filename.
+
+Square, about 1000x1000. Anything over 3 MB is refused.
+Keep the style line identical across every one - that consistency is the
+whole reason for generating these rather than collecting stock.
 
 ------------------------------------------------------------
 l6.jpg  -  Beef and black bean burrito bowl
@@ -52,29 +54,9 @@ d9.jpg  -  Tofu and vegetable curry with rice
 overhead photo of tofu and vegetable curry with rice, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
 
 ------------------------------------------------------------
-s1.jpg  -  Whey shake with water
-
-overhead photo of whey shake with water, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
-
-------------------------------------------------------------
-s2.jpg  -  Apple with peanut butter
-
-overhead photo of apple with peanut butter, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
-
-------------------------------------------------------------
-s3.jpg  -  Beef jerky
-
-overhead photo of beef jerky, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
-
-------------------------------------------------------------
 s4.jpg  -  Greek yoghurt with almonds
 
 overhead photo of greek yoghurt with almonds, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
-
-------------------------------------------------------------
-s5.jpg  -  Three hard-boiled eggs
-
-overhead photo of three hard-boiled eggs, on a plain matte dark grey surface, soft even daylight from the left, shallow depth of field, no hands, no cutlery, no napkins, no text or labels, square crop, photorealistic
 
 ------------------------------------------------------------
 s6.jpg  -  Protein bar
