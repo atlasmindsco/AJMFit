@@ -15,6 +15,7 @@ import {
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
 import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type OnboardingForm } from '@/lib/onboarding'
 import AssignProgram from '@/components/admin/AssignProgram'
+import ProgramRecommendation from '@/components/admin/ProgramRecommendation'
 import ClientPhotos from '@/components/admin/ClientPhotos'
 
 function getTierColor(tier: string) {
@@ -396,6 +397,11 @@ export default function ClientsPage() {
                       </div>
 
                       <ClientPhotos userId={client.id} />
+
+                      {/* The recommendation sits ABOVE the manual picker: the
+                          common case is accepting or tweaking the match, and
+                          the dropdown is the fallback for when it is wrong. */}
+                      <ProgramRecommendation userId={client.id} clientName={client.name ?? undefined} />
 
                       <AssignProgram userId={client.id} />
                     </div>
