@@ -1,5 +1,6 @@
 'use client'
 
+import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/Button'
@@ -28,30 +29,32 @@ const tiers: Tier[] = [
       'M-F messaging access',
     ],
   },
+  /*
+   * The two coached tiers take their promises from TIER_EXPERIENCE, which is
+   * the same list the client reads inside the app.
+   *
+   * They used to be written out here separately, and the two drifted badly.
+   * This page sold "Form feedback via video review", which does not exist
+   * anywhere in the product, and "Weekly 30-45 min video check-in", where the
+   * app promises a written reply. It also sold "New plan every 30 days" against
+   * 8-week blocks, and "Custom 3-4 day/week" against a library that runs 2 to 6.
+   *
+   * Selling what you do not deliver is a refund waiting to happen, and keeping
+   * two hand-written lists in step is a promise nobody keeps. One list, used in
+   * both places, cannot drift.
+   */
   {
     name: 'The Accelerator',
     monthlyPrice: 397,
-    tagline: 'For those ready to level up.',
+    tagline: TIER_EXPERIENCE.accelerator.headline,
     featured: true,
-    features: [
-      'Everything in The Blueprint',
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Weekly 30-45 min video check-in',
-      'Form feedback via video review',
-      'Priority response M-F',
-    ],
+    features: ['Everything in The Blueprint', ...TIER_EXPERIENCE.accelerator.includes],
   },
   {
     name: 'The Full Experience',
     monthlyPrice: 697,
-    tagline: 'Maximum output. Zero guesswork.',
-    features: [
-      'Everything in The Accelerator',
-      '2x live 45-min virtual training sessions/week',
-      'Real-time coaching & intensity',
-      'Live form correction every session',
-    ],
+    tagline: TIER_EXPERIENCE['full-experience'].headline,
+    features: ['Everything in The Accelerator', ...TIER_EXPERIENCE['full-experience'].includes],
   },
 ]
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
@@ -26,30 +27,27 @@ const tiers = [
     tagline: 'For those ready to level up.',
     equipment: 'Dumbbells, Bands, or Full Home Gym',
     featured: true,
-    features: [
-      'Everything in The Blueprint',
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Weekly 30-45 min video check-in',
-      'Form feedback via video review',
-      'Priority response M-F',
-    ],
+    // Same list the client reads inside the app. Written out here once rather
+    // than invented again: the previous version sold video form review, which
+    // the product has never had.
+    features: ['Everything in The Blueprint', ...TIER_EXPERIENCE.accelerator.includes],
     idealFor:
-      "You want more than just the app, you want a coach in your corner. Custom programming, weekly check-ins, and form reviews keep you accountable and training right.",
+      "You want more than just the app, you want a coach in your corner. Anthony builds your program, reads what you logged every week, and adjusts it.",
   },
   {
     name: 'The Full Experience',
     price: '$697',
     tagline: 'Maximum output. Zero guesswork.',
     equipment: 'Full Home Gym Recommended',
-    features: [
-      'Everything in The Accelerator',
-      '2x live 45-min virtual training sessions/week',
-      'Real-time coaching & intensity',
-      'Live form correction every session',
-    ],
+    // NOTE FOR ANTHONY: this page used to say "2x live 45-min virtual training
+    // sessions/week" — eight a month. The in-app list says "two live training
+    // sessions" with no frequency. Those are very different promises and only
+    // you can say which is right, so this now shows the in-app wording, which
+    // is the more conservative of the two. Decide the number and set it in
+    // lib/tiers.ts, and both places follow.
+    features: ['Everything in The Accelerator', ...TIER_EXPERIENCE['full-experience'].includes],
     idealFor:
-      "You want to be coached like an athlete. Live sessions, real-time intensity, zero guesswork. This is the closest thing to having a trainer standing next to you.",
+      "You want to be coached like an athlete. Anthony watches you lift, moves first when something slips, and rebuilds your program as you change.",
   },
 ]
 

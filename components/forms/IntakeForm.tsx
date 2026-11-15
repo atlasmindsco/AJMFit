@@ -1,5 +1,6 @@
 'use client'
 
+import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -64,26 +65,17 @@ const tierOptions = [
     monthlyPrice: 397,
     tagline: 'For those ready to level up.',
     featured: true,
-    features: [
-      'Everything in The Blueprint',
-      'Custom 3-4 day/week workout plan',
-      'New plan every 30 days (3 phases)',
-      'Weekly 30-45 min video check-in',
-      'Form feedback via video review',
-      'Priority response M-F',
-    ],
+    // From TIER_EXPERIENCE, so the form someone applies through promises the
+    // same thing the app will deliver. It previously listed video form review,
+    // which does not exist.
+    features: ['Everything in The Blueprint', ...TIER_EXPERIENCE.accelerator.includes],
   },
   {
     value: 'full-experience',
     label: 'The Full Experience',
     monthlyPrice: 697,
     tagline: 'Maximum output. Zero guesswork.',
-    features: [
-      'Everything in The Accelerator',
-      '2x live 45-min virtual training sessions/week',
-      'Real-time coaching & intensity',
-      'Live form correction every session',
-    ],
+    features: ['Everything in The Accelerator', ...TIER_EXPERIENCE['full-experience'].includes],
   },
 ]
 
