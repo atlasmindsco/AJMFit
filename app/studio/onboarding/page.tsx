@@ -1,7 +1,22 @@
 'use client'
 
+/**
+ * The coaching assessment: eight questions, one screen.
+ *
+ * It was seventeen questions across five cards and had one submission in the
+ * product's lifetime. Everything here changes which program gets assigned;
+ * nothing here is a good coaching question asked at the wrong moment. Stress,
+ * sleep and job activity moved to the welcome call, where the answer is a
+ * conversation rather than a number, and the weekly check-in asks about sleep
+ * every week regardless.
+ *
+ * Two questions are new and matter most: where they train, and how long they
+ * have. Those are two of the three inputs that pick a template, and the old
+ * form never asked either — so the questionnaire could not answer the question
+ * it existed to answer, which is probably part of why nobody finished it.
+ */
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
@@ -11,8 +26,8 @@ import { fetchMyTier } from '@/lib/scheduling'
 const inputCls =
   'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/60 transition-colors'
 const labelCls = 'block text-ink-2 text-xs font-display font-bold uppercase tracking-[0.12em] mb-2'
+const hintCls = 'text-ink-3 text-xs font-body mb-2.5'
 
-/** Segmented picker for short option sets. */
 function Segmented({
   value,
   onChange,
@@ -20,29 +35,32 @@ function Segmented({
 }: {
   value: string | undefined
   onChange: (v: string) => void
-  options: Array<{ key: string; label: string }>
+  options: Array<{ key: string; label: string; sub?: string }>
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
       {options.map((o) => (
         <button
           key={o.key}
           type="button"
           onClick={() => onChange(o.key)}
-          className={`px-3.5 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors duration-150 ${
+          className={`px-4 py-3 rounded-control text-left border transition-colors duration-150 ${
             value === o.key
-              ? 'bg-brand-blue/15 border-brand-blue/50 text-brand-blue'
-              : 'bg-white/[0.03] border-white/[0.10] text-ink-3 hover:text-ink-2'
+              ? 'bg-brand-blue/[0.14] border-brand-blue/50'
+              : 'bg-white/[0.03] border-white/[0.10] hover:bg-white/[0.06]'
           }`}
         >
-          {o.label}
+          <span className={`block font-display font-bold text-sm ${value === o.key ? 'text-white' : 'text-ink-2'}`}>
+            {o.label}
+          </span>
+          {o.sub && <span className="block text-ink-3 text-2xs font-body mt-0.5">{o.sub}</span>}
         </button>
       ))}
     </div>
   )
 }
 
-export default function OnboardingFormPage() {
+export default function CoachingAssessmentPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [answers, setAnswers] = useState<OnboardingAnswers>({})
@@ -63,8 +81,8 @@ export default function OnboardingFormPage() {
       }
       setUserId(id)
       try {
-        // Blueprint is self-serve: no onboarding form or call. Send them to
-        // the program picker instead.
+        // Blueprint is self-serve: they pick their own program, so there is
+        // nothing for a coach to assess.
         const tier = await fetchMyTier(id)
         if (tier === 'blueprint') {
           router.replace('/studio/programs')
@@ -82,27 +100,33 @@ export default function OnboardingFormPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [router])
 
-  const set = (key: keyof OnboardingAnswers) => (v: string) =>
-    setAnswers((a) => ({ ...a, [key]: v }))
+  const set = useCallback(
+    (key: keyof OnboardingAnswers) => (v: string) => setAnswers((a) => ({ ...a, [key]: v })),
+    []
+  )
   const setFromInput =
-    (key: keyof OnboardingAnswers) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    (key: keyof OnboardingAnswers) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       set(key)(e.target.value)
+
+  // The four the template matcher needs. Weight, injuries and the free text
+  // are useful to the coach but never block a program being built.
+  const canSubmit = Boolean(answers.goal && answers.experience && answers.daysPerWeek && answers.location)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!userId || saving) return
+    if (!userId || saving || !canSubmit) return
     setSaving(true)
     setError('')
     try {
       await saveMyOnboarding(userId, answers)
-      // Tell Coach Anthony (instructional email). Best-effort.
       fetch('/api/onboarding/notify', { method: 'POST' }).catch(() => {})
       setDone(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
-      console.error('[Onboarding] save failed:', err)
+      console.error('[Assessment] save failed:', err)
       setError('Could not save your answers. Please try again.')
     } finally {
       setSaving(false)
@@ -126,21 +150,17 @@ export default function OnboardingFormPage() {
           </svg>
         </div>
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">
-          {alreadyFilled ? 'Answers updated' : 'All set'}
+          {alreadyFilled ? 'Answers updated' : 'Anthony is building your program'}
         </h1>
-        <p className="text-ink-2 text-sm font-body mt-3 max-w-md mx-auto">
-          Coach Anthony has your answers and will review them before your onboarding call. Next step: book the call if you haven&rsquo;t yet.
+        <p className="text-ink-3 text-sm font-body mt-3 max-w-md mx-auto leading-relaxed">
+          {alreadyFilled
+            ? 'He will see the changes before your next check-in.'
+            : 'He reviews this and assigns your program, usually the same day. You will get a message when it is ready.'}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <button
-            onClick={() => router.push('/studio/schedule')}
-            className="px-6 py-3 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition"
-          >
-            Book your onboarding call
-          </button>
-          <button
             onClick={() => router.push('/studio')}
-            className="px-6 py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition"
+            className="px-6 py-3 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition"
           >
             Go to dashboard
           </button>
@@ -151,148 +171,160 @@ export default function OnboardingFormPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="mb-8">
+      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="mb-7">
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
-          Onboarding Form
+          Before Anthony builds your program
         </h1>
         <p className="text-ink-3 text-sm font-body mt-2 max-w-lg">
-          This is what Coach Anthony uses to prepare your plan and your onboarding call. Takes about 3 minutes. Be honest, there are no wrong answers.
+          Eight questions, about two minutes. He reads every one of these before he assigns anything.
         </p>
       </motion.div>
 
-      <form onSubmit={submit} className="space-y-6">
-        {/* Basics */}
-        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
-          <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">The basics</h2>
+      <form onSubmit={submit} className="space-y-5">
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>1 &middot; What are you training for?</label>
+          <Segmented
+            value={answers.goal}
+            onChange={set('goal')}
+            options={[
+              { key: 'muscle', label: 'Build muscle', sub: 'Size and shape' },
+              { key: 'strength', label: 'Get stronger', sub: 'Heavier lifts' },
+              { key: 'lean_out', label: 'Lean out', sub: 'Lose fat, keep muscle' },
+            ]}
+          />
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>2 &middot; Where are you right now?</label>
+          <Segmented
+            value={answers.experience}
+            onChange={set('experience')}
+            options={[
+              { key: 'new', label: 'New to this', sub: 'First real program' },
+              { key: 'returning', label: 'Coming back', sub: 'Trained before' },
+              { key: 'consistent', label: 'Training already', sub: 'In the gym most weeks' },
+            ]}
+          />
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>3 &middot; How many days a week can you train?</label>
+          <p className={hintCls}>Be realistic. A program you finish beats one you admire.</p>
+          <div className="grid grid-cols-5 gap-2">
+            {['2', '3', '4', '5', '6'].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => set('daysPerWeek')(d)}
+                className={`py-3.5 rounded-control border font-display font-extrabold text-lg transition-colors duration-150 ${
+                  answers.daysPerWeek === d
+                    ? 'bg-brand-blue/[0.14] border-brand-blue/50 text-white'
+                    : 'bg-white/[0.03] border-white/[0.10] text-ink-2 hover:bg-white/[0.06]'
+                }`}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>4 &middot; Where will you train?</label>
+          <Segmented
+            value={answers.location}
+            onChange={set('location')}
+            options={[
+              { key: 'gym', label: 'At a gym', sub: 'Full equipment' },
+              { key: 'home', label: 'At home', sub: 'Dumbbells and bodyweight' },
+            ]}
+          />
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>5 &middot; How long have you got per session?</label>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { k: '30', l: '30 min' },
+              { k: '45', l: '45 min' },
+              { k: '60', l: '60 min' },
+              { k: '75', l: '75+ min' },
+            ].map((o) => (
+              <button
+                key={o.k}
+                type="button"
+                onClick={() => set('sessionMinutes')(o.k)}
+                className={`py-3 rounded-control border font-display font-bold text-sm transition-colors duration-150 ${
+                  answers.sessionMinutes === o.k
+                    ? 'bg-brand-blue/[0.14] border-brand-blue/50 text-white'
+                    : 'bg-white/[0.03] border-white/[0.10] text-ink-2 hover:bg-white/[0.06]'
+                }`}
+              >
+                {o.l}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>6 &middot; Anything that hurts, or that you cannot do?</label>
+          <p className={hintCls}>
+            Injuries, surgeries, a joint that complains. This is the one he most wants to know before
+            picking exercises.
+          </p>
+          <textarea
+            className={`${inputCls} min-h-[84px] resize-y`}
+            value={answers.injuries ?? ''}
+            onChange={setFromInput('injuries')}
+            placeholder="Left knee hurts on deep squats. Nothing else."
+          />
+        </div>
+
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>7 &middot; Where are you now, and where are you heading?</label>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Age</label>
-              <input className={inputCls} value={answers.age ?? ''} onChange={setFromInput('age')} placeholder="34" inputMode="numeric" />
-            </div>
-            <div>
-              <label className={labelCls}>Height</label>
-              <input className={inputCls} value={answers.height ?? ''} onChange={setFromInput('height')} placeholder={'5\'10"'} />
-            </div>
-            <div>
-              <label className={labelCls}>Current weight</label>
+              <p className={hintCls}>Current weight</p>
               <input className={inputCls} value={answers.currentWeight ?? ''} onChange={setFromInput('currentWeight')} placeholder="185 lbs" />
             </div>
             <div>
-              <label className={labelCls}>Goal weight (optional)</label>
+              <p className={hintCls}>Target weight (optional)</p>
               <input className={inputCls} value={answers.goalWeight ?? ''} onChange={setFromInput('goalWeight')} placeholder="170 lbs" />
             </div>
           </div>
         </div>
 
-        {/* Training background */}
-        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
-          <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Training background</h2>
-          <div>
-            <label className={labelCls}>Where are you right now?</label>
-            <Segmented
-              value={answers.experience}
-              onChange={set('experience')}
-              options={[
-                { key: 'new', label: 'New to training' },
-                { key: 'returning', label: 'Getting back into it' },
-                { key: 'consistent', label: 'Training consistently' },
-              ]}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Years of experience</label>
-              <input className={inputCls} value={answers.yearsTraining ?? ''} onChange={setFromInput('yearsTraining')} placeholder="2" inputMode="numeric" />
-            </div>
-            <div>
-              <label className={labelCls}>Days per week you can train</label>
-              <input className={inputCls} value={answers.daysPerWeek ?? ''} onChange={setFromInput('daysPerWeek')} placeholder="4" inputMode="numeric" />
-            </div>
-          </div>
-          <div>
-            <label className={labelCls}>Best time of day for you</label>
-            <Segmented
-              value={answers.preferredTime}
-              onChange={set('preferredTime')}
-              options={[
-                { key: 'morning', label: 'Morning' },
-                { key: 'midday', label: 'Midday' },
-                { key: 'evening', label: 'Evening' },
-              ]}
-            />
-          </div>
+        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
+          <label className={labelCls}>8 &middot; Anything else he should know?</label>
+          <textarea
+            className={`${inputCls} min-h-[84px] resize-y`}
+            value={answers.anythingElse ?? ''}
+            onChange={setFromInput('anythingElse')}
+            placeholder="I travel most of February. I hate running."
+          />
         </div>
 
-        {/* Health */}
-        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
-          <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Health</h2>
-          <div>
-            <label className={labelCls}>Injuries, pain, or movements that bother you</label>
-            <textarea className={inputCls} rows={2} value={answers.injuries ?? ''} onChange={setFromInput('injuries')} placeholder="Right shoulder clicks on overhead press, lower back gets tight on deadlifts" />
-          </div>
-          <div>
-            <label className={labelCls}>Medications or conditions Anthony should know about</label>
-            <textarea className={inputCls} rows={2} value={answers.medications ?? ''} onChange={setFromInput('medications')} placeholder="None" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Sleep (hours per night)</label>
-              <input className={inputCls} value={answers.sleepHours ?? ''} onChange={setFromInput('sleepHours')} placeholder="7" inputMode="numeric" />
-            </div>
-            <div>
-              <label className={labelCls}>Stress level (1 low to 5 high)</label>
-              <input className={inputCls} value={answers.stressLevel ?? ''} onChange={setFromInput('stressLevel')} placeholder="3" inputMode="numeric" />
-            </div>
-          </div>
-          <div>
-            <label className={labelCls}>Your day job, activity wise</label>
-            <Segmented
-              value={answers.jobActivity}
-              onChange={set('jobActivity')}
-              options={[
-                { key: 'sedentary', label: 'Mostly seated' },
-                { key: 'on-my-feet', label: 'On my feet' },
-                { key: 'physical', label: 'Physical work' },
-              ]}
-            />
-          </div>
+        {error && (
+          <p className="px-3.5 py-2.5 rounded-control bg-state-danger/10 border border-state-danger/25 text-state-danger text-xs font-body">
+            {error}
+          </p>
+        )}
+
+        {/* The button stays visible but disabled rather than hidden: a form
+            whose submit disappears reads as broken, not as incomplete. */}
+        <div className="pt-1">
+          <button
+            type="submit"
+            disabled={saving || !canSubmit}
+            className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-40"
+          >
+            {saving ? 'Sending…' : alreadyFilled ? 'Save changes' : 'Send to Anthony'}
+          </button>
+          {!canSubmit && (
+            <p className="text-ink-3 text-xs font-body mt-2.5 text-center">
+              Answer questions 1 to 4 and he has what he needs.
+            </p>
+          )}
         </div>
-
-        {/* Nutrition */}
-        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
-          <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Nutrition</h2>
-          <div>
-            <label className={labelCls}>How do you eat right now?</label>
-            <textarea className={inputCls} rows={2} value={answers.eatingStyle ?? ''} onChange={setFromInput('eatingStyle')} placeholder="Skip breakfast, big lunch, takeout 3 nights a week" />
-          </div>
-          <div>
-            <label className={labelCls}>Allergies or foods you will not eat</label>
-            <input className={inputCls} value={answers.foodAllergies ?? ''} onChange={setFromInput('foodAllergies')} placeholder="No shellfish" />
-          </div>
-        </div>
-
-        {/* Goals */}
-        <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6 space-y-5">
-          <h2 className="font-display font-bold text-sm text-white uppercase tracking-wide">Your goal</h2>
-          <div>
-            <label className={labelCls}>90 days from now, what does success look like?</label>
-            <textarea className={inputCls} rows={3} value={answers.ninetyDayGoal ?? ''} onChange={setFromInput('ninetyDayGoal')} placeholder="Down 10 lbs, comfortable in the gym, bench 185 again" />
-          </div>
-          <div>
-            <label className={labelCls}>Anything else Anthony should know? (optional)</label>
-            <textarea className={inputCls} rows={2} value={answers.anythingElse ?? ''} onChange={setFromInput('anythingElse')} />
-          </div>
-        </div>
-
-        {error && <p className="text-red-400 text-sm font-body">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-60"
-        >
-          {saving ? 'Saving…' : alreadyFilled ? 'Update my answers' : 'Send to Coach Anthony'}
-        </button>
       </form>
     </div>
   )

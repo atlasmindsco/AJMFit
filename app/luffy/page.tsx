@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { fetchActiveBlocks, type Assignment } from '@/lib/programs'
+import { fetchActiveBlocks, fetchEverAssigned, type Assignment } from '@/lib/programs'
 import { blockProgress } from '@/lib/blocks'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
@@ -32,6 +32,9 @@ export default function AdminDashboard() {
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [checkIns, setCheckIns] = useState<CheckIn[]>([])
   const [blocks, setBlocks] = useState<Map<string, Assignment>>(new Map())
+  // Who has EVER had a program, so a client between blocks is not accused of
+  // having been given nothing.
+  const [everAssigned, setEverAssigned] = useState<Set<string>>(new Set())
   const [stalls, setStalls] = useState<Map<string, StalledLift[]>>(new Map())
   const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
   const [wins, setWins] = useState<RecentWin[]>([])
@@ -41,7 +44,7 @@ export default function AdminDashboard() {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f, ci, bl, st, pr, rw] = await Promise.all([
+        const [s, c, f, ci, bl, st, pr, rw, ea] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
@@ -50,6 +53,7 @@ export default function AdminDashboard() {
           fetchStalledLifts().catch(() => new Map()),
           fetchPendingNutritionProposals().catch(() => new Map()),
           fetchRecentWins().catch(() => []),
+          fetchEverAssigned().catch(() => new Set<string>()),
         ])
         if (!active) return
         setStats(s)
@@ -60,6 +64,7 @@ export default function AdminDashboard() {
         setStalls(st)
         setProposals(pr)
         setWins(rw)
+        setEverAssigned(ea)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -143,6 +148,8 @@ export default function AdminDashboard() {
                         stalledLifts: stalls.get(client.id) ?? [],
                         // Hold the coach to what the tier actually sold.
                         responseHours: tier ? TIER_EXPERIENCE[tier].responseHours : null,
+                        // Explicit boolean: undefined would mean "do not judge".
+                        hasProgram: everAssigned.has(client.id),
                         blockEndsInDays: (() => {
                           const b = blocks.get(client.id)
                           return b ? blockProgress(b.assigned_at, b.block_weeks).daysLeft : null

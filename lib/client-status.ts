@@ -11,6 +11,7 @@ import { weekOf, previousWeekOf, type CheckIn } from '@/lib/check-ins'
  * is the one that most needs the coach to do something.
  */
 export type ClientStatus =
+  | 'no_program'
   | 'review_needed'
   | 'never_started'
   | 'at_risk'
@@ -19,6 +20,7 @@ export type ClientStatus =
   | 'on_track'
 
 export const STATUS_META: Record<ClientStatus, { label: string; tone: string; dot: string }> = {
+  no_program: { label: 'Needs a program', tone: 'text-state-danger', dot: 'bg-state-danger' },
   review_needed: { label: 'Review needed', tone: 'text-brand-blue', dot: 'bg-brand-blue' },
   never_started: { label: 'Never started', tone: 'text-state-danger', dot: 'bg-state-danger' },
   at_risk: { label: 'At risk', tone: 'text-state-danger', dot: 'bg-state-danger' },
@@ -60,6 +62,14 @@ export interface StatusInput {
    * Null for Blueprint, which promises best effort.
    */
   responseHours?: number | null
+  /**
+   * Whether a program has ever been assigned to this client.
+   *
+   * Optional, and undefined means "do not judge": a caller that has not
+   * loaded assignments should not have every client accused of having no
+   * program. Only an explicit `false` raises the status.
+   */
+  hasProgram?: boolean
 }
 
 export interface StatusResult {
@@ -95,13 +105,36 @@ export function clientStatus({
   signedUpAt,
   stalledLifts,
   responseHours,
+  hasProgram,
 }: StatusInput): StatusResult {
   const sorted = [...checkIns].sort((a, b) => b.week_of.localeCompare(a.week_of))
   const thisWeek = weekOf()
   const lastWeek = previousWeekOf(thisWeek)
   const sinceWorkout = daysSince(lastWorkoutAt)
 
-  // 1. Waiting on the coach beats everything — this is the coach's own backlog.
+  // 0. Paid, and has nothing to train.
+  //
+  // Above everything, including a waiting check-in, because it is the only
+  // state where the client physically cannot use what they bought. It is also
+  // the one the dashboard was getting wrong rather than missing: a coached
+  // client with no program has logged no workouts, so they showed as "never
+  // started — joined 210 days ago, never trained", which reads as the client
+  // losing interest. The actual fact was that nobody had given them a program.
+  // One real client sat in that state for seven months.
+  if (coached && hasProgram === false) {
+    const age = daysSince(signedUpAt ?? null)
+    return {
+      status: 'no_program',
+      reason:
+        age == null
+          ? 'Paid, and has no program to train'
+          : age === 0
+            ? 'Joined today — needs a program'
+            : `Joined ${age} days ago and still has no program`,
+    }
+  }
+
+  // 1. Waiting on the coach beats everything else — the coach's own backlog.
   //
   // Measured against what the TIER promised, not a flat number. Accelerator
   // sells a reply within 48 hours and Full Experience within 24; both are
@@ -211,6 +244,7 @@ export function clientStatus({
 
 /** Sort key so the dashboard leads with whatever needs the coach first. */
 export const STATUS_ORDER: ClientStatus[] = [
+  'no_program',
   'review_needed',
   'never_started',
   'at_risk',

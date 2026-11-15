@@ -79,6 +79,22 @@ export async function completeBlock(
  * One query rather than one per client: the dashboard already loads every
  * client in a single pass and should not acquire an N+1 to add a column.
  */
+/**
+ * Everyone who has EVER been assigned a program.
+ *
+ * Deliberately separate from fetchActiveBlocks, which returns only open
+ * assignments: a client between blocks has no active one, and treating that
+ * as "never given a program" would accuse the coach of neglecting someone
+ * who just finished eight weeks. This answers the different question of
+ * whether a paying client has ever had anything to train at all.
+ */
+export async function fetchEverAssigned(): Promise<Set<string>> {
+  const { data } = await db.from('program_assignments').select('user_id')
+  const out = new Set<string>()
+  for (const row of (data ?? []) as Array<{ user_id: string }>) out.add(row.user_id)
+  return out
+}
+
 export async function fetchActiveBlocks(): Promise<Map<string, Assignment>> {
   const { data } = await db
     .from('program_assignments')

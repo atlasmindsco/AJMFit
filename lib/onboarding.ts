@@ -4,27 +4,48 @@ import { supabase } from '@/lib/supabase'
 const db = supabase as any
 
 /**
- * Onboarding questionnaire answers. Stored as jsonb so the shape can evolve
- * (the AI program builder consumes this later). Keys mirror the form fields.
+ * What a coached client is asked before their program is built.
+ *
+ * This was seventeen questions and had exactly one submission in the product's
+ * history. The eight marked ASKED below are the ones that change which program
+ * gets assigned; the rest were good coaching questions asked at the wrong
+ * moment — stress level and sleep hours decide nothing on day zero, the weekly
+ * check-in asks about sleep anyway, and every extra field is another reason to
+ * close the tab before the end.
+ *
+ * Two of the eight are NEW, and their absence was the real problem: the form
+ * never asked where someone trains or how long they have. Those are two of the
+ * three inputs that pick a template, so the questionnaire could not actually
+ * answer the question it existed to answer.
+ *
+ * The retired fields stay in the type, optional and unasked. One person filled
+ * the long form in; deleting the keys would silently drop their answers, and
+ * the coach view still reads whatever is stored.
  */
 export interface OnboardingAnswers {
-  age?: string
-  height?: string
+  /* ── ASKED ── */
+  goal?: string // 'muscle' | 'strength' | 'lean_out' — matches BlueprintGoal
+  experience?: string // 'new' | 'returning' | 'consistent'
+  daysPerWeek?: string
+  location?: string // 'gym' | 'home' — matches BlueprintLocation
+  sessionMinutes?: string // '30' | '45' | '60' | '75'
+  injuries?: string
   currentWeight?: string
   goalWeight?: string
-  experience?: string // 'new' | 'returning' | 'consistent'
+  anythingElse?: string
+
+  /* ── Retired: still read, no longer asked ── */
+  age?: string
+  height?: string
   yearsTraining?: string
-  daysPerWeek?: string
-  preferredTime?: string // 'morning' | 'midday' | 'evening'
-  injuries?: string
+  preferredTime?: string
   medications?: string
   sleepHours?: string
-  stressLevel?: string // '1'..'5'
-  jobActivity?: string // 'sedentary' | 'on-my-feet' | 'physical'
+  stressLevel?: string
+  jobActivity?: string
   eatingStyle?: string
   foodAllergies?: string
   ninetyDayGoal?: string
-  anythingElse?: string
 }
 
 export interface OnboardingForm {
@@ -63,17 +84,27 @@ export async function fetchAllOnboarding(): Promise<Map<string, OnboardingForm>>
   return new Map(((data ?? []) as OnboardingForm[]).map((f) => [f.user_id, f]))
 }
 
-/** Field labels for coach-facing displays (luffy + notification email). */
+/**
+ * Field labels for coach-facing displays (luffy + notification email).
+ *
+ * Retired fields keep their labels: one client's long-form answers are still
+ * in the database and should still read properly on the coach's side.
+ */
 export const ONBOARDING_LABELS: Record<keyof OnboardingAnswers, string> = {
-  age: 'Age',
-  height: 'Height',
+  goal: 'Main goal',
+  experience: 'Training experience',
+  daysPerWeek: 'Days per week',
+  location: 'Trains at',
+  sessionMinutes: 'Time per session',
+  injuries: 'Injuries or pain',
   currentWeight: 'Current weight',
   goalWeight: 'Goal weight',
-  experience: 'Training experience',
+  anythingElse: 'Anything else',
+
+  age: 'Age',
+  height: 'Height',
   yearsTraining: 'Years training',
-  daysPerWeek: 'Days per week',
   preferredTime: 'Preferred time',
-  injuries: 'Injuries or pain',
   medications: 'Medications or conditions',
   sleepHours: 'Sleep (hours per night)',
   stressLevel: 'Stress level (1-5)',
@@ -81,5 +112,23 @@ export const ONBOARDING_LABELS: Record<keyof OnboardingAnswers, string> = {
   eatingStyle: 'Current eating style',
   foodAllergies: 'Allergies or foods to avoid',
   ninetyDayGoal: '90-day success looks like',
-  anythingElse: 'Anything else',
+}
+
+/** The eight that are actually asked, in the order the form asks them. */
+export const ASKED_FIELDS: Array<keyof OnboardingAnswers> = [
+  'goal',
+  'experience',
+  'daysPerWeek',
+  'location',
+  'sessionMinutes',
+  'injuries',
+  'currentWeight',
+  'goalWeight',
+  'anythingElse',
+]
+
+/** Everything the template matcher needs is present. */
+export function isAssessmentComplete(a: OnboardingAnswers | null | undefined): boolean {
+  if (!a) return false
+  return Boolean(a.goal && a.experience && a.daysPerWeek && a.location)
 }
