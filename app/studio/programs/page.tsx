@@ -1,5 +1,6 @@
 'use client'
 
+import TravelSwitch from '@/components/studio/TravelSwitch'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
@@ -1680,6 +1681,11 @@ export default function ProgramsPage() {
             A program used to have no length, so it had no end and no week
             number — clients sat on one template for weeks without ever being
             told how far through they were or that there was a finish line. */}
+        {/* Travelling, or back from it. Renders nothing unless this exact
+            program has a twin at the other location, so a custom build never
+            shows a button that cannot work. */}
+        <TravelSwitch programId={assignedProgramId} onSwitched={() => window.location.reload()} />
+
         {block && !block.completed_at && (() => {
           const prog = blockProgress(block.assigned_at, block.block_weeks)
           return (
