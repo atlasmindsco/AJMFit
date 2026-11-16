@@ -24,6 +24,7 @@
 
 export type AttentionKind =
   | 'coach_replied'
+  | 'reply_late'
   | 'check_in_due'
   | 'no_program'
   | 'block_ending'
@@ -31,6 +32,7 @@ export type AttentionKind =
   | 'last_pr'
   | 'protein_short'
   | 'set_training_days'
+  | 'photo_due'
   | 'recommendation'
 
 export interface AttentionCard {
@@ -62,6 +64,16 @@ export interface AttentionInput {
   /** Average protein as a fraction of target over a full week, or null. */
   proteinRatio: number | null
   /** A published recommendation to surface, at most weekly. */
+  /**
+   * Hours past the reply time this client's tier promised, when a check-in is
+   * still unanswered. Null or absent when nothing is overdue.
+   */
+  replyOverdueHours?: number | null
+  /**
+   * Days since their last progress photo. Null means they have never taken
+   * one; absent means the caller did not look, and nothing is offered.
+   */
+  daysSinceLastPhoto?: number | null
   recommendation: { title: string; category: string } | null
 }
 
@@ -72,6 +84,9 @@ export const PR_FRESH_DAYS = 14
 const BREAK_DAYS = 7
 
 /** A block closing inside this window is worth flagging. */
+// Four weeks is the shortest gap where two progress photos actually differ.
+const PHOTO_INTERVAL_DAYS = 28
+
 const BLOCK_WARNING_DAYS = 7
 
 /** Below this share of their protein target, for a full week. */
@@ -89,6 +104,38 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
       title: input.unreadFromCoach === 1 ? 'Anthony replied' : `${input.unreadFromCoach} messages from Anthony`,
       detail: null,
       href: '/studio/messages',
+      tone: 'act',
+      dismissible: false,
+    })
+  }
+
+  // 1.5 The coach is late, said before the client works it out.
+  //
+  //    The tier sells a reply within 48 or 24 hours and the client was told
+  //    that number. When it passes, they are sitting there deciding what the
+  //    silence means, and the answer they reach on their own is always worse
+  //    than the truth. A late reply someone acknowledged is survivable; an
+  //    unexplained one is where people quietly decide to cancel.
+  //
+  //    Not dismissible, and it disappears by itself the moment the reply
+  //    lands. Ranked above the check-in prompt because asking for this week's
+  //    check-in while last week's is still unanswered is insulting.
+  if (
+    input.coached &&
+    input.replyOverdueHours !== null &&
+    input.replyOverdueHours !== undefined &&
+    input.replyOverdueHours > 0
+  ) {
+    const h = Math.round(input.replyOverdueHours)
+    cards.push({
+      kind: 'reply_late',
+      rank: 1.5,
+      title: 'Your check-in reply is running late',
+      detail:
+        h < 24
+          ? 'Anthony has it and has not replied yet. He knows it is overdue.'
+          : `It has been ${Math.round(h / 24)} days past when he said he would reply. He knows.`,
+      href: '/studio/check-in',
       tone: 'act',
       dismissible: false,
     })
@@ -212,6 +259,35 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
       title: 'Which days do you train?',
       detail: 'Tell us once and the app can track your week and remind you on the right days.',
       href: '/studio/schedule',
+      tone: 'offer',
+      dismissible: true,
+    })
+  }
+
+  // 8.5 A progress photo, every fourth week and no oftener.
+  //
+  //     Weekly photos are a bad idea dressed as diligence: seven days of
+  //     change is mostly water, light and angle, so a weekly habit mostly
+  //     teaches people that nothing is happening. Four weeks is the shortest
+  //     gap where two photos actually differ, which is also why the upload
+  //     screen already says "once a month is plenty" — it just never asked.
+  //
+  //     An offer, always dismissible. Progress photos are the single most
+  //     personal thing the app asks for, and anyone who finds them unpleasant
+  //     should be able to make the request go away without explaining.
+  if (
+    input.daysSinceLastPhoto === null ||
+    (input.daysSinceLastPhoto !== undefined && input.daysSinceLastPhoto >= PHOTO_INTERVAL_DAYS)
+  ) {
+    const first = input.daysSinceLastPhoto === null
+    cards.push({
+      kind: 'photo_due',
+      rank: 8.5,
+      title: first ? 'Take a starting photo' : 'Time for a progress photo',
+      detail: first
+        ? 'Only Anthony sees it. In eight weeks it will be the clearest evidence you have.'
+        : `Your last one was ${Math.round((input.daysSinceLastPhoto ?? 0) / 7)} weeks ago. Same spot, same light.`,
+      href: '/studio/progress',
       tone: 'offer',
       dismissible: true,
     })

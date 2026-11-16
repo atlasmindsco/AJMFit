@@ -8,11 +8,11 @@ import EmptyState from '@/components/ui/EmptyState'
 import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import PlanPanel from '@/components/studio/PlanPanel'
 import BillingPanel from '@/components/studio/BillingPanel'
-import { isCoached } from '@/lib/tiers'
+import { isCoached, TIER_EXPERIENCE } from '@/lib/tiers'
 import AttentionStack from '@/components/studio/AttentionStack'
 import { topAttention } from '@/lib/attention'
 import { fetchMyBlock, blockProgressDaysLeft } from '@/lib/programs'
-import { fetchCheckInForWeek, weekOf } from '@/lib/check-ins'
+import { fetchCheckInForWeek, replyOverdueHours, weekOf } from '@/lib/check-ins'
 import type { Tier } from '@/lib/stripe/catalog'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
@@ -32,7 +32,7 @@ import { rotationState } from '@/lib/rotation'
 import { fetchMyProgram, type Program } from '@/lib/programs'
 import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
-import { fetchBodyMetrics } from '@/lib/body-metrics'
+import { fetchBodyMetrics, daysSinceLastPhoto } from '@/lib/body-metrics'
 import { fetchNutritionSetup } from '@/lib/nutrition'
 import { hasBookedOnboarding } from '@/lib/scheduling'
 
@@ -89,6 +89,12 @@ export default function ClientDashboard() {
   // have — everything else the stack needs was being fetched already.
   const [blockDaysLeft, setBlockDaysLeft] = useState<number | null>(null)
   const [trainingDaysSet, setTrainingDaysSet] = useState(true)
+  // Hours past the reply this client's tier promised, so the app can say so
+  // before they work it out from the silence.
+  const [replyLateHours, setReplyLateHours] = useState<number | null>(null)
+  // undefined means "not looked up yet", which keeps the photo card silent
+  // rather than offering it on a guess.
+  const [photoAgeDays, setPhotoAgeDays] = useState<number | null | undefined>(undefined)
   const [lastWorkoutDate, setLastWorkoutDate] = useState<string | null>(null)
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const [setupState, setSetupState] = useState({ intakeDone: false, startingStatsDone: false, nutritionDone: false, welcomeCallBooked: false, programAssigned: false })
@@ -103,7 +109,7 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn, myBlock] =
+        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn, myBlock, photoAge] =
           await Promise.all([
             fetchTargets(id),
             fetchTodaysLogs(id),
@@ -122,8 +128,17 @@ export default function ClientDashboard() {
             hasBookedOnboarding(id).catch(() => false),
             fetchCheckInForWeek(id, weekOf()).catch(() => null),
             fetchMyBlock(id).catch(() => null),
+            daysSinceLastPhoto(id).catch(() => undefined),
           ])
         if (!active) return
+        setPhotoAgeDays(photoAge)
+        // Needs the tier, which only resolves inside this call, so it runs
+        // after the batch rather than inside it.
+        void (async () => {
+          const hrs = TIER_EXPERIENCE[myTier as Tier]?.responseHours ?? null
+          const over = await replyOverdueHours(id, hrs).catch(() => null)
+          if (active) setReplyLateHours(over)
+        })()
         setTargets(t)
         setTotals(sumTotals(logs))
         setWaterOz(dl.water_oz)
@@ -306,6 +321,8 @@ export default function ClientDashboard() {
                 }
               : null,
             // A week of logged food is needed and this screen holds one day.
+            replyOverdueHours: replyLateHours,
+            daysSinceLastPhoto: photoAgeDays,
             proteinRatio: null,
             recommendation: null,
           })}

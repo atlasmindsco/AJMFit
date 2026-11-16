@@ -97,6 +97,31 @@ export async function submitCheckIn(
 }
 
 /** Trainer view: every check-in still waiting on a reply, oldest first. */
+/**
+ * How many hours past the promised reply the client's oldest unanswered
+ * check-in is, or null when nothing is overdue.
+ *
+ * The client was shown a number when they bought — 48 hours on Accelerator,
+ * 24 on Full Experience — and until now nothing compared the promise to the
+ * clock on their side. They were left to work out what the silence meant, and
+ * the conclusion someone reaches alone is always worse than the truth.
+ */
+export async function replyOverdueHours(userId: string, responseHours: number | null): Promise<number | null> {
+  if (!responseHours) return null
+  const { data } = await db
+    .from('check_ins')
+    .select('submitted_at')
+    .eq('user_id', userId)
+    .is('coach_response', null)
+    .order('submitted_at', { ascending: true })
+    .limit(1)
+  const row = (data ?? [])[0] as { submitted_at: string } | undefined
+  if (!row?.submitted_at) return null
+  const hours = (Date.now() - Date.parse(row.submitted_at)) / 36e5
+  const over = hours - responseHours
+  return over > 0 ? over : null
+}
+
 export async function fetchAwaitingReview(): Promise<CheckIn[]> {
   const { data, error } = await db
     .from('check_ins')

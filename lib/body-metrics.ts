@@ -45,6 +45,30 @@ export type BodyMetricInput = Partial<
 > & { recorded_on?: string }
 
 /** Newest first. */
+/**
+ * Days since this client last took a progress photo, or null if never.
+ *
+ * Its own query rather than a scan of the recent metrics the dashboard
+ * already holds: that list is capped at five entries, so someone who logs
+ * their weight weekly and photographed themselves two months ago would look
+ * like they had never taken one — and be told to "take a starting photo"
+ * when they have a set already.
+ */
+export async function daysSinceLastPhoto(userId: string): Promise<number | null> {
+  const { data } = await db
+    .from('body_metrics')
+    .select('recorded_on, photo_front_url, photo_side_url, photo_back_url')
+    .eq('user_id', userId)
+    .or('photo_front_url.not.is.null,photo_side_url.not.is.null,photo_back_url.not.is.null')
+    .order('recorded_on', { ascending: false })
+    .limit(1)
+  const row = (data ?? [])[0] as { recorded_on: string } | undefined
+  if (!row?.recorded_on) return null
+  const t = Date.parse(`${row.recorded_on}T00:00:00`)
+  if (Number.isNaN(t)) return null
+  return Math.max(0, Math.floor((Date.now() - t) / 86400000))
+}
+
 export async function fetchBodyMetrics(userId: string, limit = 60): Promise<BodyMetric[]> {
   const { data, error } = await db
     .from('body_metrics')
