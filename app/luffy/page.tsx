@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { fetchActiveBlocks, fetchEverAssigned, type Assignment } from '@/lib/programs'
+import { fetchPainSwaps } from '@/lib/workout'
 import { blockProgress } from '@/lib/blocks'
 import Link from 'next/link'
 import { fadeInAdmin as fadeIn } from '@/lib/animations'
@@ -35,6 +36,9 @@ export default function AdminDashboard() {
   // Who has EVER had a program, so a client between blocks is not accused of
   // having been given nothing.
   const [everAssigned, setEverAssigned] = useState<Set<string>>(new Set())
+  // Exercises clients swapped out because something hurt. Collected since the
+  // swap feature shipped; never once shown to anyone until now.
+  const [painSwaps, setPainSwaps] = useState<Array<{ user_id: string; original_exercise_name: string; created_at: string }>>([])
   const [stalls, setStalls] = useState<Map<string, StalledLift[]>>(new Map())
   const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
   const [wins, setWins] = useState<RecentWin[]>([])
@@ -44,7 +48,7 @@ export default function AdminDashboard() {
     let active = true
     ;(async () => {
       try {
-        const [s, c, f, ci, bl, st, pr, rw, ea] = await Promise.all([
+        const [s, c, f, ci, bl, st, pr, rw, ea, ps] = await Promise.all([
           fetch('/api/admin/stats').then((r) => (r.ok ? r.json() : null)),
           fetchClients(),
           fetchFeedback().catch(() => []),
@@ -54,6 +58,7 @@ export default function AdminDashboard() {
           fetchPendingNutritionProposals().catch(() => new Map()),
           fetchRecentWins().catch(() => []),
           fetchEverAssigned().catch(() => new Set<string>()),
+          fetchPainSwaps().catch(() => []),
         ])
         if (!active) return
         setStats(s)
@@ -65,6 +70,7 @@ export default function AdminDashboard() {
         setProposals(pr)
         setWins(rw)
         setEverAssigned(ea)
+        setPainSwaps(ps)
       } catch (err) {
         console.error('[Admin dashboard] load failed', err)
       } finally {
@@ -150,6 +156,9 @@ export default function AdminDashboard() {
                         responseHours: tier ? TIER_EXPERIENCE[tier].responseHours : null,
                         // Explicit boolean: undefined would mean "do not judge".
                         hasProgram: everAssigned.has(client.id),
+                        painSwaps: painSwaps
+                          .filter((p) => p.user_id === client.id)
+                          .map((p) => ({ exerciseName: p.original_exercise_name, at: p.created_at })),
                         blockEndsInDays: (() => {
                           const b = blocks.get(client.id)
                           return b ? blockProgress(b.assigned_at, b.block_weeks).daysLeft : null

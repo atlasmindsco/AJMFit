@@ -4123,13 +4123,15 @@ function SwapSheet({
           ))}
         </div>
 
-        {/* Pain is a coaching signal, not a UI event. There is nowhere to
-            store it yet, so the client is pointed at the one place it will
-            actually reach Anthony. */}
+        {/* Pain is a coaching signal, not a UI event. It is stored even for a
+            one-session swap, and it now reaches the coach's own list rather
+            than asking the client to go and write a message about it — which
+            is a step most people skip, by quietly avoiding the movement
+            instead. */}
         {reason === 'hurts' && (
           <p className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.10] border border-state-warning/25 text-state-warning text-xs font-body leading-relaxed">
-            Swap it for today, then tell Coach Anthony in Messages. Something that doesn&rsquo;t feel right is worth him
-            knowing about before next week.
+            Swap it for today &mdash; Coach Anthony will see that this one didn&rsquo;t feel right. If it is sharp
+            pain, or it is still there next session, message him so he can look at it properly.
           </p>
         )}
 

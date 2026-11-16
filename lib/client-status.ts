@@ -11,6 +11,7 @@ import { weekOf, previousWeekOf, type CheckIn } from '@/lib/check-ins'
  * is the one that most needs the coach to do something.
  */
 export type ClientStatus =
+  | 'reported_pain'
   | 'no_program'
   | 'review_needed'
   | 'never_started'
@@ -20,6 +21,7 @@ export type ClientStatus =
   | 'on_track'
 
 export const STATUS_META: Record<ClientStatus, { label: string; tone: string; dot: string }> = {
+  reported_pain: { label: 'Something hurts', tone: 'text-state-danger', dot: 'bg-state-danger' },
   no_program: { label: 'Needs a program', tone: 'text-state-danger', dot: 'bg-state-danger' },
   review_needed: { label: 'Review needed', tone: 'text-brand-blue', dot: 'bg-brand-blue' },
   never_started: { label: 'Never started', tone: 'text-state-danger', dot: 'bg-state-danger' },
@@ -70,6 +72,17 @@ export interface StatusInput {
    * program. Only an explicit `false` raises the status.
    */
   hasProgram?: boolean
+  /**
+   * Exercises this client swapped out because something hurt, recently.
+   *
+   * The client already has a way to say it — swapping an exercise offers
+   * "Doesn't feel right" as a reason, and a pain swap is deliberately stored
+   * even when the swap itself is only for one session. `fetchPainSwaps` has
+   * existed the whole time. Nothing ever called it, so the one signal in the
+   * product that a client might be getting injured was collected and thrown
+   * away, and the app told them to go and write a message instead.
+   */
+  painSwaps?: Array<{ exerciseName: string; at: string }>
 }
 
 export interface StatusResult {
@@ -95,6 +108,10 @@ const daysSince = (iso: string | null): number | null =>
  * less likely they ever begin. The fix is also completely different, which is
  * why the two share a severity but not a status.
  */
+// How long a reported pain stays on the coach's list. Long enough that a
+// weekend does not bury it, short enough that it clears once addressed.
+const PAIN_WINDOW_DAYS = 14
+
 const NEVER_STARTED_GRACE_DAYS = 3
 
 export function clientStatus({
@@ -106,6 +123,7 @@ export function clientStatus({
   stalledLifts,
   responseHours,
   hasProgram,
+  painSwaps,
 }: StatusInput): StatusResult {
   const sorted = [...checkIns].sort((a, b) => b.week_of.localeCompare(a.week_of))
   const thisWeek = weekOf()
@@ -131,6 +149,35 @@ export function clientStatus({
           : age === 0
             ? 'Joined today — needs a program'
             : `Joined ${age} days ago and still has no program`,
+    }
+  }
+
+  // 0.5 Something hurt.
+  //
+  // Above a waiting check-in because the cost of being late is different in
+  // kind: a reply one day late is a disappointed client, and training through
+  // a joint that hurts for another week is an injury. It is also the only
+  // signal here the client cannot be relied on to repeat — they already told
+  // the app once, by swapping the exercise, and someone who has to compose a
+  // message about it often just stops doing that movement quietly instead.
+  const hurts = painSwaps ?? []
+  if (hurts.length) {
+    const recent = hurts
+      .filter((p) => {
+        const d = daysSince(p.at)
+        return d != null && d <= PAIN_WINDOW_DAYS
+      })
+      .sort((a, b) => b.at.localeCompare(a.at))
+    if (recent.length) {
+      const d = daysSince(recent[0].at) ?? 0
+      const when = d === 0 ? 'today' : d === 1 ? 'yesterday' : `${d}d ago`
+      return {
+        status: 'reported_pain',
+        reason:
+          recent.length === 1
+            ? `Swapped ${recent[0].exerciseName} — did not feel right, ${when}`
+            : `${recent.length} exercises swapped for pain, most recently ${when}`,
+      }
     }
   }
 
@@ -244,6 +291,7 @@ export function clientStatus({
 
 /** Sort key so the dashboard leads with whatever needs the coach first. */
 export const STATUS_ORDER: ClientStatus[] = [
+  'reported_pain',
   'no_program',
   'review_needed',
   'never_started',
