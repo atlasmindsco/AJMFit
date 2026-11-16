@@ -21,10 +21,17 @@ export interface Assignment {
   ended_at: string | null
   block_weeks: number
   /**
-   * Which weekdays this client trains, 0 = Sunday. Null on every open
-   * assignment in production: the question is optional in the picker and
-   * everyone skips it, which is why there is no weekly goal to count against
-   * and why the reminders cannot say "it is Tuesday and you train Tuesdays".
+   * Which weekdays this client trains, 0 = Sunday.
+   *
+   * Null on every open assignment in production, because the question is
+   * optional in the picker and everyone skips it — and until now the only
+   * other place that asked, the dashboard's "which days do you train?" card,
+   * sent clients to a page that could not answer it. /studio/schedule now
+   * carries the picker, so a null here is a choice rather than a dead end.
+   *
+   * Null means "do not remind me", and an empty array is never stored: a set
+   * of no days would read as a set to compare against and be wrong every day
+   * of the week.
    */
   training_days: number[] | null
   completed_at: string | null

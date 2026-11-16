@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import CalendlyEmbed from '@/components/studio/CalendlyEmbed'
+import TrainingDays from '@/components/studio/TrainingDays'
 import EmptyState from '@/components/ui/EmptyState'
 import {
   fetchMySessions,
@@ -101,6 +102,14 @@ export default function SchedulePage() {
           {tier ? `${TIER_LABELS[tier]} plan` : 'Book your calls with Coach Anthony'}
         </p>
       </header>
+
+      {/*
+        First, because for a Blueprint client it is the only thing on this page
+        they can act on — and because the dashboard card that asks "which days
+        do you train?" sends them here. It used to land them on a Calendly
+        page with no answer to give. Renders nothing if they have no program.
+      */}
+      <TrainingDays />
 
       {/* Plans without live calls (Blueprint) */}
       {!hasAnyCalls && (

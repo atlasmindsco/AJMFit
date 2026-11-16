@@ -270,14 +270,24 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
 
   // 8. The cheapest card here and the most valuable. Nobody has ever set their
   //    training days — it is optional in the picker and everyone skips it — so
-  //    there is no weekly goal to count against, no "3 of 4 done", and the
-  //    reminders cannot say "it is Tuesday and you train Tuesdays".
+  //    the reminders cannot say "it is Tuesday and you train Tuesdays".
+  //
+  //    This card used to be a dead end. It pointed at /studio/schedule, which
+  //    was a Calendly booking page with no way to set a training day, so the
+  //    only recovery path from skipping the question in the picker asked the
+  //    question again and then offered nowhere to answer it. That, not
+  //    indifference, is why the column is null for every client in production.
+  //    /studio/schedule now opens with the day picker.
+  //
+  //    The detail promises reminders and nothing else. There is no weekly
+  //    goal counting "3 of 4 done" yet, and this card is not the place to
+  //    advertise one.
   if (input.hasProgram && !input.trainingDaysSet) {
     cards.push({
       kind: 'set_training_days',
       rank: 8,
       title: 'Which days do you train?',
-      detail: 'Tell us once and the app can track your week and remind you on the right days.',
+      detail: 'Tell us once and we will remind you on those days and stay quiet on the rest.',
       href: '/studio/schedule',
       tone: 'offer',
       dismissible: true,
