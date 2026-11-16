@@ -191,8 +191,28 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
           : left === 0
             ? 'Your block finishes today'
             : `Your block ends in ${left} ${left === 1 ? 'day' : 'days'}`,
-      detail: over > 0 ? 'Pick what comes next, or run it again.' : 'Time to think about what comes next.',
-      href: '/studio/programs',
+      /*
+       * Who picks the next block depends on what they bought, and the card
+       * used to ignore that. It told every client to "pick what comes next"
+       * and sent them to the programs page — where the picker is gated to
+       * Blueprint, so a coached client arrived at a screen that could not do
+       * the thing they had just been told to do.
+       *
+       * It is the same shape as the bug that left one client reading "joined
+       * 210 days ago, never trained": the app handing a client the blame for
+       * work the coach owns. A coached client's next block is Anthony's job,
+       * he is already warned about it on his own list, and the honest thing
+       * to tell them is that it is with him — with a way to chase it if he is
+       * late, rather than a dead end.
+       */
+      detail: input.coached
+        ? over > 0
+          ? 'Anthony is putting the next one together. Message him if you want to get moving.'
+          : 'Anthony sets the next one. Keep training this until he does.'
+        : over > 0
+          ? 'Pick what comes next, or run it again.'
+          : 'Time to think about what comes next.',
+      href: input.coached && over > 0 ? '/studio/messages' : '/studio/programs',
       tone: 'act',
       dismissible: false,
     })

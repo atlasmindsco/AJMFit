@@ -226,13 +226,24 @@ export function clientStatus({
   // Sits above the check-in signals because it has a deadline the others do
   // not: those can be answered tomorrow, and this one stops being useful the
   // moment the client finishes their last session.
-  if (coached && blockEndsInDays != null && blockEndsInDays >= 0 && blockEndsInDays <= 7) {
+  // The window used to be 0 to 7 days, which meant the warning appeared a
+  // week out and then went SILENT the moment the block actually ended — the
+  // coach was reminded right up until the point it became a real problem, and
+  // not after. A client sitting three weeks past the end of their block is
+  // more overdue than one with two days left, not less, so an ended block
+  // escalates rather than disappearing.
+  if (coached && blockEndsInDays != null && blockEndsInDays <= 7) {
+    const over = blockEndsInDays < 0 ? Math.abs(blockEndsInDays) : 0
     return {
-      status: 'needs_attention',
+      status: over > 0 ? 'at_risk' : 'needs_attention',
       reason:
-        blockEndsInDays === 0
-          ? 'Training block ends today — next block needed'
-          : `Training block ends in ${blockEndsInDays} days — decide what is next`,
+        over > 0
+          ? over === 1
+            ? 'Training block ended yesterday — they have nothing new to run'
+            : `Training block ended ${over} days ago — they have nothing new to run`
+          : blockEndsInDays === 0
+            ? 'Training block ends today — next block needed'
+            : `Training block ends in ${blockEndsInDays} ${blockEndsInDays === 1 ? "day" : "days"} — decide what is next`,
     }
   }
 
