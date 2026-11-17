@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/current-user'
 import {
   fetchThread,
@@ -82,12 +83,35 @@ export default function ClientMessagesPage() {
   }
 
   return (
+    <>
+    {/* The rest of the coaching relationship.
+        The weekly check-in and booking a call used to be two separate
+        destinations behind a More button, which made one relationship feel
+        like three small features — and neither was ever used. They belong
+        with the person they are about. */}
+    <div className="flex gap-2 mb-3">
+      <Link
+        href="/studio/check-in"
+        className="flex-1 px-4 py-3 rounded-card bg-surface-raised border border-white/[0.10] text-center hover:border-white/[0.18] transition-colors duration-200"
+      >
+        <span className="block font-display font-bold text-white text-sm">Weekly update</span>
+        <span className="block text-ink-3 text-2xs font-body mt-0.5">How the week went</span>
+      </Link>
+      <Link
+        href="/studio/schedule"
+        className="flex-1 px-4 py-3 rounded-card bg-surface-raised border border-white/[0.10] text-center hover:border-white/[0.18] transition-colors duration-200"
+      >
+        <span className="block font-display font-bold text-white text-sm">Schedule</span>
+        <span className="block text-ink-3 text-2xs font-body mt-0.5">Calls and training days</span>
+      </Link>
+    </div>
+
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="bg-white rounded-card border border-brand-navy/[0.06] overflow-hidden"
-      style={{ height: 'calc(100vh - 130px)' }}
+      style={{ height: 'calc(100vh - 210px)' }}
     >
       <div className="flex flex-col h-full">
         {/* Header */}
@@ -168,5 +192,6 @@ export default function ClientMessagesPage() {
         </div>
       </div>
     </motion.div>
+    </>
   )
 }

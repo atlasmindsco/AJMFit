@@ -46,7 +46,7 @@ export default function PlanPanel({
         <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="font-display font-bold text-sm text-white">
-              {checkInDone ? 'Check-in sent this week' : 'Your weekly check-in'}
+              {checkInDone ? 'Update sent this week' : 'Your weekly update'}
             </p>
             <p className="text-ink-3 text-xs font-body mt-0.5">
               {checkInDone

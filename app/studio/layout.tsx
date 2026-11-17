@@ -12,27 +12,36 @@ import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
 /**
- * One list for both navigations. Desktop and the mobile tab bar previously had
- * separate arrays, which drifted immediately — the same four screens were
- * called Dashboard/Programs/Nutrition/Messages on desktop and
- * Home/Train/Food/Coach on a phone. Entries carrying an icon (`d`) also earn a
- * thumb-reachable slot on mobile; the rest live behind More.
+ * Four destinations. There is no More button.
+ *
+ * There used to be nine: these four, plus Check-in, Progress, Schedule,
+ * Community and Settings behind a More button. Three of those five had never
+ * been opened by a single client in the product's history, which is what a
+ * hidden menu does — a feature behind More has to be remembered rather than
+ * noticed, and a new customer has nothing to remember yet.
+ *
+ * Where the other five went:
+ *   Check-in and Schedule  → Coach. They are the coaching relationship, and
+ *                            splitting it across three destinations made it
+ *                            feel like three small features instead of one.
+ *   Progress and Settings  → the profile menu under your own initials, which
+ *                            is where everybody already looks for them.
+ *   Community              → still at its address, off the navigation until
+ *                            there is a community. An empty feed is worse
+ *                            than no feed.
+ *
+ * Every route still works. Nothing was deleted.
  */
 const navTabs = [
-  { label: 'Home', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
+  { label: 'Today', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
   { label: 'Train', href: '/studio/programs', d: 'M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3' },
   { label: 'Food', href: '/studio/nutrition', d: 'M6.75 3v8.25a2.25 2.25 0 0 0 4.5 0V3m-2.25 8.25V21M15.75 3c-1.243 1.5-1.5 3.75-1.5 5.25 0 1.243.757 2.25 1.5 2.25V21' },
   { label: 'Coach', href: '/studio/messages', d: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155' },
-  // "Food" above is the tracker. This is the guidance: what to eat, how much,
-  // and what to do in a restaurant. Kept as a separate destination because
-  // folding it into the tracker is how the tracker became the whole product.
-  /* "Meals" pointed at /studio/food while the primary "Food" tab pointed at
-     /studio/nutrition. One destination now, so this entry is gone rather than
-     renamed — a second way into the same screen is a second thing to scan. */
-  { label: 'Check-in', href: '/studio/check-in' },
+]
+
+/** Under your initials, top right. Things you check rather than places you go. */
+const profileLinks = [
   { label: 'Progress', href: '/studio/progress' },
-  { label: 'Schedule', href: '/studio/schedule' },
-  { label: 'Community', href: '/studio/community' },
   { label: 'Settings', href: '/studio/settings' },
 ]
 
@@ -42,8 +51,6 @@ const icon = (d: string) => (
   </svg>
 )
 
-const primaryTabs = navTabs.filter((t): t is typeof t & { d: string } => Boolean(t.d))
-
 export default function ClientPortalLayout({
   children,
 }: {
@@ -51,7 +58,7 @@ export default function ClientPortalLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
   const [clientName, setClientName] = useState('')
   // Auth is enforced in middleware; here we additionally gate on subscription
@@ -186,10 +193,19 @@ export default function ClientPortalLayout({
               </div>
             </div>
 
-            {/* Right: Avatar */}
-            <div className="flex items-center gap-4">
-              {/* Client identity */}
-              <div className="flex items-center gap-2.5">
+            {/* Right: your initials, and what lives under them.
+                Progress and Settings used to be behind the More button on the
+                tab bar, where nobody found them — zero weights were ever
+                logged. A profile menu is where people already look for the
+                things that are about them rather than about today. */}
+            <div className="relative flex items-center">
+              <button
+                onClick={() => setProfileOpen((v) => !v)}
+                aria-expanded={profileOpen}
+                aria-haspopup="menu"
+                aria-label="Your account"
+                className="flex items-center gap-2.5 rounded-full pl-0.5 pr-2 py-0.5 hover:bg-white/[0.06] transition-colors duration-200"
+              >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
                   <span className="text-white text-2xs font-display font-bold">
                     {initials || '·'}
@@ -200,19 +216,51 @@ export default function ClientPortalLayout({
                     {firstName}
                   </span>
                 )}
-              </div>
-
-              {/* Sign out */}
-              <button
-                onClick={handleSignOut}
-                title="Sign out"
-                className="text-ink-3 hover:text-ink transition-colors duration-200"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                <svg className="w-4 h-4 text-ink-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                 </svg>
               </button>
 
+              {profileOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileOpen(false)}
+                    aria-hidden="true"
+                  />
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-[calc(100%+8px)] z-50 w-52 rounded-card bg-surface-raised border border-white/[0.12] shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-1.5"
+                  >
+                    {profileLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className={`block px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
+                          pathname === link.href
+                            ? 'bg-white/[0.10] text-white'
+                            : 'text-ink-2 hover:bg-white/[0.06] hover:text-white'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                    <div className="h-px bg-white/[0.08] my-1.5" />
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setProfileOpen(false)
+                        void handleSignOut()
+                      }}
+                      className="block w-full text-left px-3.5 py-2.5 rounded-control text-sm font-body text-ink-3 hover:bg-white/[0.06] hover:text-white transition-colors duration-150"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -224,18 +272,18 @@ export default function ClientPortalLayout({
         {children}
       </main>
 
-      {/* Mobile tab bar. This app gets used between sets, one-handed — the six
-          destinations were behind a hamburger at the top of the screen, which
-          is two taps away and the hardest place to reach. */}
+      {/* Mobile tab bar. This app gets used between sets, one-handed, so the
+          destinations sit under the thumb rather than behind a menu at the
+          top of the screen. Four slots and no More button: wider targets, and
+          nothing left to wonder about. */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-base/95 backdrop-blur border-t border-white/[0.08] pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5">
-          {primaryTabs.map((tab) => {
+        <div className="grid grid-cols-4">
+          {navTabs.map((tab) => {
             const isActive = pathname === tab.href
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
-                onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
                   isActive ? 'text-brand-blue' : 'text-ink-3 active:text-ink-2'
@@ -246,50 +294,8 @@ export default function ClientPortalLayout({
               </Link>
             )
           })}
-          <button
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-expanded={mobileMenuOpen}
-            className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
-              mobileMenuOpen ? 'text-white' : 'text-ink-3 active:text-ink-2'
-            }`}
-          >
-            {icon('M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm6 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z')}
-            <span className="text-2xs font-display font-bold uppercase tracking-wide">More</span>
-          </button>
         </div>
       </nav>
-
-      {/* "More" sheet — the destinations that do not earn a permanent slot. */}
-      {mobileMenuOpen && (
-        <>
-          <div
-            className="md:hidden fixed inset-0 z-40 bg-black/60"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          {/* Sits on top of the tab bar. The bar grows by the safe-area inset
-              on phones with a home indicator, so the offset has to include it
-              or this panel slides down over the buttons. */}
-          <div className="md:hidden fixed bottom-[calc(68px+env(safe-area-inset-bottom))] left-0 right-0 z-50 bg-surface-raised border-t border-white/[0.08] px-4 py-3">
-            {navTabs
-              .filter((tab) => !primaryTabs.some((p) => p.href === tab.href))
-              .map((tab) => {
-                const isActive = pathname === tab.href
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`block px-4 py-3 rounded-control text-sm font-body font-medium mb-1 ${
-                      isActive ? 'bg-white/[0.10] text-white' : 'text-ink-2'
-                    }`}
-                  >
-                    {tab.label}
-                  </Link>
-                )
-              })}
-          </div>
-        </>
-      )}
 
       <FeedbackButton />
 

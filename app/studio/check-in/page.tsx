@@ -165,7 +165,7 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
-        <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Check-in sent</h1>
+        <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Update sent</h1>
         <p className="text-ink-2 text-sm font-body mt-2 max-w-sm mx-auto leading-relaxed">
           Anthony has it. He&rsquo;ll come back to you with what to change, if anything — you&rsquo;ll see his reply
           here and in your messages.
@@ -185,7 +185,7 @@ export default function CheckInPage() {
   return (
     <div className="max-w-xl mx-auto">
       <header className="mb-6">
-        <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Weekly check-in</h1>
+        <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Weekly update</h1>
         <p className="text-ink-3 text-sm font-body mt-1">
           Six questions, about a minute. This is what Anthony uses to decide what changes next week.
         </p>

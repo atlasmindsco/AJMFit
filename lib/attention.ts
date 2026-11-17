@@ -130,7 +130,7 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
     cards.push({
       kind: 'reply_late',
       rank: 1.5,
-      title: 'Your check-in reply is running late',
+      title: 'Anthony has not replied yet',
       detail:
         h < 24
           ? 'Anthony has it and has not replied yet. He knows it is overdue.'
@@ -148,7 +148,7 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
     cards.push({
       kind: 'check_in_due',
       rank: 2,
-      title: 'Your weekly check-in',
+      title: 'Your weekly update',
       detail: 'Six questions, about a minute.',
       href: '/studio/check-in',
       tone: 'act',
