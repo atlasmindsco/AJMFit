@@ -19,7 +19,6 @@ const place = (p: Partial<TrainPlace>): TrainPlace => ({ ...HOME_PLACE, ...p })
 console.log('ROUND TRIP — every screen survives being written down and read back\n')
 const places: Array<[string, TrainPlace]> = [
   ['the week', HOME_PLACE],
-  ['the week, program tab', place({ tab: 'program' })],
   ['a day', place({ view: 'workout', day: 2 })],
   ['day zero', place({ view: 'workout', day: 0 })],
   ['an exercise', place({ view: 'exercise', day: 1, exercise: 'Barbell Squat' })],
@@ -59,7 +58,7 @@ const bad: Array<[string, string, string]> = [
   ['?view=exercise&day=1', 'an exercise screen with no exercise', 'workout'],
   ['?day=-4', 'a negative day', 'preview'],
   ['?day=abc', 'a day that is not a number', 'preview'],
-  ['?tab=sideways', 'an unknown tab', 'preview'],
+  ['?tab=program', 'a link saved when the week had sub-tabs', 'preview'],
   ['?view=workout&day=2.7', 'a fractional day', 'preview'],
 ]
 for (const [q, label, want] of bad) {
@@ -75,9 +74,9 @@ ok(
   placeToQuery(place({ view: 'builder', day: 4 }))
 )
 ok(
-  placeToQuery(place({ view: 'myPrograms', tab: 'program' })) === '?view=myPrograms',
-  'the preview tab is not carried off the preview',
-  placeToQuery(place({ view: 'myPrograms', tab: 'program' }))
+  queryToPlace('?tab=program&view=myPrograms').view === 'myPrograms',
+  'a retired tab parameter is ignored, not fought with',
+  queryToPlace('?tab=program&view=myPrograms').view
 )
 
 console.log(

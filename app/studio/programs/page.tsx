@@ -392,7 +392,6 @@ const slideBack = {
 
 export default function ProgramsPage() {
   const [view, setView] = useState<ProgramView>('preview')
-  const [previewTab, setPreviewTab] = useState<'overview' | 'program'>('overview')
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
@@ -1429,7 +1428,6 @@ export default function ProgramsPage() {
       setView(v)
       setSelectedDay(v === 'workout' || v === 'exercise' ? p.day : null)
       setSelectedExercise(v === 'exercise' ? p.exercise : null)
-      setPreviewTab(p.tab)
     },
     [weeklyPlan, builderDraft]
   )
@@ -1454,7 +1452,6 @@ export default function ProgramsPage() {
       view,
       day: selectedDay,
       exercise: selectedExercise,
-      tab: previewTab,
     }
     const wasPop = poppingRef.current
     poppingRef.current = false
@@ -1464,7 +1461,7 @@ export default function ProgramsPage() {
     // second entry and make one back press take two.
     if (wasPop) return
     window.history.pushState(null, '', window.location.pathname + placeToQuery(place))
-  }, [view, selectedDay, selectedExercise, previewTab])
+  }, [view, selectedDay, selectedExercise])
 
   // Back or forward → go where the address says.
   useEffect(() => {
@@ -2086,7 +2083,7 @@ export default function ProgramsPage() {
                 onClick={() => { setBuilderMoved(null); void openStartFrom() }}
                 className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-ink-2 uppercase tracking-wide hover:bg-white/[0.10] hover:text-ink transition-colors duration-200"
               >
-                Change Program
+                Edit my program
               </button>
               <span className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
@@ -2152,151 +2149,50 @@ export default function ProgramsPage() {
           {/* ════════ VIEW 1: PROGRAM PREVIEW ════════ */}
           {view === 'preview' && (
             <motion.div key="preview" {...slideBack}>
-              <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
-                {/* Overview / Program toggle */}
-                <div className="flex items-center border-b border-white/[0.10]">
+              {/* TODAY.
+                  The Train tab used to land on a brochure: two sub-tabs called
+                  Overview and Program, neither of which is where anybody wants
+                  to be. They want the day. It is now the first thing on the
+                  screen and the only filled button. */}
+              {todayIndex >= 0 && weeklyPlan[todayIndex] && weeklyPlan[todayIndex].exercises.length > 0 && (
+                <div className="bg-surface-raised rounded-card border border-brand-blue/30 p-6 mb-4">
+                  <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-[0.18em]">
+                    Today
+                  </p>
+                  <p className="font-display font-extrabold text-2xl text-white mt-1.5 leading-tight">
+                    {weeklyPlan[todayIndex].name}
+                  </p>
+                  <p className="text-ink-2 text-sm font-body mt-1.5">
+                    {weeklyPlan[todayIndex].muscles}
+                    <span className="text-ink-3">
+                      {' · '}
+                      {weeklyPlan[todayIndex].exercises.length} exercises
+                      {weeklyPlan[todayIndex].duration ? ` · ${weeklyPlan[todayIndex].duration}` : ''}
+                    </span>
+                  </p>
                   <button
-                    onClick={() => setPreviewTab('overview')}
-                    className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
-                      previewTab === 'overview'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
-                        : 'text-ink-4 hover:text-ink-2'
-                    }`}
+                    onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
+                    className="w-full mt-5 py-4 bg-brand-blue text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                   >
-                    Overview
-                  </button>
-                  <button
-                    onClick={() => setPreviewTab('program')}
-                    className={`flex-1 px-5 py-3.5 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200 ${
-                      previewTab === 'program'
-                        ? 'text-white bg-white/[0.04] border-b-2 border-brand-blue'
-                        : 'text-ink-4 hover:text-ink-2'
-                    }`}
-                  >
-                    Program
+                    Start {weeklyPlan[todayIndex].name}
                   </button>
                 </div>
+              )}
 
-                {/* ── Overview tab content ── */}
-                {previewTab === 'overview' && (
-                  <div className="p-5 space-y-5">
-                    {/* Quick stats */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
-                        <p className="text-white font-display font-extrabold text-2xl tracking-tight">
-                          {weeklyPlan.filter((d) => d.exercises.length > 0).length}
-                        </p>
-                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Training Days</p>
-                      </div>
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
-                        <p className="text-white font-display font-extrabold text-2xl tracking-tight">
-                          {weeklyPlan.reduce((sum, d) => sum + d.exercises.length, 0)}
-                        </p>
-                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Total Exercises</p>
-                      </div>
-                      <div className="bg-white/[0.06] border border-white/[0.10] rounded-card p-4 text-center">
-                        <p className="text-state-success font-display font-extrabold text-2xl tracking-tight">
-                          {weeklyPlan.filter((d) => d.completed).length}/{weeklyPlan.filter((d) => d.exercises.length > 0).length}
-                        </p>
-                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide mt-1">Completed</p>
-                      </div>
-                    </div>
-
-                    {/* Program details */}
-                    <div className="space-y-3">
-                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Program Details</h3>
-                      {[
-                        { label: 'Program', value: currentProgram.name },
-                        { label: 'Type', value: programSource === 'custom' ? 'Built by you' : 'Sample routine' },
-                        { label: 'Level', value: currentProgram.level },
-                        { label: 'Training days', value: `${weeklyPlan.filter((d) => d.exercises.length > 0).length} / week` },
-                      ].map((item) => (
-                        <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
-                          <span className="text-ink-2 text-sm font-body shrink-0">{item.label}</span>
-                          <span className="text-white font-body font-semibold text-sm text-right">{item.value}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Weekly split summary */}
-                    <div className="space-y-2">
-                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Weekly Split</h3>
-                      {weeklyPlan.filter((d) => d.exercises.length > 0).map((day) => {
-                        const dayIndex = weeklyPlan.indexOf(day)
-                        return (
-                          <button
-                            key={day.day}
-                            onClick={() => { setSelectedDay(dayIndex); setView('workout') }}
-                            className="w-full flex items-center gap-3 py-2.5 px-3 rounded-control bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 text-left group"
-                          >
-                            {/* `day.day` is the literal string "Day 1", so
-                                slicing it to 3 characters printed the word
-                                "Day" on every single row. */}
-                            <span className="text-ink-3 text-xs font-body w-8 shrink-0 tabular-nums">{dayIndex + 1}</span>
-                            <span className="text-white font-body font-semibold text-sm shrink-0 group-hover:text-brand-blue transition-colors duration-200">{day.name}</span>
-                            {dayIndex === todayIndex && (
-                              <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-[9px] font-display font-bold uppercase tracking-wide shrink-0">
-                                Today
-                              </span>
-                            )}
-                            <span className="text-ink-4 text-xs font-body ml-auto text-right">{day.muscles}</span>
-                            {day.completed ? (
-                              <div className="w-5 h-5 rounded-full bg-state-success flex items-center justify-center shrink-0">
-                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                </svg>
-                              </div>
-                            ) : (
-                              <svg className="w-4 h-4 text-ink-4 group-hover:text-ink-3 shrink-0 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                              </svg>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {/* CTA to view program */}
-                    <button
-                      onClick={() => setPreviewTab('program')}
-                      className="w-full py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
-                    >
-                      View Program
-                    </button>
-
-                    {/* Make it yours.
-                        Copying the program you are already on beats building
-                        from a blank week on every measure: a handful of swaps
-                        instead of twenty-five decisions, something that works
-                        on screen from the first second, and history that
-                        carries straight over because it keys on exercise name
-                        rather than on the program. */}
-                    {assignedProgramId && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-                          className="flex-1 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
-                        >
-                          Build my own
-                        </button>
-                        <button
-                          onClick={openMyPrograms}
-                          className="px-4 py-3 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-3 text-xs font-display font-bold uppercase tracking-wide hover:text-ink transition-colors duration-200"
-                        >
-                          My programs
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── Program tab content ── */}
-                {previewTab === 'program' && (
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="font-display font-bold text-white text-sm">Program Preview</h2>
-                    </div>
-
+              {/* THE WEEK.
+                  One list, not two. Overview and Program were two versions of
+                  the same week — a plain list with stat tiles above it, and
+                  this one with thumbnails and rest days. This is the better
+                  one, so it is the only one. */}
+              <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
+                <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
+                  <h2 className="font-display font-bold text-white text-sm">Your week</h2>
+                  <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">
+                    {weeklyPlan.filter((d) => d.completed).length} of{' '}
+                    {weeklyPlan.filter((d) => d.exercises.length > 0).length} done
+                  </span>
+                </div>
+                <div className="p-4">
                     <div className="space-y-2">
                       {weeklyPlan.map((day, i) => {
                         const isRest = day.exercises.length === 0
@@ -2382,16 +2278,41 @@ export default function ProgramsPage() {
                         )
                       })}
                     </div>
+                </div>
+              </div>
 
-                    {/* Today's workout CTA */}
-                    {todayIndex >= 0 && weeklyPlan[todayIndex] && (
-                      <button
-                        onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                        className="w-full mt-4 py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
-                      >
-                        Start {weeklyPlan[todayIndex].name}
-                      </button>
-                    )}
+              {/* The program itself, and what you can do with it.
+                  Below the week because it is reference, not an action. */}
+              <div className="mt-4 bg-surface-raised rounded-card border border-white/[0.10] p-5">
+                {[
+                  { label: 'Program', value: currentProgram.name },
+                  { label: 'Type', value: programSource === 'custom' ? 'Built by you' : 'Sample routine' },
+                  { label: 'Level', value: currentProgram.level },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
+                    <span className="text-ink-2 text-sm font-body shrink-0">{item.label}</span>
+                    <span className="text-white font-body font-semibold text-sm text-right">{item.value}</span>
+                  </div>
+                ))}
+
+                {/* "My programs" sat three levels down — Train, then Change
+                    Program, then My programs — so the thing you made and will
+                    want again next week was the deepest item in the app. It is
+                    one tap from here now. */}
+                {assignedProgramId && (
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => { setBuilderMoved(null); void openStartFrom() }}
+                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                    >
+                      Edit my program
+                    </button>
+                    <button
+                      onClick={openMyPrograms}
+                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                    >
+                      My programs
+                    </button>
                   </div>
                 )}
               </div>
@@ -2451,7 +2372,7 @@ export default function ProgramsPage() {
                     <p className="text-state-success text-xs font-body leading-relaxed">
                       Saved to your program &mdash; {keptSwaps}{' '}
                       {keptSwaps === 1 ? 'exercise' : 'exercises'} changed for good. Find it
-                      any time under Change Program → My programs.
+                      any time under My programs.
                     </p>
                   </div>
                 )}

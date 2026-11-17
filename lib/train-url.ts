@@ -23,22 +23,18 @@
 
 export type TrainView = 'preview' | 'workout' | 'exercise' | 'builder' | 'myPrograms' | 'startFrom'
 
-export type PreviewTab = 'overview' | 'program'
-
 export interface TrainPlace {
   view: TrainView
   /** Index into the weekly plan, for the day and exercise screens. */
   day: number | null
   /** Exercise name, for the exercise screen. */
   exercise: string | null
-  tab: PreviewTab
 }
 
 export const HOME_PLACE: TrainPlace = {
   view: 'preview',
   day: null,
   exercise: null,
-  tab: 'overview',
 }
 
 const VIEWS: TrainView[] = ['preview', 'workout', 'exercise', 'builder', 'myPrograms', 'startFrom']
@@ -55,7 +51,6 @@ export function placeToQuery(place: TrainPlace): string {
   const q = new URLSearchParams()
 
   if (place.view !== 'preview') q.set('view', place.view)
-  else if (place.tab !== 'overview') q.set('tab', place.tab)
 
   // The day only means something on the two screens that show one, and
   // carrying it elsewhere would make the builder's address change every time
@@ -101,10 +96,10 @@ export function queryToPlace(search: string): TrainPlace {
   const exercise = view === 'exercise' ? q.get('ex') : null
   if (view === 'exercise' && !exercise) view = 'workout'
 
-  const rawTab = q.get('tab')
-  const tab: PreviewTab = rawTab === 'program' ? 'program' : 'overview'
-
-  return { view, day: view === 'preview' ? null : day, exercise, tab }
+  // A `tab` parameter may still arrive from a link saved while the week had
+  // Overview and Program sub-tabs. It is ignored rather than rejected: the
+  // address still points at the week, which is where that link meant to go.
+  return { view, day: view === 'preview' ? null : day, exercise }
 }
 
 /** True when two places would draw the same screen. */
