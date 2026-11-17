@@ -1,10 +1,23 @@
 'use client'
 
+/**
+ * Home answers one question: what am I doing today?
+ *
+ * It used to answer eight. At its fullest it carried a greeting, three
+ * attention cards, a five-item setup checklist, today's session, four stat
+ * tiles, a weekly calorie chart, a list of personal records, upcoming calls
+ * and a macro breakdown — eleven things competing for the first five seconds,
+ * with the one people opened the app for sitting fourth.
+ *
+ * Nothing was deleted in the clear-out. Every card that came off exists on
+ * the screen it belongs to: calories and macros on Food, calls on Schedule,
+ * personal records on Train beside the workout history. What is left here is
+ * the session, how the week is going, and at most one thing that genuinely
+ * needs attention.
+ */
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import MacroRing from '@/components/ui/MacroRing'
-import EmptyState from '@/components/ui/EmptyState'
 import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import PlanPanel from '@/components/studio/PlanPanel'
 import BillingPanel from '@/components/studio/BillingPanel'
@@ -17,66 +30,31 @@ import type { Tier } from '@/lib/stripe/catalog'
 import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
-import {
-  fetchTargets,
-  fetchTodaysLogs,
-  fetchDailyLog,
-  fetchWeeklyCalories,
-  sumTotals,
-  type MacroTargets,
-  type NutritionTotals,
-} from '@/lib/nutrition'
+import { todayShape, weeklyTarget, weekLine } from '@/lib/today'
 import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, fetchTrainedDays, type PRRow } from '@/lib/workout'
 import { loadAssignedProgram, type PlanDay } from '@/lib/blueprint'
 import { rotationState } from '@/lib/rotation'
 import { fetchMyProgram, type Program } from '@/lib/programs'
-import { fetchMySessions, fetchMyTier, type Session } from '@/lib/scheduling'
+import { fetchMyTier } from '@/lib/scheduling'
 import { fetchMyOnboarding } from '@/lib/onboarding'
 import { fetchBodyMetrics, daysSinceLastPhoto } from '@/lib/body-metrics'
 import { fetchNutritionSetup } from '@/lib/nutrition'
 import { hasBookedOnboarding } from '@/lib/scheduling'
 
-const CheckIcon = (
-  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-  </svg>
-)
-const FlameIcon = (
-  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 23c-4.97 0-9-3.58-9-8 0-5.5 9-13 9-13s9 7.5 9 13c0 4.42-4.03 8-9 8zm0-18.58C9.12 7.38 5 12.13 5 15c0 3.31 3.13 6 7 6s7-2.69 7-6c0-2.87-4.12-7.62-7-10.58z" />
-  </svg>
-)
-const BoltIcon = (
-  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-  </svg>
-)
-const DropIcon = (
-  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a8.25 8.25 0 0 0 5.834-14.084L12 2.25 6.166 6.916A8.25 8.25 0 0 0 12 21Z" />
-  </svg>
-)
-
-function dayLabel(dateStr: string): string {
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' })
-}
-
-const cardHeader =
-  'px-5 py-4 border-b border-white/[0.10] flex items-center justify-between'
-
 export default function ClientDashboard() {
   const [firstName, setFirstName] = useState('')
   const [loading, setLoading] = useState(true)
   const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
-  const [totals, setTotals] = useState<NutritionTotals>({ calories: 0, protein: 0, carbs: 0, fats: 0 })
-  const [targets, setTargets] = useState<MacroTargets>({ calories: 2000, protein: 180, carbs: 250, fats: 70 })
-  const [waterOz, setWaterOz] = useState(0)
-  const [weekCals, setWeekCals] = useState<Array<{ date: string; calories: number }>>([])
+  /**
+   * Kept only to decide whether a record is worth mentioning in the attention
+   * card. The list of records itself lives on Train now, beside the workout
+   * history, which is where somebody goes when they wonder what they have
+   * lifted — a different question from "what am I doing today".
+   */
   const [prs, setPrs] = useState<PRRow[]>([])
   const [myProgram, setMyProgram] = useState<Program | null>(null)
   /** The session to offer, and where it sits in the program. */
   const [today, setToday] = useState<{ index: number; day: PlanDay } | null>(null)
-  const [sessions, setSessions] = useState<Session[]>([])
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
   const [tier, setTier] = useState<string | null>(null)
   // Whether this client has ever logged a workout. Defaults to true so the
@@ -88,7 +66,14 @@ export default function ClientDashboard() {
   // said which days they train. The only input the homepage did not already
   // have — everything else the stack needs was being fetched already.
   const [blockDaysLeft, setBlockDaysLeft] = useState<number | null>(null)
-  const [trainingDaysSet, setTrainingDaysSet] = useState(true)
+  /**
+   * Which weekdays they train, 0 = Sunday, or null if never answered.
+   *
+   * Newly useful: it is what lets the screen say "rest day" instead of
+   * offering the next session every day of the week, which quietly implies
+   * you are behind whenever you are not training.
+   */
+  const [trainingDays, setTrainingDays] = useState<number[] | null>(null)
   // Hours past the reply this client's tier promised, so the app can say so
   // before they work it out from the silence.
   const [replyLateHours, setReplyLateHours] = useState<number | null>(null)
@@ -109,16 +94,14 @@ export default function ClientDashboard() {
         return
       }
       try {
-        const [t, logs, dl, week, workouts, prRows, program, mySessions, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn, myBlock, photoAge] =
+        // Booked calls are no longer read here — they live on Schedule, which
+        // is also where you book them. One fewer query on the screen clients
+        // open most often.
+        const [workouts, prRows, program, onboarding, myTier, history, streak, metrics, nutri, welcomeBooked, thisWeekCheckIn, myBlock, photoAge] =
           await Promise.all([
-            fetchTargets(id),
-            fetchTodaysLogs(id),
-            fetchDailyLog(id),
-            fetchWeeklyCalories(id),
             fetchWorkoutsThisWeek(id),
             fetchPRs(id),
             fetchMyProgram(id),
-            fetchMySessions(id),
             fetchMyOnboarding(id),
             fetchMyTier(id),
             fetchWorkoutHistory(id, 1),
@@ -139,21 +122,16 @@ export default function ClientDashboard() {
           const over = await replyOverdueHours(id, hrs).catch(() => null)
           if (active) setReplyLateHours(over)
         })()
-        setTargets(t)
-        setTotals(sumTotals(logs))
-        setWaterOz(dl.water_oz)
-        setWeekCals(week)
         setWorkoutsThisWeek(workouts)
         setPrs(prRows)
         setMyProgram(program)
-        setSessions(mySessions)
         setNeedsOnboarding(!onboarding)
         setTier(myTier)
         setHasEverTrained(history.length > 0)
         setWeekStreak(streak)
         setCheckInDone(!!thisWeekCheckIn)
         setBlockDaysLeft(blockProgressDaysLeft(myBlock))
-        setTrainingDaysSet(myBlock?.training_days != null)
+        setTrainingDays(myBlock?.training_days ?? null)
         setLastWorkoutDate(history[0]?.date ?? null)
         setSetupState({
           intakeDone: !!onboarding,
@@ -215,70 +193,22 @@ export default function ClientDashboard() {
     }
   }, [])
 
-  const val = (v: string | number) => (loading ? '—' : v)
-  const caloriesMax = Math.max(targets.calories, ...weekCals.map((d) => d.calories), 1)
   const recentPRs = [...prs].sort((a, b) => +new Date(b.set_at) - +new Date(a.set_at)).slice(0, 5)
-  const upcomingSessions = [...sessions]
-    .filter((s) => s.status === 'scheduled' && new Date(s.starts_at).getTime() > Date.now())
-    .sort((a, b) => +new Date(a.starts_at) - +new Date(b.starts_at))
-    .slice(0, 3)
-
-  const stats = [
-    {
-      label: 'Workouts This Week',
-      value: val(workoutsThisWeek),
-      // Match the "1,800 / 2,000" shape of the cards beside it, so the number
-      // reads as progress toward the week rather than a bare count.
-      sub: myProgram?.days_per_week ? `/ ${myProgram.days_per_week} planned` : 'logged',
-      icon: CheckIcon,
-      iconBg: 'bg-brand-blue/10',
-      iconColor: 'text-brand-blue',
-    },
-    {
-      label: 'Calories Today',
-      value: val(totals.calories.toLocaleString()),
-      sub: `/ ${targets.calories.toLocaleString()}`,
-      icon: FlameIcon,
-      iconBg: 'bg-brand-orange/10',
-      iconColor: 'text-brand-orange',
-    },
-    {
-      label: 'Protein Today',
-      value: val(Math.round(totals.protein)),
-      sub: `/ ${targets.protein}g`,
-      icon: BoltIcon,
-      iconBg: 'bg-brand-blue/10',
-      iconColor: 'text-brand-blue',
-    },
-    {
-      label: 'Water Today',
-      value: val(waterOz),
-      sub: 'oz',
-      icon: DropIcon,
-      iconBg: 'bg-brand-blue/10',
-      iconColor: 'text-brand-blue',
-    },
-  ]
-
-  const macroRings = [
-    { name: 'Protein', current: Math.round(totals.protein), goal: targets.protein, color: '#1A7BFF' },
-    { name: 'Carbs', current: Math.round(totals.carbs), goal: targets.carbs, color: '#F76B16' },
-    { name: 'Fats', current: Math.round(totals.fats), goal: targets.fats, color: '#64748B' },
-  ]
-  const caloriePct = targets.calories > 0 ? Math.min((totals.calories / targets.calories) * 100, 100) : 0
+  const shape = todayShape(trainingDays)
+  const week = weekLine(workoutsThisWeek, weeklyTarget(trainingDays, myProgram?.days_per_week ?? null))
 
   return (
-    <div>
-      {/* Greeting. The streak sits here rather than in the stat row because it
+    <div className="max-w-2xl mx-auto">
+      {/* Greeting. The streak sits here rather than in a stat row because it
           is status, not a metric — and it carries the marketing hero's outline
           numerals into the studio, which is the one piece of the brand that
           previously stopped at the login screen. */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
-            Welcome back{firstName ? `, ${firstName}` : ''}
+            {firstName ? `Hey, ${firstName}` : 'Hey'}
           </h1>
-          <p className="text-ink-3 text-sm font-body mt-1">Here&rsquo;s your training snapshot.</p>
+          {!loading && week && <p className="text-ink-3 text-sm font-body mt-1">{week}</p>}
         </div>
         {!loading && weekStreak > 0 && (
           <div className="shrink-0 text-right">
@@ -297,10 +227,16 @@ export default function ClientDashboard() {
           never about the session itself — that card is directly below and is
           better than anything this could say about it. Renders nothing at all
           when there is nothing to say, which for half the active clients is
-          the honest answer, and then the start button moves back up. */}
+          the honest answer, and then the start button moves back up.
+
+          One card, not three. Three things that all need attention is a list
+          of chores above the thing they came to do, and the stack is already
+          ranked — so the second and third were, by its own reckoning, less
+          important than the session underneath them. */}
       {!loading && (
         <AttentionStack
-          cards={topAttention({
+          cards={topAttention(
+            {
             coached: isCoached(tier as Tier),
             // Not loaded on this screen yet, so the card simply never fires.
             // Better an absent card than one driven by a guess.
@@ -311,7 +247,7 @@ export default function ClientDashboard() {
             daysSinceLastWorkout: lastWorkoutDate
               ? Math.floor((Date.now() - new Date(`${lastWorkoutDate}T00:00:00`).getTime()) / 86400000)
               : null,
-            trainingDaysSet,
+            trainingDaysSet: trainingDays != null,
             lastPr: recentPRs[0]
               ? {
                   exercise: recentPRs[0].exercise_name,
@@ -325,40 +261,67 @@ export default function ClientDashboard() {
             daysSinceLastPhoto: photoAgeDays,
             proteinRatio: null,
             recommendation: null,
-          })}
+            },
+            1
+          )}
         />
       )}
 
-      {/* Today's training.
-          First card on the page, because it is the question the client opened
-          the app to ask. It used to sit last, below calories, PRs, sessions
-          and nutrition — and named the program rather than the session. */}
-      <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="mb-6 bg-surface-raised rounded-card border border-white/[0.10] p-5">
-        <h2 className="font-display font-bold text-sm text-white">Today&rsquo;s Training</h2>
+      {/* The session. This is the screen.
+          It used to sit fourth, below calories, records and calls, and name
+          the program rather than the day. It is now the only thing competing
+          for attention, which is the whole point of the page. */}
+      <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="mb-5 bg-surface-raised rounded-card border border-white/[0.10] p-6">
         {loading ? (
-          <p className="text-ink-4 text-sm font-body mt-1 mb-4">Loading…</p>
+          <p className="text-ink-4 text-sm font-body py-6 text-center">Loading…</p>
+        ) : today && shape.rest ? (
+          /* A rest day is a planned part of the week, not an absence.
+             Offering the next session every single day quietly implies you
+             are behind whenever you are not training — so when they have told
+             us which days they train, the screen says so plainly and gets out
+             of the way. Training anyway stays one tap away and is phrased as
+             a choice, never as catching up. */
+          <>
+            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.18em]">
+              Rest day
+            </p>
+            <p className="font-display font-extrabold text-2xl text-white mt-2 leading-tight">
+              Nothing scheduled
+            </p>
+            <p className="text-ink-2 text-sm font-body mt-2 leading-relaxed">
+              {shape.nextLabel
+                ? `Next session ${shape.nextLabel} — ${today.day.name}.`
+                : `Next session is ${today.day.name}.`}
+            </p>
+            <Link
+              href={`/studio/programs?day=${today.index}`}
+              className="inline-block mt-5 text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+            >
+              Train anyway →
+            </Link>
+          </>
         ) : today ? (
           <>
-            <p className="font-display font-extrabold text-xl text-white mt-2 leading-tight">{today.day.name}</p>
-            <p className="text-ink-2 text-sm font-body mt-1">
-              {today.day.muscles}
+            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.18em]">
+              Today
             </p>
-            <div className="flex flex-wrap gap-1.5 mt-2.5 mb-3">
-              <span className="px-2 py-0.5 rounded-control bg-brand-blue/10 text-brand-blue text-2xs font-body font-semibold">
-                {today.day.exercises.length} exercises
-              </span>
-              {today.day.duration && (
-                <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body font-semibold">{today.day.duration}</span>
+            <p className="font-display font-extrabold text-3xl text-white mt-1.5 leading-tight">
+              {today.day.name}
+            </p>
+            <p className="text-ink-2 text-sm font-body mt-1.5">
+              {today.day.muscles}
+              {today.day.exercises.length > 0 && (
+                <span className="text-ink-3">
+                  {' · '}
+                  {today.day.exercises.length} exercises
+                  {today.day.duration ? ` · ${today.day.duration}` : ''}
+                </span>
               )}
-              <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body font-semibold">
-                Day {today.index + 1}
-              </span>
-            </div>
+            </p>
 
-            {/* The first few lifts, with what they did last time.
-                Enough to know whether to bring chalk, read without opening
-                anything. */}
-            <div className="space-y-1 mb-4">
+            {/* The first few lifts. Enough to know whether to bring chalk,
+                read without opening anything. */}
+            <div className="space-y-1.5 mt-5 mb-6">
               {today.day.exercises.slice(0, 3).map((ex) => (
                 <div key={ex.name} className="flex items-baseline gap-2 text-sm font-body">
                   <span className="text-ink-2 truncate">{ex.name}</span>
@@ -376,7 +339,7 @@ export default function ClientDashboard() {
 
             <Link
               href={`/studio/programs?day=${today.index}`}
-              className="block w-full text-center py-3.5 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center py-4 bg-brand-blue text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
             >
               Start Workout
             </Link>
@@ -506,197 +469,6 @@ export default function ClientDashboard() {
         </Link>
       )}
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            custom={i}
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="bg-surface-raised rounded-card border border-white/[0.10] p-5 flex items-center gap-4"
-          >
-            <div className={`w-12 h-12 rounded-card ${stat.iconBg} flex items-center justify-center shrink-0 ${stat.iconColor}`}>
-              {stat.icon}
-            </div>
-            <div>
-              <p className="text-ink-3 text-2xs font-body uppercase tracking-wide">{stat.label}</p>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-display font-extrabold text-2xl text-white tracking-tight">{stat.value}</span>
-                <span className="text-ink-3 text-xs font-body">{stat.sub}</span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT: chart + PRs */}
-        <div className="lg:col-span-8 space-y-4">
-          {/* Calories This Week */}
-          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className={cardHeader}>
-              <h2 className="font-display font-bold text-sm text-white">Calories This Week</h2>
-              <span className="text-ink-4 text-xs font-body">target {targets.calories.toLocaleString()}</span>
-            </div>
-            <div className="p-5">
-              {loading ? (
-                <div className="h-44 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
-                </div>
-              ) : (
-                <div className="flex items-end justify-between gap-2 sm:gap-3 h-44">
-                  {weekCals.map((d) => {
-                    const h = caloriesMax > 0 ? (d.calories / caloriesMax) * 100 : 0
-                    const onTarget = d.calories > 0 && d.calories <= targets.calories
-                    return (
-                      <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
-                        <span className="text-ink-2 text-2xs font-body">{d.calories > 0 ? d.calories.toLocaleString() : ''}</span>
-                        <div className="w-full bg-white/[0.04] rounded-control flex items-end h-full">
-                          <div
-                            className={`w-full rounded-control ${onTarget ? 'bg-brand-blue' : 'bg-brand-orange'}`}
-                            style={{ height: `${Math.max(h, d.calories > 0 ? 4 : 0)}%` }}
-                          />
-                        </div>
-                        <span className="text-ink-3 text-2xs font-body">{dayLabel(d.date)}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Recent PRs */}
-          <motion.div custom={5} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className={cardHeader}>
-              <h2 className="font-display font-bold text-sm text-white">Recent PRs</h2>
-              <Link href="/studio/programs" className="text-brand-blue text-xs font-body hover:underline">
-                Train →
-              </Link>
-            </div>
-            <div className="p-5">
-              {loading ? (
-                <p className="text-ink-4 text-sm font-body">Loading…</p>
-              ) : recentPRs.length === 0 ? (
-                <EmptyState
-                  title="Your first PR is one workout away"
-                  line="Every lift you log sets the bar. Beat it next time and it shows up here."
-                  actionLabel="Start a workout"
-                  actionHref="/studio/programs"
-                />
-              ) : (
-                <div className="space-y-3">
-                  {recentPRs.map((pr) => (
-                    <div key={pr.exercise_name + pr.set_at} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-body font-semibold text-white text-sm">{pr.exercise_name}</p>
-                        <p className="text-ink-3 text-xs font-body">
-                          {new Date(pr.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          {pr.previous_weight ? ` · prev ${Number(pr.previous_weight)} lbs` : ''}
-                        </p>
-                      </div>
-                      <span className="font-display font-extrabold text-white text-sm">
-                        {Number(pr.weight)} lbs <span className="text-ink-3 text-xs font-body">× {pr.reps}</span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* RIGHT: nutrition + today's workout */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* Upcoming Sessions */}
-          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className={cardHeader}>
-              <h2 className="font-display font-bold text-sm text-white">Upcoming Sessions</h2>
-            </div>
-            <div className="p-5">
-              {loading ? (
-                <p className="text-ink-4 text-sm font-body">Loading…</p>
-              ) : upcomingSessions.length === 0 ? (
-                <EmptyState
-                  title="No calls booked"
-                  line="Coach Anthony books your next one, or you can grab a slot yourself."
-                  actionLabel="Book a session"
-                  actionHref="/studio/schedule"
-                />
-              ) : (
-                <div className="space-y-2.5">
-                  {upcomingSessions.map((s) => (
-                    <div key={s.id} className="flex items-center gap-3 rounded-control bg-white/[0.03] p-3">
-                      <div className="w-9 h-9 rounded-control bg-brand-orange/10 flex items-center justify-center shrink-0">
-                        <svg className="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-body font-medium truncate">{s.type || 'Session'}</p>
-                        <p className="text-ink-3 text-2xs font-body mt-0.5">
-                          {new Date(s.starts_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · {s.duration_min} min
-                        </p>
-                      </div>
-                      {s.join_url && (
-                        <a href={s.join_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-control bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200">
-                          Join
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Nutrition Today */}
-          <motion.div custom={6} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
-            <div className={cardHeader}>
-              <h2 className="font-display font-bold text-sm text-white">Nutrition Today</h2>
-              <div className="flex items-center gap-2">
-                <Link href="/studio/setup-nutrition" className="text-brand-blue text-xs font-body hover:underline">
-                  Macros →
-                </Link>
-                <span className="text-ink-4">·</span>
-                <Link href="/studio/nutrition" className="text-brand-blue text-xs font-body hover:underline">
-                  Log →
-                </Link>
-              </div>
-            </div>
-            <div className="p-5">
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-ink-2 text-xs font-body uppercase tracking-wide">Calories</span>
-                  <span className="text-white text-sm font-body font-semibold">
-                    {val(totals.calories.toLocaleString())} / {targets.calories.toLocaleString()} kcal
-                  </span>
-                </div>
-                <div className="w-full h-3 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-blue rounded-full transition-[width] duration-500" style={{ width: `${loading ? 0 : caloriePct}%` }} />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-around">
-                {macroRings.map((macro) => (
-                  <div key={macro.name} className="flex flex-col items-center">
-                    <div className="relative">
-                      <MacroRing current={macro.current} goal={macro.goal} color={macro.color} size={72} />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="font-display font-bold text-white text-sm">{loading ? ', ' : `${macro.current}g`}</span>
-                      </div>
-                    </div>
-                    <span className="font-body font-semibold text-white text-xs mt-2">{macro.name}</span>
-                    <span className="text-ink-3 text-2xs font-body">Goal {macro.goal}g</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-        </div>
-      </div>
     </div>
   )
 }

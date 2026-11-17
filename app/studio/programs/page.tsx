@@ -12,6 +12,7 @@ import {
   saveSet as dbSaveSet,
   upsertPR as dbUpsertPR,
   fetchPRs as dbFetchPRs,
+  type PRRow,
   saveSwap as dbSaveSwap,
   removeSwap as dbRemoveSwap,
   fetchSwaps as dbFetchSwaps,
@@ -438,6 +439,15 @@ export default function ProgramsPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [workoutIds, setWorkoutIds] = useState<Record<number, string>>({}) // day index → DB workout id
   const [dbPRs, setDbPRs] = useState<Record<string, PRRecord>>({}) // overrides hardcoded demo PRs when present
+  /**
+   * Recent records as a list, for the sidebar.
+   *
+   * Lives here rather than on the home screen. A list of your last six
+   * records is reference material you go and look at, not an answer to
+   * "what am I doing today" — and this is the tab you are on when you
+   * wonder about it.
+   */
+  const [prList, setPrList] = useState<PRRow[]>([])
 
   // ── Assigned program + Blueprint self-serve picker ──
   const [weeklyPlan, setWeeklyPlan] = useState<PlanDay[]>(EMPTY_WEEKLY_PLAN)
@@ -1353,6 +1363,15 @@ export default function ProgramsPage() {
           }
         }
         setDbPRs(map)
+        // The same rows as a list, newest first. The map above answers "is
+        // this a record" during a session; this answers "what have I done",
+        // which is a different question and wants a different shape.
+        setPrList(
+          rows
+            .slice()
+            .sort((a, b) => +new Date(b.set_at) - +new Date(a.set_at))
+            .slice(0, 6)
+        )
       })
       .catch((err) => console.error('[PRs] Failed to load:', err))
 
@@ -4213,6 +4232,38 @@ export default function ProgramsPage() {
 
       {/* SIDEBAR */}
       <div className="lg:col-span-4 space-y-4">
+        {/* Personal records.
+            Moved off the home screen, which should answer one question —
+            what am I doing today — and was answering eight. This is the
+            screen you are on when you wonder what you have lifted. */}
+        {prList.length > 0 && (
+          <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
+            <div className="px-5 py-4 border-b border-white/[0.10]">
+              <h2 className="font-display font-bold text-sm text-white">Personal Records</h2>
+            </div>
+            <div className="p-4 space-y-2">
+              {prList.map((pr) => (
+                <div
+                  key={pr.exercise_name + pr.set_at}
+                  className="flex items-center justify-between gap-3 rounded-control bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-body font-semibold truncate">{pr.exercise_name}</p>
+                    <p className="text-ink-3 text-xs font-body mt-0.5">
+                      {new Date(pr.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {pr.previous_weight ? ` · up from ${Number(pr.previous_weight)} lbs` : ''}
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-display font-extrabold text-white text-sm tabular-nums">
+                    {Number(pr.weight)}
+                    <span className="text-ink-3 text-xs font-body"> lbs × {pr.reps}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Recent Workout Logs */}
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
