@@ -3777,11 +3777,27 @@ export default function ProgramsPage() {
                         <button
                           onClick={async () => {
                             if (!userId) return
-                            await activateCustomProgram(userId, p.id)
-                            await applyLoadedProgram(p.id, userId)
-                            setSelectedDay(null)
-                            setShowPicker(false)
-                            setView('preview')
+                            try {
+                              // Re-picking the program they are already on is
+                              // not a switch and must not restart the block.
+                              await activateCustomProgram(userId, p.id, {
+                                continueBlock: p.id === assignedProgramId,
+                              })
+                              await applyLoadedProgram(p.id, userId)
+                              setSelectedDay(null)
+                              setShowPicker(false)
+                              setView('preview')
+                              setWriteError(null)
+                            } catch (err) {
+                              // This throws when the current assignment could
+                              // not be closed, which would otherwise leave the
+                              // client on two programs at once. Unhandled, the
+                              // button simply did nothing and said nothing.
+                              console.error('[Use program] Failed:', err)
+                              setWriteError(
+                                `Could not start "${p.name}". You are still on your current program — try again.`
+                              )
+                            }
                           }}
                           className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
                         >
