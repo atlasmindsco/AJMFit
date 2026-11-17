@@ -139,11 +139,21 @@ export default function ExerciseConfigSheet({
           />
         </details>
 
+        {/* This button said "Done" while it was the only thing on the screen
+            that kept your sets, reps and rest — and tapping the dimmed area
+            behind the sheet threw them away without saying so. Two labelled
+            buttons instead: one keeps, one does not, and both say which. */}
         <button
           onClick={commit}
           className="w-full mt-6 py-3.5 rounded-control bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
         >
-          Done
+          Save
+        </button>
+        <button
+          onClick={onClose}
+          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+        >
+          Cancel
         </button>
       </motion.div>
     </div>
