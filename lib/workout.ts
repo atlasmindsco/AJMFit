@@ -330,7 +330,17 @@ export async function saveSwap(
   userId: string,
   originalName: string,
   swappedName: string,
-  reason?: SwapReason | null
+  reason?: SwapReason | null,
+  /**
+   * True for "just today", false for "every time from now on".
+   *
+   * This column has existed since the swap-reason migration and until now
+   * nothing wrote it, so every stored swap read back as permanent — including
+   * the ones stored ONLY because the client said something hurt, which the UI
+   * had told them was for that session. The next day the app silently kept
+   * giving them the substitute for a movement they never asked to replace.
+   */
+  sessionOnly = false
 ) {
   const { error } = await db
     .from('exercise_swaps')
@@ -342,6 +352,7 @@ export async function saveSwap(
         // The swap sheet already asks why and used to throw the answer away.
         // "hurts" is the earliest and cheapest injury signal in the app.
         reason: reason ?? null,
+        session_only: sessionOnly,
       },
       { onConflict: 'user_id,original_exercise_name' }
     )
@@ -435,11 +446,21 @@ export interface SwapRow {
   swapped_exercise_name: string
 }
 
+/**
+ * The swaps that should still be in force when a client opens their program.
+ *
+ * Only the permanent ones. A "just today" swap is stored when the reason was
+ * pain, because the coach must see that, but it is not a change to the
+ * program and must not come back tomorrow. `fetchPainSwaps` deliberately does
+ * not filter on this — the coach's view wants every pain report, whether or
+ * not the client meant to keep the substitute.
+ */
 export async function fetchSwaps(userId: string): Promise<SwapRow[]> {
   const { data, error } = await db
     .from('exercise_swaps')
     .select('original_exercise_name, swapped_exercise_name')
     .eq('user_id', userId)
+    .eq('session_only', false)
   if (error) throw error
   return (data ?? []) as SwapRow[]
 }

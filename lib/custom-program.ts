@@ -344,7 +344,40 @@ export async function saveCustomProgram(input: {
  * Ends any open assignment first, which is how `program_assignments` has
  * always expressed "one active program".
  */
-export async function activateCustomProgram(userId: string, programId: string): Promise<void> {
+export async function activateCustomProgram(
+  userId: string,
+  programId: string,
+  opts: {
+    /**
+     * True when this is the program they are already training, saved with
+     * changes — not a move to a different program.
+     *
+     * It decides whether the block clock restarts. Activating used to insert
+     * a bare row, so `assigned_at` defaulted to now and `block_weeks` to the
+     * table default: editing the program you were six weeks into dropped you
+     * back to week one for the crime of changing a rep range. Same bug the
+     * travel switch was built to avoid, on the path people actually use.
+     */
+    continueBlock?: boolean
+  } = {}
+): Promise<void> {
+  // What the current assignment knows, read BEFORE it is closed. Training
+  // days come across either way: which days of the week someone trains is a
+  // fact about their life, not a property of the program, and dropping them
+  // silently re-opens the "which days do you train?" card they already
+  // answered.
+  const { data: current } = await db
+    .from('program_assignments')
+    .select('assigned_at, block_weeks, training_days')
+    .eq('user_id', userId)
+    .is('ended_at', null)
+    .order('assigned_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const open = current as
+    | { assigned_at: string; block_weeks: number | null; training_days: number[] | null }
+    | null
+
   // `.select()` so the row count comes back. Without it this was a write that
   // could do nothing and say nothing: PostgREST reports an RLS-filtered update
   // as a successful update of zero rows, so for months starting a custom
@@ -372,9 +405,14 @@ export async function activateCustomProgram(userId: string, programId: string): 
     )
   }
 
-  const { error } = await db
-    .from('program_assignments')
-    .insert({ user_id: userId, program_id: programId })
+  const { error } = await db.from('program_assignments').insert({
+    user_id: userId,
+    program_id: programId,
+    training_days: open?.training_days ?? null,
+    ...(opts.continueBlock && open
+      ? { assigned_at: open.assigned_at, block_weeks: open.block_weeks ?? undefined }
+      : {}),
+  })
   if (error) throw error
 }
 

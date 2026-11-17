@@ -439,6 +439,20 @@ export default function ProgramsPage() {
   const [builderEditingId, setBuilderEditingId] = useState<string | null>(null)
   const [builderSaving, setBuilderSaving] = useState(false)
   /**
+   * A write that failed, said out loud.
+   *
+   * Every save on this screen used to fail into console.error. The builder's
+   * catch block logged and stopped: the spinner ended, the screen did not
+   * move, the draft stayed on screen looking unsaved-or-maybe-saved, and the
+   * client had no way to tell which. Nothing a client cannot see in the app
+   * counts as having told them.
+   */
+  const [writeError, setWriteError] = useState<string | null>(null)
+  /** Saving the client's active swaps into their own program. */
+  const [keepingSwaps, setKeepingSwaps] = useState(false)
+  /** How many exercises the last such save changed, for the confirmation. */
+  const [keptSwaps, setKeptSwaps] = useState<number | null>(null)
+  /**
    * The draft exactly as it was loaded, kept so a save can tell which days
    * were renamed and carry their workout history across.
    */
@@ -886,7 +900,12 @@ export default function ProgramsPage() {
       })
       setBuilderMoved(sessionsMoved > 0 ? sessionsMoved : null)
       if (activate) {
-        await activateCustomProgram(userId, id)
+        // Editing the program they are already training is a continuation,
+        // not a switch: keep their place in the block. Starting a different
+        // program is a new block and week one is honest.
+        await activateCustomProgram(userId, id, {
+          continueBlock: id === assignedProgramId,
+        })
         await applyLoadedProgram(id, userId)
         setSelectedDay(null)
         // A Blueprint client with no program yet reaches the builder from the
@@ -905,10 +924,110 @@ export default function ProgramsPage() {
       // A rename on the program they are ON changes which day is today, and
       // the loaded plan is now stale against it.
       if (!activate && assignedProgramId === id) await applyLoadedProgram(id, userId)
+      setWriteError(null)
     } catch (err) {
       console.error('[Builder] Save failed:', err)
+      // The draft is deliberately left on screen. It is the only copy of
+      // their work, and clearing the view to show an error would throw away
+      // the thing the error is about.
+      setWriteError(
+        'Could not save your program. Your changes are still here — check your connection and try Save again.'
+      )
     } finally {
       setBuilderSaving(false)
+    }
+  }
+
+  /**
+   * Turn the swaps a client is training with into part of their own program.
+   *
+   * THE GAP THIS CLOSES. A swap and a program were two different kinds of
+   * thing with no bridge between them. Swapping is how anyone actually
+   * customises a day — you are standing in the gym, the rack is taken, you
+   * pick something else — but a swap is a per-exercise overlay, it reverts
+   * unless the client finds the permanence control, and even a permanent one
+   * is never part of the program they can see, name, or come back to. The
+   * builder could save a program but knew nothing about the swaps. So the way
+   * people customise and the way the app stores a customisation never met,
+   * and a rebuilt day looked like it had been thrown away.
+   *
+   * Applied by exercise NAME, across every day. That is how swaps are already
+   * stored and reapplied — globally per client, not per day — so honouring
+   * the same rule here is what makes the saved program match what they have
+   * been training rather than a per-day subset of it.
+   *
+   * The swap rows are deleted afterwards. Once the substitute IS the
+   * prescription, a swap off the original is an overlay with nothing left to
+   * overlay, and leaving it means "undo swap" silently does nothing.
+   */
+  const keepSwapsInProgram = async () => {
+    if (!userId || !assignedProgramId || keepingSwaps) return
+    setKeepingSwaps(true)
+    setWriteError(null)
+    try {
+      // key is `${dayIndex}-${exerciseName}`; the index never contains '-'.
+      const swapByName = new Map<string, string>()
+      for (const key of Object.keys(swappedExercises)) {
+        const name = key.slice(key.indexOf('-') + 1)
+        const alt = swappedExercises[key]
+        if (name && alt) swapByName.set(name, alt)
+      }
+      if (swapByName.size === 0) return
+
+      const mine = await fetchMyCustomPrograms(userId)
+      const editingOwn = mine.some((p) => p.id === assignedProgramId)
+
+      // keepKeys only when editing their own program: the day ids are what
+      // carry logged sessions across a rename. A copy of an AJM Fit program
+      // has no history of its own to carry.
+      const draft = await loadIntoBuilder(assignedProgramId, { keepKeys: editingOwn })
+      if (!draft) throw new Error('Could not read your program.')
+
+      let changed = 0
+      const days = draft.days.map((d) => ({
+        ...d,
+        exercises: d.exercises.map((ex) => {
+          const alt = swapByName.get(ex.exerciseName)
+          if (!alt) return ex
+          changed += 1
+          return { ...ex, exerciseName: alt }
+        }),
+      }))
+      if (changed === 0) throw new Error('Those exercises are no longer in this program.')
+
+      const { programId: savedId } = await saveCustomProgram({
+        userId,
+        program: {
+          name: editingOwn ? draft.name : `${draft.name} (my version)`,
+          days,
+        },
+        programId: editingOwn ? assignedProgramId : undefined,
+        original: editingOwn ? draft : undefined,
+      })
+
+      // Always a continuation. Nothing about their week changed except which
+      // movements are in it, and sending someone back to week one for saving
+      // a substitution is the bug this whole change exists to stop.
+      await activateCustomProgram(userId, savedId, { continueBlock: true })
+
+      // Clear the overlays now that the program carries them.
+      const names: string[] = []
+      swapByName.forEach((_alt, name) => names.push(name))
+      await Promise.all(names.map((n) => dbRemoveSwap(userId, n).catch(() => {})))
+      setSwappedExercises({})
+
+      await applyLoadedProgram(savedId, userId)
+      setMyPrograms(await fetchMyCustomPrograms(userId))
+      setKeptSwaps(changed)
+    } catch (err) {
+      console.error('[Keep swaps] Failed:', err)
+      setWriteError(
+        err instanceof Error && err.message.startsWith('Those exercises')
+          ? err.message
+          : 'Could not save these changes to your program. Nothing was changed — your swaps are still in place, so try again.'
+      )
+    } finally {
+      setKeepingSwaps(false)
     }
   }
 
@@ -924,6 +1043,21 @@ export default function ProgramsPage() {
 
   /** True while this day's workout is running. */
   const sessionActive = selectedDay !== null && Boolean(workoutStartTime[selectedDay])
+
+  /**
+   * How many distinct exercises the client is currently training away from
+   * their program. Counted by name, not by key: a swap applies to every day
+   * the exercise appears in, so the same substitution showing up on three
+   * days is one change, not three.
+   */
+  const activeSwapCount = useMemo(() => {
+    const names = new Set<string>()
+    for (const key of Object.keys(swappedExercises)) {
+      const name = key.slice(key.indexOf('-') + 1)
+      if (name) names.add(name)
+    }
+    return names.size
+  }, [swappedExercises])
 
   /** How far through each exercise the client is, for the progress strip. */
   const exerciseProgress = (selected?.exercises ?? []).map((ex) => {
@@ -1401,6 +1535,25 @@ export default function ProgramsPage() {
     )
   }
 
+  /* A failed write, on screen rather than in the console. Rendered in every
+     branch that can produce one, which is both places the builder appears
+     plus the main view that owns the swap sheet. */
+  const errorBanner = writeError ? (
+    <div
+      role="alert"
+      className="mb-4 flex items-start gap-3 rounded-control bg-state-danger/[0.10] border border-state-danger/30 px-4 py-3"
+    >
+      <span className="text-state-danger text-sm font-body leading-relaxed flex-1">{writeError}</span>
+      <button
+        onClick={() => setWriteError(null)}
+        aria-label="Dismiss"
+        className="text-state-danger/70 hover:text-state-danger text-xs font-display font-bold shrink-0 mt-0.5"
+      >
+        ✕
+      </button>
+    </div>
+  ) : null
+
   /* The builder, for a client who has no program to anchor it to.
      Four of thirteen users had no route to it at all: both screens below
      return before `view` is consulted, so the fork living inside the main
@@ -1412,6 +1565,7 @@ export default function ProgramsPage() {
   if ((showPicker || !hasAssigned) && (view === 'startFrom' || view === 'builder')) {
     return (
       <div className="py-8">
+        {errorBanner}
         {view === 'builder' && builderDraft ? (
           <ProgramBuilder
             initial={builderDraft}
@@ -1485,6 +1639,7 @@ export default function ProgramsPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {errorBanner && <div className="lg:col-span-12">{errorBanner}</div>}
       <AnimatePresence>
         {prCelebration && (
           <PRCelebration
@@ -1580,17 +1735,26 @@ export default function ProgramsPage() {
               setSwapFor(null)
             }}
             onPick={(alt, forever, reason) => {
+              setKeptSwaps(null)
               setSwappedExercises((prev) => ({ ...prev, [`${selectedDay}-${swapFor}`]: alt }))
-              // A swap is usually "the rack is busy right now", so it lasts
-              // this session unless the client says otherwise. It used to be
-              // saved for every future occurrence of that exercise, forever,
-              // with no way to undo it short of finding the menu again.
-              // A permanent swap is stored as before. A session-only swap is
-              // ALSO stored when the reason was pain, because that is a
-              // coaching signal rather than a preference and it is the one
-              // thing here the coach must not miss.
+              // A permanent swap is stored to be reapplied. A "just today"
+              // swap is ALSO stored when the reason was pain, because that is
+              // a coaching signal rather than a preference and it is the one
+              // thing here the coach must not miss — but it is written with
+              // session_only set, so the coach sees it and the client's
+              // program is not quietly rewritten by it.
               if ((forever || reason === 'hurts') && userId) {
-                dbSaveSwap(userId, swapFor, alt, reason).catch((err) => console.error('[Swap save] Failed:', err))
+                dbSaveSwap(userId, swapFor, alt, reason, !forever).catch((err) => {
+                  console.error('[Swap save] Failed:', err)
+                  // Only worth saying when they asked for it to last. A
+                  // failed one-session swap still holds for this session,
+                  // which is all it promised.
+                  if (forever) {
+                    setWriteError(
+                      `Could not save ${alt} as a permanent change. It is swapped for this session only — try again from the swap menu.`
+                    )
+                  }
+                })
               }
               setSwapFor(null)
             }}
@@ -2000,6 +2164,43 @@ export default function ProgramsPage() {
                   <h2 className="font-display font-bold text-lg text-white">Workout Overview</h2>
                   <p className="text-ink-3 text-xs font-body mt-0.5">{selected.muscles}</p>
                 </div>
+
+                {/* Keep what you changed.
+                    Swapping is how people actually customise a day, and until
+                    now a swap could never become part of the program — so the
+                    work of rebuilding a day had nowhere to live and looked
+                    lost the next morning. Shown only when there is something
+                    to keep. */}
+                {activeSwapCount > 0 && (
+                  <div className="mx-4 mt-4 rounded-control bg-brand-blue/[0.08] border border-brand-blue/25 px-4 py-3.5">
+                    <p className="text-white text-sm font-display font-bold">
+                      You&rsquo;ve changed {activeSwapCount}{' '}
+                      {activeSwapCount === 1 ? 'exercise' : 'exercises'}
+                    </p>
+                    <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">
+                      Save them into your own program and this is what you&rsquo;ll train next
+                      week too. You keep your place in the block and everything you&rsquo;ve
+                      logged.
+                    </p>
+                    <button
+                      onClick={() => void keepSwapsInProgram()}
+                      disabled={keepingSwaps}
+                      className="mt-3 px-3.5 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/85 disabled:opacity-40 active:scale-[0.98] transition-all duration-200"
+                    >
+                      {keepingSwaps ? 'Saving…' : 'Keep these changes'}
+                    </button>
+                  </div>
+                )}
+
+                {keptSwaps !== null && (
+                  <div className="mx-4 mt-4 rounded-control bg-state-success/[0.08] border border-state-success/25 px-4 py-3">
+                    <p className="text-state-success text-xs font-body leading-relaxed">
+                      Saved to your program &mdash; {keptSwaps}{' '}
+                      {keptSwaps === 1 ? 'exercise' : 'exercises'} changed for good. Find it
+                      any time under Change Program → My programs.
+                    </p>
+                  </div>
+                )}
 
                 {/* Series-grouped exercises.
                     While a session is running this collapses to the ONE
@@ -4091,7 +4292,23 @@ function SwapSheet({
   onPick: (alt: string, forever: boolean, reason: SwapReason | null) => void
 }) {
   const [reason, setReason] = useState<'busy' | 'missing' | 'hurts' | null>(null)
-  const [forever, setForever] = useState(false)
+  /**
+   * The chosen alternative, held rather than committed.
+   *
+   * THIS SHEET USED TO COMMIT ON TAP. Picking an alternative fired the swap
+   * and closed the sheet immediately — and the "use this every time" checkbox
+   * sat BELOW the list of alternatives, so the control that decided whether
+   * the change survived the night was underneath the button that ended the
+   * conversation. You could only reach it by noticing it before choosing.
+   * Practically nobody did, every swap defaulted to one session, and clients
+   * who carefully rebuilt a day came back the next morning to the original
+   * program. That is the "my customization disappeared" report.
+   *
+   * So: tap selects, and the decision that matters is made by its own named
+   * button. No default, because there is no sensible default between "the
+   * squat rack is busy" and "I am never doing this movement".
+   */
+  const [chosen, setChosen] = useState<string | null>(null)
 
   const reasons: Array<{ key: 'busy' | 'missing' | 'hurts'; label: string }> = [
     { key: 'busy', label: "It's busy" },
@@ -4143,33 +4360,60 @@ function SwapSheet({
 
         <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Instead, do</p>
         <div className="space-y-1.5">
-          {alternatives.map((alt) => (
-            <button
-              key={alt}
-              onClick={() => onPick(alt, forever, reason)}
-              className={`w-full px-3.5 py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
-                current === alt ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
-              }`}
-            >
-              <span className="text-white text-sm font-body">{alt}</span>
-              {current === alt && (
-                <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              )}
-            </button>
-          ))}
+          {alternatives.map((alt) => {
+            const picked = chosen ? chosen === alt : current === alt
+            return (
+              <button
+                key={alt}
+                onClick={() => setChosen(alt)}
+                aria-pressed={picked}
+                className={`w-full px-3.5 py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
+                  picked ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+                }`}
+              >
+                <span className="text-white text-sm font-body">{alt}</span>
+                {picked && (
+                  <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                )}
+              </button>
+            )
+          })}
         </div>
 
-        <label className="flex items-center gap-2.5 mt-4 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={forever}
-            onChange={(e) => setForever(e.target.checked)}
-            className="w-4 h-4 rounded accent-brand-blue"
-          />
-          <span className="text-ink-2 text-xs font-body">Use this every time, not just today</span>
-        </label>
+        {/* How long for — the question that used to be a checkbox under the
+            tap target that had already committed the answer. Both options are
+            spelled out, because "just today" and "from now on" are different
+            enough that guessing on the client's behalf is how a rebuilt leg
+            day quietly reverts overnight. */}
+        {chosen && (
+          <div className="mt-5 pt-4 border-t border-white/[0.08]">
+            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-2">
+              For how long?
+            </p>
+            <div className="space-y-1.5">
+              <button
+                onClick={() => onPick(chosen, false, reason)}
+                className="w-full py-3 px-3.5 rounded-control bg-white/[0.06] text-left hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+              >
+                <span className="block text-white text-sm font-display font-bold">Just today</span>
+                <span className="block text-ink-3 text-2xs font-body mt-0.5">
+                  Your program is unchanged and comes back as it was next session.
+                </span>
+              </button>
+              <button
+                onClick={() => onPick(chosen, true, reason)}
+                className="w-full py-3 px-3.5 rounded-control bg-brand-blue text-left hover:bg-brand-blue/85 active:scale-[0.98] transition-all duration-200"
+              >
+                <span className="block text-white text-sm font-display font-bold">Every time from now on</span>
+                <span className="block text-white/70 text-2xs font-body mt-0.5">
+                  {chosen} replaces {exerciseName} in your program until you undo it.
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2 mt-5">
           <button
