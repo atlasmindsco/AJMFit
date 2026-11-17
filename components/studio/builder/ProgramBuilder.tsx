@@ -12,7 +12,7 @@
  * is one you cannot use in the gaps, which on a phone is when it will mostly
  * be used.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import ExercisePickerSheet from './ExercisePickerSheet'
 import ExerciseConfigSheet from './ExerciseConfigSheet'
@@ -37,6 +37,7 @@ export default function ProgramBuilder({
   onSave,
   onCancel,
   onRequestExercise,
+  onDirtyChange,
 }: {
   initial: BuilderProgram
   library: LibraryExercise[]
@@ -50,6 +51,15 @@ export default function ProgramBuilder({
   onCancel: () => void
   /** Tell Anthony the library is missing something. */
   onRequestExercise: (term: string) => Promise<void>
+  /**
+   * Whether there is unsaved work in here.
+   *
+   * Only this component knows: `program` is its own state and the page that
+   * holds it sees nothing between opening the builder and a save. Without
+   * this, leaving by the Back link or the phone's back gesture threw the
+   * draft away in silence.
+   */
+  onDirtyChange?: (dirty: boolean) => void
 }) {
   const [program, setProgram] = useState<BuilderProgram>(initial)
   const [openDay, setOpenDay] = useState<number | null>(null)
@@ -57,6 +67,20 @@ export default function ProgramBuilder({
   const [configuring, setConfiguring] = useState<number | null>(null)
   /** The review sheet, and whether saving from it should also activate. */
   const [reviewing, setReviewing] = useState<{ activate: boolean } | null>(null)
+
+  /**
+   * Compared against what was loaded, not tracked as "has anything been
+   * tapped". Someone who adds a day and removes it again has nothing to lose,
+   * and asking them about it would be the kind of prompt people learn to
+   * dismiss without reading.
+   */
+  const dirty = useMemo(
+    () => JSON.stringify(program) !== JSON.stringify(initial),
+    [program, initial]
+  )
+  useEffect(() => {
+    onDirtyChange?.(dirty)
+  }, [dirty, onDirtyChange])
 
   const byName = useMemo(() => {
     const m = new Map(library.map((e) => [e.name, e]))

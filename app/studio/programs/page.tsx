@@ -28,6 +28,15 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import { rotationState } from '@/lib/rotation'
+import { fetchBodyMetrics, saveBodyMetric } from '@/lib/body-metrics'
+import { localDate } from '@/lib/dates'
+import {
+  HOME_PLACE,
+  placeToQuery,
+  queryToPlace,
+  samePlace,
+  type TrainPlace,
+} from '@/lib/train-url'
 import ProgramBuilder from '@/components/studio/builder/ProgramBuilder'
 import StartFrom from '@/components/studio/builder/StartFrom'
 import {
@@ -448,6 +457,33 @@ export default function ProgramsPage() {
    * counts as having told them.
    */
   const [writeError, setWriteError] = useState<string | null>(null)
+  /**
+   * True when the builder holds changes that are not saved yet.
+   *
+   * Reported up by the builder because only it knows what has been typed.
+   * The page needs it because leaving can start in three different places:
+   * the builder's own Cancel, the Back link above it, and the phone's back
+   * gesture — and all three used to discard the work in silence.
+   */
+  const [builderDirty, setBuilderDirty] = useState(false)
+  /**
+   * Whether they have already recorded a bodyweight today.
+   *
+   * Decides whether the finish-a-workout screen offers the weigh-in. Nobody
+   * in the product's history has ever logged a weight, because the only place
+   * that asked was behind a More menu, under an empty chart, as a form of six
+   * fields. Asking here costs one tap at a moment they are already standing
+   * still, and ignoring it costs nothing.
+   */
+  const [weighedToday, setWeighedToday] = useState(true)
+  /**
+   * Held while we ask about unsaved work: what to do if they say discard.
+   *
+   * A function rather than a destination, because the three ways out of the
+   * builder land in three different places — the week, the chooser they came
+   * from, or wherever the back gesture was heading.
+   */
+  const [leaveGuard, setLeaveGuard] = useState<{ discard: () => void } | null>(null)
   /** Saving the client's active swaps into their own program. */
   const [keepingSwaps, setKeepingSwaps] = useState(false)
   /** How many exercises the last such save changed, for the confirmation. */
@@ -921,6 +957,7 @@ export default function ProgramsPage() {
       setBuilderDraft(null)
       setBuilderOriginal(null)
       setBuilderEditingId(null)
+      setBuilderDirty(false)
       // A rename on the program they are ON changes which day is today, and
       // the loaded plan is now stale against it.
       if (!activate && assignedProgramId === id) await applyLoadedProgram(id, userId)
@@ -1334,6 +1371,149 @@ export default function ProgramsPage() {
    * appeared to vanish when the app was closed and reopened. The sets were
    * always in the database; nothing was reading them back.
    */
+  /* ── Where you are, written in the address bar ──────────────────────────
+     This tab holds six screens and used to switch between them with a
+     variable in memory, so the address never changed. The phone therefore
+     thought all six were one page: the back gesture left the tab entirely
+     rather than going back a screen, and a reload dropped you at the week.
+     Both are fixed by telling the browser where you are and then listening
+     to it, which is work it already knows how to do. */
+
+  /** The place the address currently describes, so we only write on a change. */
+  const placeRef = useRef<TrainPlace>(HOME_PLACE)
+  /** Set while applying a back/forward, so we do not push what we just popped. */
+  const poppingRef = useRef(false)
+  const placeRestoredRef = useRef(false)
+  /** Read by the popstate listener, which must not go stale between renders. */
+  const guardRef = useRef({ dirty: false, view: 'preview' as typeof view })
+  useEffect(() => {
+    guardRef.current = { dirty: builderDirty, view }
+  }, [builderDirty, view])
+  /**
+   * Let the next back through without asking.
+   *
+   * Set when the client has already answered the question. A ref rather than
+   * state because `history.back()` fires popstate before React re-renders, so
+   * anything held in state would still read as unanswered.
+   */
+  const bypassGuardRef = useRef(false)
+
+  const applyPlace = useCallback(
+    (p: TrainPlace) => {
+      const dayOk = p.day !== null && Boolean(weeklyPlan[p.day]?.exercises.length)
+      let v = p.view
+      // Two screens cannot be drawn from an address alone: a day that is not
+      // in this program any more, and the builder once its draft is gone (a
+      // reload loses it, and restoring an empty builder shows a blank page).
+      if ((v === 'workout' || v === 'exercise') && !dayOk) v = 'preview'
+      if (v === 'builder' && !builderDraft) v = 'preview'
+      setView(v)
+      setSelectedDay(v === 'workout' || v === 'exercise' ? p.day : null)
+      setSelectedExercise(v === 'exercise' ? p.exercise : null)
+      setPreviewTab(p.tab)
+    },
+    [weeklyPlan, builderDraft]
+  )
+
+  // Restore from the address once the week has loaded, then normalise it —
+  // the dashboard's "Start Workout" link arrives as ?day=2, which means the
+  // same thing as ?view=workout&day=2 and should read that way afterwards.
+  useEffect(() => {
+    if (placeRestoredRef.current || weeklyPlan.length === 0) return
+    placeRestoredRef.current = true
+    const p = queryToPlace(window.location.search)
+    applyPlace(p)
+    placeRef.current = p
+    window.history.replaceState(null, '', window.location.pathname + placeToQuery(p))
+  }, [weeklyPlan, applyPlace])
+
+  // State changed → write it down. One effect rather than touching all 23
+  // places that switch screen.
+  useEffect(() => {
+    if (!placeRestoredRef.current) return
+    const place: TrainPlace = {
+      view,
+      day: selectedDay,
+      exercise: selectedExercise,
+      tab: previewTab,
+    }
+    const wasPop = poppingRef.current
+    poppingRef.current = false
+    if (samePlace(place, placeRef.current)) return
+    placeRef.current = place
+    // A back or forward already moved the address; pushing here would add a
+    // second entry and make one back press take two.
+    if (wasPop) return
+    window.history.pushState(null, '', window.location.pathname + placeToQuery(place))
+  }, [view, selectedDay, selectedExercise, previewTab])
+
+  // Back or forward → go where the address says.
+  useEffect(() => {
+    const onPop = () => {
+      const next = queryToPlace(window.location.search)
+      const bypassed = bypassGuardRef.current
+      bypassGuardRef.current = false
+      // Leaving a half-built program by the back gesture. The browser has
+      // already moved, so put the entry back and ask before letting it go —
+      // losing the work with no warning is the thing this change exists to
+      // stop. On Discard we drop the draft and press back again for real,
+      // rather than applying the destination by hand: the browser owns the
+      // address, and faking the move here would leave it saying "builder"
+      // on a screen showing the week.
+      if (
+        !bypassed &&
+        guardRef.current.view === 'builder' &&
+        guardRef.current.dirty &&
+        next.view !== 'builder'
+      ) {
+        window.history.pushState(null, '', window.location.pathname + placeToQuery(placeRef.current))
+        setLeaveGuard({
+          discard: () => {
+            dropBuilderDraft()
+            bypassGuardRef.current = true
+            window.history.back()
+          },
+        })
+        return
+      }
+      poppingRef.current = true
+      applyPlace(next)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [applyPlace])
+
+  /** Forget the draft. Does not navigate — the caller decides where to go. */
+  const dropBuilderDraft = useCallback(() => {
+    setBuilderDraft(null)
+    setBuilderOriginal(null)
+    setBuilderEditingId(null)
+    setBuilderDirty(false)
+    setLeaveGuard(null)
+  }, [])
+
+  /**
+   * The Back link above the builder.
+   *
+   * Goes back through the browser rather than setting the screen directly, so
+   * it lands wherever they actually came from — the week, or the chooser —
+   * and leaves no dead-end entry behind. Back should mean back.
+   */
+  const leaveBuilderBack = useCallback(() => {
+    dropBuilderDraft()
+    bypassGuardRef.current = true
+    window.history.back()
+  }, [dropBuilderDraft])
+
+  /** Every way out of the builder goes through here. */
+  const askBeforeLeavingBuilder = useCallback(
+    (discard: () => void) => {
+      if (builderDirty) setLeaveGuard({ discard })
+      else discard()
+    },
+    [builderDirty]
+  )
+
   const restoredRef = useRef(false)
   useEffect(() => {
     if (restoredRef.current || !userId || weeklyPlan.length === 0) return
@@ -1355,24 +1535,18 @@ export default function ProgramsPage() {
       })
       .catch((err) => console.error('[Swaps] Failed to load:', err))
 
+    // Only the latest row is needed: one weigh-in per client per day.
+    fetchBodyMetrics(id, 1)
+      .then((rows) => setWeighedToday(rows[0]?.recorded_on === localDate()))
+      .catch(() => setWeighedToday(true))
+
     // Rehydrate an in-progress workout if one exists
     dbFetchInProgressWorkout(id)
       .then((data) => {
-        if (!data) {
-          // No live session, so honour a ?day= deep link from the dashboard.
-          // This is what lets "Start Workout" on the home screen land on the
-          // session itself rather than on the program brochure.
-          //
-          // Read off location rather than useSearchParams: this page is
-          // statically rendered, and the hook would force a Suspense boundary
-          // around the whole thing for one optional number.
-          const want = Number(new URLSearchParams(window.location.search).get('day'))
-          if (Number.isInteger(want) && want >= 0 && weeklyPlan[want]?.exercises.length) {
-            setSelectedDay(want)
-            setView('workout')
-          }
-          return
-        }
+        // The dashboard's ?day= deep link used to be honoured here. It is now
+        // read with every other part of the address by the restore effect
+        // above, which also covers a reload from any of the six screens.
+        if (!data) return
         const { workout, sets } = data
         const dayIdx = weeklyPlan.findIndex((d) => d.name === workout.day_name)
         if (dayIdx === -1) return
@@ -1554,6 +1728,48 @@ export default function ProgramsPage() {
     </div>
   ) : null
 
+  /* Asked once, only when there is something to lose.
+     Two options, no third. "Keep editing" is the safe one, so it gets the
+     filled button under the thumb; discarding is deliberately the quieter of
+     the two, because that tap cannot be undone. */
+  const unsavedSheet = leaveGuard ? (
+    <div className="fixed inset-0 z-[70] flex items-end sm:items-center sm:justify-center">
+      <div
+        className="absolute inset-0 bg-black/70"
+        onClick={() => setLeaveGuard(null)}
+        aria-hidden="true"
+      />
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+        className="relative w-full sm:max-w-sm bg-surface-raised border-t sm:border border-white/[0.12] sm:rounded-card rounded-t-card px-5 pt-5 pb-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Unsaved changes"
+      >
+        <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
+          You have unsaved changes
+        </h2>
+        <p className="text-ink-2 text-sm font-body mt-1.5 leading-relaxed">
+          Leave now and this program goes back to how it was.
+        </p>
+        <button
+          onClick={() => setLeaveGuard(null)}
+          className="w-full mt-5 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+        >
+          Keep editing
+        </button>
+        <button
+          onClick={() => leaveGuard.discard()}
+          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+        >
+          Discard changes
+        </button>
+      </motion.div>
+    </div>
+  ) : null
+
   /* The builder, for a client who has no program to anchor it to.
      Four of thirteen users had no route to it at all: both screens below
      return before `view` is consulted, so the fork living inside the main
@@ -1566,6 +1782,7 @@ export default function ProgramsPage() {
     return (
       <div className="py-8">
         {errorBanner}
+        <AnimatePresence>{unsavedSheet}</AnimatePresence>
         {view === 'builder' && builderDraft ? (
           <ProgramBuilder
             initial={builderDraft}
@@ -1576,7 +1793,15 @@ export default function ProgramsPage() {
                makes sense when you already have a program to keep training. */
             onSave={(program) => void handleBuilderSave(program, true)}
             onRequestExercise={requestExercise}
-            onCancel={() => { setBuilderDraft(null); void openStartFrom() }}
+            onDirtyChange={setBuilderDirty}
+            onCancel={() =>
+              askBeforeLeavingBuilder(() => {
+                setBuilderDraft(null)
+                setBuilderDirty(false)
+                setLeaveGuard(null)
+                void openStartFrom()
+              })
+            }
           />
         ) : (
           <StartFrom
@@ -1640,6 +1865,7 @@ export default function ProgramsPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       {errorBanner && <div className="lg:col-span-12">{errorBanner}</div>}
+      <AnimatePresence>{unsavedSheet}</AnimatePresence>
       <AnimatePresence>
         {prCelebration && (
           <PRCelebration
@@ -1787,7 +2013,16 @@ export default function ProgramsPage() {
       </AnimatePresence>
       <AnimatePresence>
         {workoutSummary && (
-          <WorkoutComplete summary={workoutSummary} onDone={() => setWorkoutSummary(null)} />
+          <WorkoutComplete
+            summary={workoutSummary}
+            askWeight={!weighedToday}
+            onWeigh={async (lb) => {
+              if (!userId) return
+              await saveBodyMetric(userId, { weight_lb: lb })
+              setWeighedToday(true)
+            }}
+            onDone={() => setWorkoutSummary(null)}
+          />
         )}
         {blockReview && !reviewDismissed && (
           <BlockComplete
@@ -3694,7 +3929,7 @@ export default function ProgramsPage() {
             <motion.div key="builder" {...slideIn}>
               <div className="flex items-center gap-2 mb-4">
                 <button
-                  onClick={() => { setBuilderDraft(null); setView('preview') }}
+                  onClick={() => askBeforeLeavingBuilder(leaveBuilderBack)}
                   className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
                 >
                   ‹ Back
@@ -3707,7 +3942,8 @@ export default function ProgramsPage() {
                 editing={Boolean(builderEditingId)}
                 onSave={handleBuilderSave}
                 onRequestExercise={requestExercise}
-                onCancel={() => { setBuilderDraft(null); setView('preview') }}
+                onDirtyChange={setBuilderDirty}
+                onCancel={() => askBeforeLeavingBuilder(leaveBuilderBack)}
               />
             </motion.div>
           )}
@@ -4620,6 +4856,8 @@ function ConfirmEnd({
 
 function WorkoutComplete({
   summary,
+  askWeight,
+  onWeigh,
   onDone,
 }: {
   summary: {
@@ -4632,9 +4870,37 @@ function WorkoutComplete({
     records: Array<{ exerciseName: string } & RecordHit>
     nextUp: string | null
   }
+  /** Offer the weigh-in: they have a program, and have not weighed in today. */
+  askWeight: boolean
+  onWeigh: (lb: number) => Promise<void>
   onDone: () => void
 }) {
   const mins = Math.max(1, Math.round(summary.seconds / 60))
+  /**
+   * One field, no Save button of its own.
+   *
+   * Typing a number changes what the closing button says, so recording a
+   * weight costs no extra tap and skipping it costs nothing at all. A second
+   * button here would make an optional thing look like a step.
+   */
+  const [weight, setWeight] = useState('')
+  const [weighing, setWeighing] = useState(false)
+  const lb = Number(weight)
+  const weightOk = weight.trim() !== '' && !isNaN(lb) && lb > 0 && lb < 1000
+
+  const finish = async () => {
+    if (weightOk && !weighing) {
+      setWeighing(true)
+      // A failed weigh-in must not trap them on this screen. The session is
+      // already saved; the weight is the small part.
+      try {
+        await onWeigh(lb)
+      } catch (e) {
+        console.error('[Weigh-in] failed', e)
+      }
+    }
+    onDone()
+  }
   const stat = (value: string, label: string) => (
     <div className="flex-1">
       <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
@@ -4714,11 +4980,36 @@ function WorkoutComplete({
           </p>
         )}
 
+        {/* The weigh-in. Offered here because this is the one moment a client
+            is already standing still with the app open, and because the place
+            that used to ask — behind a More menu, under an empty chart, six
+            fields deep — has never been used by anybody. */}
+        {askWeight && (
+          <div className="flex items-center gap-3 mb-4 px-3.5 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-left">
+            <label htmlFor="weigh-in" className="text-ink-2 text-sm font-body flex-1">
+              Weigh in?
+              <span className="block text-ink-4 text-2xs font-body mt-0.5">Optional</span>
+            </label>
+            <input
+              id="weigh-in"
+              type="number"
+              inputMode="decimal"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder="—"
+              aria-label="Bodyweight in pounds"
+              className="w-20 px-2.5 py-2 rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <span className="text-ink-3 text-xs font-body">lbs</span>
+          </div>
+        )}
+
         <button
-          onClick={onDone}
-          className="w-full py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+          onClick={() => void finish()}
+          disabled={weighing}
+          className="w-full py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
         >
-          Done
+          {weighing ? 'Saving…' : weightOk ? 'Save & finish' : 'Done'}
         </button>
       </motion.div>
     </div>
