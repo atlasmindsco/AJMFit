@@ -1805,9 +1805,13 @@ export default function ProgramsPage() {
             library={exerciseDB}
             saving={builderSaving}
             editing={Boolean(builderEditingId)}
-            /* Always activates. Saving without starting is a choice that only
-               makes sense when you already have a program to keep training. */
+            /* Always activates: this is the builder reached from the picker,
+               by someone who has no program yet. Saving without starting is a
+               choice that only makes sense when you already have one to keep
+               training, so the button says what will happen instead of
+               offering a second one that did the same thing. */
             onSave={(program) => void handleBuilderSave(program, true)}
+            saveLabel="Start training"
             onRequestExercise={requestExercise}
             onDirtyChange={setBuilderDirty}
             onCancel={() =>
@@ -3880,7 +3884,15 @@ export default function ProgramsPage() {
                 library={exerciseDB}
                 saving={builderSaving}
                 editing={Boolean(builderEditingId)}
-                onSave={handleBuilderSave}
+                /* Editing the program you are training is a save, full stop —
+                   you are already on it, so there is nothing to "start".
+                   Anything else saves to My programs, where Use starts it.
+                   Starting a program is one named action in one place rather
+                   than a second button on every save. */
+                onSave={(program) =>
+                  void handleBuilderSave(program, builderEditingId === assignedProgramId)
+                }
+                saveLabel={builderEditingId === assignedProgramId ? 'Save' : 'Save to my programs'}
                 onRequestExercise={requestExercise}
                 onDirtyChange={setBuilderDirty}
                 onCancel={() => askBeforeLeavingBuilder(leaveBuilderBack)}

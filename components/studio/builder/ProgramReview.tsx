@@ -25,7 +25,7 @@ export default function ProgramReview({
   volume,
   trainingDays,
   saving,
-  activate,
+  saveLabel,
   onSave,
   onBack,
 }: {
@@ -34,7 +34,7 @@ export default function ProgramReview({
   trainingDays: number
   saving: boolean
   /** Whether saving from here also makes this the program they train. */
-  activate: boolean
+  saveLabel: string
   onSave: () => void
   onBack: () => void
 }) {
@@ -134,15 +134,7 @@ export default function ProgramReview({
             disabled={saving}
             className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
           >
-            {saving
-              ? 'Saving…'
-              : warns.length > 0
-                ? activate
-                  ? 'Save & start anyway'
-                  : 'Save anyway'
-                : activate
-                  ? 'Save & start'
-                  : 'Save'}
+            {saving ? 'Saving…' : warns.length > 0 ? `${saveLabel} anyway` : saveLabel}
           </button>
         </div>
       </motion.div>

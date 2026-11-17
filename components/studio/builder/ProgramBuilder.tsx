@@ -35,6 +35,7 @@ export default function ProgramBuilder({
   saving,
   editing = false,
   onSave,
+  saveLabel = 'Save',
   onCancel,
   onRequestExercise,
   onDirtyChange,
@@ -47,7 +48,20 @@ export default function ProgramBuilder({
    * day have history behind it, and only then is renaming worth a word.
    */
   editing?: boolean
-  onSave: (program: BuilderProgram, activate: boolean) => void
+  onSave: (program: BuilderProgram) => void
+  /**
+   * What saving does here, said on the button.
+   *
+   * There used to be two save buttons — "Save" and "Save & start" — side by
+   * side, with nothing explaining the difference. Worse, on the only screen a
+   * new client ever sees the builder from, the parent ignored which one was
+   * pressed and started the program either way: two buttons, identical
+   * behaviour, no way to tell.
+   *
+   * The builder no longer has an opinion about activation. Whoever opened it
+   * knows what saving means in their context and says so here.
+   */
+  saveLabel?: string
   onCancel: () => void
   /** Tell Anthony the library is missing something. */
   onRequestExercise: (term: string) => Promise<void>
@@ -65,8 +79,8 @@ export default function ProgramBuilder({
   const [openDay, setOpenDay] = useState<number | null>(null)
   const [picking, setPicking] = useState(false)
   const [configuring, setConfiguring] = useState<number | null>(null)
-  /** The review sheet, and whether saving from it should also activate. */
-  const [reviewing, setReviewing] = useState<{ activate: boolean } | null>(null)
+  /** True while the review sheet is open. */
+  const [reviewing, setReviewing] = useState(false)
 
   /**
    * Compared against what was loaded, not tracked as "has anything been
@@ -115,9 +129,9 @@ export default function ProgramBuilder({
    * light side would teach them to tap past this screen without reading it,
    * which is the one outcome that makes the check worthless.
    */
-  const attemptSave = (activate: boolean) => {
-    if (warnCount > 0) setReviewing({ activate })
-    else onSave(program, activate)
+  const attemptSave = () => {
+    if (warnCount > 0) setReviewing(true)
+    else onSave(program)
   }
 
   const setDay = (index: number, next: BuilderDay) =>
@@ -405,7 +419,7 @@ export default function ProgramBuilder({
           tapping it opens the full review with the volume bars. */}
       {block.ok && (
         <button
-          onClick={() => setReviewing({ activate: false })}
+          onClick={() => setReviewing(true)}
           className="w-full mt-4 px-4 py-3 rounded-card bg-white/[0.03] border border-white/[0.07] text-left hover:bg-white/[0.06] transition-colors duration-200"
         >
           <span className="flex items-center gap-2">
@@ -430,18 +444,11 @@ export default function ProgramBuilder({
           Cancel
         </button>
         <button
-          onClick={() => attemptSave(false)}
-          disabled={!block.ok || saving}
-          className="flex-1 py-3.5 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
-        >
-          Save
-        </button>
-        <button
-          onClick={() => attemptSave(true)}
+          onClick={attemptSave}
           disabled={!block.ok || saving}
           className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
-          {saving ? 'Saving…' : 'Save & start'}
+          {saving ? 'Saving…' : saveLabel}
         </button>
       </div>
 
@@ -452,13 +459,12 @@ export default function ProgramBuilder({
             volume={health.volume}
             trainingDays={trainingDays}
             saving={saving}
-            activate={reviewing.activate}
+            saveLabel={saveLabel}
             onSave={() => {
-              const activate = reviewing.activate
-              setReviewing(null)
-              onSave(program, activate)
+              setReviewing(false)
+              onSave(program)
             }}
-            onBack={() => setReviewing(null)}
+            onBack={() => setReviewing(false)}
           />
         )}
       </AnimatePresence>
