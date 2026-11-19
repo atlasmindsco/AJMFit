@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GOAL_LABELS,
@@ -9,6 +10,12 @@ import {
   type BlueprintGoal,
   type BlueprintLocation,
 } from '@/lib/blueprint'
+
+/**
+ * How long they have been training. The only answer that changes what the
+ * rest of the picker offers, which is why it is asked first.
+ */
+type Experience = 'new' | 'returning' | 'consistent'
 
 /**
  * Blueprint self-serve program picker. Shown on /studio/programs when a
@@ -47,6 +54,23 @@ export default function BlueprintPicker({
    */
   onBuildOwn?: () => void
 }) {
+  /**
+   * How long they have been training, asked here rather than inferred.
+   *
+   * The `beginner` prop above reads an onboarding answer, and Blueprint
+   * clients never fill in onboarding — the table has no rows in it at all. So
+   * the beginner flow, which caps the week at three or four days and keeps
+   * the sprinting and jumping tracks out of sight, had never once run: every
+   * client who ever picked a program was treated as experienced, including
+   * somebody who had never touched a barbell.
+   *
+   * One question fixes that, and it is the one question whose answer actually
+   * changes what somebody is offered. The prop still seeds it, so if
+   * onboarding ever does say, this does not ask again.
+   */
+  const [experience, setExperience] = useState<Experience | null>(beginner ? 'new' : null)
+  const isNew = experience === 'new'
+
   // Beginners start on Location because Goal is decided for them.
   const [step, setStep] = useState(beginner ? 1 : 0)
   const [goal, setGoal] = useState<BlueprintGoal | null>(beginner ? 'muscle' : null)
@@ -59,9 +83,9 @@ export default function BlueprintPicker({
 
   const goals: BlueprintGoal[] = ['muscle', 'strength', 'lean_out']
   const locations: BlueprintLocation[] = ['home', 'gym']
-  const dayChoices = beginner ? [3, 4] : [2, 3, 4, 5, 6]
+  const dayChoices = isNew ? [3, 4] : [2, 3, 4, 5, 6]
 
-  const splitsForDays = days ? splitsFor(days, goal, beginner) : []
+  const splitsForDays = days ? splitsFor(days, goal, isNew) : []
   const needsSplitChoice = splitsForDays.length > 1
   const chosenSplit = splitKey ?? splitsForDays[0]?.key ?? null
 
@@ -112,13 +136,17 @@ export default function BlueprintPicker({
   )
 
   // Beginners never see the Goal step, so labels and dots shift by one.
-  const firstStep = beginner ? 1 : 0
+  const firstStep = isNew ? 1 : 0
   const steps = [
-    ...(beginner ? [] : ['Goal']),
+    'About you',
+    ...(isNew ? [] : ['Goal']),
     'Location',
     'Days',
     ...(needsSplitChoice ? ['Choose Split'] : []),
   ]
+  /* "About you" sits in front of the numbered steps, so the lit dot is that
+     one until it is answered and everything shifts along by one after. */
+  const dotIndex = experience === null ? 0 : step - firstStep + 1
 
   const summary = (title: string) => (
     <motion.div
@@ -211,10 +239,10 @@ export default function BlueprintPicker({
           {firstName ? `Let's get you set up, ${firstName}` : "Let's set up your program"}
         </h1>
         <p className="text-ink-3 text-sm font-body mt-1">
-          Answer {beginner ? 'two' : 'three'} questions to get your program
+          Answer {isNew ? 'three' : 'four'} questions to get your program
         </p>
         <p className="text-ink-4 text-xs font-body mt-2.5">
-          {beginner
+          {isNew
             ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
             : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split, plus hybrid tracks with running and conditioning • Gym or dumbbells at home'}
         </p>
@@ -226,7 +254,7 @@ export default function BlueprintPicker({
           <div key={label} className="flex items-center gap-2">
             <div
               className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                i < step - firstStep ? 'bg-state-success' : i === step - firstStep ? 'bg-brand-blue' : 'bg-white/15'
+                i < dotIndex ? "bg-state-success" : i === dotIndex ? "bg-brand-blue" : "bg-white/15"
               }`}
             />
           </div>
@@ -235,8 +263,54 @@ export default function BlueprintPicker({
 
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-6">
         <AnimatePresence mode="wait">
+          {/* FIRST — how long they have been training.
+              Asked before anything else because it is the only answer that
+              changes what the rest of the picker offers: a first-timer is
+              capped at three or four days and never shown the sprinting and
+              jumping tracks. Three options, no numbers, no "training age" —
+              people know which of these they are. */}
+          {experience === null && (
+            <motion.div key="experience" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <h2 className="font-display font-bold text-white text-lg mb-4">
+                Where are you starting from?
+              </h2>
+              <div className="space-y-2.5">
+                <Option
+                  active={false}
+                  onClick={() => {
+                    setExperience('new')
+                    // Muscle is the right default starting out, and it saves
+                    // a first-timer a question they have no basis to answer.
+                    setGoal('muscle')
+                    setStep(1)
+                  }}
+                  title="New to lifting"
+                  sub="Never trained, or only a handful of times"
+                />
+                <Option
+                  active={false}
+                  onClick={() => {
+                    setExperience('returning')
+                    setStep(0)
+                  }}
+                  title="Coming back after a break"
+                  sub="Trained before, been away a while"
+                />
+                <Option
+                  active={false}
+                  onClick={() => {
+                    setExperience('consistent')
+                    setStep(0)
+                  }}
+                  title="Training already"
+                  sub="In the gym regularly and want a better plan"
+                />
+              </div>
+            </motion.div>
+          )}
+
           {/* STEP 0 — goal */}
-          {step === 0 && (
+          {experience !== null && step === 0 && (
             <motion.div key="goal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-4">What&rsquo;s your main goal?</h2>
               <div className="space-y-2.5">
@@ -263,7 +337,7 @@ export default function BlueprintPicker({
           )}
 
           {/* STEP 1 — location */}
-          {step === 1 && (
+          {experience !== null && step === 1 && (
             <motion.div key="loc" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-4">Where will you train?</h2>
               <div className="space-y-2.5">
@@ -284,7 +358,7 @@ export default function BlueprintPicker({
           )}
 
           {/* STEP 2 — days */}
-          {step === 2 && (
+          {experience !== null && step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-2">How many days a week?</h2>
               <p className="text-ink-3 text-xs font-body mb-4">
@@ -305,14 +379,14 @@ export default function BlueprintPicker({
                   always move up.
                 </p>
               )}
-              <div className={`grid gap-2 mb-5 ${beginner ? 'grid-cols-2' : 'grid-cols-5'}`}>
+              <div className={`grid gap-2 mb-5 ${isNew ? "grid-cols-2" : "grid-cols-5"}`}>
                 {dayChoices.map((d) => (
                   <button
                     key={d}
                     onClick={() => {
                       setDays(d)
                       setSplitKey(null)
-                      if (splitsFor(d, goal, beginner).length > 1) setStep(3)
+                      if (splitsFor(d, goal, isNew).length > 1) setStep(3)
                     }}
                     className={`py-4 rounded-card border font-display font-extrabold text-xl transition-all duration-200 active:scale-[0.97] ${
                       days === d
@@ -332,7 +406,7 @@ export default function BlueprintPicker({
           )}
 
           {/* STEP 3 — split choice, at any day count with more than one */}
-          {step === 3 && needsSplitChoice && (
+          {experience !== null && step === 3 && needsSplitChoice && (
             <motion.div key="split" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-4">Which {days}-day split?</h2>
               <div className="space-y-2.5 mb-5">
@@ -375,12 +449,20 @@ export default function BlueprintPicker({
         )}
 
         {/* Back */}
-        {step > firstStep && !submitting && (
+        {experience !== null && !submitting && (
           <button
             onClick={() => {
               if (step === 3) {
                 setStep(2)
                 setSplitKey(null)
+              } else if (step === firstStep) {
+                // Back off the first numbered step reopens "about you".
+                // Clearing the goal matters: it was set for them when they
+                // said they were new, and leaving it would mean changing
+                // that answer silently kept a goal they never chose.
+                setExperience(null)
+                setGoal(null)
+                setStep(0)
               } else {
                 setStep((s) => Math.max(firstStep, s - 1))
               }
