@@ -135,9 +135,24 @@ console.log('\nLOUDER SIGNALS STILL WIN\n')
 
 console.log('\nTHE SET STAYS SMALL AND ORDERED\n')
 {
-  g('six statuses, no more', STATUS_ORDER.length === 6, String(STATUS_ORDER.length))
-  g('every status has a label', STATUS_ORDER.every((s) => Boolean(STATUS_META[s as ClientStatus]?.label)))
-  g('never_started ranks just under review_needed', STATUS_ORDER.indexOf('never_started') === 1)
+  // Eight. Two were added with the coaching work — reported_pain, because a
+  // client saying a movement hurts is the one true interrupt, and no_program,
+  // because a client with nothing assigned was reading as "never trained",
+  // which blamed them for the coach's omission. This assertion still said six
+  // and went red the day they landed; counting a number is only worth doing
+  // if somebody updates it when the number changes on purpose.
+  g('eight statuses, no more', STATUS_ORDER.length === 8, String(STATUS_ORDER.length))
+  g('every status has a label', STATUS_META && STATUS_ORDER.every((s) => Boolean(STATUS_META[s as ClientStatus]?.label)))
+  // Pain outranks everything: it is the only one that cannot wait for the
+  // daily digest. A client with no program comes next, because that is the
+  // coach's own work undone and it blocks everything else.
+  g('pain is first', STATUS_ORDER[0] === 'reported_pain', STATUS_ORDER[0])
+  g('no_program is second', STATUS_ORDER[1] === 'no_program', STATUS_ORDER[1])
+  g(
+    'never_started still ranks just under review_needed',
+    STATUS_ORDER.indexOf('never_started') === STATUS_ORDER.indexOf('review_needed') + 1,
+    `${STATUS_ORDER.indexOf('review_needed')} then ${STATUS_ORDER.indexOf('never_started')}`
+  )
   g('on_track is last', STATUS_ORDER.at(-1) === 'on_track')
   const all = new Set(STATUS_ORDER)
   g('no duplicates in the order', all.size === STATUS_ORDER.length)

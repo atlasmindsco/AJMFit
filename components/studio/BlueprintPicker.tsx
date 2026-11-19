@@ -290,6 +290,21 @@ export default function BlueprintPicker({
               <p className="text-ink-3 text-xs font-body mb-4">
                 Pick what you can actually keep to. Consistency beats the perfect split.
               </p>
+              {/* Said at the moment of the decision, and only when it applies.
+                  The picker has a beginner mode that caps this at 3 or 4 days,
+                  and it has never run for anybody: it keys off an onboarding
+                  answer, and Blueprint clients do not fill in onboarding — the
+                  table is empty. So every client, including somebody who has
+                  never lifted, is offered six days with nothing said.
+                  This is not a gate. Someone who wants six days can have six
+                  days; they should just know what they are choosing. */}
+              {days !== null && days >= 5 && (
+                <p className="text-ink-2 text-xs font-body mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] leading-relaxed">
+                  {days} days is a serious commitment. If you are new to lifting or coming back
+                  after time off, three or four is where most people stick &mdash; and you can
+                  always move up.
+                </p>
+              )}
               <div className={`grid gap-2 mb-5 ${beginner ? 'grid-cols-2' : 'grid-cols-5'}`}>
                 {dayChoices.map((d) => (
                   <button
