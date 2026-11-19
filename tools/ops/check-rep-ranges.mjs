@@ -30,7 +30,7 @@ const assignments = await all('program_assignments', 'program_id')
 const assigned = new Set(assignments.map((a) => a.program_id))
 const days = await all('program_days', 'id, program_id')
 const programOf = new Map(days.map((d) => [d.id, d.program_id]))
-const ex = await all('program_exercises', 'id, exercise_name, reps, rep_min, rep_max, target_rir, program_day_id')
+const ex = await all('program_exercises', 'id, exercise_name, reps, rep_min, rep_max, target_rir, rest_seconds, program_day_id')
 
 const inUse = ex.filter((e) => assigned.has(programOf.get(e.program_day_id)))
 const timed = (r) => /[a-z]/i.test(String(r ?? ''))
@@ -78,13 +78,32 @@ ok(
   `${timedRows.length} timed rows, ${timedRows.filter((e) => e.rep_min != null).length} wrongly ranged`
 )
 
-console.log('\nTHE REST OF THE CATALOG IS UNTOUCHED, AS INTENDED\n')
-const notUsed = ex.filter((e) => !assigned.has(programOf.get(e.program_day_id)))
-const touchedAnyway = notUsed.filter((e) => e.rep_min != null)
+console.log('\nTHE WHOLE CATALOG, NOT JUST THE PROGRAMS IN USE\n')
+// Slice one covered only the 14 assigned programs. That left 54 programs
+// still offering single numbers in the picker, so a client choosing one
+// today would have got the old every-session load increase. Coverage is now
+// the whole catalog, and this is the check that keeps it that way.
+const everyCountable = ex.filter((e) => !timed(e.reps))
+const noRange = everyCountable.filter(
+  (e) => e.rep_min == null && !/^\s*\d+\s*$/.test(String(e.reps))
+)
+ok(noRange.length === 0, 'no rep count anywhere is left unclassified', `${noRange.length} unclassified`)
+const noRir = everyCountable.filter((e) => e.target_rir == null)
 ok(
-  touchedAnyway.length === 0,
-  'programs nobody has been assigned were left alone',
-  `${notUsed.length} prescriptions, ${touchedAnyway.length} touched`
+  noRir.length === 0,
+  'every rep count in the catalog carries an effort target',
+  `${noRir.length} of ${everyCountable.length} without one`
+)
+
+console.log('\nHEAVY LOW-REP WORK KEPT ITS FIXED PRESCRIPTION\n')
+// Five or fewer reps at 150s or more is a linear strength protocol: the reps
+// are fixed on purpose and the load is what progresses.
+const heavyWidened = ex.filter(
+  (e) => e.rep_min != null && e.rep_min <= 5 && (e.rest_seconds ?? 0) >= 150 && e.rep_max > e.rep_min
+)
+ok(heavyWidened.length === 0, 'no heavy set of five or fewer was widened', `${heavyWidened.length} widened`)
+heavyWidened.slice(0, 5).forEach((e) =>
+  console.log(`        ${e.exercise_name}: ${e.rep_min}-${e.rep_max} at ${e.rest_seconds}s`)
 )
 
 console.log(bad === 0 ? '\nAll checks passed.' : `\n${bad} CHECK${bad === 1 ? '' : 'S'} FAILED`)

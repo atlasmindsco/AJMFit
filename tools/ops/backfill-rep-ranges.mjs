@@ -23,42 +23,32 @@
  *   node tools/ops/backfill-rep-ranges.mjs --confirm
  *   node tools/ops/backfill-rep-ranges.mjs --all --confirm
  */
+/*
+ * RUN WITH TYPE STRIPPING so the mapping can come from the one place it
+ * lives:
+ *
+ *   node --experimental-strip-types --import ./tools/_alias-hook.mjs \
+ *     tools/ops/backfill-rep-ranges.mjs
+ *
+ * It used to carry its own copy of the ranges, on the reasoning that a plain
+ * .mjs script cannot import TypeScript. That was wrong, and it cost
+ * something real: when the heavy-rep rule was added to lib/rep-ranges.ts,
+ * this file did not get it, and a dry run across the whole catalog was about
+ * to widen 84 heavy fives that had just been deliberately set back to fives.
+ */
 import { supa, parseArgs, requireConfirm, logAction, fail } from './_lib.mjs'
+import { rangeFor as libRangeFor, targetRirFor } from '../../lib/rep-ranges.ts'
 
 const args = parseArgs()
 const sb = supa()
 const includeAll = Boolean(args.all)
 
-/* The mapping, kept in step with lib/rep-ranges.ts by verify-rep-ranges.ts.
-   Duplicated here rather than imported because this is a plain .mjs script
-   and the library is TypeScript; the verifier asserts they agree. */
-const RANGES = {
-  1: null,
-  3: [3, 5],
-  5: [5, 7],
-  6: [6, 8],
-  8: [8, 12],
-  10: [10, 12],
-  12: [12, 15],
-  15: [15, 20],
-  20: [20, 25],
+/** Tuple form, so the rest of this script reads as it did. */
+const rangeFor = (reps, restSeconds) => {
+  const r = libRangeFor(reps, restSeconds)
+  return r ? [r.min, r.max] : null
 }
-
-function rangeFor(reps) {
-  const raw = String(reps ?? '').trim()
-  if (raw === '' || /[a-z]/i.test(raw) || /[-–]/.test(raw)) return null
-  const n = parseInt(raw, 10)
-  if (!Number.isFinite(n) || n < 1) return null
-  if (n in RANGES) return RANGES[n]
-  const keys = Object.keys(RANGES).map(Number).sort((a, b) => a - b)
-  let key = null
-  for (const k of keys) if (k <= n) key = k
-  if (key === null || !RANGES[key]) return null
-  return [n, n + (RANGES[key][1] - RANGES[key][0])]
-}
-
-const RIR = { strength: 2, muscle: 2, lean_out: 3 }
-const rirFor = (goal) => RIR[goal] ?? 2
+const rirFor = (goal) => targetRirFor(goal)
 
 async function all(table, cols) {
   const out = []
@@ -75,7 +65,7 @@ const assignments = await all('program_assignments', 'program_id')
 const assigned = new Set(assignments.map((a) => a.program_id))
 const programs = await all('programs', 'id, name, goal, source')
 const days = await all('program_days', 'id, program_id, name')
-const exercises = await all('program_exercises', 'id, program_day_id, exercise_name, sets, reps, rep_min, rep_max, target_rir')
+const exercises = await all('program_exercises', 'id, program_day_id, exercise_name, sets, reps, rest_seconds, rep_min, rep_max, target_rir')
 
 const programOf = new Map(days.map((d) => [d.id, d.program_id]))
 const dayName = new Map(days.map((d) => [d.id, d.name]))
@@ -100,7 +90,7 @@ for (const e of inScope) {
     continue
   }
 
-  const r = rangeFor(e.reps)
+  const r = rangeFor(e.reps, e.rest_seconds)
   if (!r) {
     const raw = String(e.reps ?? '')
     if (/[a-z]/i.test(raw)) skipped.timed++

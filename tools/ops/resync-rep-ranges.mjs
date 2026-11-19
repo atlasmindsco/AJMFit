@@ -20,36 +20,22 @@
  *   node tools/ops/resync-rep-ranges.mjs
  *   node tools/ops/resync-rep-ranges.mjs --confirm
  */
+/*
+ * RUN WITH TYPE STRIPPING, so the rule comes from the one place it lives:
+ *
+ *   node --experimental-strip-types --import ./tools/_alias-hook.mjs \
+ *     tools/ops/resync-rep-ranges.mjs
+ */
 import { supa, parseArgs, requireConfirm, logAction, fail } from './_lib.mjs'
+import { rangeFor as libRangeFor } from '../../lib/rep-ranges.ts'
 
 const args = parseArgs()
 const sb = supa()
 
-/* Kept in step with lib/rep-ranges.ts; verify-rep-ranges.ts holds the rule. */
-const RANGES = {
-  1: null,
-  3: [3, 5],
-  5: [5, 7],
-  6: [6, 8],
-  8: [8, 12],
-  10: [10, 12],
-  12: [12, 15],
-  15: [15, 20],
-  20: [20, 25],
-}
-const HEAVY_MAX_REPS = 5
-const HEAVY_MIN_REST = 150
-
 /** Takes the ORIGINAL rep count, which is recoverable as rep_min. */
 function rangeFor(n, restSeconds) {
-  if (!Number.isFinite(n) || n < 1) return null
-  if (n <= HEAVY_MAX_REPS && (restSeconds ?? 0) >= HEAVY_MIN_REST) return null
-  if (n in RANGES) return RANGES[n]
-  const keys = Object.keys(RANGES).map(Number).sort((a, b) => a - b)
-  let key = null
-  for (const k of keys) if (k <= n) key = k
-  if (key === null || !RANGES[key]) return null
-  return [n, n + (RANGES[key][1] - RANGES[key][0])]
+  const r = libRangeFor(String(n), restSeconds)
+  return r ? [r.min, r.max] : null
 }
 
 async function all(table, cols) {
