@@ -36,6 +36,15 @@ export interface PlanExercise {
   reps: string
   rest: string
   series: string
+  /**
+   * Reps to leave in the tank on a working set, or null when the program
+   * does not say.
+   *
+   * The app has always ASKED for this at the end of an exercise and never
+   * told anyone what to aim for, which is most of why only 2 of 432 sets in
+   * production carry a rating. A question with no target is a quiz.
+   */
+  targetRir: number | null
 }
 export interface PlanDay {
   day: string
@@ -64,7 +73,7 @@ export interface LoadedProgram {
 }
 
 interface DayRow { id: string; day_index: number; name: string; focus: string | null; notes: string | null }
-interface ExRow { program_day_id: string; order_index: number; exercise_name: string; sets: number | null; reps: string | null; rest_seconds: number | null; superset_group: string | null }
+interface ExRow { program_day_id: string; order_index: number; exercise_name: string; sets: number | null; reps: string | null; rest_seconds: number | null; superset_group: string | null; target_rir: number | null }
 
 /** Strip the "Day N — " prefix to a short title, e.g. "Day 3 — Push A" → "Push A". */
 function shortName(dayName: string): string {
@@ -95,7 +104,7 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
   const dayIds = dayRows.map((d) => d.id)
   const { data: exs } = await db
     .from('program_exercises')
-    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, superset_group')
+    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, superset_group, target_rir')
     .in('program_day_id', dayIds)
     .order('order_index', { ascending: true })
   const exRows = (exs ?? []) as ExRow[]
@@ -120,6 +129,7 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
       reps: e.reps ?? '10',
       rest: e.rest_seconds ? `${e.rest_seconds}s` : '60s',
       series: labels[xi],
+      targetRir: e.target_rir ?? null,
     }))
     return {
       day: `Day ${i + 1}`,

@@ -125,6 +125,8 @@ interface ProgramExercise {
   reps: string
   rest: string
   series: string
+  /** Reps to leave in the tank, when the program says. Mirrors PlanExercise. */
+  targetRir?: number | null
 }
 
 type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
@@ -3532,8 +3534,19 @@ export default function ProgramsPage() {
                                           <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">
                                             {treatAsBeginner ? 'Could you have done more?' : 'Reps left in the tank?'}
                                           </span>
+                                          {/* What the program actually asked for.
+                                              This question has been here a while and only 2 of 432
+                                              sets in production carry an answer — which is what a
+                                              question with no target gets. The program has always
+                                              known the number; it just never said it. */}
+                                          {exercise.targetRir != null && (
+                                            <span className="text-ink-4 text-2xs font-body">
+                                              aim for {exercise.targetRir}
+                                            </span>
+                                          )}
                                           {[0, 1, 2, 3].map((n) => {
                                             const on = rirByExercise[logKey] === n
+                                            const isTarget = exercise.targetRir === n && !on
                                             return (
                                               <button
                                                 key={n}
@@ -3565,7 +3578,9 @@ export default function ProgramsPage() {
                                                 className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
                                                   on
                                                     ? 'bg-brand-blue text-white'
-                                                    : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
+                                                    : isTarget
+                                                      ? 'bg-white/[0.04] text-ink-2 ring-1 ring-brand-blue/40'
+                                                      : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                 }`}
                                               >
                                                 {n === 0 ? 'Nothing' : n === 3 ? '3+' : n}
