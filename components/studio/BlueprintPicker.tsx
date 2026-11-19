@@ -100,7 +100,20 @@ export default function BlueprintPicker({
         headers: { 'Content-Type': 'application/json' },
         // Empty means they skipped it, and null tells the reminder to stay
         // silent rather than guess.
-        body: JSON.stringify({ goal, location, days, splitKey: chosenSplit, trainingDays: trainingDays.length ? trainingDays : null }),
+        // `experience` is not used to choose the program — the picker has
+        // already done that by capping the days and hiding the advanced
+        // tracks. It is stored because the progression engine scales load
+        // increments by training age and, until now, had nothing to read:
+        // every client was treated as a beginner and told to add 10 lb to
+        // their squat after one good session.
+        body: JSON.stringify({
+          goal,
+          location,
+          days,
+          splitKey: chosenSplit,
+          trainingDays: trainingDays.length ? trainingDays : null,
+          experience,
+        }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
       if (!res.ok || !data.ok || !data.programId) throw new Error(data.error || 'Could not set up your program.')

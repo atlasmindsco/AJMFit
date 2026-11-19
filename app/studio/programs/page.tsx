@@ -80,7 +80,7 @@ import {
   type ExperienceLevel,
   type ProgressionGoal,
 } from '@/lib/progression'
-import { fetchMyOnboarding } from '@/lib/onboarding'
+import { fetchMyOnboarding, fetchTrainingExperience } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import {
   completeBlock,
@@ -661,10 +661,11 @@ export default function ProgramsPage() {
       try {
         const id = await getCurrentUserId()
         if (!active || !id) return
-        const [tier, program, onboarding] = await Promise.all([
+        const [tier, program, onboarding, trainingExperience] = await Promise.all([
           fetchMyTier(id),
           fetchMyProgram(id),
           fetchMyOnboarding(id),
+          fetchTrainingExperience(id).catch(() => null),
         ])
         if (!active) return
 
@@ -702,12 +703,15 @@ export default function ProgramsPage() {
           }
         }
 
-        setLevel(
-          experienceFrom(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
-        )
-        setLevelKnown(
-          experienceKnown(onboarding?.answers?.experience, onboarding?.answers?.yearsTraining)
-        )
+        /* The picker's answer first, the coach's intake form second.
+           Both say the same kind of thing, and one of them is actually
+           filled in: the onboarding table is empty, so until the picker
+           started asking, this resolved to 'beginner' for every client in
+           the app — 5 lb on the bar and 10 on the squat after a single
+           good session, for somebody two years in. */
+        const saidExperience = trainingExperience ?? onboarding?.answers?.experience
+        setLevel(experienceFrom(saidExperience, onboarding?.answers?.yearsTraining))
+        setLevelKnown(experienceKnown(saidExperience, onboarding?.answers?.yearsTraining))
 
         if (program) {
           await applyLoadedProgram(program.id, id)

@@ -8,6 +8,10 @@ export const runtime = 'nodejs'
 const GOALS: BlueprintGoal[] = ['muscle', 'strength', 'lean_out']
 const LOCATIONS: BlueprintLocation[] = ['gym', 'home']
 
+/** Matches the check constraint on users.training_experience. */
+type Experience = 'new' | 'returning' | 'consistent'
+const EXPERIENCES: Experience[] = ['new', 'returning', 'consistent']
+
 /**
  * Blueprint self-assign. A Blueprint client picks Goal + Days/week + Location;
  * we resolve the matching pre-made template and assign it to them. Runs with the
@@ -26,13 +30,19 @@ export async function POST(request: Request) {
   // 2. Validate input.
   let goal: string, location: string, days: number, splitKey: string | undefined
   let trainingDays: unknown = null
+  let experience: Experience | null = null
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string; trainingDays?: unknown }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string; trainingDays?: unknown; experience?: unknown }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
     splitKey = body.splitKey
     trainingDays = Array.isArray(body.trainingDays) ? body.trainingDays : null
+    // Only the three the column allows. Anything else is dropped rather than
+    // rejected: a bad value here should not cost somebody their program.
+    experience = EXPERIENCES.includes(body.experience as Experience)
+      ? (body.experience as Experience)
+      : null
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
@@ -111,6 +121,24 @@ export async function POST(request: Request) {
     training_days: cleanDays,
   })
   if (aErr) return NextResponse.json({ error: aErr.message }, { status: 500 })
+
+  /* Where they said they are starting from.
+     Written after the assignment, and a failure here is logged rather than
+     returned: they have a program, which is what they came for, and the cost
+     of losing this is that the progression engine keeps using the cautious
+     default it has always used. Not worth failing the request over. */
+  if (experience) {
+    const { data: updated, error: uErr } = await admin
+      .from('users')
+      .update({ training_experience: experience })
+      .eq('id', dbUser.id)
+      .select('id')
+    // PostgREST calls a filtered-out update a success with no rows, so the
+    // row count is the only honest signal.
+    if (uErr || !updated || updated.length === 0) {
+      console.error('[Blueprint assign] could not store experience:', uErr?.message ?? 'no rows updated')
+    }
+  }
 
   return NextResponse.json({ ok: true, programId: program.id })
 }

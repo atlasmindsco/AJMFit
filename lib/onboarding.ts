@@ -127,6 +127,24 @@ export const ASKED_FIELDS: Array<keyof OnboardingAnswers> = [
   'anythingElse',
 ]
 
+/**
+ * Where the client said they are starting from, as told to the program picker.
+ *
+ * Separate from the onboarding answers because it is asked somewhere else and
+ * means something narrower: onboarding is the coached-tier intake form, which
+ * Blueprint clients never see — that table has no rows in it. For months that
+ * meant `experienceFrom` had nothing to read and every client in the app got
+ * the beginner load increments, including people two years in.
+ */
+export async function fetchTrainingExperience(userId: string): Promise<string | null> {
+  const { data } = await db
+    .from('users')
+    .select('training_experience')
+    .eq('id', userId)
+    .maybeSingle()
+  return (data as { training_experience?: string | null } | null)?.training_experience ?? null
+}
+
 /** Everything the template matcher needs is present. */
 export function isAssessmentComplete(a: OnboardingAnswers | null | undefined): boolean {
   if (!a) return false
