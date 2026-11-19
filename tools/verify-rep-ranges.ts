@@ -59,6 +59,27 @@ for (const n of [7, 9, 11, 13, 14, 18, 30]) {
   ok(r !== null && r.min === n && r.max > n, `${n} -> ${r ? formatRange(r) : 'null'}`)
 }
 
+console.log('\nHEAVY LOW-REP WORK KEEPS ITS FIXED PRESCRIPTION\n')
+// Five sets of five at three minutes' rest is a linear strength protocol:
+// the reps are fixed on purpose and the load is what progresses.
+ok(rangeFor('5', 180) === null, '5 reps at 180s rest is left alone', 'the 5x5')
+ok(rangeFor('5', 150) === null, '5 reps at 150s rest is left alone')
+ok(rangeFor('3', 180) === null, '3 reps at 180s rest is left alone')
+ok(rangeFor('1', 180) === null, 'a heavy single is left alone')
+console.log('  — and the rule does not spill onto everything else:')
+const widened: Array<[string, number]> = [
+  ['5', 90],
+  ['6', 150],
+  ['8', 120],
+  ['10', 90],
+  ['12', 75],
+]
+for (const [reps, rest] of widened) {
+  const r = rangeFor(reps, rest)
+  ok(r !== null, `${reps} reps at ${rest}s rest still gets a range`, r ? formatRange(r) : 'null')
+}
+ok(rangeFor('5') !== null, 'without a rest time the heavy rule cannot fire', 'the safe direction')
+
 console.log('\nEVERY RANGE IS A RANGE THE DATABASE WILL ACCEPT\n')
 let bad = 0
 for (let n = 1; n <= 40; n++) {
