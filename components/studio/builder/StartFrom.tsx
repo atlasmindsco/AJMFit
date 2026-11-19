@@ -19,7 +19,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { DAY_COUNT_CHOICES, templatesFor, type BuilderTemplate } from '@/lib/builder-templates'
-import type { LibraryProgram } from '@/lib/custom-program'
+import { MAX_CUSTOM_PROGRAMS, type LibraryProgram } from '@/lib/custom-program'
 
 type Step = 'door' | 'pickLibrary' | 'dayCount' | 'split'
 
@@ -155,11 +155,21 @@ export default function StartFrom({
             Build your own
           </p>
 
-          {atLimit && (
+          {/* Said before you hit it, not after.
+              The limit used to appear only once it had already stopped you,
+              which turns a reasonable rule into a surprise at the worst
+              moment — with a program half designed in your head. */}
+          {atLimit ? (
             <p className="text-state-warning/90 text-xs font-body mb-3">
-              You&rsquo;re holding the maximum number of built programs. Delete one from My programs to build
-              another.
+              You&rsquo;re holding all {MAX_CUSTOM_PROGRAMS} of your saved programs. Delete one from My
+              programs to build another.
             </p>
+          ) : (
+            savedCount > 0 && (
+              <p className="text-ink-4 text-xs font-body mb-3">
+                {savedCount} of {MAX_CUSTOM_PROGRAMS} saved programs used.
+              </p>
+            )
           )}
 
           <div className="space-y-2.5">

@@ -122,7 +122,7 @@ console.log('\nTHE CARDS THAT NEED EVIDENCE\n')
   g('today is phrased as today', attentionCards(calm({ blockDaysLeft: 0 }))[0].title.includes('today'))
   // Several blocks in production ran weeks past their end, because recording a
   // completed block only started working recently.
-  g('an overdue block says so', attentionCards(calm({ blockDaysLeft: -21 }))[0].title === 'Your block finished 21 days ago',
+  g('an overdue block says so', attentionCards(calm({ blockDaysLeft: -21 }))[0].title === 'Your 8-week plan finished 21 days ago',
     attentionCards(calm({ blockDaysLeft: -21 }))[0].title)
   g('and never claims it ends today', !attentionCards(calm({ blockDaysLeft: -21 }))[0].title.includes('today'))
   g('one day over reads as yesterday', attentionCards(calm({ blockDaysLeft: -1 }))[0].title.includes('yesterday'))

@@ -8,6 +8,7 @@ import CheaChat from '@/components/chat/CheaChat'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MembershipPaywall from '@/components/studio/MembershipPaywall'
 import FeedbackButton from '@/components/studio/FeedbackButton'
+import { SessionChromeProvider, useSessionChrome } from '@/components/studio/SessionChrome'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
@@ -59,7 +60,6 @@ export default function ClientPortalLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [profileOpen, setProfileOpen] = useState(false)
-  const [chatOpen, setChatOpen] = useState(false)
   const [clientName, setClientName] = useState('')
   // Auth is enforced in middleware; here we additionally gate on subscription
   // status: only an active (incl. trialing) member sees the studio. Others are
@@ -151,6 +151,7 @@ export default function ClientPortalLayout({
   }
 
   return (
+    <SessionChromeProvider>
     <div className="min-h-screen bg-surface-base">
       {/* Top Navbar */}
       <nav className="bg-surface-base border-b border-white/[0.06] sticky top-0 z-50">
@@ -297,16 +298,43 @@ export default function ClientPortalLayout({
         </div>
       </nav>
 
+      <FloatingChrome />
+    </div>
+    </SessionChromeProvider>
+  )
+}
+
+/**
+ * The two things that float over every screen, and the one screen they should
+ * not float over.
+ *
+ * The chat bubble and the feedback button are both there for the app's
+ * benefit rather than the client's. During a running set they sit on top of
+ * the one screen that has earned the whole display — the exercise, the
+ * weight, the reps, and what was lifted last time. Both step aside while a
+ * workout is actually running and come back the moment it ends.
+ *
+ * Its own component so it can read the session flag; the layout above it
+ * provides it.
+ */
+function FloatingChrome() {
+  const [chatOpen, setChatOpen] = useState(false)
+  const { sessionActive } = useSessionChrome()
+
+  // Not merely hidden: an open chat window would otherwise stay on screen
+  // over the session it was told to get out of the way of.
+  if (sessionActive) return null
+
+  return (
+    <>
       <FeedbackButton />
 
-      {/* Floating Chea Chat Widget */}
       {chatOpen && (
         <div className="fixed bottom-[calc(160px+env(safe-area-inset-bottom))] md:bottom-20 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[460px] md:h-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-card overflow-hidden">
           <CheaChat portal="client" onNavigate={() => setChatOpen(false)} />
         </div>
       )}
 
-      {/* Chea FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
         className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
@@ -326,6 +354,6 @@ export default function ClientPortalLayout({
           />
         )}
       </button>
-    </div>
+    </>
   )
 }

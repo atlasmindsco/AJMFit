@@ -44,55 +44,55 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
   if (doneCount === steps.length) return null
 
   const next = steps.find((s) => !s.done)
-  const pct = Math.round((doneCount / steps.length) * 100)
+  if (!next) return null
 
-  return (
-    <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-6">
-      <div className="flex items-baseline justify-between gap-4 mb-1">
-        <h2 className="font-display font-bold text-white text-sm">Getting you set up</h2>
-        <span className="text-ink-3 text-xs font-body tabular-nums">
+  /*
+   * ONE STEP, NOT SIX.
+   *
+   * This used to list the whole sequence with a progress bar: six rows, five
+   * of them things you had not done, on the screen of a product somebody had
+   * just paid for. A list of outstanding homework is a strange first
+   * impression, and only one row of it was ever actionable anyway — the rest
+   * were either finished or not yet reachable.
+   *
+   * The count stays, small, because "2 of 6" answers how much is left without
+   * spelling out what it is.
+   */
+  const row = (
+    <div className="flex items-start gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em]">
+          Next, to get you set up
+        </p>
+        <p className="font-display font-bold text-white text-base mt-1">{next.label}</p>
+        {next.coach ? (
+          <p className="text-brand-blue text-xs font-body mt-1">
+            Waiting on Anthony &mdash; nothing for you to do here.
+          </p>
+        ) : (
+          next.hint && <p className="text-ink-3 text-xs font-body mt-1">{next.hint}</p>
+        )}
+      </div>
+      <div className="shrink-0 text-right">
+        <span className="text-ink-4 text-xs font-body tabular-nums">
           {doneCount} of {steps.length}
         </span>
+        {!next.coach && next.href && (
+          <p className="text-brand-orange text-xs font-display font-bold uppercase tracking-[0.12em] mt-1">
+            Start &rarr;
+          </p>
+        )}
       </div>
-
-      <div className="h-1 rounded-full bg-white/[0.08] overflow-hidden mb-4">
-        <div className="h-full bg-brand-orange transition-all duration-500" style={{ width: `${pct}%` }} />
-      </div>
-
-      <ul className="space-y-1.5">
-        {steps.map((s) => {
-          const isNext = s === next
-          const row = (
-            <div
-              className={`flex items-start gap-3 px-3 py-2.5 rounded-control transition-colors duration-200 ${
-                isNext && !s.coach ? 'bg-brand-orange/[0.10] border border-brand-orange/25' : ''
-              }`}
-            >
-              <span
-                className={`mt-0.5 w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-2xs font-bold ${
-                  s.done ? 'bg-state-success text-white' : 'border border-white/20 text-transparent'
-                }`}
-              >
-                ✓
-              </span>
-              <div className="min-w-0">
-                <p className={`text-sm font-body ${s.done ? 'text-ink-3 line-through' : 'text-ink'}`}>
-                  {s.label}
-                </p>
-                {!s.done && s.hint && <p className="text-ink-3 text-xs font-body mt-0.5">{s.hint}</p>}
-                {!s.done && s.coach && (
-                  <p className="text-brand-blue text-xs font-body mt-0.5">Waiting on Anthony — nothing for you to do here.</p>
-                )}
-              </div>
-            </div>
-          )
-          return (
-            <li key={s.label}>
-              {s.done || s.coach || !s.href ? row : <Link href={s.href}>{row}</Link>}
-            </li>
-          )
-        })}
-      </ul>
     </div>
+  )
+
+  const shell = 'block bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-6'
+
+  return next.coach || !next.href ? (
+    <div className={shell}>{row}</div>
+  ) : (
+    <Link href={next.href} className={`${shell} hover:border-white/[0.18] transition-colors duration-200`}>
+      {row}
+    </Link>
   )
 }

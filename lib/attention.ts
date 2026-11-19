@@ -185,12 +185,19 @@ export function attentionCards(input: AttentionInput): AttentionCard[] {
     cards.push({
       kind: 'block_ending',
       rank: 4,
+      /*
+       * "Block" is what a coach calls an eight-week run of a program. It is
+       * not a word most people know, and a client reading "your block ends in
+       * three days" has to work out whether that is good, bad, or something
+       * they are meant to do. The thing itself is unchanged; it is now named
+       * in a way that explains itself.
+       */
       title:
         over > 0
-          ? `Your block finished ${over === 1 ? 'yesterday' : `${over} days ago`}`
+          ? `Your 8-week plan finished ${over === 1 ? 'yesterday' : `${over} days ago`}`
           : left === 0
-            ? 'Your block finishes today'
-            : `Your block ends in ${left} ${left === 1 ? 'day' : 'days'}`,
+            ? 'Your 8-week plan finishes today'
+            : `Your 8-week plan ends in ${left} ${left === 1 ? 'day' : 'days'}`,
       /*
        * Who picks the next block depends on what they bought, and the card
        * used to ignore that. It told every client to "pick what comes next"

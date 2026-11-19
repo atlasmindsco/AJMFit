@@ -1408,20 +1408,6 @@ export default function NutritionPage() {
               <p className="text-brand-slate text-2xs font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
             </div>
           </motion.div>
-
-          <motion.div custom={4} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
-            <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
-              <h2 className="font-display font-bold text-sm text-brand-navy">Nutrition Tip</h2>
-            </div>
-            <div className="p-5">
-              <div className="p-3 rounded-control bg-brand-orange/[0.04] border border-brand-orange/10">
-                <p className="text-brand-navy text-sm font-body leading-relaxed">
-                  &ldquo;Try to get 30-40g of protein within 30 minutes post-workout. Your shake + a banana is a solid combo.&rdquo;
-                </p>
-                <p className="text-brand-slate text-xs font-body mt-2">, Anthony</p>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
 

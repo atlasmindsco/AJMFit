@@ -83,9 +83,19 @@ export default function ProgressPage() {
 
   const num = (v: string) => (v.trim() === '' ? null : Number(v))
 
+  /**
+   * Anything at all is worth saving.
+   *
+   * This used to require weight or waist specifically. Now that waist sits
+   * with the other measurements behind the toggle, that rule would leave
+   * somebody who opened them and recorded only their chest looking at a dead
+   * Save button with nothing saying why.
+   */
+  const hasSomething = Object.keys(form).some((k) => form[k as keyof typeof form].trim() !== '')
+
   const save = async () => {
     if (!userId) return
-    if (!form.weight.trim() && !form.waist.trim()) return
+    if (!hasSomething) return
     setSaving(true)
     try {
       await saveBodyMetric(userId, {
@@ -208,36 +218,29 @@ export default function ProgressPage() {
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
         <p className="font-display font-bold text-white text-sm mb-3">Log today</p>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <p className={`${labelCls} mb-1.5`}>Weight (lbs)</p>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={form.weight}
-              onChange={(e) => setForm({ ...form, weight: e.target.value })}
-              placeholder={trend.latest != null ? String(trend.latest) : '185'}
-              className={inputCls}
-            />
-          </div>
-          <div>
-            <p className={`${labelCls} mb-1.5`}>Waist (in)</p>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={form.waist}
-              onChange={(e) => setForm({ ...form, waist: e.target.value })}
-              placeholder="34"
-              className={inputCls}
-            />
-          </div>
+        {/* One field.
+            Weight used to sit beside Waist, which made the screen read as two
+            things to fill in before you could save — and waist is a tape
+            measure, which most people do not own and nobody carries. It has
+            joined the other measurements behind the toggle, where it is an
+            offer rather than a gap. */}
+        <div>
+          <p className={`${labelCls} mb-1.5`}>Weight (lbs)</p>
+          <input
+            type="number"
+            inputMode="decimal"
+            value={form.weight}
+            onChange={(e) => setForm({ ...form, weight: e.target.value })}
+            placeholder={trend.latest != null ? String(trend.latest) : '185'}
+            className={inputCls}
+          />
         </div>
 
         <button
           onClick={() => setShowMeasurements((v) => !v)}
           className="text-ink-3 hover:text-ink-2 text-xs font-body mt-3 transition-colors duration-200"
         >
-          {showMeasurements ? '− Fewer measurements' : '+ More measurements (optional)'}
+          {showMeasurements ? '− Hide measurements' : '+ Add measurements (optional)'}
         </button>
 
         {showMeasurements && (
@@ -246,7 +249,7 @@ export default function ProgressPage() {
             animate={{ opacity: 1, height: 'auto' }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3 overflow-hidden"
           >
-            {(['hips', 'chest', 'arm', 'thigh'] as const).map((k) => (
+            {(['waist', 'hips', 'chest', 'arm', 'thigh'] as const).map((k) => (
               <div key={k}>
                 <p className={`${labelCls} mb-1.5`}>{k} (in)</p>
                 <input
@@ -263,7 +266,7 @@ export default function ProgressPage() {
 
         <button
           onClick={save}
-          disabled={saving || (!form.weight.trim() && !form.waist.trim())}
+          disabled={saving || !hasSomething}
           className="w-full mt-4 py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Saving…' : saved ? 'Saved' : 'Save'}

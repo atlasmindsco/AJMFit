@@ -1,6 +1,7 @@
 'use client'
 
 import TravelSwitch from '@/components/studio/TravelSwitch'
+import { useSessionChrome } from '@/components/studio/SessionChrome'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
@@ -580,6 +581,20 @@ export default function ProgramsPage() {
     records: Array<{ exerciseName: string } & RecordHit>
     /** The next training day in the rotation. */
     nextUp: string | null
+    /**
+     * Two moments that only happen once, and were passing unmarked.
+     *
+     * `firstEver` is the first session a client ever finishes — the thing the
+     * whole product is trying to get them to do, and the app said nothing
+     * about it. `weekDone` is every training day in the rotation completed.
+     *
+     * Both are deliberately one line inside the summary they already see
+     * rather than a separate celebration. A screen that has to be dismissed
+     * is a toll, and a week of training is not a surprise worth stopping
+     * somebody for.
+     */
+    firstEver: boolean
+    weekDone: boolean
   } | null>(null)
   const loadHistory = useCallback((uid: string) => {
     dbFetchWorkoutHistory(uid, 12)
@@ -1090,6 +1105,17 @@ export default function ProgramsPage() {
   /** True while this day's workout is running. */
   const sessionActive = selectedDay !== null && Boolean(workoutStartTime[selectedDay])
 
+  /* Tell the layout to put the chat bubble and the feedback button away while
+     a set is actually running. Only while RUNNING — browsing the day's
+     exercises is reading, and there is no reason to strip the screen for it. */
+  const { setSessionActive } = useSessionChrome()
+  useEffect(() => {
+    setSessionActive(sessionActive)
+    // Leaving the Train tab mid-session must not leave the rest of the app
+    // stripped, so the flag is cleared on the way out either way.
+    return () => setSessionActive(false)
+  }, [sessionActive, setSessionActive])
+
   /**
    * How many distinct exercises the client is currently training away from
    * their program. Counted by name, not by key: a swap applies to every day
@@ -1259,7 +1285,20 @@ export default function ProgramsPage() {
       return null
     })()
 
+    // Counted before the history reloads, so "first ever" means first before
+    // this one rather than first including it.
+    const finishedBefore = history.filter((w) => w.ended_at).length
+    // Every training day in the rotation ticked off, this one included. The
+    // plan's `completed` flags are set from logged sessions, so the day just
+    // finished is the only one not yet reflected in them.
+    const trainingDays = weeklyPlan.filter((d) => d.exercises.length > 0)
+    const weekDone =
+      trainingDays.length > 0 &&
+      trainingDays.every((d) => d.completed || weeklyPlan.indexOf(d) === selectedDay)
+
     setWorkoutSummary({
+      firstEver: finishedBefore === 0 && doneSets > 0,
+      weekDone: weekDone && doneSets > 0,
       dayName: selected?.name ?? 'Session',
       seconds: elapsed,
       sets: doneSets,
@@ -4430,7 +4469,7 @@ function BlockComplete({
         className="w-full max-w-md px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
       >
         <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.2em]">
-          Block complete
+          Plan complete
         </p>
         <h2 className="font-display font-extrabold text-2xl text-white tracking-tight mt-2 mb-4">
           {review.weeks} weeks done
@@ -4853,6 +4892,8 @@ function WorkoutComplete({
     improvements: string[]
     records: Array<{ exerciseName: string } & RecordHit>
     nextUp: string | null
+    firstEver: boolean
+    weekDone: boolean
   }
   /** Offer the weigh-in: they have a program, and have not weighed in today. */
   askWeight: boolean
@@ -4901,8 +4942,10 @@ function WorkoutComplete({
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
         className="w-full max-w-sm text-center px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
       >
+        {/* Two moments that only happen once, said in the line that was
+            already there rather than as a second screen to dismiss. */}
         <p className="font-display font-bold text-2xs uppercase tracking-[0.25em] text-brand-orange">
-          Session complete
+          {summary.firstEver ? 'First one done' : summary.weekDone ? "That's the week" : 'Session complete'}
         </p>
         <h2 className="font-display font-extrabold text-3xl text-white tracking-tight mt-2">
           {summary.dayName}
@@ -4954,6 +4997,18 @@ function WorkoutComplete({
         {summary.fatigue && (
           <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
             {summary.fatigue}
+          </p>
+        )}
+
+        {summary.firstEver && (
+          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-brand-blue/[0.08] border border-brand-blue/20">
+            That&rsquo;s your first session logged. Everything from here gets measured against it.
+          </p>
+        )}
+
+        {summary.weekDone && !summary.firstEver && (
+          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
+            Every session this week done. Rest is part of it &mdash; the next one will keep.
           </p>
         )}
 
