@@ -258,6 +258,48 @@ if (!url) {
   const entries = Object.entries(noteTally).sort((a, b) => b[1] - a[1])
   if (entries.length === 0) console.log('    none at all')
   for (const [code, n] of entries) console.log(`    ${W(code, 24)} ${n}`)
+
+  // The home full-body threes have no vertical pull: a pulldown needs a bar
+  // and the home library is dumbbells. A sensible constraint, so it is a note
+  // and it must stay one. If this count moves, something in the catalog or
+  // the pattern table changed and somebody should know which.
+  g(
+    'exactly three shipped programs are missing a movement pattern',
+    (noteTally.missing_pattern ?? 0) === 3,
+    `${noteTally.missing_pattern ?? 0} are`
+  )
+}
+
+/* ── The pattern check itself ───────────────────────────────────────────── */
+{
+  console.log('\nMOVEMENT PATTERNS\n')
+  const ex = (exerciseName: string) => ({ exerciseName, sets: 3, restSeconds: 90 })
+  const run = (names: string[]) =>
+    reviewProgram({ days: [{ name: 'Day 1', exercises: names.map(ex) }] }, lookup)
+  const codes = (names: string[]) => run(names).map((f) => f.code)
+
+  const complete = [
+    'Barbell Bench Press - Medium Grip',
+    'Standing Military Press',
+    'Bent Over Barbell Row',
+    'Wide-Grip Lat Pulldown',
+    'Barbell Squat',
+    'Romanian Deadlift',
+  ]
+  g('a week covering all six essentials says nothing', !codes(complete).includes('missing_pattern'))
+
+  const noHinge = complete.filter((n) => n !== 'Romanian Deadlift')
+  const f = run(noHinge).find((x) => x.code === 'missing_pattern')
+  g('dropping the hinge is noticed', Boolean(f), f?.title ?? 'not noticed')
+  g('and it is a note, never a warning', f?.severity === 'note', f?.severity ?? '-')
+
+  // Muscle volume cannot see this: a pulldown and a row are both "back".
+  const rowsOnly = complete.filter((n) => n !== 'Wide-Grip Lat Pulldown')
+  const f2 = run(rowsOnly).find((x) => x.code === 'missing_pattern')
+  g('all-horizontal pulling is noticed, which volume alone cannot see', Boolean(f2), f2?.title ?? '')
+
+  // An empty shell is an unfinished program, not a programming opinion.
+  g('a week missing everything says nothing about patterns', !codes(['Plank']).includes('missing_pattern'))
 }
 
 console.log(fail === 0 ? '\nAll health checks passed.' : `\n${fail} FAILED`)

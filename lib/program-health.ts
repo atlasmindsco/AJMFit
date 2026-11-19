@@ -30,6 +30,12 @@
  */
 
 import { MUSCLE_GROUPS, estimateMinutes, type LibraryExercise } from '@/lib/builder-rules'
+import {
+  patternFor,
+  ESSENTIAL_PATTERNS,
+  PATTERN_LABELS,
+  type MovementPattern,
+} from '@/lib/movement-patterns'
 
 export type Severity = 'warn' | 'note'
 
@@ -122,6 +128,52 @@ export function reviewProgram(
   const vol = volumeOf(input, lookup)
   const warns: Finding[] = []
   const notes: Finding[] = []
+
+  /* ── Movement patterns ─────────────────────────────────────────────── */
+
+  // A week can be balanced by muscle and still be missing a whole pattern:
+  // every row horizontal and nothing overhead, or quads trained only by
+  // squatting with no hinge in sight. Muscle-group volume cannot see that,
+  // because a pulldown and a row are both "back".
+  //
+  // A NOTE, NOT A WARNING, and deliberately so. Three of the shipped
+  // programs — the home full-body threes — have no vertical pull, because a
+  // pulldown needs a bar and the home library is dumbbells. That is a
+  // sensible constraint rather than a fault, and the file's contract is that
+  // no warning may fire on a program AJM Fit sells. The serious case, a
+  // muscle group trained not at all, is already a warning above.
+  {
+    const trained = new Set<MovementPattern>()
+    for (const day of trainingDays) {
+      for (const e of day.exercises) {
+        const lib = lookup(e.exerciseName)
+        trained.add(
+          patternFor(e.exerciseName, {
+            primaryMuscle: lib?.primaryMuscles?.[0] ?? null,
+            force: lib?.force ?? null,
+            mechanic: lib?.mechanic ?? null,
+            category: lib?.category ?? null,
+          })
+        )
+      }
+    }
+    const absent = ESSENTIAL_PATTERNS.filter((p) => !trained.has(p))
+    // Everything missing at once means an unfinished program, not a
+    // programming opinion, and saying so six times over would be noise.
+    if (absent.length > 0 && absent.length < ESSENTIAL_PATTERNS.length) {
+      const names = absent.map((p) => PATTERN_LABELS[p].toLowerCase())
+      notes.push({
+        code: 'missing_pattern',
+        severity: 'note',
+        title:
+          names.length === 1
+            ? `No ${names[0]} this week`
+            : `No ${names.slice(0, -1).join(', ')} or ${names[names.length - 1]} this week`,
+        detail:
+          'Not a problem on its own — some of these need kit you may not have. Worth adding if you can.',
+      })
+    }
+  }
 
   /* ── Whole-week balance ────────────────────────────────────────────── */
 
