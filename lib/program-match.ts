@@ -22,8 +22,16 @@ export interface MatchInput {
   answers: OnboardingAnswers
   /** Exercise names in the matched program, for the injury scan. */
   exerciseNames?: string[]
-  /** How many exercises the program prescribes per day, for the time check. */
-  exercisesPerDay?: number
+  /**
+   * How long an average day runs, in minutes, for the time check.
+   *
+   * Passed in rather than worked out here. This used to be an exercise COUNT
+   * that a private `estimateMinutes` multiplied by nine — the third of three
+   * duration formulas in the codebase, all disagreeing. The caller has the
+   * sets and rest already, so it uses the one real estimator in
+   * lib/builder-rules.ts and hands over the answer.
+   */
+  minutesPerDay?: number
 }
 
 export interface Flag {
@@ -77,11 +85,6 @@ const BODY_PART_MOVEMENTS: Array<{ part: string; says: string[]; loads: string[]
 const GYM_ONLY = ['barbell', 'smith machine', 'cable', 'lat pulldown', 'leg press', 'hack squat', 'pec deck', 'leg extension', 'leg curl', 'machine']
 
 const lower = (s: string | undefined) => (s ?? '').toLowerCase()
-
-/** Roughly how long a session runs: a working set plus rest, times exercises. */
-function estimateMinutes(exercises: number): number {
-  return Math.round(exercises * 9)
-}
 
 export function matchProgram(input: MatchInput): Match {
   const a = input.answers
@@ -153,8 +156,8 @@ export function matchProgram(input: MatchInput): Match {
 
   /* 3. A session that runs past the time they said they had. */
   const cap = a.sessionMinutes ? Number(a.sessionMinutes) : null
-  if (cap && input.exercisesPerDay) {
-    const est = estimateMinutes(input.exercisesPerDay)
+  if (cap && input.minutesPerDay) {
+    const est = input.minutesPerDay
     if (est > cap + 10) {
       flags.push({
         level: 'warn',

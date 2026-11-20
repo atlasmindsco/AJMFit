@@ -62,6 +62,17 @@ export default function CheckInPage() {
   const [submitted, setSubmitted] = useState(false)
 
   const [weight, setWeight] = useState('')
+  /**
+   * The most recent weigh-in on record, and when it was taken.
+   *
+   * Kept apart from `weight` so a stale one can be SHOWN without being
+   * SUBMITTED. The field used to prefill from this whatever its age, and
+   * submitting wrote it back to body_metrics dated today — so a client who
+   * last weighed in three weeks ago silently stamped a three-week-old number
+   * as this week's, every week, flattening the trend the check-in exists to
+   * track.
+   */
+  const [lastWeighIn, setLastWeighIn] = useState<{ lb: number; on: string } | null>(null)
   const [workouts, setWorkouts] = useState('')
   const [nutrition, setNutrition] = useState<number | null>(null)
   const [energy, setEnergy] = useState<number | null>(null)
@@ -109,10 +120,19 @@ export default function CheckInPage() {
           setObstacle(mine.obstacle ?? '')
         } else {
           // Pre-fill what the app already knows so the client confirms rather
-          // than recalls.
+          // than recalls. The workout count is counted from this week, so it
+          // is always about this week.
           setWorkouts(String(logged))
+
+          // The weight is not. A weigh-in is only this week's if it was taken
+          // this week — anything older gets shown as a reminder of where they
+          // were, with its date, and an empty box to fill in. Prefilling an
+          // old number is how the same weight got re-saved week after week.
           const lastWeight = metrics.find((m) => m.weight_lb != null)
-          if (lastWeight?.weight_lb != null) setWeight(String(Number(lastWeight.weight_lb)))
+          if (lastWeight?.weight_lb != null) {
+            setLastWeighIn({ lb: Number(lastWeight.weight_lb), on: lastWeight.recorded_on })
+            if (lastWeight.recorded_on >= week) setWeight(String(Number(lastWeight.weight_lb)))
+          }
         }
       } catch (e) {
         console.error('[Check-in] load failed', e)
@@ -125,7 +145,15 @@ export default function CheckInPage() {
     }
   }, [week])
 
-  const canSubmit = nutrition !== null && energy !== null
+  /**
+   * The smallest check-in worth sending.
+   *
+   * Three taps. Training is in here now because it is the one Anthony coaches
+   * on, and because the form shows it directly above the button — a required
+   * set that does not match what is on screen is how a form feels broken.
+   * Sleep, hunger, the win and the obstacle stay optional.
+   */
+  const canSubmit = nutrition !== null && energy !== null && performance !== null
 
   const submit = async () => {
     if (!userId || !canSubmit) return
@@ -143,8 +171,12 @@ export default function CheckInPage() {
         win: win.trim() || null,
         obstacle: obstacle.trim() || null,
       })
-      // The weight belongs in the trend too, not just on this check-in.
-      if (w != null) await saveBodyMetric(userId, { weight_lb: w })
+      // The weight belongs in the trend too, not just on this check-in — but
+      // only when it is genuinely NEW. If the box still holds the weigh-in it
+      // was prefilled with, writing it again just re-dates an old reading and
+      // the trend goes flat.
+      const unchanged = lastWeighIn != null && w === lastWeighIn.lb
+      if (w != null && !unchanged) await saveBodyMetric(userId, { weight_lb: w })
       fetch('/api/studio/check-in-notify', { method: 'POST' }).catch(() => {})
       setSubmitted(true)
     } catch (e) {
@@ -202,7 +234,11 @@ export default function CheckInPage() {
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 space-y-6">
         <div>
           <p className={labelCls}>Bodyweight</p>
-          <p className={hintCls}>Same day, same time each week if you can.</p>
+          <p className={hintCls}>
+            {lastWeighIn && lastWeighIn.on < week
+              ? `Last weighed ${Number(lastWeighIn.lb)} lbs on ${new Date(lastWeighIn.on + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}. Leave it blank if you haven't weighed in.`
+              : 'Same day, same time each week if you can.'}
+          </p>
           <input
             type="number"
             inputMode="decimal"
@@ -288,7 +324,7 @@ export default function CheckInPage() {
         </button>
         {!canSubmit && (
           <p className="text-ink-4 text-xs font-body text-center">
-            Rate eating and energy to send.
+            Rate eating, energy and training to send. The rest is optional.
           </p>
         )}
       </div>

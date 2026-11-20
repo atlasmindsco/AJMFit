@@ -7,6 +7,7 @@
  */
 
 import { isHold, formatHold, DEFAULT_HOLD_SECONDS } from '@/lib/holds'
+import { parsePrescribedDuration } from '@/lib/conditioning'
 
 export interface LibraryExercise {
   name: string
@@ -179,14 +180,34 @@ export function canSave(program: { name: string; days: Array<{ name: string; exe
   return { ok: true, reason: null }
 }
 
+/** About how long a working set takes when the program does not say. */
+const WORK_SECONDS_PER_SET = 40
+
 /**
- * Roughly how long a day will take.
+ * Roughly how long a day will take. THE ONLY ESTIMATOR.
  *
  * Deliberately rough, and labelled as such wherever it is shown: real rest
  * bears little resemblance to prescribed rest. About forty seconds a set plus
  * the rest between them.
+ *
+ * There used to be three of these. A second, in lib/program-match.ts,
+ * multiplied the exercise count by nine; a third, in lib/blueprint.ts, was the
+ * only one any CLIENT ever saw and read `max(30, exercises * 10)` — a floor
+ * that made every program card in the library say thirty minutes or more. Not
+ * one of the 69 programs could display a session under half an hour, including
+ * the Lean Out days that really run 21. Both are gone.
+ *
+ * `reps` is optional and matters more than it looks: a 45-minute long run is
+ * one set, and without reading the prescription this counted it as forty
+ * seconds. Twenty of the 69 programs hold time-prescribed work and every one
+ * of them was understated — the Strength + Endurance days by 18 minutes.
  */
-export function estimateMinutes(exercises: Array<{ sets: number; restSeconds: number }>): number {
-  const seconds = exercises.reduce((total, e) => total + e.sets * (40 + e.restSeconds), 0)
+export function estimateMinutes(
+  exercises: Array<{ sets: number; restSeconds: number; reps?: string | null }>
+): number {
+  const seconds = exercises.reduce((total, e) => {
+    const prescribed = parsePrescribedDuration(String(e.reps ?? ''))
+    return total + e.sets * ((prescribed ?? WORK_SECONDS_PER_SET) + e.restSeconds)
+  }, 0)
   return Math.round(seconds / 60)
 }

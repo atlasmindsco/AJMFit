@@ -19,6 +19,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { matchProgram, type Match } from '@/lib/program-match'
+import { estimateMinutes } from '@/lib/builder-rules'
 import { GOAL_LABELS, LOCATION_LABELS } from '@/lib/splits'
 import type { OnboardingAnswers } from '@/lib/onboarding'
 
@@ -69,7 +70,7 @@ export default function ProgramRecommendation({
       let programId: string | null = null
       let programName: string | null = null
       let exerciseNames: string[] = []
-      let exercisesPerDay = 0
+      let minutesPerDay = 0
 
       if (first.ready) {
         const { data: prog } = await db
@@ -88,16 +89,42 @@ export default function ProgramRecommendation({
           if (dayIds.length) {
             const { data: exs } = await db
               .from('program_exercises')
-              .select('exercise_name, program_day_id')
+              .select('exercise_name, program_day_id, sets, reps, rest_seconds')
               .in('program_day_id', dayIds)
-            exerciseNames = (exs ?? []).map((e: { exercise_name: string }) => e.exercise_name)
-            exercisesPerDay = Math.round(exerciseNames.length / dayIds.length)
+            type ExRow = {
+              exercise_name: string
+              program_day_id: string
+              sets: number | null
+              reps: string | null
+              rest_seconds: number | null
+            }
+            const rows = (exs ?? []) as ExRow[]
+            exerciseNames = rows.map((e) => e.exercise_name)
+            // The real estimator, averaged over the days. This used to hand
+            // the matcher an exercise COUNT and let it guess nine minutes
+            // apiece, which understated every day with a run in it — a
+            // 45-minute long run counted as nine minutes.
+            minutesPerDay = Math.round(
+              dayIds
+                .map((id: string) =>
+                  estimateMinutes(
+                    rows
+                      .filter((e) => e.program_day_id === id)
+                      .map((e) => ({
+                        sets: e.sets ?? 3,
+                        restSeconds: e.rest_seconds ?? 60,
+                        reps: e.reps,
+                      }))
+                  )
+                )
+                .reduce((total: number, m: number) => total + m, 0) / dayIds.length
+            )
           }
         }
       }
 
       // Second pass, now that the flags have exercises to scan.
-      const match = matchProgram({ answers, exerciseNames, exercisesPerDay })
+      const match = matchProgram({ answers, exerciseNames, minutesPerDay })
       setData({ answers, programId, programName, match })
     } catch (e) {
       console.error('[ProgramRecommendation] load failed', e)

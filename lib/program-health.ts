@@ -54,7 +54,13 @@ export interface Finding {
 export interface HealthInput {
   days: Array<{
     name: string
-    exercises: Array<{ exerciseName: string; sets: number; restSeconds: number }>
+    exercises: Array<{
+      exerciseName: string
+      sets: number
+      restSeconds: number
+      /** The prescription. Optional, and only read for the time estimate. */
+      reps?: string | null
+    }>
   }>
 }
 
@@ -294,8 +300,10 @@ export function reviewProgram(
 
     // Longer than any shipped day. The estimate is rough and says so
     // everywhere it appears, so the threshold sits well clear of the real max.
+    // reps goes through so a 45-minute run counts as 45 minutes rather than
+    // forty seconds. The builder's own exercises carry it already.
     const minutes = estimateMinutes(
-      day.exercises.map((e) => ({ sets: e.sets, restSeconds: e.restSeconds }))
+      day.exercises.map((e) => ({ sets: e.sets, restSeconds: e.restSeconds, reps: e.reps }))
     )
     if (minutes > 75) {
       notes.push({

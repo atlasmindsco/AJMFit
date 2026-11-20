@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { BlueprintGoal, BlueprintLocation } from '@/lib/splits'
 import { seriesLabels } from '@/lib/supersets'
+import { estimateMinutes } from '@/lib/builder-rules'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -136,7 +137,34 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
       name: shortName(d.name),
       muscles: d.focus || (exercises.length === 0 ? 'Recovery' : ''),
       primaryMuscle: '',
-      duration: exercises.length ? `~${Math.max(30, exercises.length * 10)} min` : '',
+      // The one estimator, the same one the builder and the health check use.
+      // This line used to be `~${Math.max(30, exercises.length * 10)} min`,
+      // which is the only duration a client ever saw. Ten minutes an exercise,
+      // floored at thirty: it ignored sets and rest entirely, so a 5x5 with
+      // three-minute rests and a circuit with forty-second rests read the same.
+      //
+      // The floor was the real damage. Not one of the 69 programs could show a
+      // session under half an hour — the Lean Out Full Body day runs 21 minutes
+      // and the card said "~50 min". Eighteen programs average half an hour or
+      // less and the app had no way to say so, which is why a client with
+      // thirty minutes concluded nothing in the library fitted.
+      //
+      // Built from `list`, not from `exercises`, because the estimator wants
+      // rest in seconds and PlanExercise carries it as a string.
+      //
+      // `?? 60` and not `|| 60`: all 56 zero-rest rows in the library are
+      // explicit zeros, not nulls, and every one of them is a conditioning
+      // block. A run has no rest after it, and `||` would hand each one a
+      // minute it does not take. Matches lib/custom-program.ts.
+      duration: exercises.length
+        ? `~${estimateMinutes(
+            list.map((e) => ({
+              sets: e.sets ?? 3,
+              restSeconds: e.rest_seconds ?? 60,
+              reps: e.reps,
+            }))
+          )} min`
+        : '',
       completed: false,
       exercises,
     }
