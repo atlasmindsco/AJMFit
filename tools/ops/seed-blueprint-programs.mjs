@@ -19,6 +19,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { supa, parseArgs, requireConfirm, logAction, fail } from './_lib.mjs'
+import { rangeFor, boundsFor, formatRange, targetRirFor } from '../../lib/rep-ranges.ts'
 
 const args = parseArgs()
 const sb = supa()
@@ -75,16 +76,35 @@ for (const [goalKey, goal] of Object.entries(goals)) {
           exercises: d.exercises.map((ex, xi) => {
             const scheme = goal.byRole[ex.role] || {}
             const name = loc.pick(ex)
+            // A held exercise gets seconds, not a rep count. The plank's
+            // role is "core" like any crunch, so the goal scheme handed it
+            // 2x10 / 3x15 / 3x20 — 45 slots of nonsense across the 68
+            // programs, which is what a client reported.
+            const rawReps = isStaticHold(name) ? holdPrescription(scheme.reps) : (scheme.reps ?? null)
+            const rest = scheme.rest_seconds ?? null
+
+            /* The library still writes single numbers — "5", "8", "10" — and
+               this script deletes every day of a program before re-inserting
+               it. So a reseed would have quietly undone the rep-range work on
+               all 1,400 prescriptions and put every client back on
+               add-weight-every-session.
+
+               Widening here rather than editing the library by hand, so the
+               rule lives in one place and the two cannot drift. `rangeFor`
+               knows to leave heavy fives and singles alone. */
+            const range = rawReps ? rangeFor(rawReps, rest) : null
+            const reps = range ? formatRange(range) : rawReps
+            const bounds = reps ? boundsFor(reps) : null
+
             return {
               order_index: xi + 1,
               exercise_name: name,
               sets: scheme.sets ?? null,
-              // A held exercise gets seconds, not a rep count. The plank's
-              // role is "core" like any crunch, so the goal scheme handed it
-              // 2x10 / 3x15 / 3x20 — 45 slots of nonsense across the 68
-              // programs, which is what a client reported.
-              reps: isStaticHold(name) ? holdPrescription(scheme.reps) : (scheme.reps ?? null),
-              rest_seconds: scheme.rest_seconds ?? null,
+              reps,
+              rest_seconds: rest,
+              rep_min: bounds?.min ?? null,
+              rep_max: bounds?.max ?? null,
+              target_rir: bounds ? targetRirFor(goalKey) : null,
               tempo: null,
               superset_group: null,
               notes: null,
