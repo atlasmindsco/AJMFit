@@ -118,6 +118,41 @@ export function formatRange(r: RepRange): string {
 }
 
 /**
+ * The rep_min and rep_max columns for a prescription exactly as written.
+ *
+ * DIFFERENT JOB FROM `rangeFor`, and the difference matters. `rangeFor`
+ * widens a single number into a range, which is right for a seeded catalog
+ * where "8" was shorthand nobody chose deliberately. This one records what is
+ * there: a client who sets an exercise to 5 in the builder means 5, and
+ * turning that into 5-7 behind their back is the app overruling a choice it
+ * just offered them.
+ *
+ * Returns null for timed and distance work, which has no reps to record.
+ */
+export function boundsFor(reps: string): RepRange | null {
+  const raw = String(reps ?? '').trim()
+  if (raw === '' || /[a-z]/i.test(raw)) return null
+
+  const m = raw.match(/^(\d+)\s*[-–]\s*(\d+)$/)
+  if (m) {
+    const min = parseInt(m[1], 10)
+    const max = parseInt(m[2], 10)
+    // A back-to-front range is a typo, not a prescription. Recording it would
+    // fail the database's own check and lose the save.
+    if (!Number.isFinite(min) || !Number.isFinite(max) || min < 1 || max < min) return null
+    return { min, max }
+  }
+
+  if (/^\d+$/.test(raw)) {
+    const n = parseInt(raw, 10)
+    if (!Number.isFinite(n) || n < 1) return null
+    return { min: n, max: n }
+  }
+
+  return null
+}
+
+/**
  * Reps left in reserve on a working set, by training goal.
  *
  * Taken from the per-goal guidance already in `lib/progression.ts`, which

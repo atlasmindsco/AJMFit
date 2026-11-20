@@ -6,7 +6,7 @@
  * be touched at all — a 45-second plank quietly becoming "45-50" would be
  * nonsense a client would meet mid-session.
  */
-import { rangeFor, formatRange, targetRirFor } from '@/lib/rep-ranges'
+import { rangeFor, formatRange, targetRirFor, boundsFor } from '@/lib/rep-ranges'
 
 let failed = 0
 const ok = (cond: boolean, label: string, extra = '') => {
@@ -87,6 +87,30 @@ for (let n = 1; n <= 40; n++) {
   if (r && !(r.min >= 1 && r.max >= r.min)) bad++
 }
 ok(bad === 0, 'min >= 1 and max >= min for every input 1..40', `${bad} violations`)
+
+console.log('\nRECORDING WHAT A CLIENT CHOSE, WHICH IS NOT THE SAME JOB\n')
+// The builder writes these. A client who sets an exercise to 5 means 5, and
+// widening it to 5-7 behind their back is the app overruling a choice it had
+// just offered them. rangeFor widens a seeded catalog; boundsFor records.
+const bounds = (s: string) => {
+  const b = boundsFor(s)
+  return b ? `${b.min}-${b.max}` : 'null'
+}
+ok(bounds('8-12') === '8-12', 'a range is recorded as written', bounds('8-12'))
+ok(bounds('12–15') === '12-15', 'an en dash is read too', bounds('12–15'))
+ok(bounds('5') === '5-5', 'a deliberate single is recorded as a single, not widened', bounds('5'))
+ok(bounds('8') === '8-8', 'and so is an 8, unlike in the seeded catalog', bounds('8'))
+for (const s of ['45 sec', '10 min', '1 mile', '', '  ']) {
+  ok(boundsFor(s) === null, `"${s}" has no reps to record`)
+}
+// A back-to-front range would fail the database's own check and lose the save.
+ok(boundsFor('12-8') === null, 'a back-to-front range is refused rather than stored', bounds('12-8'))
+ok(boundsFor('0') === null, 'zero reps is not a prescription', bounds('0'))
+// Everything the builder can produce has to be storable.
+for (const preset of ['5', '6-8', '8-12', '10-15', '12-15', '15-20']) {
+  const b = boundsFor(preset)
+  ok(b !== null && b.min >= 1 && b.max >= b.min, `the builder preset "${preset}" stores cleanly`, bounds(preset))
+}
 
 console.log('\nEFFORT TARGETS MATCH THE GUIDANCE ALREADY IN THE APP\n')
 ok(targetRirFor('strength') === 2, 'strength leaves 2 in reserve', String(targetRirFor('strength')))

@@ -14,6 +14,7 @@
  * code. The policies answer it once, in the database.
  */
 
+import { boundsFor, targetRirFor } from '@/lib/rep-ranges'
 import { supabase } from '@/lib/supabase'
 import { fetchAssignmentStart } from '@/lib/programs'
 import { renamesFor, planRenameOps, nextCopyName, type Rename } from '@/lib/day-renames'
@@ -317,17 +318,36 @@ export async function saveCustomProgram(input: {
     ((dayRows ?? []) as Array<{ id: string; day_index: number }>).map((d) => [d.day_index, d.id])
   )
 
+  /* Record the rep range and effort target alongside the text.
+     The seeded catalog carries these on all 1,400-odd prescriptions; a
+     program built here did not, so the moment a client saved one they had a
+     program the structured checks could not read. The text was right — the
+     builder's presets are mostly ranges already — but the columns were
+     empty, and anything that comes to rely on them would have been wrong
+     about exactly the programs people made themselves.
+
+     `boundsFor`, not `rangeFor`: this records what the client chose rather
+     than widening it. Somebody who sets an exercise to 5 means 5. */
   const exerciseRows = program.days.flatMap((d, i) =>
-    d.exercises.map((e, j) => ({
-      program_day_id: idByIndex.get(i + 1),
-      order_index: j + 1,
-      exercise_name: e.exerciseName,
-      sets: e.sets,
-      reps: e.reps,
-      rest_seconds: e.restSeconds,
-      notes: e.notes ?? null,
-      superset_group: e.supersetGroup ?? null,
-    }))
+    d.exercises.map((e, j) => {
+      const bounds = boundsFor(e.reps)
+      return {
+        program_day_id: idByIndex.get(i + 1),
+        order_index: j + 1,
+        exercise_name: e.exerciseName,
+        sets: e.sets,
+        reps: e.reps,
+        rest_seconds: e.restSeconds,
+        notes: e.notes ?? null,
+        superset_group: e.supersetGroup ?? null,
+        rep_min: bounds?.min ?? null,
+        rep_max: bounds?.max ?? null,
+        // A program somebody built has no goal to read one from, so this is
+        // the middle of the three the app uses. It is a suggestion on a
+        // screen, not a rule.
+        target_rir: bounds ? targetRirFor(null) : null,
+      }
+    })
   )
   if (exerciseRows.length) {
     const { error: eErr } = await db.from('program_exercises').insert(exerciseRows)
