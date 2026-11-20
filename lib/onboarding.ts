@@ -132,9 +132,10 @@ export const ASKED_FIELDS: Array<keyof OnboardingAnswers> = [
  *
  * Separate from the onboarding answers because it is asked somewhere else and
  * means something narrower: onboarding is the coached-tier intake form, which
- * Blueprint clients never see — that table has no rows in it. For months that
- * meant `experienceFrom` had nothing to read and every client in the app got
- * the beginner load increments, including people two years in.
+ * Blueprint clients never see. `onboarding_forms` holds a single row, created
+ * in July, whose answers object is empty — so no client has ever had an
+ * `experience` or `currentWeight` answer to read. That is why every client in
+ * the app got the beginner load increments, including people two years in.
  */
 export async function fetchTrainingExperience(userId: string): Promise<string | null> {
   const { data } = await db

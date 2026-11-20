@@ -2,10 +2,10 @@
  * What a first-timer is offered, now that anybody can be one.
  *
  * The beginner path has existed for a while and had never run: it keyed off
- * an onboarding answer, and Blueprint clients do not fill in onboarding — the
- * table is empty, so every client who ever picked a program was treated as
- * experienced. The picker asks directly now, which means these rules are
- * reachable for the first time and worth pinning down.
+ * an onboarding answer that no client has ever given, so every client who
+ * picked a program was treated as experienced. The picker asks directly now,
+ * which means these rules are reachable for the first time and worth pinning
+ * down.
  */
 import { splitsFor, isValidSplitForDays, SPLIT_OPTIONS, DAYS_TO_SPLIT } from '@/lib/splits'
 

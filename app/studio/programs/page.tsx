@@ -713,7 +713,7 @@ export default function ProgramsPage() {
 
         /* The picker's answer first, the coach's intake form second.
            Both say the same kind of thing, and one of them is actually
-           filled in: the onboarding table is empty, so until the picker
+           filled in: no client has ever answered it, so until the picker
            started asking, this resolved to 'beginner' for every client in
            the app — 5 lb on the bar and 10 on the squat after a single
            good session, for somebody two years in. */

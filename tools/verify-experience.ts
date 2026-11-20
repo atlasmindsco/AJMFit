@@ -1,8 +1,10 @@
 /**
  * Where a client says they are starting from, and what it changes.
  *
- * For months this resolved to 'beginner' for everybody: it read an onboarding
- * answer, Blueprint clients never fill in onboarding, and the table is empty.
+ * For months this resolved to 'beginner' for everybody. It reads an onboarding
+ * answer that no client has ever given: `onboarding_forms` holds a single row,
+ * created in July, whose answers object is empty.
+ *
  * The beginner rules are the aggressive ones — 5 lb on an upper-body lift and
  * 10 on a lower-body one, earned after a single good session — so a client two
  * years in was being told to put another 10 lb on their squat every time they

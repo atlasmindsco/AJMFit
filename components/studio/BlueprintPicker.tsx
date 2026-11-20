@@ -57,12 +57,13 @@ export default function BlueprintPicker({
   /**
    * How long they have been training, asked here rather than inferred.
    *
-   * The `beginner` prop above reads an onboarding answer, and Blueprint
-   * clients never fill in onboarding — the table has no rows in it at all. So
-   * the beginner flow, which caps the week at three or four days and keeps
-   * the sprinting and jumping tracks out of sight, had never once run: every
-   * client who ever picked a program was treated as experienced, including
-   * somebody who had never touched a barbell.
+   * The `beginner` prop above reads an onboarding answer, and no client has
+   * ever given one: `onboarding_forms` holds a single row, created in July,
+   * whose answers object is empty. So the beginner flow — which caps the week
+   * at three or four days and keeps the sprinting and jumping tracks out of
+   * sight — had never once run. Every client who ever picked a program was
+   * treated as experienced, including somebody who had never touched a
+   * barbell.
    *
    * One question fixes that, and it is the one question whose answer actually
    * changes what somebody is offered. The prop still seeds it, so if
@@ -380,9 +381,9 @@ export default function BlueprintPicker({
               {/* Said at the moment of the decision, and only when it applies.
                   The picker has a beginner mode that caps this at 3 or 4 days,
                   and it has never run for anybody: it keys off an onboarding
-                  answer, and Blueprint clients do not fill in onboarding — the
-                  table is empty. So every client, including somebody who has
-                  never lifted, is offered six days with nothing said.
+                  answer that no client has ever given. So every client,
+                  including somebody who has never lifted, is offered six days
+                  with nothing said.
                   This is not a gate. Someone who wants six days can have six
                   days; they should just know what they are choosing. */}
               {days !== null && days >= 5 && (
