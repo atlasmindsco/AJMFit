@@ -30,7 +30,7 @@ import {
   type WorkoutHistoryRow,
 } from '@/lib/workout'
 import { rotationState } from '@/lib/rotation'
-import { fetchBodyMetrics, saveBodyMetric } from '@/lib/body-metrics'
+import { fetchBodyMetrics, saveBodyMetric, latestBodyWeight } from '@/lib/body-metrics'
 import { localDate } from '@/lib/dates'
 import {
   HOME_PLACE,
@@ -672,8 +672,16 @@ export default function ProgramsPage() {
         // Training age decides how big a load jump is and how many flat
         // sessions count as a stall. Every program in the library is stamped
         // "All Levels"; the answer is in onboarding and was never read.
+        /* Their weigh-in first, the intake form second.
+           This used to read onboarding alone, and Blueprint clients never
+           fill that in — so the weight was always null, the bodyweight guard
+           always declined, and one client is currently being told to add 5 lb
+           to a glute bridge he logs at his own bodyweight. The end of a
+           workout asks for a weigh-in now, which is where this comes from. */
+        const weighed = await latestBodyWeight(id).catch(() => null)
         const cw = Number(onboarding?.answers?.currentWeight)
-        if (Number.isFinite(cw) && cw > 0) setBodyWeightLb(cw)
+        if (weighed != null) setBodyWeightLb(weighed)
+        else if (Number.isFinite(cw) && cw > 0) setBodyWeightLb(cw)
 
         // The block this client is in. If it has run its eight weeks and has
         // not been reviewed yet, build the review now — this is the moment the

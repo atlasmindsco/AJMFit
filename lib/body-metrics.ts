@@ -84,6 +84,33 @@ export async function fetchBodyMetrics(userId: string, limit = 60): Promise<Body
  * One row per client per day, so logging twice in a day corrects the entry
  * rather than creating a second conflicting one.
  */
+/**
+ * The most recent bodyweight on record, or null.
+ *
+ * Used to spot a client typing their own weight into a load field — an
+ * Inverted Row logged at 160 lb, a glute bridge at 175 — and to say "add a
+ * rep" instead of "add 5 lb" on a movement the body loads.
+ *
+ * That guard has never once fired. It read `onboarding.answers.currentWeight`
+ * and Blueprint clients never fill in onboarding, so the weight was always
+ * null and the check always declined. One client is currently being told to
+ * put another 5 lb on a Butt Lift (Bridge) he logs at his own bodyweight.
+ *
+ * This reads the weigh-in instead, which the end of a workout now asks for.
+ */
+export async function latestBodyWeight(userId: string): Promise<number | null> {
+  const { data } = await db
+    .from('body_metrics')
+    .select('weight_lb')
+    .eq('user_id', userId)
+    .not('weight_lb', 'is', null)
+    .order('recorded_on', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const w = Number((data as { weight_lb?: number | null } | null)?.weight_lb)
+  return Number.isFinite(w) && w > 0 ? w : null
+}
+
 export async function saveBodyMetric(userId: string, input: BodyMetricInput): Promise<BodyMetric> {
   const recorded_on = input.recorded_on ?? localDate()
   const { data, error } = await db
