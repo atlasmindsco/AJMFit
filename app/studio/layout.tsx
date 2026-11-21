@@ -9,42 +9,13 @@ import ResumeSession from '@/components/studio/ResumeSession'
 import MembershipPaywall from '@/components/studio/MembershipPaywall'
 import FeedbackButton from '@/components/studio/FeedbackButton'
 import { SessionChromeProvider, useSessionChrome } from '@/components/studio/SessionChrome'
+import { NAV_TABS, PROFILE_LINKS, owns } from '@/lib/nav'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
-/**
- * Four destinations. There is no More button.
- *
- * There used to be nine: these four, plus Check-in, Progress, Schedule,
- * Community and Settings behind a More button. Three of those five had never
- * been opened by a single client in the product's history, which is what a
- * hidden menu does — a feature behind More has to be remembered rather than
- * noticed, and a new customer has nothing to remember yet.
- *
- * Where the other five went:
- *   Check-in and Schedule  → Coach. They are the coaching relationship, and
- *                            splitting it across three destinations made it
- *                            feel like three small features instead of one.
- *   Progress and Settings  → the profile menu under your own initials, which
- *                            is where everybody already looks for them.
- *   Community              → still at its address, off the navigation until
- *                            there is a community. An empty feed is worse
- *                            than no feed.
- *
- * Every route still works. Nothing was deleted.
- */
-const navTabs = [
-  { label: 'Today', href: '/studio', d: 'm2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75' },
-  { label: 'Train', href: '/studio/programs', d: 'M6 12h12M6 9v6m12-6v6M3.75 10.5v3m16.5-3v3' },
-  { label: 'Food', href: '/studio/nutrition', d: 'M6.75 3v8.25a2.25 2.25 0 0 0 4.5 0V3m-2.25 8.25V21M15.75 3c-1.243 1.5-1.5 3.75-1.5 5.25 0 1.243.757 2.25 1.5 2.25V21' },
-  { label: 'Coach', href: '/studio/messages', d: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155' },
-]
+/* The nav table, who owns which route, and the profile menu all live in
+   lib/nav.ts so they can be checked. See tools/verify-nav.ts. */
 
-/** Under your initials, top right. Things you check rather than places you go. */
-const profileLinks = [
-  { label: 'Progress', href: '/studio/progress' },
-  { label: 'Settings', href: '/studio/settings' },
-]
 
 const icon = (d: string) => (
   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
@@ -175,8 +146,8 @@ export default function ClientPortalLayout({
 
               {/* Desktop nav tabs */}
               <div className="hidden md:flex items-center gap-1">
-                {navTabs.map((tab) => {
-                  const isActive = pathname === tab.href
+                {NAV_TABS.map((tab) => {
+                  const isActive = owns(tab, pathname)
                   return (
                     <Link
                       key={tab.href}
@@ -233,7 +204,7 @@ export default function ClientPortalLayout({
                     role="menu"
                     className="absolute right-0 top-[calc(100%+8px)] z-50 w-52 rounded-card bg-surface-raised border border-white/[0.12] shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-1.5"
                   >
-                    {profileLinks.map((link) => (
+                    {PROFILE_LINKS.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
@@ -275,12 +246,12 @@ export default function ClientPortalLayout({
 
       {/* Mobile tab bar. This app gets used between sets, one-handed, so the
           destinations sit under the thumb rather than behind a menu at the
-          top of the screen. Four slots and no More button: wider targets, and
-          nothing left to wonder about. */}
+          top of the screen. Three slots and no More button: wider targets
+          still, and nothing left to wonder about. */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-base/95 backdrop-blur border-t border-white/[0.08] pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-4">
-          {navTabs.map((tab) => {
-            const isActive = pathname === tab.href
+        <div className="grid grid-cols-3">
+          {NAV_TABS.map((tab) => {
+            const isActive = owns(tab, pathname)
             return (
               <Link
                 key={tab.href}

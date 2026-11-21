@@ -381,6 +381,31 @@ export default function ClientDashboard() {
         )}
       </motion.div>
 
+      {/* My Plan. The third question this screen answers.
+          Today says what to do now and the card above says what is next; this
+          is "where is my training plan", and until the Train tab came off the
+          bar it was the only one of the three with a destination of its own.
+          It goes to exactly where that tab went — /studio/programs, same six
+          views, same back behaviour — so nothing was moved, only renamed to
+          what a client would call it.
+          Only shown once there IS a plan. Without one the card above is
+          already a Pick Your Program button, and two of those is a choice
+          about nothing. */}
+      {!loading && myProgram && (
+        <Link
+          href="/studio/programs"
+          className="group flex items-center justify-between gap-4 mb-5 px-5 py-4 rounded-card bg-surface-raised border border-white/[0.10] hover:border-white/[0.18] transition-colors duration-200"
+        >
+          <div className="min-w-0">
+            <p className="font-display font-bold text-sm text-white">My Plan</p>
+            <p className="text-ink-3 text-xs font-body mt-0.5 truncate">{myProgram.name}</p>
+          </div>
+          <span className="shrink-0 text-ink-3 group-hover:text-white text-lg leading-none transition-colors duration-200" aria-hidden="true">
+            &rsaquo;
+          </span>
+        </Link>
+      )}
+
       {!loading && myUserId && <BillingPanel userId={myUserId} />}
 
       {!loading && isCoached(tier as Tier) && (
