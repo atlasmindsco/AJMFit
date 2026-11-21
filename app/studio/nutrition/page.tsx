@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { getCurrentUserId } from '@/lib/current-user'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MacroRing from '@/components/ui/MacroRing'
+import { remaining, eatenLine } from '@/lib/remaining'
 import UnitPickerSheet from '@/components/studio/UnitPickerSheet'
 import { fadeIn } from '@/lib/animations'
 
@@ -656,9 +657,37 @@ export default function NutritionPage() {
                   Delete
                 </button>
               </div>
-              <span className="text-brand-navy text-sm font-body font-semibold">
-                {totals.calories.toLocaleString()} / {targets.calories.toLocaleString()} kcal
-              </span>
+              {/* "1,320 / 2,500 kcal" used to be the headline, and the
+                  remainder was printed under the bar in 12px grey. Standing in
+                  a kitchen holding something, a client wants to know whether
+                  they can eat it — and to find that out they were subtracting
+                  1,320 from 2,500 in their head. The app did the harder
+                  calculation and left them the easy one.
+                  Both numbers are still here. They swapped sizes. */}
+              {(() => {
+                const left = remaining(totals.calories, targets.calories)
+                if (!left) {
+                  return (
+                    <span className="text-brand-navy text-sm font-body font-semibold">
+                      {totals.calories.toLocaleString()} kcal eaten
+                    </span>
+                  )
+                }
+                return (
+                  <span className="text-right">
+                    <span
+                      className={`block font-display font-extrabold text-2xl leading-none ${
+                        left.isOver ? 'text-brand-orange' : 'text-brand-navy'
+                      }`}
+                    >
+                      {left.label}
+                    </span>
+                    <span className="block text-brand-slate text-2xs font-body mt-1">
+                      {eatenLine(totals.calories, targets.calories)} kcal
+                    </span>
+                  </span>
+                )
+              })()}
             </div>
             <div className="w-full h-4 bg-[#E5E7EB] rounded-full overflow-hidden">
               <div
@@ -668,9 +697,8 @@ export default function NutritionPage() {
             </div>
             <div className="flex items-center justify-between mt-2">
               <span className="text-brand-slate text-xs font-body">{Math.round(calPct)}% of daily goal</span>
-              <span className={`text-xs font-body font-medium ${totals.calories > targets.calories ? 'text-brand-orange' : 'text-emerald-500'}`}>
-                {Math.abs(targets.calories - totals.calories)} kcal {totals.calories > targets.calories ? 'over' : 'remaining'}
-              </span>
+              {/* The remainder moved up to be the headline. Repeating it
+                  here would be the same number twice on one card. */}
             </div>
 
             {/* Why this number is this number. A target a client does not
@@ -707,14 +735,33 @@ export default function NutritionPage() {
                 <div className="relative">
                   <MacroRing current={macro.current} goal={macro.goal} color={macro.color} size={80} bgStroke="#E5E7EB" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display font-bold text-brand-navy text-sm">
-                      {Math.round(macro.current)}{macro.unit}
-                    </span>
+                    {/* The ring fills as you eat; the number in the middle
+                        says what is left to eat. Eaten and target are both
+                        still printed underneath it. */}
+                    {(() => {
+                      const left = remaining(macro.current, macro.goal)
+                      if (!left) {
+                        return (
+                          <span className="font-display font-bold text-brand-navy text-sm">
+                            {Math.round(macro.current)}{macro.unit}
+                          </span>
+                        )
+                      }
+                      return (
+                        <span
+                          className={`font-display font-bold text-sm ${
+                            left.isOver ? 'text-brand-orange' : 'text-brand-navy'
+                          }`}
+                        >
+                          {left.isOver ? `+${left.over}` : left.left}{macro.unit}
+                        </span>
+                      )
+                    })()}
                   </div>
                 </div>
                 <span className="font-body font-semibold text-brand-navy text-xs mt-1.5">{macro.label}</span>
                 <span className="text-brand-slate text-2xs font-body">
-                  / {macro.goal}{macro.unit}
+                  {Math.round(macro.current)} / {macro.goal}{macro.unit}
                 </span>
               </div>
             ))}
