@@ -73,11 +73,62 @@ const LEVELS: Record<ExperienceLevel, LevelRules> = {
   advanced: { upperIncrementLb: 2.5, lowerIncrementLb: 5, sessionsAtTopToAdd: 2, stallAfter: 6 },
 }
 
+/**
+ * A jump this big, as a share of what they are lifting, earns extra patience.
+ *
+ * The increments above are flat pounds, and a flat pound is a different
+ * exercise depending on the bar. Measured against the 1,371 sets clients have
+ * actually logged: +5 on a 125 lb bench is 4%, and +5 on a 20 lb lateral
+ * raise is 25%. Thirty-two of the sixty exercises clients log would get a
+ * jump worth more than a tenth of the weight in their hands.
+ *
+ * So the LIFT decides the patience, not the lifter. A client cannot answer
+ * "how experienced are you" in a way the app can trust — three features have
+ * already broken on self-reported fields nobody fills in — but "how big is
+ * this jump for you" is measured from what they just lifted.
+ */
+const BIG_JUMP = 0.1
+const MODERATE_JUMP = 0.05
+
+/**
+ * Dumbbells come in fives, per hand.
+ *
+ * A 10 lb jump on a dumbbell lift is not a jump, it is skipping a rung: the
+ * next pair up IS +5 each. Dumbbell Lunges sit at a 25 lb median in the logs,
+ * so the old +10 was a 40% overload in one step — the largest single error in
+ * this file.
+ *
+ * Read off the name rather than the library's equipment field, which this
+ * module cannot reach. Unlike a bench, which is implicit and invisible, an
+ * exercise called "Dumbbell Lunges" is telling you what is in the client's
+ * hands.
+ */
+// Just the word. A "|db" alternative was meant to carry a word boundary and
+// the escape turned into a literal control character on its way into the
+// file, which is its own argument for keeping this simple.
+const DUMBBELL = /dumbbell/i
+
 /** Consecutive declining sessions before we cut the load and rebuild. */
 const DECLINE_BEFORE_CUTBACK = 3
 /** How much to take off when rebuilding. */
 const CUTBACK_FRACTION = 0.1
 /** A layoff longer than this softens the next session's targets. */
+/**
+ * Extra flat sessions required before calling a stall when nobody said how
+ * hard it felt.
+ *
+ * The stall branch required `rir <= 1` — proof they were working hard. RIR is
+ * recorded on 56 of 1,371 sets, four per cent, so in practice the branch
+ * never fired and a client grinding the same weight for two months was told
+ * to keep pushing toward the top of the range forever. The fifth feature
+ * gated on a field nobody fills in.
+ *
+ * Without the rating we cannot tell a stall from coasting, so we wait longer
+ * rather than not at all. Six flat sessions at the same weight is a stall
+ * whatever the effort was.
+ */
+const STALL_PATIENCE_WITHOUT_RIR = 2
+
 const LAYOFF_DAYS = 14
 const LONG_LAYOFF_DAYS = 28
 
@@ -227,7 +278,14 @@ export function nextTarget(
 
   const sessions = (history ?? []).filter((s) => s && s.topWeight > 0 && s.topReps > 0)
   const rules = LEVELS[ctx.level]
-  const jump = isLowerBody(exerciseName) ? rules.lowerIncrementLb : rules.upperIncrementLb
+  // A lower-body DUMBBELL lift takes the upper-body increment, because five
+  // pounds a hand is the smallest step the rack allows. See DUMBBELL above.
+  const jump =
+    isLowerBody(exerciseName) && !DUMBBELL.test(exerciseName)
+      ? rules.lowerIncrementLb
+      : rules.upperIncrementLb
+  // Dumbbells round to fives for the same reason; a barbell to 2.5.
+  const loadStep = DUMBBELL.test(exerciseName) ? 5 : 2.5
 
   if (sessions.length === 0) {
     return {
@@ -276,25 +334,36 @@ export function nextTarget(
   }
 
   // --- Genuinely stuck, and working hard for it -----------------------------
-  const flat = flatSessions(sessions)
+  // Stuck means no more weight AND no more reps. Flat weight on its own is
+  // what double progression looks like while it is working.
+  const flat = stalledSessions(sessions)
   const workingHard = last.rir != null && last.rir <= 1
-  if (flat >= rules.stallAfter && workingHard) {
+  // Nobody said how hard it felt, which is the normal case. Wait longer
+  // rather than never calling it at all.
+  const stallAt = workingHard ? rules.stallAfter : rules.stallAfter + STALL_PATIENCE_WITHOUT_RIR
+  if (flat >= stallAt) {
     return {
       verdict: 'change_exercise',
       addLoad: false,
       attention: true,
       suggestedWeight: last.topWeight,
       suggestedReps: last.topReps,
-      text: `${flat} sessions at ${last.topWeight} lbs and you're giving it everything. Time to swap this for something similar — a fresh movement usually gets things moving again.`,
+      // Only claim they were working hard if they actually said so. With no
+      // rating on record the honest sentence is about the weight, not the
+      // effort — the app does not know how hard it felt.
+      text: workingHard
+        ? `${flat} sessions at ${last.topWeight} lbs and you're giving it everything. Time to swap this for something similar — a fresh movement usually gets things moving again.`
+        : `${flat} sessions stuck at ${last.topWeight} lbs. Swap this for something similar — a fresh movement usually gets things moving again.`,
     }
   }
 
   // --- Earned the increase --------------------------------------------------
   const atTop = sessionsAtTopOfRange(sessions, range.max)
+  const needed = sessionsBeforeAdding(rules.sessionsAtTopToAdd, jump, last.topWeight)
 
   // On a movement the body loads, with the body's weight in the load field,
   // "add 5 lbs" is meaningless. Progress the reps instead and say so plainly.
-  if (atTop >= rules.sessionsAtTopToAdd && loadIsActuallyBodyweight(exerciseName, last.topWeight, ctx.bodyWeightLb)) {
+  if (atTop >= needed && loadIsActuallyBodyweight(exerciseName, last.topWeight, ctx.bodyWeightLb)) {
     return {
       verdict: 'push_reps',
       addLoad: false,
@@ -305,8 +374,8 @@ export function nextTarget(
     }
   }
 
-  if (atTop >= rules.sessionsAtTopToAdd) {
-    const target = roundLoad(last.topWeight + jump)
+  if (atTop >= needed) {
+    const target = roundLoad(last.topWeight + jump, loadStep)
     return {
       verdict: 'add_load',
       addLoad: true,
@@ -361,8 +430,24 @@ export function nextTarget(
  * 105, so an advanced lifter got the beginner's increment anyway. Any rounding
  * step coarser than the smallest increment eats that increment.
  */
-function roundLoad(lb: number): number {
-  return Math.round(lb / 2.5) * 2.5
+function roundLoad(lb: number, step = 2.5): number {
+  return Math.round(lb / step) * step
+}
+
+/**
+ * How many sessions at the top of the range before the load moves.
+ *
+ * The experience table sets a floor; the size of the jump relative to the
+ * weight in their hands can only raise it. A 4% jump on a bench goes up after
+ * one good session exactly as it always did. A 25% jump on a lateral raise
+ * waits for three.
+ */
+function sessionsBeforeAdding(base: number, jump: number, currentLoad: number): number {
+  if (currentLoad <= 0) return base
+  const share = jump / currentLoad
+  if (share > BIG_JUMP) return Math.max(base, 3)
+  if (share > MODERATE_JUMP) return Math.max(base, 2)
+  return base
 }
 
 /**
@@ -392,6 +477,35 @@ function flatSessions(sessions: ExerciseSession[]): number {
     else break
   }
   return n
+}
+
+/**
+ * How many recent sessions made NO progress at all — not in weight, not in
+ * reps.
+ *
+ * `flatSessions` compares the top weight only, which is the right measure for
+ * "have they been at this load a while" and the wrong one for "are they
+ * stuck". Double progression — the thing rep ranges exist to make possible —
+ * looks exactly like a flat weight: 20 lb for eight reps, then ten, then
+ * twelve, is a client getting stronger every single session.
+ *
+ * Gating the stall on flat WEIGHT alone would have told nine clients in the
+ * live data to swap an exercise they were steadily improving at. Caught by
+ * replaying all 1,371 logged sets through both versions before shipping.
+ */
+function stalledSessions(sessions: ExerciseSession[]): number {
+  let n = 0
+  for (let i = 0; i < sessions.length - 1; i++) {
+    const now = sessions[i]
+    const before = sessions[i + 1]
+    const heavier = now.topWeight > before.topWeight
+    const moreReps = now.topWeight === before.topWeight && now.topReps > before.topReps
+    if (heavier || moreReps) break
+    n++
+  }
+  // The loop counts gaps between sessions; the one at the near end is stuck
+  // too, so a run of two gaps is three stuck sessions.
+  return n === 0 ? 0 : n + 1
 }
 
 /** How many of the most recent sessions hit the top of the rep range. */
