@@ -294,7 +294,18 @@ export function nextTarget(
       attention: false,
       suggestedWeight: null,
       suggestedReps: range.min,
-      text: `First time on this one. Pick a weight you could do about ${range.max + 2} reps with, and we'll build from there.`,
+      /**
+       * A procedure, not an estimate.
+       *
+       * This used to read "pick a weight you could do about N reps with",
+       * which asks somebody to simulate a set they have never performed. An
+       * experienced lifter can do that; a true beginner cannot, and they are
+       * the one being asked — it is the only guidance in this app that can
+       * injure a person, aimed at the client least able to judge it.
+       *
+       * Starting light cannot hurt anyone. The error case is one easy set.
+       */
+      text: `First time here. Start light — lighter than you think. Finish the set, and if it felt easy, go up next set.`,
     }
   }
 

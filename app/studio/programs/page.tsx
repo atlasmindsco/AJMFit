@@ -426,6 +426,15 @@ export default function ProgramsPage() {
   const [intensityChoice, setIntensityChoice] = useState<Record<string, IntensityTechnique>>({}) // exercise key → selected technique
   const [intensityLogs, setIntensityLogs] = useState<Record<string, { weight: string; done: boolean }[]>>({}) // exercise key → 2 intensity set logs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  /**
+   * When the current rest ends, where the ticking interval can see it.
+   *
+   * The interval used to close over a const deadline, which was fine while
+   * rest was fixed and wrong the moment it could be extended: +30s would have
+   * updated the number on screen and the alert would still have fired at the
+   * original time. A ref is read fresh on every tick.
+   */
+  const restEndsAtRef = useRef<number>(0)
   /*
    * Strength sets no longer need a save debounce or a PR debounce.
    *
@@ -827,9 +836,11 @@ export default function ProgramsPage() {
   const startRestTimer = useCallback((exerciseKey: string, seconds: number) => {
     if (timerRef.current) clearInterval(timerRef.current)
     const endsAt = Date.now() + seconds * 1000
+    restEndsAtRef.current = endsAt
     setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds, endsAt })
     timerRef.current = setInterval(() => {
-      const left = Math.ceil((endsAt - Date.now()) / 1000)
+      // Read from the ref, not a captured const: addRestTime moves it.
+      const left = Math.ceil((restEndsAtRef.current - Date.now()) / 1000)
       if (left <= 0) {
         if (timerRef.current) clearInterval(timerRef.current)
         timerRef.current = null
@@ -837,8 +848,34 @@ export default function ProgramsPage() {
         setActiveTimer(null)
         return
       }
-      setActiveTimer((prev) => (prev && prev.endsAt === endsAt ? { ...prev, remaining: left } : prev))
+      setActiveTimer((prev) => (prev ? { ...prev, remaining: left } : prev))
     }, 500)
+  }, [])
+
+  /**
+   * Another thirty seconds.
+   *
+   * Needing longer after a hard set is not an edge case, it is what training
+   * heavy is. The only route before this was the per-exercise rest setting,
+   * which is the wrong depth for a thirty-second decision — so people opened
+   * their phone's own timer instead, and once they have done that they are in
+   * another app.
+   *
+   * Moves the DEADLINE rather than a counter, which is the whole reason the
+   * timer survives a sleeping phone.
+   */
+  const addRestTime = useCallback((seconds: number) => {
+    setActiveTimer((prev) => {
+      if (!prev) return prev
+      const endsAt = prev.endsAt + seconds * 1000
+      restEndsAtRef.current = endsAt
+      return {
+        ...prev,
+        endsAt,
+        total: prev.total + seconds,
+        remaining: Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)),
+      }
+    })
   }, [])
 
   const stopRestTimer = useCallback(() => {
@@ -1984,9 +2021,22 @@ export default function ProgramsPage() {
                     {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')}
                   </p>
                 </div>
+                {/* Another thirty seconds, where the countdown already is.
+                    The only way to rest longer used to be the per-exercise
+                    rest setting, which is the wrong depth for a thirty-second
+                    decision — so people opened their phone's own timer, and
+                    once they have done that they are in another app.
+                    44px tall, because this is tapped between heavy sets. */}
+                <button
+                  onClick={() => addRestTime(30)}
+                  className="ml-auto h-11 px-3 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                  aria-label="Add thirty seconds to this rest"
+                >
+                  +30s
+                </button>
                 <button
                   onClick={stopRestTimer}
-                  className="ml-auto px-3 py-2 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                  className="h-11 px-3 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                 >
                   Skip
                 </button>
@@ -2095,6 +2145,7 @@ export default function ProgramsPage() {
         {workoutSummary && (
           <WorkoutComplete
             summary={workoutSummary}
+            pendingSets={pendingSets}
             askWeight={!weighedToday}
             onWeigh={async (lb) => {
               if (!userId) return
@@ -2700,6 +2751,21 @@ export default function ProgramsPage() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 mt-0.5">
+                                    {/* Where you are, in words.
+                                        The set number was a numeral in a 24px
+                                        column at the left of each row, so
+                                        "what set am I on" meant counting
+                                        filled circles while out of breath —
+                                        the one question on this screen that
+                                        could not be answered at a glance.
+                                        Only while a session is running: on the
+                                        preview it would be a countdown from a
+                                        workout nobody has started. */}
+                                    {sessionActive && activeSet >= 0 && (
+                                      <p className="text-white text-xs font-display font-bold shrink-0">
+                                        Set {activeSet + 1} of {currentLogs.length}
+                                      </p>
+                                    )}
                                     <p className="text-ink-3 text-xs font-body">
                                       Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
                                     </p>
@@ -3251,7 +3317,7 @@ export default function ProgramsPage() {
                                                       rir: q.key,
                                                     })
                                                   }}
-                                                  className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                  className={`h-11 min-w-11 px-3 rounded-control text-sm font-display font-bold transition-colors duration-150 ${
                                                     rirByExercise[logKey] === q.key
                                                       ? 'bg-brand-blue text-white'
                                                       : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
@@ -3637,7 +3703,7 @@ export default function ProgramsPage() {
                                                     rir: n,
                                                   })
                                                 }}
-                                                className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                className={`h-11 min-w-11 px-3 rounded-control text-sm font-display font-bold transition-colors duration-150 ${
                                                   on
                                                     ? 'bg-brand-blue text-white'
                                                     : isTarget
@@ -4956,10 +5022,19 @@ function ConfirmEnd({
 
 function WorkoutComplete({
   summary,
+  pendingSets,
   askWeight,
   onWeigh,
   onDone,
 }: {
+  /**
+   * Sets written to this phone that have not reached the server.
+   *
+   * The session already shows this while training. Saying it once more at the
+   * end is the difference between finishing a workout in a basement gym and
+   * wondering all evening whether it counted.
+   */
+  pendingSets: number
   summary: {
     dayName: string
     seconds: number
@@ -5028,11 +5103,29 @@ function WorkoutComplete({
           {summary.dayName}
         </h2>
 
+        {/* Minutes and sets. Volume used to sit here as a third tile and
+            does not any more: 14,200 lb lifted reads as an achievement and is
+            mostly a property of the program — it goes up when a day gains a
+            set. A number shown because it exists rather than because it
+            means something. */}
         <div className="flex items-start gap-3 mt-6 mb-6">
           {stat(`${mins}`, mins === 1 ? 'Minute' : 'Minutes')}
           {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
-          {stat(summary.volume.toLocaleString(), 'Lbs Lifted')}
         </div>
+
+        {/* Did it all land? The session says so while training; saying it once
+            more here is the difference between finishing a workout in a
+            basement gym and wondering all evening whether it counted. */}
+        {pendingSets > 0 ? (
+          <div className="flex items-center justify-center gap-2 mb-5 px-3 py-2.5 rounded-control bg-state-warning/10 border border-state-warning/25">
+            <span className="w-2 h-2 rounded-full bg-state-warning shrink-0" />
+            <p className="text-state-warning text-2xs font-body">
+              {pendingSets} {pendingSets === 1 ? 'set is' : 'sets are'} still waiting for signal. They&rsquo;ll sync on their own.
+            </p>
+          </div>
+        ) : (
+          <p className="text-ink-4 text-2xs font-body mb-5">All sets saved.</p>
+        )}
 
         {/* Records first: the one thing worth reading twice. */}
         {summary.records.length > 0 && (

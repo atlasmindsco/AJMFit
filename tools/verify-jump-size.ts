@@ -142,5 +142,29 @@ const r = ask('Arnold Dumbbell Press', '8-12', climbingReps)
 console.log(`        20 lbs for 7,8,9,10,11,12 reps -> ${r?.verdict}`)
 ok(r?.verdict !== 'change_exercise', 'that client is getting stronger, not stuck', String(r?.verdict))
 
+console.log('\nA FIRST-EVER SET IS A PROCEDURE, NOT AN ESTIMATE\n')
+/* This used to read "pick a weight you could do about N reps with", which
+   asks somebody to simulate a set they have never performed. An experienced
+   lifter can do that; a true beginner cannot, and the beginner is the one
+   being asked. It is the only guidance in this app that can injure a person,
+   so the words are pinned. */
+const firstEver = ask('Barbell Squat', '8-12', [])
+console.log(`        -> "${firstEver?.text}"`)
+ok(firstEver?.verdict === 'first_time', 'the first time is its own verdict', String(firstEver?.verdict))
+ok(firstEver?.suggestedWeight === null, 'and suggests no weight at all', String(firstEver?.suggestedWeight))
+ok(firstEver?.addLoad === false, 'and does not ask them to add load')
+
+const words = String(firstEver?.text ?? '')
+ok(/start light/i.test(words), 'it says to start light', words)
+// A digit in front of "rep" or "lb" is the old shape coming back: a number
+// the client is asked to aim at before they have lifted anything.
+ok(
+  !/[0-9]+\s*reps?/i.test(words),
+  'and does NOT ask them to estimate a weight for a rep count they have never hit',
+  words
+)
+ok(!/[0-9]+\s*lbs?/i.test(words), 'and names no weight, because we do not know one', words)
+ok(/next set|go up/i.test(words), 'it tells them what to do after the set', words)
+
 console.log(failed === 0 ? '\nAll jump-size checks passed.' : `\n${failed} CHECK${failed === 1 ? '' : 'S'} FAILED`)
 process.exit(failed === 0 ? 0 : 1)
