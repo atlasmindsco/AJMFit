@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getCurrentUserId } from '@/lib/current-user'
+import ProfilePhoto from '@/components/studio/ProfilePhoto'
 import { createClient } from '@/lib/supabase/client'
 import { localDate } from '@/lib/dates'
 
@@ -44,6 +45,8 @@ const deviceZone = () => {
 
 export default function StudioSettingsPage() {
   const [userId, setUserId] = useState<string | null>(null)
+  /** Only for the initials shown until there is a photo. */
+  const [initials, setInitials] = useState('')
   const [timezone, setTimezone] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -61,6 +64,26 @@ export default function StudioSettingsPage() {
         setLoading(false)
         return
       }
+      // The initials behind the profile photo, until there is one. Built
+      // here rather than in the component so the component stays about the
+      // photo and nothing else.
+      void (async () => {
+        const client = createClient()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const anyDb = client as any
+        const { data } = await anyDb.from('users').select('name').eq('id', id).maybeSingle()
+        const name = String((data as { name?: string } | null)?.name ?? '').trim()
+        if (!active) return
+        setInitials(
+          name
+            .split(/[^A-Za-z]+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((w: string) => w[0])
+            .join('')
+            .toUpperCase()
+        )
+      })()
       const supabase = createClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any
@@ -108,6 +131,8 @@ export default function StudioSettingsPage() {
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Settings</h1>
       </header>
+
+      <ProfilePhoto userId={userId} initials={initials} />
 
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
         <p className="font-display font-bold text-white text-sm">Time zone</p>

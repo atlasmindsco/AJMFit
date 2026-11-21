@@ -10,6 +10,7 @@ import MembershipPaywall from '@/components/studio/MembershipPaywall'
 import FeedbackButton from '@/components/studio/FeedbackButton'
 import { SessionChromeProvider, useSessionChrome } from '@/components/studio/SessionChrome'
 import { NAV_TABS, PROFILE_LINKS, owns } from '@/lib/nav'
+import { signedAvatarUrl } from '@/lib/avatar'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
@@ -32,6 +33,13 @@ export default function ClientPortalLayout({
   const router = useRouter()
   const [profileOpen, setProfileOpen] = useState(false)
   const [clientName, setClientName] = useState('')
+  /**
+   * The client's own photo, read through a short-lived signed URL.
+   *
+   * Null until it loads and whenever it fails, which falls back to the
+   * initials rather than to a broken-image icon.
+   */
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   // Auth is enforced in middleware; here we additionally gate on subscription
   // status: only an active (incl. trialing) member sees the studio. Others are
   // shown the paywall. 'out' is a graceful fallback if no session/record loads.
@@ -59,15 +67,23 @@ export default function ClientPortalLayout({
       for (let i = 0; i < attempts; i++) {
         const { data: u } = await supabase
           .from('users')
-          .select('status,name,is_beta')
+          .select('status,name,is_beta,avatar_path')
           .eq('auth_id', user.id)
-          .maybeSingle<{ status: string; name: string | null; is_beta: boolean }>()
+          .maybeSingle<{ status: string; name: string | null; is_beta: boolean; avatar_path: string | null }>()
         if (cancelled) return
         if (!u) {
           setGate('out')
           return
         }
         if (u.name) setClientName(u.name)
+        // Signed separately and not awaited: the nav should not wait on a
+        // storage round trip to render, and the initials stand in until the
+        // photo arrives.
+        if (u.avatar_path) {
+          void signedAvatarUrl(u.avatar_path).then((signed) => {
+            if (!cancelled) setAvatarUrl(signed)
+          })
+        }
         // Active members and beta testers get full access; beta bypasses payment.
         if (u.status === 'active' || u.is_beta) {
           setGate('in')
@@ -178,10 +194,23 @@ export default function ClientPortalLayout({
                 aria-label="Your account"
                 className="flex items-center gap-2.5 rounded-full pl-0.5 pr-2 py-0.5 hover:bg-white/[0.06] transition-colors duration-200"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
-                  <span className="text-white text-2xs font-display font-bold">
-                    {initials || '·'}
-                  </span>
+                {/* 44px, not 32. A profile photo you have to lean in to
+                    recognise is not worth uploading, and 44 is also the
+                    smallest comfortable touch target on a phone. */}
+                <div className="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center shrink-0">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      onError={() => setAvatarUrl(null)}
+                    />
+                  ) : (
+                    <span className="text-white text-sm font-display font-bold">
+                      {initials || '·'}
+                    </span>
+                  )}
                 </div>
                 {firstName && (
                   <span className="text-ink text-sm font-body hidden sm:block max-w-[140px] truncate">
