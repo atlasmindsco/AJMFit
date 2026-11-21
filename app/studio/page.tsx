@@ -31,7 +31,8 @@ import { fadeIn } from '@/lib/animations'
 import { getCurrentUserId } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 import { todayShape, weeklyTarget, weekLine } from '@/lib/today'
-import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, fetchTrainedDays, type PRRow } from '@/lib/workout'
+import { bestLift, liftLine } from '@/lib/progress-lines'
+import { fetchPRs, fetchWorkoutsThisWeek, fetchWorkoutHistory, fetchWeekStreak, fetchTrainedDays, fetchLiftHistory, type PRRow } from '@/lib/workout'
 import { loadAssignedProgram, type PlanDay } from '@/lib/blueprint'
 import { rotationState } from '@/lib/rotation'
 import { fetchMyProgram, type Program } from '@/lib/programs'
@@ -52,6 +53,15 @@ export default function ClientDashboard() {
    * lifted — a different question from "what am I doing today".
    */
   const [prs, setPrs] = useState<PRRow[]>([])
+  /**
+   * One sentence about a lift that really moved, or null.
+   *
+   * Null for most clients most of the time and that is correct: it needs a
+   * loaded movement with four sessions behind it that actually went up. Two
+   * of the six clients on the platform qualify today. An empty slot is better
+   * than a padded one.
+   */
+  const [lift, setLift] = useState<string | null>(null)
   const [myProgram, setMyProgram] = useState<Program | null>(null)
   /** The session to offer, and where it sits in the program. */
   const [today, setToday] = useState<{ index: number; day: PlanDay } | null>(null)
@@ -115,6 +125,14 @@ export default function ClientDashboard() {
           ])
         if (!active) return
         setPhotoAgeDays(photoAge)
+        // Deliberately outside the batch above. It reads every set this
+        // client has ever logged, and nothing on this screen should wait on
+        // a progress sentence — the session card is what they opened the app
+        // for. It arrives when it arrives.
+        void (async () => {
+          const history = await fetchLiftHistory(id).catch(() => ({}))
+          if (active) setLift(liftLine(bestLift(history)))
+        })()
         // Needs the tier, which only resolves inside this call, so it runs
         // after the batch rather than inside it.
         void (async () => {
@@ -380,6 +398,21 @@ export default function ClientDashboard() {
           </>
         )}
       </motion.div>
+
+      {/* One line about a lift that moved.
+          Not a chart and not a Progress tab. A chart invites study; this is
+          read on the way past. It needs a LOADED movement with four sessions
+          behind it that genuinely went up, which is why it is usually absent
+          — the unfiltered version of this feature wanted to congratulate a
+          client on gaining 145 lbs at the Inverted Row, which is a row you do
+          hanging under a bar. See lib/progress-lines.ts.
+          The week streak is not repeated here: it is already in the greeting
+          at the top of this screen. */}
+      {!loading && lift && (
+        <p className="mb-5 px-5 py-3.5 rounded-card bg-white/[0.03] border border-white/[0.08] text-ink-2 text-sm font-body">
+          {lift}
+        </p>
+      )}
 
       {/* My Plan. The third question this screen answers.
           Today says what to do now and the card above says what is next; this

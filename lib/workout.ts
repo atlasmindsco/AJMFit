@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { localDate, localWeekStart } from '@/lib/dates'
 import type { TrainedDay } from '@/lib/rotation'
+import type { SessionPoint } from '@/lib/progress-lines'
 
 export type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
 
@@ -681,4 +682,68 @@ export async function fetchWeekStreak(userId: string): Promise<number> {
     cursor--
   }
   return streak
+}
+
+/**
+ * Every session of every loaded exercise, for one client.
+ *
+ * NOT lib/workout.ts's `fetchExerciseHistory`, which caps at six sessions per
+ * exercise. Six is the right window for "is this lift stalling" — the question
+ * that function exists to answer — and the wrong one here: capped at six, the
+ * FIRST session we can see is the sixth-most-recent, so a client eight
+ * sessions in gets told their deadlift started at a weight they were already
+ * lifting, in a month after the one they started.
+ *
+ * Paginated. PostgREST caps a page at 1,000 rows whatever limit you ask for,
+ * and a silent truncation here means a client's earliest sessions quietly
+ * vanish and the sentence understates them — which is worse than no sentence,
+ * because it is wrong rather than absent.
+ */
+export async function fetchLiftHistory(userId: string): Promise<Record<string, SessionPoint[]>> {
+  const rows: Array<{
+    exercise_name: string
+    weight: number | null
+    workout_id: string
+    workouts: { date: string } | { date: string }[] | null
+  }> = []
+
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await db
+      .from('workout_sets')
+      .select('exercise_name, weight, workout_id, workouts!inner(date)')
+      .eq('user_id', userId)
+      .eq('completed', true)
+      .eq('is_intensity_set', false)
+      .order('logged_at', { ascending: false })
+      .range(from, from + 999)
+    if (error) return {}
+    const page = (data ?? []) as typeof rows
+    rows.push(...page)
+    if (page.length < 1000) break
+  }
+
+  // Heaviest working set per exercise per WORKOUT, not per set. Three sets of
+  // a lift is one session, and counting each set would let one hard day clear
+  // the four-session floor on its own.
+  const byExercise: Record<string, Record<string, SessionPoint>> = {}
+  for (const row of rows) {
+    const weight = Number(row.weight) || 0
+    if (weight <= 0) continue
+    const joined = row.workouts
+    const date = Array.isArray(joined) ? joined[0]?.date : joined?.date
+    if (!date) continue
+
+    const perWorkout = (byExercise[row.exercise_name] ??= {})
+    const seen = perWorkout[row.workout_id]
+    if (!seen || weight > seen.topWeight) {
+      perWorkout[row.workout_id] = { date, topWeight: weight }
+    }
+  }
+
+  const out: Record<string, SessionPoint[]> = {}
+  for (const name of Object.keys(byExercise)) {
+    const perWorkout = byExercise[name]
+    out[name] = Object.keys(perWorkout).map((id) => perWorkout[id])
+  }
+  return out
 }
