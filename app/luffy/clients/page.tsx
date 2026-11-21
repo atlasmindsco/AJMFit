@@ -23,6 +23,8 @@ import { fetchAllCheckIns } from '@/lib/check-ins'
 import { fetchActiveBlocks, fetchEverAssigned } from '@/lib/programs'
 import { fetchStalledLifts } from '@/lib/admin'
 import { fetchPainSwaps } from '@/lib/workout'
+import { findDuplicates } from '@/lib/duplicate-subs'
+import { fetchAllSubscriptions } from '@/lib/admin'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
@@ -66,6 +68,15 @@ export default function ClientsPage() {
   const [roster, setRoster] = useState<Map<string, { status: ClientStatus; reason: string }>>(new Map())
   const [rosterCount, setRosterCount] = useState<Record<string, number>>({})
   const [rosterStates, setRosterStates] = useState<ClientStatus[]>([])
+  /**
+   * Clients paying more than once, keyed by user id.
+   *
+   * Found four months late: Ruth had three active subscriptions across two
+   * accounts and Luis had two, because the Blueprint checkout is a guest GET
+   * link that never checks whether somebody already has one. Shown here
+   * because this is the screen where a coach looks a client up.
+   */
+  const [duplicatePay, setDuplicatePay] = useState<Map<string, number>>(new Map())
 
   const loadClients = () => {
     setLoading(true)
@@ -77,8 +88,9 @@ export default function ClientsPage() {
       fetchEverAssigned().catch(() => new Set<string>()),
       fetchStalledLifts().catch(() => new Map()),
       fetchPainSwaps().catch(() => []),
+      fetchAllSubscriptions().catch(() => []),
     ])
-      .then(([rows, forms, checkIns, blocks, everAssigned, stalls, painSwaps]) => {
+      .then(([rows, forms, checkIns, blocks, everAssigned, stalls, painSwaps, subs]) => {
         setClients(rows)
         setOnboardingMap(forms)
         // Ranked by lib/roster.ts, the same call the dashboard makes, so the
@@ -87,6 +99,13 @@ export default function ClientsPage() {
         setRoster(new Map(ranked.map((r) => [r.client.id, { status: r.status, reason: r.reason }])))
         setRosterCount(rosterCounts(ranked) as unknown as Record<string, number>)
         setRosterStates(rosterFilters(ranked))
+        // Detection only. Cancelling or refunding is never automatic.
+        const dupes = findDuplicates(rows, subs)
+        const payMap = new Map<string, number>()
+        for (const d of dupes) {
+          for (const id of d.userIds) payMap.set(id, d.subscriptionIds.length)
+        }
+        setDuplicatePay(payMap)
       })
       .catch((err) => {
         console.error('[Clients] Failed to load:', err)
@@ -303,6 +322,20 @@ export default function ClientsPage() {
                             The reason is printed too: "Never trained" is a
                             label, "joined 200 days ago, never trained" is
                             something a coach can act on. */}
+                        {/* Paying more than once. Above the training state
+                            because it is the only thing on this row costing
+                            somebody money while nobody looks. */}
+                        {duplicatePay.has(client.id) && (
+                          <p className="text-state-danger text-2xs font-body mt-1">
+                            <span className="font-display font-bold uppercase tracking-wide">
+                              Paying {duplicatePay.get(client.id)}&times;
+                            </span>
+                            {' · '}
+                            <span className="text-ink-3">
+                              {duplicatePay.get(client.id)} active subscriptions &mdash; check Stripe
+                            </span>
+                          </p>
+                        )}
                         {rosterRow && (
                           <p className={`text-2xs font-body mt-1 ${STATUS_META[rosterRow.status].tone}`}>
                             <span className="font-display font-bold uppercase tracking-wide">

@@ -190,6 +190,54 @@ export async function POST(request: Request) {
                   }
                 }
 
+                /* Did this person already have one?
+                   The Blueprint checkout is a guest GET link with no signed-in
+                   user and no check for an existing subscription, so clicking
+                   it twice produces two Stripe customers and two live
+                   subscriptions. Ruth checked out three times across four
+                   days — which is what somebody does when they are not sure
+                   the first payment worked, and Blueprint signup is "pay,
+                   then wait for an email to set a password".
+
+                   This does NOT cancel or refund anything. Which subscription
+                   should end, and whether anyone is owed money, is a decision
+                   about somebody's money and belongs to the coach. It is
+                   recorded loudly so the next one is caught in a day rather
+                   than four months. */
+                try {
+                  const { data: already } = await db
+                    .from('subscriptions')
+                    .select('stripe_subscription_id, status')
+                    .eq('user_id', user.id)
+                  const live = (already ?? []).filter(
+                    (r: { stripe_subscription_id: string | null; status: string | null }) =>
+                      r.stripe_subscription_id &&
+                      r.stripe_subscription_id !== sub.id &&
+                      ['active', 'trialing', 'past_due', 'unpaid'].indexOf(String(r.status)) !== -1
+                  )
+                  if (live.length > 0) {
+                    console.error(
+                      `[stripe webhook] DUPLICATE SUBSCRIPTION: ${email} already has ${live.length} live (${live
+                        .map((r: { stripe_subscription_id: string | null }) => r.stripe_subscription_id)
+                        .join(', ')}) and just started ${sub.id}`
+                    )
+                    await db.from('ops_action_log').insert({
+                      action: 'duplicate_subscription',
+                      target: user.id,
+                      summary: `${email} started ${sub.id} while already holding ${live.length}`,
+                      detail: {
+                        email,
+                        existing: live.map((r: { stripe_subscription_id: string | null }) => r.stripe_subscription_id),
+                        new: sub.id,
+                      },
+                      actor: 'stripe-webhook',
+                    })
+                  }
+                } catch (e) {
+                  // Never let the check break the signup it is watching.
+                  console.error('[stripe webhook] duplicate check failed', e)
+                }
+
                 await stripe.subscriptions.update(sub.id, {
                   metadata: { ...sub.metadata, user_id: user.id },
                 })

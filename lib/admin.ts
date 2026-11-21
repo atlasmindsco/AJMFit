@@ -362,3 +362,25 @@ export async function fetchBriefSource(days = 70): Promise<{
 
   return { sessionsByUser, liftsByUser }
 }
+
+/**
+ * Every subscription row, for the duplicate-billing check.
+ *
+ * Read-only and deliberately narrow: the three fields findDuplicates needs
+ * and nothing else. No Stripe customer id, no period dates, nothing that
+ * invites this into becoming a billing screen. Cancelling and refunding stay
+ * in Stripe, with the coach.
+ */
+export async function fetchAllSubscriptions(): Promise<
+  Array<{ user_id: string; status: string | null; stripe_subscription_id: string | null }>
+> {
+  const { data, error } = await db
+    .from('subscriptions')
+    .select('user_id, status, stripe_subscription_id')
+  if (error) throw error
+  return (data ?? []) as Array<{
+    user_id: string
+    status: string | null
+    stripe_subscription_id: string | null
+  }>
+}

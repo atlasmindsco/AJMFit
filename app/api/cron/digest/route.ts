@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { findDuplicates, duplicateHeadline } from '@/lib/duplicate-subs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendMail } from '@/lib/email'
 import { runNutritionReview } from '@/lib/nutrition-review-run'
@@ -260,7 +261,30 @@ export async function GET(request: Request) {
     </div>`
   })
 
+  /* Somebody paying twice.
+     Found on 21 November, four months after Ruth's started: three active
+     subscriptions across two accounts, and nothing in the product able to
+     notice. It goes FIRST in the headline because it is the only item here
+     that is costing a client money every month it goes unnoticed.
+     Detection only. Which subscription should end, and whether anyone is
+     owed a refund, is a decision about somebody's money and stays with the
+     coach. */
+  const dupes = await (async () => {
+    try {
+      const [{ data: allUsers }, { data: allSubs }] = await Promise.all([
+        admin.from('users').select('id, name, email'),
+        admin.from('subscriptions').select('user_id, status, stripe_subscription_id'),
+      ])
+      return findDuplicates(allUsers ?? [], allSubs ?? [])
+    } catch {
+      // A digest that fails over a nice-to-have is a digest that stops
+      // arriving, and the rest of it still matters.
+      return []
+    }
+  })()
+
   const headline = [
+    duplicateHeadline(dupes) ?? '',
     checkInRows.length ? `${checkInRows.length} check-${checkInRows.length === 1 ? 'in' : 'ins'} to review` : '',
     sorted.length ? `${sorted.length} ${sorted.length === 1 ? 'client' : 'clients'} waiting on a reply` : '',
     quietIds.length ? `${quietIds.length} gone quiet` : '',
