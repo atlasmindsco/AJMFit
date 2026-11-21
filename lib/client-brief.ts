@@ -47,6 +47,14 @@ export interface BriefInput {
   nutritionAdherence?: number | null
   sleep?: number | null
   hunger?: number | null
+  /**
+   * How training went, 1-5.
+   *
+   * Required on the check-in now — it is one of the three questions a client
+   * is asked and the one Anthony actually coaches on — and until this line
+   * it was the only one of the three that never reached him.
+   */
+  trainingPerformance?: number | null
   win?: string | null
   obstacle?: string | null
 }
@@ -146,12 +154,18 @@ export function buildBrief(input: BriefInput): Brief {
   if (input.nutritionAdherence != null) scores.push(`nutrition ${input.nutritionAdherence}/5`)
   if (input.sleep != null) scores.push(`sleep ${input.sleep}/5`)
   if (input.hunger != null) scores.push(`hunger ${input.hunger}/5`)
+  if (input.trainingPerformance != null) scores.push(`training ${input.trainingPerformance}/5`)
   if (scores.length) facts.push(`Reported: ${scores.join(', ')}.`)
 
   if (input.energy != null && input.energy <= 2) flags.push('Low energy')
   if (input.nutritionAdherence != null && input.nutritionAdherence <= 2) flags.push('Nutrition adherence low')
   if (input.sleep != null && input.sleep <= 2) flags.push('Sleep poor')
   if (input.hunger != null && input.hunger >= 4) flags.push('Hunger high — deficit may be too aggressive')
+  // Two or below on training, from someone who turned up, is the signal that
+  // the program is wrong rather than the client.
+  if (input.trainingPerformance != null && input.trainingPerformance <= 2) {
+    flags.push('Training felt worse — check the load')
+  }
 
   if (input.obstacle?.trim()) flags.push('Named an obstacle — read it')
 

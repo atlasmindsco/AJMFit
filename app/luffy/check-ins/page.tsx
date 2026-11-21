@@ -136,6 +136,7 @@ export default function CoachCheckInsPage() {
       nutritionAdherence: c.nutrition_adherence,
       sleep: c.sleep_quality,
       hunger: c.hunger,
+      trainingPerformance: c.training_performance,
       win: c.win,
       obstacle: c.obstacle,
     })

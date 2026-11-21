@@ -73,6 +73,14 @@ export default function CheckInPage() {
    * track.
    */
   const [lastWeighIn, setLastWeighIn] = useState<{ lb: number; on: string } | null>(null)
+  /**
+   * Whether the optional half is open.
+   *
+   * Nine fields in one scrolling column, with no sign that seven of them were
+   * optional and two were already filled in. Only three are needed to send,
+   * and that was true before this change — the screen just never said so.
+   */
+  const [showMore, setShowMore] = useState(false)
   const [workouts, setWorkouts] = useState('')
   const [nutrition, setNutrition] = useState<number | null>(null)
   const [energy, setEnergy] = useState<number | null>(null)
@@ -219,7 +227,7 @@ export default function CheckInPage() {
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Weekly update</h1>
         <p className="text-ink-3 text-sm font-body mt-1">
-          Six questions, about a minute. This is what Anthony uses to decide what changes next week.
+          Three taps. This is what Anthony uses to decide what changes next week.
         </p>
       </header>
 
@@ -231,7 +239,62 @@ export default function CheckInPage() {
         </div>
       )}
 
+      {/* What the app already knows, stated rather than asked.
+          Both of these were being PREFILLED into number inputs, which looks
+          exactly like a question — so a client read two fields they had to
+          check before they reached the three that actually needed them. The
+          inputs still exist, under "Add more", for the times the count is
+          wrong or they weighed in this morning. */}
+      <div className="bg-white/[0.03] border border-white/[0.08] rounded-card px-4 py-3 mb-3">
+        <p className="text-ink-2 text-sm font-body">
+          <span className="text-white font-semibold">
+            {workouts.trim() === '' ? 'No' : workouts} workout{workouts.trim() === '1' ? '' : 's'}
+          </span>{' '}
+          logged this week
+          {lastWeighIn && (
+            <>
+              {' · '}
+              <span className="text-white font-semibold">{Number(lastWeighIn.lb)} lbs</span>
+              {lastWeighIn.on < week
+                ? `, last weighed ${new Date(lastWeighIn.on + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+                : ' this week'}
+            </>
+          )}
+        </p>
+      </div>
+
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 space-y-6">
+        <div>
+          <p className={labelCls}>How did eating go?</p>
+          <p className={hintCls}>Be honest. A 2 tells him more than a generous 4.</p>
+          <Scale value={nutrition} onChange={setNutrition} low="Off the rails" high="Dialled in" />
+        </div>
+
+        <div>
+          <p className={labelCls}>Energy and recovery</p>
+          <p className={hintCls}>Sleep, soreness, how you felt in the gym.</p>
+          <Scale value={energy} onChange={setEnergy} low="Running on empty" high="Fresh" />
+        </div>
+
+        <div>
+          <p className={labelCls}>How was training?</p>
+          <p className={hintCls}>Strength and effort compared to last week.</p>
+          <Scale value={performance} onChange={setPerformance} low="Much worse" high="Much better" />
+        </div>
+
+        {/* Everything optional, behind one tap.
+            None of it stopped being collected and none of it stopped being
+            stored — the trainer view reads the same nine columns it always
+            did. Bodyweight leads because it is the one that feeds a trend. */}
+        <button
+          onClick={() => setShowMore((v) => !v)}
+          className="w-full text-left text-ink-3 hover:text-ink-2 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+        >
+          {showMore ? 'Less' : 'Add more'} {showMore ? '↑' : '↓'}
+        </button>
+
+        {showMore && (
+          <div className="space-y-6 pt-1">
         <div>
           <p className={labelCls}>Bodyweight</p>
           <p className={hintCls}>
@@ -260,19 +323,6 @@ export default function CheckInPage() {
             className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
-
-        <div>
-          <p className={labelCls}>How did eating go?</p>
-          <p className={hintCls}>Be honest. A 2 tells him more than a generous 4.</p>
-          <Scale value={nutrition} onChange={setNutrition} low="Off the rails" high="Dialled in" />
-        </div>
-
-        <div>
-          <p className={labelCls}>Energy and recovery</p>
-          <p className={hintCls}>Sleep, soreness, how you felt in the gym.</p>
-          <Scale value={energy} onChange={setEnergy} low="Running on empty" high="Fresh" />
-        </div>
-
         <div>
           <p className={labelCls}>How hungry were you?</p>
           <p className={hintCls}>Constant hunger is the warning sign, not a test of willpower.</p>
@@ -284,13 +334,6 @@ export default function CheckInPage() {
           <p className={hintCls}>Poor sleep stalls fat loss on its own.</p>
           <Scale value={sleep} onChange={setSleep} low="Broken" high="Slept well" />
         </div>
-
-        <div>
-          <p className={labelCls}>How was training?</p>
-          <p className={hintCls}>Strength and effort compared to last week.</p>
-          <Scale value={performance} onChange={setPerformance} low="Much worse" high="Much better" />
-        </div>
-
         <div>
           <p className={labelCls}>Best thing this week</p>
           <p className={hintCls}>A lift, a habit, turning up when you didn&rsquo;t want to.</p>
@@ -314,6 +357,8 @@ export default function CheckInPage() {
             placeholder="Travelled Thursday and Friday, missed both sessions"
           />
         </div>
+          </div>
+        )}
 
         <button
           onClick={submit}

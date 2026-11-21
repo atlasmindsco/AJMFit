@@ -12,6 +12,7 @@ import {
   formatMsgTime,
   type Message,
 } from '@/lib/messages'
+import { fetchCheckInForWeek, weekOf } from '@/lib/check-ins'
 
 export default function ClientMessagesPage() {
   const [userId, setUserId] = useState<string | null>(null)
@@ -19,6 +20,19 @@ export default function ClientMessagesPage() {
   const [loading, setLoading] = useState(true)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  /**
+   * Whether this week's update is already in.
+   *
+   * The two cards above the thread were identical whether a client had sent
+   * their check-in on Monday or had not sent one in a month. One of them is
+   * something to do and the other is a place to go, and the screen said
+   * nothing about which was which.
+   *
+   * Starts true so nothing is flagged as outstanding before we know. An
+   * empty highlight that corrects itself a moment later is worse than a
+   * highlight that arrives late.
+   */
+  const [checkInDone, setCheckInDone] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -38,6 +52,9 @@ export default function ClientMessagesPage() {
         return
       }
       setUserId(id)
+      void fetchCheckInForWeek(id, weekOf())
+        .then((row) => active && setCheckInDone(!!row))
+        .catch(() => {})
       load(id).finally(() => active && setLoading(false))
       timer = setInterval(() => active && load(id), 5000)
     })
@@ -90,12 +107,25 @@ export default function ClientMessagesPage() {
         like three small features — and neither was ever used. They belong
         with the person they are about. */}
     <div className="flex gap-2 mb-3">
+      {/* Outstanding, or done. Highlighted only while there is something
+          to do — a card that looks urgent every week of the year stops
+          looking like anything at all. */}
       <Link
         href="/studio/check-in"
-        className="flex-1 px-4 py-3 rounded-card bg-surface-raised border border-white/[0.10] text-center hover:border-white/[0.18] transition-colors duration-200"
+        className={`flex-1 px-4 py-3 rounded-card border text-center transition-colors duration-200 ${
+          checkInDone
+            ? 'bg-surface-raised border-white/[0.10] hover:border-white/[0.18]'
+            : 'bg-brand-orange/[0.10] border-brand-orange/30 hover:bg-brand-orange/[0.16]'
+        }`}
       >
         <span className="block font-display font-bold text-white text-sm">Weekly update</span>
-        <span className="block text-ink-3 text-2xs font-body mt-0.5">How the week went</span>
+        <span
+          className={`block text-2xs font-body mt-0.5 ${
+            checkInDone ? 'text-ink-3' : 'text-brand-orange'
+          }`}
+        >
+          {checkInDone ? 'Sent this week' : 'Three taps'}
+        </span>
       </Link>
       <Link
         href="/studio/schedule"
