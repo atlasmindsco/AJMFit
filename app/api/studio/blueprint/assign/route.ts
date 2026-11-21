@@ -31,8 +31,11 @@ export async function POST(request: Request) {
   let goal: string, location: string, days: number, splitKey: string | undefined
   let trainingDays: unknown = null
   let experience: Experience | null = null
+  // Null means not asked, and lib/equipment.ts reads that as YES. Only an
+  // explicit false ever substitutes anything.
+  let hasBench: boolean | null = null
   try {
-    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string; trainingDays?: unknown; experience?: unknown }
+    const body = (await request.json()) as { goal?: string; location?: string; days?: number; splitKey?: string; trainingDays?: unknown; experience?: unknown; hasBench?: unknown }
     goal = String(body.goal)
     location = String(body.location)
     days = Number(body.days)
@@ -43,6 +46,7 @@ export async function POST(request: Request) {
     experience = EXPERIENCES.includes(body.experience as Experience)
       ? (body.experience as Experience)
       : null
+    hasBench = typeof body.hasBench === 'boolean' ? body.hasBench : null
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
@@ -127,16 +131,21 @@ export async function POST(request: Request) {
      returned: they have a program, which is what they came for, and the cost
      of losing this is that the progression engine keeps using the cautious
      default it has always used. Not worth failing the request over. */
-  if (experience) {
+  if (experience || hasBench !== null) {
+    const patch: Record<string, unknown> = {}
+    if (experience) patch.training_experience = experience
+    // Only written when they actually answered. A null here must stay null:
+    // it is what tells lib/equipment.ts to leave the program alone.
+    if (hasBench !== null) patch.has_bench = hasBench
     const { data: updated, error: uErr } = await admin
       .from('users')
-      .update({ training_experience: experience })
+      .update(patch)
       .eq('id', dbUser.id)
       .select('id')
     // PostgREST calls a filtered-out update a success with no rows, so the
     // row count is the only honest signal.
     if (uErr || !updated || updated.length === 0) {
-      console.error('[Blueprint assign] could not store experience:', uErr?.message ?? 'no rows updated')
+      console.error('[Blueprint assign] could not store experience or bench:', uErr?.message ?? 'no rows updated')
     }
   }
 

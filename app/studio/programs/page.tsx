@@ -81,7 +81,7 @@ import {
   type ExperienceLevel,
   type ProgressionGoal,
 } from '@/lib/progression'
-import { fetchMyOnboarding, fetchTrainingExperience } from '@/lib/onboarding'
+import { fetchMyOnboarding, fetchTrainingExperience, fetchHasBench } from '@/lib/onboarding'
 import { fetchMyTier } from '@/lib/scheduling'
 import {
   completeBlock,
@@ -128,6 +128,8 @@ interface ProgramExercise {
   series: string
   /** Reps to leave in the tank, when the program says. Mirrors PlanExercise. */
   targetRir?: number | null
+  /** The exercise this replaced, when the client said they have no bench. */
+  swappedFrom?: string | null
 }
 
 type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
@@ -615,7 +617,11 @@ export default function ProgramsPage() {
    * should still get their program, just without the ticks.
    */
   const applyLoadedProgram = useCallback(async (programId: string, uid: string | null) => {
-    const loaded = await loadAssignedProgram(programId)
+    // What they own. Undefined means never asked, which equipment.ts
+    // reads as "has it" — so nothing changes for anyone who picked a
+    // program before the question existed.
+    const bench = uid ? await fetchHasBench(uid).catch(() => null) : null
+    const loaded = await loadAssignedProgram(programId, { bench: bench ?? undefined })
     if (!loaded) return
 
     let plan = loaded.weeklyPlan
@@ -2663,9 +2669,25 @@ export default function ProgramsPage() {
                                       <span className="text-state-success text-2xs font-display font-bold">{seriesPrefix}</span>
                                     )}
                                     <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
+                                    {exercise.swappedFrom && (
+                                      <span className="sr-only">
+                                        instead of {exercise.swappedFrom}
+                                      </span>
+                                    )}
                                     {isSwapped && (
                                       <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
                                         Swapped
+                                      </span>
+                                    )}
+                                    {/* Changed because of equipment they said
+                                        they do not have. Named, never silent:
+                                        a client who opens their program and
+                                        finds a different exercise with no
+                                        explanation has learned that the app
+                                        changes things behind their back. */}
+                                    {exercise.swappedFrom && (
+                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-white/[0.07] text-ink-3 shrink-0">
+                                        No bench
                                       </span>
                                     )}
                                     {intensityEnabled && selectedTechnique && (

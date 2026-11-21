@@ -151,3 +151,21 @@ export function isAssessmentComplete(a: OnboardingAnswers | null | undefined): b
   if (!a) return false
   return Boolean(a.goal && a.experience && a.daysPerWeek && a.location)
 }
+
+/**
+ * Whether the client says they have a bench, a sturdy chair or a step.
+ *
+ * Null means never asked, and lib/equipment.ts reads that as YES. Every
+ * client who picked a program before the question existed has a null here,
+ * and reading it the other way would substitute exercises into 34 programs
+ * overnight for people who never asked for it.
+ */
+export async function fetchHasBench(userId: string): Promise<boolean | null> {
+  const { data } = await db
+    .from('users')
+    .select('has_bench')
+    .eq('id', userId)
+    .maybeSingle()
+  const value = (data as { has_bench?: boolean | null } | null)?.has_bench
+  return typeof value === 'boolean' ? value : null
+}

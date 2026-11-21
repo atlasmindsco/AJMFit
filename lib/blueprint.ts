@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { BlueprintGoal, BlueprintLocation } from '@/lib/splits'
 import { seriesLabels } from '@/lib/supersets'
 import { estimateMinutes } from '@/lib/builder-rules'
+import { swapFor } from '@/lib/equipment'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -46,6 +47,15 @@ export interface PlanExercise {
    * production carry a rating. A question with no target is a quiz.
    */
   targetRir: number | null
+  /**
+   * Set when this slot was changed because of equipment the client said they
+   * do not have: "Dumbbell Bench Press — you said no bench".
+   *
+   * Shown, never silent. A client who opens their program and finds a
+   * different exercise than last week, with no explanation, has learned that
+   * the app changes things behind their back.
+   */
+  swappedFrom: string | null
 }
 export interface PlanDay {
   day: string
@@ -85,7 +95,15 @@ function shortName(dayName: string): string {
  * Load an assigned program's full content and map it into the Programs page
  * shape (weeklyPlan + currentProgram). Returns null if the program has no days.
  */
-export async function loadAssignedProgram(programId: string): Promise<LoadedProgram | null> {
+export async function loadAssignedProgram(
+  programId: string,
+  /**
+   * What the client says they own. Absent, or a kit left undefined, means
+   * they HAVE it — so every client who picked a program before the question
+   * existed sees exactly what they saw yesterday.
+   */
+  kit: { bench?: boolean } = {}
+): Promise<LoadedProgram | null> {
   const { data: prog } = await db
     .from('programs')
     .select('id, name, level, split, location, goal, source')
@@ -124,14 +142,19 @@ export async function loadAssignedProgram(programId: string): Promise<LoadedProg
     // per position regardless of superset_group. The 68 seeded programs carry
     // no groups, so they are unaffected.
     const labels = seriesLabels(list.map((e) => ({ supersetGroup: e.superset_group })))
-    const exercises: PlanExercise[] = list.map((e, xi) => ({
-      name: e.exercise_name,
-      sets: e.sets ?? 3,
-      reps: e.reps ?? '10',
-      rest: e.rest_seconds ? `${e.rest_seconds}s` : '60s',
-      series: labels[xi],
-      targetRir: e.target_rir ?? null,
-    }))
+    const exercises: PlanExercise[] = list.map((e, xi) => {
+      // Only ever substitutes on an explicit "no". See lib/equipment.ts.
+      const swap = swapFor(e.exercise_name, { bench: kit.bench })
+      return {
+        name: swap ? swap.name : e.exercise_name,
+        sets: e.sets ?? 3,
+        reps: e.reps ?? '10',
+        rest: e.rest_seconds ? `${e.rest_seconds}s` : '60s',
+        series: labels[xi],
+        targetRir: e.target_rir ?? null,
+        swappedFrom: swap ? e.exercise_name : null,
+      }
+    })
     return {
       day: `Day ${i + 1}`,
       name: shortName(d.name),

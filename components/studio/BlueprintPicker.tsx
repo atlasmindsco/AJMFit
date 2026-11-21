@@ -70,6 +70,16 @@ export default function BlueprintPicker({
    * onboarding ever does say, this does not ask again.
    */
   const [experience, setExperience] = useState<Experience | null>(beginner ? 'new' : null)
+  /**
+   * Whether they have a bench, a sturdy chair or a step.
+   *
+   * Null means not asked, and lib/equipment.ts reads that as YES on purpose:
+   * every client who picked a program before today has a null, and reading it
+   * the other way would substitute exercises into 34 programs overnight.
+   *
+   * Asked only for home. In a gym there is always a bench.
+   */
+  const [hasBench, setHasBench] = useState<boolean | null>(null)
   const isNew = experience === 'new'
 
   // Beginners start on Location because Goal is decided for them.
@@ -114,6 +124,8 @@ export default function BlueprintPicker({
           splitKey: chosenSplit,
           trainingDays: trainingDays.length ? trainingDays : null,
           experience,
+          // Only meaningful at home. A gym has a bench.
+          hasBench: location === 'home' ? hasBench : null,
         }),
       })
       const data = (await res.json()) as { ok?: boolean; programId?: string; error?: string }
@@ -361,13 +373,62 @@ export default function BlueprintPicker({
                     active={location === l}
                     onClick={() => {
                       setLocation(l)
-                      setStep(2)
+                      // Home reveals the kit question below instead of moving
+                      // on; answering it is what advances.
+                      if (l !== 'home') setStep(2)
                     }}
                     title={LOCATION_LABELS[l]}
-                    sub={l === 'home' ? 'Dumbbells + bodyweight' : 'Full equipment'}
+                    sub={l === 'home' ? 'Dumbbells, bodyweight, pull-up bar' : 'Full equipment'}
                   />
                 ))}
               </div>
+
+              {/* What home actually needs, said before they commit rather than
+                  discovered in week three.
+                  Every one of the 34 home programs needs a bench or an
+                  elevated surface and 31 need a pull-up bar, and until now the
+                  app said "Dumbbells + bodyweight" and left them to find out.
+                  The bar is a requirement: Chin-Up and Pullups have no honest
+                  substitute, because the only exercises tagged lats a
+                  dumbbells-only client can do are stretches. The bench is a
+                  question, because a chair works and six exercises have
+                  substitutes. */}
+              {location === 'home' && (
+                <div className="mt-5 px-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08]">
+                  <p className="text-ink-2 text-xs font-body leading-relaxed">
+                    At home you&rsquo;ll need <span className="text-white font-semibold">dumbbells</span> and
+                    a <span className="text-white font-semibold">doorway pull-up bar</span>. The bar is about
+                    $25 and there&rsquo;s no honest way to train your back without one.
+                  </p>
+                  <p className="font-display font-bold text-white text-sm mt-4">
+                    Got a bench, sturdy chair or step?
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 mt-2.5">
+                    {[
+                      { label: 'Yes', value: true },
+                      { label: 'No', value: false },
+                    ].map((o) => (
+                      <button
+                        key={o.label}
+                        onClick={() => {
+                          setHasBench(o.value)
+                          setStep(2)
+                        }}
+                        className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
+                          hasBench === o.value
+                            ? 'bg-brand-orange/[0.14] border-brand-orange/50 text-white'
+                            : 'bg-white/[0.04] border-white/[0.08] text-ink-2 hover:text-white'
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-ink-4 text-2xs font-body mt-2.5 leading-relaxed">
+                    No bench is fine — we&rsquo;ll swap six exercises for floor versions and tell you which.
+                  </p>
+                </div>
+              )}
             </motion.div>
           )}
 
