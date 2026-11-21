@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import TravelSwitch from '@/components/studio/TravelSwitch'
 import { useSessionChrome } from '@/components/studio/SessionChrome'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -2127,21 +2128,11 @@ export default function ProgramsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {/* The one front door for changing programs, ready-made or your
-                  own. It used to go straight to the Blueprint picker, so the
-                  builder was reachable only from two quiet buttons at the
-                  bottom of the Overview tab, below the fold, under the big
-                  blue CTA that looks like the end of the page. Nobody found
-                  them — including Anthony.
-                  Also no longer gated on programLocation: a custom program has
-                  no location, so the moment a client started training their
-                  own build, the button that got them there disappeared. */}
-              <button
-                onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-                className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-white/[0.06] text-ink-2 uppercase tracking-wide hover:bg-white/[0.10] hover:text-ink transition-colors duration-200"
-              >
-                Edit my program
-              </button>
+              {/* "Edit my program" used to sit here too, beside the badge.
+                  Two identical front doors, one of them in the middle of the
+                  training flow. Changing the program now lives in one place:
+                  the CHANGING MY PROGRAM section at the bottom of this screen.
+                  Nothing was removed, it stopped being in two places. */}
               <span className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
               </span>
@@ -2153,11 +2144,6 @@ export default function ProgramsPage() {
             A program used to have no length, so it had no end and no week
             number — clients sat on one template for weeks without ever being
             told how far through they were or that there was a finish line. */}
-        {/* Travelling, or back from it. Renders nothing unless this exact
-            program has a twin at the other location, so a custom build never
-            shows a button that cannot work. */}
-        <TravelSwitch programId={assignedProgramId} onSwitched={() => window.location.reload()} />
-
         {block && !block.completed_at && (() => {
           const prog = blockProgress(block.assigned_at, block.block_weeks)
           return (
@@ -2241,6 +2227,16 @@ export default function ProgramsPage() {
                   the same week — a plain list with stat tiles above it, and
                   this one with thumbnails and rest days. This is the better
                   one, so it is the only one. */}
+              {/* ─── USING MY PROGRAM ───
+                  Everything above this line and down to the end of the week is
+                  read-and-tap: what the program is, where you are in it, and
+                  which session is next. Nothing here changes the plan.
+                  Changing it is a separate section at the bottom, under its
+                  own rule, because a client opening this screen to train
+                  should never be one mis-tap from rebuilding their week. */}
+              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.18em] mb-2">
+                Using my program
+              </p>
               <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
                   <h2 className="font-display font-bold text-white text-sm">Your week</h2>
@@ -2338,9 +2334,25 @@ export default function ProgramsPage() {
                 </div>
               </div>
 
-              {/* The program itself, and what you can do with it.
-                  Below the week because it is reference, not an action. */}
-              <div className="mt-4 bg-surface-raised rounded-card border border-white/[0.10] p-5">
+              {/* ─── CHANGING MY PROGRAM ───
+                  Everything that rewrites the plan, in one place, below the
+                  week rather than beside it. Swapping a single exercise is
+                  deliberately NOT here: that happens mid-session, from the
+                  exercise itself, because a rack being taken is a thing you
+                  discover while training. Everything else is a decision you
+                  make sitting down. */}
+              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.18em] mt-8 mb-2">
+                Changing my program
+              </p>
+
+              {/* Travelling, or back from it. Renders nothing unless this exact
+                  program has a twin at the other location, so a custom build
+                  never shows a button that cannot work. It used to sit up by
+                  the program name, which made it look like part of the
+                  heading rather than a change you were making. */}
+              <TravelSwitch programId={assignedProgramId} onSwitched={() => window.location.reload()} />
+
+              <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
                 {[
                   { label: 'Program', value: currentProgram.name },
                   { label: 'Type', value: programSource === 'custom' ? 'Built by you' : 'Sample routine' },
@@ -2356,6 +2368,22 @@ export default function ProgramsPage() {
                     Program, then My programs — so the thing you made and will
                     want again next week was the deepest item in the app. It is
                     one tap from here now. */}
+                {/* Which days you train is a property of the plan, not a
+                    conversation with your coach — but the only way to set it
+                    was /studio/schedule, which lives under Coach. It decides
+                    whether Today says "rest day" or offers a session, so a
+                    client who never found it got offered a session every day
+                    of their life. */}
+                <Link
+                  href="/studio/schedule"
+                  className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] group"
+                >
+                  <span className="text-ink-2 text-sm font-body shrink-0">Which days I train</span>
+                  <span className="text-ink-3 group-hover:text-white text-lg leading-none transition-colors duration-200" aria-hidden="true">
+                    &rsaquo;
+                  </span>
+                </Link>
+
                 {assignedProgramId && (
                   <div className="flex gap-2 mt-4">
                     <button
