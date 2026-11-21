@@ -56,6 +56,17 @@ export interface PlanExercise {
    * the app changes things behind their back.
    */
   swappedFrom: string | null
+  /**
+   * A note the coach attached to this exercise.
+   *
+   * `program_exercises.notes` has existed since the table did and nothing has
+   * ever read it. A coached client paying for Anthony's attention gets his
+   * programming and none of his words, because the only place a note could
+   * land was a message in a thread they are not looking at mid-set.
+   *
+   * Null on all 68 seeded programs, so this shows up only where he put one.
+   */
+  note: string | null
 }
 export interface PlanDay {
   day: string
@@ -84,7 +95,8 @@ export interface LoadedProgram {
 }
 
 interface DayRow { id: string; day_index: number; name: string; focus: string | null; notes: string | null }
-interface ExRow { program_day_id: string; order_index: number; exercise_name: string; sets: number | null; reps: string | null; rest_seconds: number | null; superset_group: string | null; target_rir: number | null }
+/** `notes` is Anthony's note on the slot. Null on all 68 seeded programs. */
+interface ExRow { program_day_id: string; order_index: number; exercise_name: string; sets: number | null; reps: string | null; rest_seconds: number | null; superset_group: string | null; target_rir: number | null; notes: string | null }
 
 /** Strip the "Day N — " prefix to a short title, e.g. "Day 3 — Push A" → "Push A". */
 function shortName(dayName: string): string {
@@ -123,7 +135,7 @@ export async function loadAssignedProgram(
   const dayIds = dayRows.map((d) => d.id)
   const { data: exs } = await db
     .from('program_exercises')
-    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, superset_group, target_rir')
+    .select('program_day_id, order_index, exercise_name, sets, reps, rest_seconds, superset_group, target_rir, notes')
     .in('program_day_id', dayIds)
     .order('order_index', { ascending: true })
   const exRows = (exs ?? []) as ExRow[]
@@ -153,6 +165,7 @@ export async function loadAssignedProgram(
         series: labels[xi],
         targetRir: e.target_rir ?? null,
         swappedFrom: swap ? e.exercise_name : null,
+        note: e.notes?.trim() ? e.notes.trim() : null,
       }
     })
     return {

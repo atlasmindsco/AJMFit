@@ -130,6 +130,8 @@ interface ProgramExercise {
   targetRir?: number | null
   /** The exercise this replaced, when the client said they have no bench. */
   swappedFrom?: string | null
+  /** A note Anthony attached to this slot. Mirrors PlanExercise. */
+  note?: string | null
 }
 
 type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
@@ -2579,6 +2581,21 @@ export default function ProgramsPage() {
                         )}
                       </div>
 
+                      {/* What a superset IS, for somebody who does not know.
+                          A1, A2 and a green badge tell an experienced lifter
+                          everything and a beginner nothing — they cannot tell
+                          whether to do all of A1 then all of A2, or alternate.
+                          The rest handling already assumes alternating and
+                          nothing on screen said so.
+                          Shown to beginners only, the same way the form cues
+                          are: an experienced lifter does not need telling
+                          twice a week forever. */}
+                      {group.isSuperset && treatAsBeginner && (
+                        <p className="text-ink-3 text-xs font-body mb-2.5 leading-relaxed">
+                          Do one set of each, back to back, then rest. That&rsquo;s one round.
+                        </p>
+                      )}
+
                       {/* Exercises in series */}
                       <div className="space-y-2">
                         {group.exercises.map(({ exercise, seriesPrefix }) => {
@@ -2590,7 +2607,7 @@ export default function ProgramsPage() {
                           const showEnd = imagePreview[exercise.name] ?? false
                           // In a running session the one exercise on screen is
                           // always open: there is nothing to collapse it to.
-                          const isOpen = sessionActive || expandedWorkoutExercise === exercise.name
+                          // isOpen is worked out below, once currentLogs exists.
                           const logKey = `${selectedDay}-${exercise.name}`
                           // Where the superset round ends, and therefore where
                           // the rest actually belongs.
@@ -2622,6 +2639,26 @@ export default function ProgramsPage() {
                           const explosive = isExplosiveMovement(displayName)
                           const needsWeight = !explosive
                           const currentLogs = timed ? [] : backingLogs.slice(0, workingSetCount)
+                          /**
+                           * Open while there is still work in it.
+                           *
+                           * Every exercise used to stay open for the whole
+                           * session, so by the last one a tired client was
+                           * scrolling past five finished blocks to reach the
+                           * one in front of them — the page is longest exactly
+                           * when they have least patience for it.
+                           *
+                           * A finished exercise folds to its header and reopens
+                           * on a tap, which is how a mistyped set still gets
+                           * corrected. Timed work has no set rows, so it never
+                           * counts as finished and never folds on its own.
+                           */
+                          const allSetsDone =
+                            currentLogs.length > 0 && currentLogs.every((l) => l.logged)
+                          const isOpen =
+                            expandedWorkoutExercise === exercise.name ||
+                            (sessionActive && !allSetsDone) ||
+                            (!sessionActive && expandedWorkoutExercise === exercise.name)
 
                           // Hoisted out of the advice block below so the set
                           // rows can be filled from it. The engine has always
@@ -2750,6 +2787,19 @@ export default function ProgramsPage() {
                                       </span>
                                     )}
                                   </div>
+                                  {/* Anthony's note on this exercise.
+                                      One line, under the name, only where he
+                                      wrote one. A coached client is paying for
+                                      his attention and the only place his words
+                                      could previously land was a message thread
+                                      they are not reading between sets. Not a
+                                      conversation — coaching must not compete
+                                      with execution. */}
+                                  {exercise.note && (
+                                    <p className="text-brand-blue text-xs font-body mt-1 leading-relaxed">
+                                      {exercise.note}
+                                    </p>
+                                  )}
                                   <div className="flex items-center gap-2 mt-0.5">
                                     {/* Where you are, in words.
                                         The set number was a numeral in a 24px
