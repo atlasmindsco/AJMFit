@@ -17,6 +17,12 @@ import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type Onb
 import AssignProgram from '@/components/admin/AssignProgram'
 import ProgramRecommendation from '@/components/admin/ProgramRecommendation'
 import ClientPhotos from '@/components/admin/ClientPhotos'
+import { rankRoster, rosterCounts, rosterFilters } from '@/lib/roster'
+import { STATUS_META, type ClientStatus } from '@/lib/client-status'
+import { fetchAllCheckIns } from '@/lib/check-ins'
+import { fetchActiveBlocks, fetchEverAssigned } from '@/lib/programs'
+import { fetchStalledLifts } from '@/lib/admin'
+import { fetchPainSwaps } from '@/lib/workout'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
@@ -34,7 +40,19 @@ function getStatusBadge(status: UserStatus) {
   return map[status]
 }
 
-type FilterType = 'all' | 'active' | 'pending' | 'paused'
+/**
+ * The list used to filter on 'active | pending | paused' — the STRIPE
+ * subscription status. It told the coach who was paying and nothing about who
+ * was training, so a client who had never logged a set rendered identically
+ * to one on a ten-week streak: both green, both Active.
+ *
+ * Measured the day this changed: 15 active clients, 7 who had never logged a
+ * single set and 4 more who had not trained in 41 to 95 days.
+ *
+ * Billing states stay, because approving an application still needs them.
+ * What is added is the state that says how somebody is actually doing.
+ */
+type FilterType = 'all' | 'active' | 'pending' | 'paused' | ClientStatus
 
 export default function ClientsPage() {
   const [filter, setFilter] = useState<FilterType>('all')
@@ -44,13 +62,31 @@ export default function ClientsPage() {
   const [processing, setProcessing] = useState<string | null>(null)
 
   const [onboardingMap, setOnboardingMap] = useState<Map<string, OnboardingForm>>(new Map())
+  /** Everything clientStatus needs to say how a client is really doing. */
+  const [roster, setRoster] = useState<Map<string, { status: ClientStatus; reason: string }>>(new Map())
+  const [rosterCount, setRosterCount] = useState<Record<string, number>>({})
+  const [rosterStates, setRosterStates] = useState<ClientStatus[]>([])
 
   const loadClients = () => {
     setLoading(true)
-    Promise.all([fetchClients(), fetchAllOnboarding().catch(() => new Map<string, OnboardingForm>())])
-      .then(([rows, forms]) => {
+    Promise.all([
+      fetchClients(),
+      fetchAllOnboarding().catch(() => new Map<string, OnboardingForm>()),
+      fetchAllCheckIns().catch(() => []),
+      fetchActiveBlocks().catch(() => new Map()),
+      fetchEverAssigned().catch(() => new Set<string>()),
+      fetchStalledLifts().catch(() => new Map()),
+      fetchPainSwaps().catch(() => []),
+    ])
+      .then(([rows, forms, checkIns, blocks, everAssigned, stalls, painSwaps]) => {
         setClients(rows)
         setOnboardingMap(forms)
+        // Ranked by lib/roster.ts, the same call the dashboard makes, so the
+        // two screens cannot disagree about who needs attention.
+        const ranked = rankRoster({ clients: rows, checkIns, stalls, painSwaps, blocks, everAssigned })
+        setRoster(new Map(ranked.map((r) => [r.client.id, { status: r.status, reason: r.reason }])))
+        setRosterCount(rosterCounts(ranked) as unknown as Record<string, number>)
+        setRosterStates(rosterFilters(ranked))
       })
       .catch((err) => {
         console.error('[Clients] Failed to load:', err)
@@ -62,12 +98,20 @@ export default function ClientsPage() {
     loadClients()
   }, [])
 
-  const filtered = filter === 'all' ? clients : clients.filter((c) => c.status === filter)
-  const counts = {
+  const isBilling = (f: FilterType): f is 'active' | 'pending' | 'paused' =>
+    f === 'active' || f === 'pending' || f === 'paused'
+  const filtered =
+    filter === 'all'
+      ? clients
+      : isBilling(filter)
+        ? clients.filter((c) => c.status === filter)
+        : clients.filter((c) => roster.get(c.id)?.status === filter)
+  const counts: Record<string, number> = {
     all: clients.length,
     active: clients.filter((c) => c.status === 'active').length,
     pending: clients.filter((c) => c.status === 'pending').length,
     paused: clients.filter((c) => c.status === 'paused').length,
+    ...rosterCount,
   }
 
   const pendingApplications = clients.filter(
@@ -178,7 +222,10 @@ export default function ClientsPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {(['all', 'active', 'pending', 'paused'] as FilterType[]).map((f) => (
+          {/* Billing first, then how they are actually doing. Only states
+              somebody is IN get a button — a filter for an empty state is a
+              button that clears the screen. */}
+          {([...(['all', 'active', 'pending', 'paused'] as FilterType[]), ...rosterStates]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -186,8 +233,8 @@ export default function ClientsPage() {
                 filter === f ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
               }`}
             >
-              {f}
-              <span className={`text-2xs ${filter === f ? 'text-ink-2' : 'text-ink-4'}`}>{counts[f]}</span>
+              {STATUS_META[f as ClientStatus]?.label ?? f}
+              <span className={`text-2xs ${filter === f ? 'text-ink-2' : 'text-ink-4'}`}>{counts[f] ?? 0}</span>
             </button>
           ))}
         </div>
@@ -208,6 +255,10 @@ export default function ClientsPage() {
             {filtered.map((client, i) => {
               const tierLabelStr = tierLabel(client.application?.tier)
               const statusBadge = getStatusBadge(client.status)
+              // Only active clients are ranked, so this is absent for a
+              // pending application, which is correct: there is nothing to
+              // say about how somebody is training before they start.
+              const rosterRow = roster.get(client.id)
               const isExpanded = selectedClient === client.id
               const isPendingApp = client.application?.status === 'pending'
               return (
@@ -244,6 +295,23 @@ export default function ClientsPage() {
                             {statusBadge.label}
                           </span>
                         </div>
+                        {/* How they are actually doing, under the name.
+                            The badge beside the name is the billing state, and
+                            on this screen it was the ONLY state shown — so a
+                            client who had never logged a set and one on a
+                            ten-week streak were both a green "Active" dot.
+                            The reason is printed too: "Never trained" is a
+                            label, "joined 200 days ago, never trained" is
+                            something a coach can act on. */}
+                        {rosterRow && (
+                          <p className={`text-2xs font-body mt-1 ${STATUS_META[rosterRow.status].tone}`}>
+                            <span className="font-display font-bold uppercase tracking-wide">
+                              {STATUS_META[rosterRow.status].label}
+                            </span>
+                            {' · '}
+                            <span className="text-ink-3">{rosterRow.reason}</span>
+                          </p>
+                        )}
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                           <span className={`text-2xs font-display font-bold px-2 py-0.5 rounded ${getTierColor(tierLabelStr)}`}>
                             {tierLabelStr}

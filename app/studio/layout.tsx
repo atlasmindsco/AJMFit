@@ -11,6 +11,7 @@ import FeedbackButton from '@/components/studio/FeedbackButton'
 import { SessionChromeProvider, useSessionChrome } from '@/components/studio/SessionChrome'
 import { NAV_TABS, PROFILE_LINKS, owns } from '@/lib/nav'
 import { signedAvatarUrl } from '@/lib/avatar'
+import { recordView } from '@/lib/screen-views'
 import { signOut } from '@/lib/current-user'
 import { createClient } from '@/lib/supabase/client'
 
@@ -30,6 +31,7 @@ export default function ClientPortalLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+
   const router = useRouter()
   const [profileOpen, setProfileOpen] = useState(false)
   const [clientName, setClientName] = useState('')
@@ -40,6 +42,22 @@ export default function ClientPortalLayout({
    * initials rather than to a broken-image icon.
    */
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  /** Only for counting screen views. Nothing on screen reads it. */
+  const [studioUserId, setStudioUserId] = useState<string | null>(null)
+  /**
+   * One row per screen a client opens.
+   *
+   * Five audits reasoned about what clients look at and the app recorded
+   * nothing, so every claim about attention in them was inference. This is
+   * the smallest thing that answers it: who, which path, when.
+   *
+   * Fire-and-forget, never awaited, failures dropped. Measurement must never
+   * be able to slow down or break a session.
+   */
+  useEffect(() => {
+    if (!studioUserId || !pathname) return
+    void recordView(studioUserId, pathname)
+  }, [studioUserId, pathname])
   // Auth is enforced in middleware; here we additionally gate on subscription
   // status: only an active (incl. trialing) member sees the studio. Others are
   // shown the paywall. 'out' is a graceful fallback if no session/record loads.
@@ -67,15 +85,18 @@ export default function ClientPortalLayout({
       for (let i = 0; i < attempts; i++) {
         const { data: u } = await supabase
           .from('users')
-          .select('status,name,is_beta,avatar_path')
+          .select('id,status,name,is_beta,avatar_path')
           .eq('auth_id', user.id)
-          .maybeSingle<{ status: string; name: string | null; is_beta: boolean; avatar_path: string | null }>()
+          .maybeSingle<{ id: string; status: string; name: string | null; is_beta: boolean; avatar_path: string | null }>()
         if (cancelled) return
         if (!u) {
           setGate('out')
           return
         }
         if (u.name) setClientName(u.name)
+        // The signed-in client's own id, kept only so navigation can be
+        // counted. See the view recorder below.
+        if (u.id) setStudioUserId(u.id)
         // Signed separately and not awaited: the nav should not wait on a
         // storage round trip to render, and the initials stand in until the
         // photo arrives.
