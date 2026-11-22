@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { stalledLifts, historyFromSets, type StalledLift } from '@/lib/coach-signals'
+import { buildSessions, type CoachSession } from '@/lib/coach-training'
 import type { BriefSession } from '@/lib/client-brief'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -400,4 +401,142 @@ export async function fetchCronRuns(): Promise<Array<{ job: string; ran_at: stri
     .order('ran_at', { ascending: false })
   if (error) throw error
   return (data ?? []) as Array<{ job: string; ran_at: string; ok: boolean | null }>
+}
+
+/**
+ * Every logged set for one client, newest session first.
+ *
+ * The table has 1,371 rows and no coach screen has ever displayed one. Two
+ * functions read it — the stall detector and the brief builder — and both
+ * reduce it to a verdict, so there was no way to open Monday and see what
+ * somebody benched.
+ *
+ * Paginated: PostgREST caps a page at 1,000 rows whatever limit you ask for,
+ * and a silent truncation here would quietly drop a client's earliest
+ * sessions from the history.
+ */
+export async function fetchClientSessions(
+  userId: string,
+  limitWorkouts = 20
+): Promise<CoachSession[]> {
+  const { data: workouts } = await db
+    .from('workouts')
+    .select('id, date, day_name, duration_seconds, started_at')
+    .eq('user_id', userId)
+    .order('started_at', { ascending: false })
+    .limit(limitWorkouts)
+
+  const wRows = (workouts ?? []) as Array<{
+    id: string
+    date: string | null
+    day_name: string | null
+    duration_seconds: number | null
+    started_at: string
+  }>
+  if (wRows.length === 0) return []
+
+  const meta: Record<string, { date: string; dayName: string | null; durationSeconds: number | null }> = {}
+  for (const w of wRows) {
+    meta[w.id] = {
+      date: w.date || w.started_at.slice(0, 10),
+      dayName: w.day_name,
+      durationSeconds: w.duration_seconds,
+    }
+  }
+
+  const ids = wRows.map((w) => w.id)
+  const sets: Array<Record<string, unknown>> = []
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await db
+      .from('workout_sets')
+      .select('workout_id, exercise_name, original_exercise_name, weight, reps, rir, set_number, is_intensity_set, completed')
+      .in('workout_id', ids)
+      .order('set_number', { ascending: true })
+      .range(from, from + 999)
+    if (error) break
+    const page = (data ?? []) as Array<Record<string, unknown>>
+    sets.push(...page)
+    if (page.length < 1000) break
+  }
+
+  const rows = sets
+    .filter((s) => s.completed !== false)
+    .map((s) => ({
+      workoutId: String(s.workout_id),
+      date: meta[String(s.workout_id)]?.date ?? '',
+      dayName: meta[String(s.workout_id)]?.dayName ?? null,
+      durationSeconds: meta[String(s.workout_id)]?.durationSeconds ?? null,
+      exerciseName: String(s.exercise_name),
+      swappedFrom: s.original_exercise_name ? String(s.original_exercise_name) : null,
+      weight: s.weight == null ? null : Number(s.weight),
+      reps: s.reps == null ? null : Number(s.reps),
+      rir: s.rir == null ? null : Number(s.rir),
+      setNumber: Number(s.set_number) || 0,
+      isIntensitySet: Boolean(s.is_intensity_set),
+    }))
+    .filter((r) => r.date)
+
+  return buildSessions(rows)
+}
+
+/* ───────────────────────────── private coach notes ─────────────────────── */
+
+export interface CoachNote {
+  id: string
+  user_id: string
+  body: string
+  pinned: boolean
+  created_at: string
+}
+
+/** Pinned first, then newest. Trainer-only by RLS; the client never sees these. */
+export async function fetchCoachNotes(userId: string): Promise<CoachNote[]> {
+  const { data, error } = await db
+    .from('coach_notes')
+    .select('id, user_id, body, pinned, created_at')
+    .eq('user_id', userId)
+    .order('pinned', { ascending: false })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []) as CoachNote[]
+}
+
+export async function addCoachNote(userId: string, body: string): Promise<CoachNote> {
+  const text = body.trim()
+  if (!text) throw new Error('A note needs something in it.')
+  const { data, error } = await db
+    .from('coach_notes')
+    .insert({ user_id: userId, body: text })
+    .select('id, user_id, body, pinned, created_at')
+    .single()
+  if (error) throw error
+  return data as CoachNote
+}
+
+/**
+ * Pin one note, unpinning the rest.
+ *
+ * At most one pinned note per client, enforced here rather than in the
+ * schema: a partial unique index would turn "pin this one instead" into a
+ * two-step write that can half-fail.
+ */
+export async function pinCoachNote(userId: string, noteId: string): Promise<void> {
+  await db.from('coach_notes').update({ pinned: false }).eq('user_id', userId).eq('pinned', true)
+  const { data, error } = await db
+    .from('coach_notes')
+    .update({ pinned: true, updated_at: new Date().toISOString() })
+    .eq('id', noteId)
+    .select('id')
+  if (error) throw error
+  // PostgREST reports an RLS-filtered update as a success with zero rows.
+  if (!data || data.length === 0) throw new Error('Could not pin that note.')
+}
+
+export async function unpinCoachNote(noteId: string): Promise<void> {
+  await db.from('coach_notes').update({ pinned: false }).eq('id', noteId)
+}
+
+export async function deleteCoachNote(noteId: string): Promise<void> {
+  const { error } = await db.from('coach_notes').delete().eq('id', noteId)
+  if (error) throw error
 }

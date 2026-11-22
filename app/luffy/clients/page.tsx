@@ -17,6 +17,8 @@ import { fetchAllOnboarding, ONBOARDING_LABELS, type OnboardingAnswers, type Onb
 import AssignProgram from '@/components/admin/AssignProgram'
 import ProgramRecommendation from '@/components/admin/ProgramRecommendation'
 import ClientPhotos from '@/components/admin/ClientPhotos'
+import ClientTraining from '@/components/admin/ClientTraining'
+import CoachNotes from '@/components/admin/CoachNotes'
 import { rankRoster, rosterCounts, rosterFilters } from '@/lib/roster'
 import { STATUS_META, type ClientStatus } from '@/lib/client-status'
 import { fetchAllCheckIns } from '@/lib/check-ins'
@@ -495,6 +497,27 @@ export default function ClientsPage() {
                         ) : (
                           <p className="text-ink-3 text-sm font-body">Not filled out yet.</p>
                         )}
+                      </div>
+
+                      {/* Private, and first: a pinned note is the thing
+                          that should be in front of the coach before they
+                          read anything else about this person. The client
+                          never sees these. */}
+                      <div>
+                        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+                          Coach notes &middot; private
+                        </p>
+                        <CoachNotes userId={client.id} />
+                      </div>
+
+                      {/* What they actually did. 1,371 logged sets existed
+                          and no coach screen showed one — you could see that
+                          a workout happened and not what was in it. */}
+                      <div>
+                        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+                          Training
+                        </p>
+                        <ClientTraining userId={client.id} />
                       </div>
 
                       <ClientPhotos userId={client.id} />

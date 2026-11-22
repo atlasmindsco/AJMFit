@@ -91,3 +91,40 @@ export function formatMsgTime(iso: string): string {
         ', ' +
         d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
+
+/**
+ * Clients whose last message has no reply from the coach, oldest wait first.
+ *
+ * The dashboard ranked on training and never on this, so Shane's message sat
+ * 154 days and Jamel's 105 without either appearing anywhere. A person
+ * waiting on an answer outranks every training signal in the app: a missed
+ * workout is a pattern, an unanswered question is a broken promise.
+ */
+export async function fetchUnansweredThreads(): Promise<
+  Array<{ userId: string; waitingDays: number; lastBody: string }>
+> {
+  const { data, error } = await db
+    .from('messages')
+    .select('user_id, from_trainer, body, created_at')
+    .order('created_at', { ascending: false })
+  if (error) return []
+
+  const rows = (data ?? []) as Array<{
+    user_id: string
+    from_trainer: boolean
+    body: string
+    created_at: string
+  }>
+
+  // Newest first, so the first row per client is their latest message.
+  const latest = new Map<string, { from_trainer: boolean; body: string; created_at: string }>()
+  for (const m of rows) if (!latest.has(m.user_id)) latest.set(m.user_id, m)
+
+  const out: Array<{ userId: string; waitingDays: number; lastBody: string }> = []
+  for (const [userId, m] of Array.from(latest)) {
+    if (m.from_trainer) continue // the coach spoke last; nobody is waiting
+    const days = Math.floor((Date.now() - Date.parse(m.created_at)) / 86400000)
+    out.push({ userId, waitingDays: Math.max(0, days), lastBody: m.body })
+  }
+  return out.sort((a, b) => b.waitingDays - a.waitingDays)
+}

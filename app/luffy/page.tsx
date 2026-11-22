@@ -11,6 +11,7 @@ import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingN
 import type { StalledLift } from '@/lib/coach-signals'
 import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
+import { fetchUnansweredThreads } from '@/lib/messages'
 import { cronHealth, cronWarning } from '@/lib/cron-health'
 import { fetchCronRuns } from '@/lib/admin'
 import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
@@ -45,6 +46,14 @@ export default function AdminDashboard() {
   const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
   const [wins, setWins] = useState<RecentWin[]>([])
   /** Whether the daily jobs are still running. See lib/cron-health.ts. */
+  /**
+   * Clients whose last message has no reply, oldest wait first.
+   *
+   * The ranking read training signals and never this, so Shane's message sat
+   * 154 days and Jamel's 105 without surfacing anywhere. Somebody waiting on
+   * an answer outranks every training signal there is.
+   */
+  const [waiting, setWaiting] = useState<Map<string, number>>(new Map())
   const [cronWarn, setCronWarn] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -69,6 +78,11 @@ export default function AdminDashboard() {
         // Second line of defence. The GitHub Action emails on failure; this
         // makes a silent stop visible on the screen the coach already opens,
         // because an email that stops arriving is what nobody notices.
+        void fetchUnansweredThreads()
+          .then((rows) => {
+            if (active) setWaiting(new Map(rows.map((r) => [r.userId, r.waitingDays])))
+          })
+          .catch(() => {})
         void fetchCronRuns()
           .then((runs) => {
             if (active) setCronWarn(cronWarning(cronHealth(runs, ['digest', 'reminders'])))
@@ -188,9 +202,23 @@ export default function AdminDashboard() {
                       })
                       return { client, status, reason }
                     })
-                    .sort((a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status))
-                    .slice(0, 10)
-                    .map(({ client, status, reason }) => {
+                    /* Somebody waiting on a reply goes above everything.
+                       A missed workout is a pattern; an unanswered question
+                       is a broken promise, and the ranking could not see it
+                       at all until now. */
+                    .map((r) => ({ ...r, waitingDays: waiting.get(r.client.id) ?? null }))
+                    .sort((a, b) => {
+                      if ((a.waitingDays ?? -1) !== (b.waitingDays ?? -1)) {
+                        return (b.waitingDays ?? -1) - (a.waitingDays ?? -1)
+                      }
+                      return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status)
+                    })
+                    /* Three, not ten. The engine finds eleven flaggable
+                       clients out of fifteen, and a list of eleven is the
+                       client list again rather than a priority list. If a
+                       fourth genuinely matters it is here tomorrow. */
+                    .slice(0, 3)
+                    .map(({ client, status, reason, waitingDays }) => {
                       const tier = tierLabel(client.application?.tier)
                       const meta = STATUS_META[status]
                       return (
@@ -206,7 +234,11 @@ export default function AdminDashboard() {
                               <span className={`w-2 h-2 rounded-full shrink-0 ${meta.dot}`} />
                               <span>
                                 <span className={`block text-xs font-display font-bold ${meta.tone}`}>{meta.label}</span>
-                                <span className="block text-ink-4 text-2xs font-body">{reason}</span>
+                                <span className="block text-ink-4 text-2xs font-body">
+                                  {waitingDays != null
+                                    ? `Message waiting ${waitingDays} day${waitingDays === 1 ? '' : 's'}`
+                                    : reason}
+                                </span>
                                 {/* A queued nutrition change rides alongside
                                     rather than competing for the status, which
                                     stays one-per-client. The cron files these
