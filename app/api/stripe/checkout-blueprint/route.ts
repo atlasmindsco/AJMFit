@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient as createServerClient } from '@/lib/supabase/server'
+import { BILLABLE } from '@/lib/duplicate-subs'
 
 export const runtime = 'nodejs'
 
@@ -66,6 +68,58 @@ async function logAttempt(request: Request, stripeSessionId: string | null): Pro
 export async function GET(request: Request) {
   const origin = new URL(request.url).origin
 
+  /**
+   * Already paying? Then this link is not for them.
+   *
+   * This route creates a GUEST Stripe session — no customer, no signed-in
+   * user, no check — so clicking it twice produced two Stripe customers and
+   * two live subscriptions, and nothing noticed. Ruth Fleurime ended up with
+   * three across two accounts and Luis with two.
+   *
+   * A visitor with no session falls straight through, because the common case
+   * is somebody buying for the first time and adding friction to that to stop
+   * a rare double-click would be the wrong trade. The guard only fires for
+   * somebody the cookie says is already signed in and already paying.
+   *
+   * Nothing here cancels, refunds or changes a subscription. It can only
+   * decline to start a new one.
+   */
+  const signedIn = await (async () => {
+    try {
+      const supabase = createServerClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return null
+      const admin = createAdminClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = admin as any
+      const { data: row } = await db
+        .from('users')
+        .select('id, email')
+        .eq('auth_id', user.id)
+        .maybeSingle()
+      if (!row?.id) return null
+      const { data: subs } = await db
+        .from('subscriptions')
+        .select('status, stripe_subscription_id')
+        .eq('user_id', row.id)
+      const live = (subs ?? []).filter(
+        (r: { status: string | null; stripe_subscription_id: string | null }) =>
+          r.stripe_subscription_id && BILLABLE.indexOf(String(r.status)) !== -1
+      )
+      return { id: row.id as string, email: row.email as string | null, live: live.length }
+    } catch {
+      // Never let the check stop somebody buying. A failed lookup falls
+      // through to the normal path.
+      return null
+    }
+  })()
+
+  if (signedIn && signedIn.live > 0) {
+    return NextResponse.redirect(`${origin}/studio?already=1`, 303)
+  }
+
   const price = (
     await stripe.prices.list({ lookup_keys: ['blueprint_monthly'], limit: 1 })
   ).data[0]
@@ -84,6 +138,16 @@ export async function GET(request: Request) {
       metadata: { tier: 'blueprint', billing_cycle: 'monthly', flow: 'blueprint_direct' },
     },
     metadata: { flow: 'blueprint_direct' },
+    // A signed-in buyer without a live subscription — somebody whose payment
+    // lapsed, say — is attached to the account they already have. Without
+    // this the webhook matches on the checkout email alone, and a different
+    // address becomes a second person: that is how Ruth ended up with two.
+    ...(signedIn
+      ? {
+          client_reference_id: signedIn.id,
+          ...(signedIn.email ? { customer_email: signedIn.email } : {}),
+        }
+      : {}),
     success_url: `${origin}/blueprint/welcome?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/work-with-me`,
   })

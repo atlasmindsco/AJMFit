@@ -18,6 +18,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import OnboardingChecklist from '@/components/studio/OnboardingChecklist'
 import PlanPanel from '@/components/studio/PlanPanel'
 import BillingPanel from '@/components/studio/BillingPanel'
@@ -61,6 +62,17 @@ export default function ClientDashboard() {
    * of the six clients on the platform qualify today. An empty slot is better
    * than a padded one.
    */
+  /**
+   * Sent here by the checkout link because they already subscribe.
+   *
+   * /api/stripe/checkout-blueprint used to create a second Stripe customer
+   * and a second live subscription for anybody who clicked it twice. It now
+   * declines and lands them here, and this says why — a silent redirect to a
+   * screen they did not ask for reads as the payment failing, which is the
+   * thing that made people pay again in the first place.
+   */
+  const alreadySubscribed = useSearchParams().get('already') === '1'
+
   const [lift, setLift] = useState<string | null>(null)
   const [myProgram, setMyProgram] = useState<Program | null>(null)
   /** The session to offer, and where it sits in the program. */
@@ -398,6 +410,16 @@ export default function ClientDashboard() {
           </>
         )}
       </motion.div>
+
+      {alreadySubscribed && (
+        <div className="mb-5 px-5 py-4 rounded-card bg-state-success/[0.08] border border-state-success/25">
+          <p className="font-display font-bold text-sm text-white">You&rsquo;re already subscribed</p>
+          <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">
+            No need to pay again &mdash; your membership is active and everything below is yours. If something
+            looks wrong, message Anthony on the Coach tab rather than signing up a second time.
+          </p>
+        </div>
+      )}
 
       {/* One line about a lift that moved.
           Not a chart and not a Progress tab. A chart invites study; this is
