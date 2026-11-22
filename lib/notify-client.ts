@@ -27,6 +27,8 @@ export type NotifyKind =
   | 'check_in_due'
   | 'training_day'
   | 'weekly_summary'
+  /** Sent to the COACH, once per client ever, when they finish their first session. */
+  | 'first_workout'
 
 /**
  * Record that something was sent, and refuse to send it twice.

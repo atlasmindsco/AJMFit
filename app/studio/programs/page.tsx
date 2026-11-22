@@ -1410,6 +1410,11 @@ export default function ProgramsPage() {
       try {
         await dbEndWorkout(workoutId, elapsed)
         if (userId) loadHistory(userId)
+        /* Tell the coach, but only ever once, and only on the first one.
+           The server decides whether this is their first — the client just
+           says a session ended. Fire and forget: a notification must never
+           be able to affect the workout somebody just finished. */
+        fetch('/api/studio/first-workout-notify', { method: 'POST' }).catch(() => {})
       } catch (err) {
         console.error('[Workout] Failed to end:', err)
       }
