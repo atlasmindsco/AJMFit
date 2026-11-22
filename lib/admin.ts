@@ -384,3 +384,20 @@ export async function fetchAllSubscriptions(): Promise<
     stripe_subscription_id: string | null
   }>
 }
+
+/**
+ * The last fortnight of cron runs, for the staleness check on the dashboard.
+ *
+ * Narrow on purpose: enough to tell "ran today" from "has not run since
+ * October", and nothing more. See lib/cron-health.ts.
+ */
+export async function fetchCronRuns(): Promise<Array<{ job: string; ran_at: string; ok: boolean | null }>> {
+  const since = new Date(Date.now() - 14 * 86400000).toISOString()
+  const { data, error } = await db
+    .from('cron_runs')
+    .select('job, ran_at, ok')
+    .gte('ran_at', since)
+    .order('ran_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []) as Array<{ job: string; ran_at: string; ok: boolean | null }>
+}

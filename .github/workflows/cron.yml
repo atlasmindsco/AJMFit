@@ -1,0 +1,98 @@
+# The daily jobs, scheduled here instead of by Vercel.
+#
+# WHY. vercel.json declares both of these and they have not run. `cron_runs`
+# holds exactly one row in the product's history — the digest, on 14 October
+# 2026 — and `notifications_sent` is empty, so not one reminder or
+# re-engagement message has ever reached a client. Meanwhile eleven of fifteen
+# active clients are dormant or have never trained, two client messages have
+# been waiting 154 and 105 days, and that single October run wrote its own
+# summary: "1 client waiting on a reply · 8 gone quiet". It was right, it said
+# so, and it never ran again.
+#
+# The endpoints are fine. `curl` against production returns a clean 401
+# without a token, which is the auth working. What is missing is something
+# calling them on a schedule.
+#
+# This repo already deploys through Actions rather than the Vercel GitHub App
+# (see deploy.yml — "needs cross-account app installs we don't have"), so the
+# scheduling runs in the same place as the deploys, with the same secrets, and
+# does not depend on which Vercel plan the project is on.
+#
+# vercel.json is deliberately left alone. If Vercel's own crons ever start
+# firing, the reminders route already dedupes through notifications_sent
+# before it sends, so nobody gets messaged twice; a second digest email is
+# noise rather than harm. Having two schedules is a better failure than
+# removing the one that might start working and being left with none.
+#
+# SETUP, once: add a repository Actions secret named CRON_SECRET whose value
+# matches the CRON_SECRET environment variable in Vercel. Until that exists
+# every run fails loudly, which is the point — a silent cron is how this went
+# unnoticed for five weeks.
+name: Daily jobs
+
+on:
+  schedule:
+    # Same times vercel.json asked for. GitHub cron is UTC.
+    - cron: '0 12 * * *' # digest, noon
+    - cron: '0 22 * * *' # reminders, 10pm
+  # So a run can be forced from the Actions tab without waiting for the clock,
+  # and so the first one can be proved to work the day this lands.
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which job to run
+        required: true
+        default: both
+        type: choice
+        options: [both, digest, reminders]
+      dry:
+        description: Decide everything, send nothing
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: daily-jobs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse to run without a secret
+        # A missing secret would otherwise look like a 401 from the app, which
+        # sends whoever reads this looking in the wrong place.
+        run: |
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "::error::CRON_SECRET is not set in this repository's Actions secrets."
+            echo "Add it with the same value as CRON_SECRET in Vercel, then re-run."
+            exit 1
+          fi
+
+      - name: Digest
+        if: github.event_name == 'schedule' && github.event.schedule == '0 12 * * *' || inputs.job == 'both' || inputs.job == 'digest'
+        run: |
+          DRY=""
+          if [ "${{ inputs.dry }}" = "true" ]; then DRY="?dry=1"; fi
+          echo "Calling /api/cron/digest$DRY"
+          CODE=$(curl -sS -o /tmp/out.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://ajmfit.com/api/cron/digest$DRY")
+          echo "HTTP $CODE"
+          cat /tmp/out.json; echo
+          # Fail the job on anything but 2xx so GitHub emails. A cron that
+          # fails quietly is the thing that caused this file to exist.
+          case "$CODE" in 2*) ;; *) echo "::error::digest returned $CODE"; exit 1;; esac
+
+      - name: Reminders
+        if: github.event_name == 'schedule' && github.event.schedule == '0 22 * * *' || inputs.job == 'both' || inputs.job == 'reminders'
+        run: |
+          DRY=""
+          if [ "${{ inputs.dry }}" = "true" ]; then DRY="?dry=1"; fi
+          echo "Calling /api/cron/reminders$DRY"
+          CODE=$(curl -sS -o /tmp/out.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://ajmfit.com/api/cron/reminders$DRY")
+          echo "HTTP $CODE"
+          cat /tmp/out.json; echo
+          case "$CODE" in 2*) ;; *) echo "::error::reminders returned $CODE"; exit 1;; esac

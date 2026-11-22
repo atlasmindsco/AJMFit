@@ -11,6 +11,8 @@ import { fetchClients, tierLabel, relativeTime, fetchStalledLifts, fetchPendingN
 import type { StalledLift } from '@/lib/coach-signals'
 import { TIER_EXPERIENCE } from '@/lib/tiers'
 import { fetchAllCheckIns, type CheckIn } from '@/lib/check-ins'
+import { cronHealth, cronWarning } from '@/lib/cron-health'
+import { fetchCronRuns } from '@/lib/admin'
 import { clientStatus, STATUS_META, STATUS_ORDER } from '@/lib/client-status'
 import { fetchFeedback, type Feedback } from '@/lib/feedback'
 
@@ -42,6 +44,8 @@ export default function AdminDashboard() {
   const [stalls, setStalls] = useState<Map<string, StalledLift[]>>(new Map())
   const [proposals, setProposals] = useState<Map<string, { created_at: string }>>(new Map())
   const [wins, setWins] = useState<RecentWin[]>([])
+  /** Whether the daily jobs are still running. See lib/cron-health.ts. */
+  const [cronWarn, setCronWarn] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -62,6 +66,14 @@ export default function AdminDashboard() {
         ])
         if (!active) return
         setStats(s)
+        // Second line of defence. The GitHub Action emails on failure; this
+        // makes a silent stop visible on the screen the coach already opens,
+        // because an email that stops arriving is what nobody notices.
+        void fetchCronRuns()
+          .then((runs) => {
+            if (active) setCronWarn(cronWarning(cronHealth(runs, ['digest', 'reminders'])))
+          })
+          .catch(() => {})
         setClients(c)
         setFeedback(f)
         setCheckIns(ci)
@@ -105,6 +117,16 @@ export default function AdminDashboard() {
         </motion.h1>
         <p className="text-ink-3 font-body text-sm mt-2">{today}</p>
       </div>
+
+      {cronWarn && (
+        <div className="mb-8 rounded-card bg-state-danger/[0.10] border border-state-danger/30 px-5 py-4">
+          <p className="font-display font-bold text-sm text-white">The daily jobs are not running</p>
+          <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">
+            {cronWarn}. Nobody is being reminded and you are not getting the digest. Check the Daily
+            jobs workflow in GitHub Actions.
+          </p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
