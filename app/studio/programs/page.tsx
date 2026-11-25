@@ -4,6 +4,8 @@ import Link from 'next/link'
 import TravelSwitch from '@/components/studio/TravelSwitch'
 import { useSessionChrome } from '@/components/studio/SessionChrome'
 import { pickDay } from '@/lib/active-workout'
+import { filterLibrary, MUSCLE_GROUPS, EQUIPMENT_FILTERS } from '@/lib/builder-rules'
+import { groupForMuscle, rankForSwap, resultsHeading } from '@/lib/swap-search'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
@@ -2216,6 +2218,10 @@ export default function ProgramsPage() {
             exerciseName={swapFor}
             current={swappedExercises[`${selectedDay}-${swapFor}`] ?? swapFor}
             alternatives={getAlternatives(swapFor)}
+            /* The whole library, and the exercise being replaced so the
+               search can open on its muscle group and rank by it. */
+            library={exerciseDB}
+            source={findExerciseMatch(swapFor, exerciseDB)}
             isSwapped={Boolean(swappedExercises[`${selectedDay}-${swapFor}`])}
             onClose={() => setSwapFor(null)}
             onReset={() => {
@@ -4982,6 +4988,8 @@ function SwapSheet({
   exerciseName,
   current,
   alternatives,
+  library,
+  source,
   isSwapped,
   onClose,
   onReset,
@@ -4990,12 +4998,51 @@ function SwapSheet({
   exerciseName: string
   current: string
   alternatives: string[]
+  /** All 873, for the second tab. */
+  library: ExerciseDB[]
+  /** The exercise being replaced, for the opening filter and the ranking. */
+  source: ExerciseDB | null
   isSwapped: boolean
   onClose: () => void
   onReset: () => void
   onPick: (alt: string, forever: boolean, reason: SwapReason | null) => void
 }) {
   const [reason, setReason] = useState<'busy' | 'missing' | 'hurts' | null>(null)
+
+  /**
+   * Recommended, or the whole library.
+   *
+   * The recommendations were never the problem — they match on primary
+   * muscle, force, mechanic and category, so a cable crossover never stands
+   * in for a bench press. The problem was that a list of six is a dead end
+   * when the thing you want is the seventh, and the only answer the app had
+   * was a list you had already read.
+   *
+   * Recommended stays the default and stays first. "All" is the escape
+   * hatch, and the two are labelled so nobody has to guess which one they
+   * are looking at — one is the engine's opinion, the other is the library.
+   */
+  const [tab, setTab] = useState<'recommended' | 'all'>('recommended')
+  const [search, setSearch] = useState('')
+  // Opens on the muscle group of the exercise being replaced, which puts the
+  // plausible answers on screen before anything is typed. One tap clears it.
+  const [group, setGroup] = useState<string | null>(() => groupForMuscle(source?.primaryMuscles?.[0]))
+  const [equipment, setEquipment] = useState('any')
+
+  const searching = search.trim().length > 0
+  const results = useMemo(
+    () =>
+      rankForSwap(filterLibrary(library, { search, group, equipment, type: 'any' }), {
+        equipment: source?.equipment,
+        mechanic: source?.mechanic,
+        primaryMuscle: source?.primaryMuscles?.[0],
+        excludeName: exerciseName,
+      }),
+    [library, search, group, equipment, source, exerciseName]
+  )
+  // 873 rows janks the scroll on a phone, and nobody reads past 40 without
+  // narrowing. The count below says how many were left out.
+  const shown = results.slice(0, 40)
   /**
    * The chosen alternative, held rather than committed.
    *
@@ -5062,29 +5109,142 @@ function SwapSheet({
           </p>
         )}
 
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Instead, do</p>
-        <div className="space-y-1.5">
-          {alternatives.map((alt) => {
-            const picked = chosen ? chosen === alt : current === alt
-            return (
-              <button
-                key={alt}
-                onClick={() => setChosen(alt)}
-                aria-pressed={picked}
-                className={`w-full px-3.5 py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
-                  picked ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
-                }`}
-              >
-                <span className="text-white text-sm font-body">{alt}</span>
-                {picked && (
-                  <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                  </svg>
-                )}
-              </button>
-            )
-          })}
+        {/* Recommended first and by default. The second tab is for when the
+            answer is not in the first six — the rack is busy, the machine is
+            taken, and a list you have already read is not a second answer. */}
+        <div className="flex gap-1.5 mt-5 mb-3">
+          {([
+            ['recommended', 'Recommended'],
+            ['all', 'All exercises'],
+          ] as Array<['recommended' | 'all', string]>).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              aria-pressed={tab === key}
+              className={`flex-1 h-tap rounded-control text-caption font-display font-bold uppercase tracking-wide transition-colors duration-150 ${
+                tab === key ? 'bg-white/[0.12] text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
+
+        {tab === 'recommended' ? (
+          <div className="space-y-1.5">
+            {alternatives.length === 0 && (
+              <p className="text-ink-3 text-label font-body py-2">
+                Nothing matched this movement closely enough to recommend. Try All exercises.
+              </p>
+            )}
+            {alternatives.map((alt) => {
+              const picked = chosen ? chosen === alt : current === alt
+              return (
+                <button
+                  key={alt}
+                  onClick={() => setChosen(alt)}
+                  aria-pressed={picked}
+                  className={`w-full px-3.5 min-h-taplg py-3 rounded-control text-left flex items-center justify-between gap-3 transition-colors duration-150 ${
+                    picked ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+                  }`}
+                >
+                  <span className="text-white text-label font-body">{alt}</span>
+                  {picked && (
+                    <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <div>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={`Search ${library.length} exercises`}
+              className="w-full px-3 min-h-taplg py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+              aria-label="Search exercises"
+            />
+
+            {/* Six buttons over seventeen muscles — the same grouping the
+                program builder uses, from lib/builder-rules. Nothing new was
+                invented and the two cannot drift, because there is only one
+                of them. */}
+            <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1 py-2.5">
+              {MUSCLE_GROUPS.map((g) => {
+                const on = group === g.key
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setGroup(on ? null : g.key)}
+                    aria-pressed={on}
+                    className={`shrink-0 px-3 h-tap rounded-control text-caption font-display font-bold transition-colors duration-150 ${
+                      on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* One control, not a second row of chips. Equipment is the thing
+                most people are swapping BECAUSE of, so it has to be reachable
+                — but two rows of filters above a list is how a search starts
+                feeling like a form. */}
+            <select
+              value={equipment}
+              onChange={(e) => setEquipment(e.target.value)}
+              className="w-full px-3 h-tap rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-label font-body focus:outline-none focus:border-brand-blue/50"
+              aria-label="Equipment"
+            >
+              {EQUIPMENT_FILTERS.map((f) => (
+                <option key={f.key} value={f.key}>{f.label}</option>
+              ))}
+            </select>
+
+            <p className="text-ink-4 text-caption font-body mt-3 mb-1.5">
+              {resultsHeading(results.length, searching)}
+              {results.length > shown.length && ` · showing ${shown.length}`}
+            </p>
+
+            <div className="space-y-1.5">
+              {shown.map((e) => {
+                const picked = chosen === e.name
+                return (
+                  <button
+                    key={e.name}
+                    onClick={() => setChosen(e.name)}
+                    aria-pressed={picked}
+                    className={`w-full px-3.5 min-h-taplg py-2.5 rounded-control text-left flex items-center gap-3 transition-colors duration-150 ${
+                      picked ? 'bg-brand-blue/15 border border-brand-blue/30' : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-white text-label font-body truncate">{e.name}</span>
+                      <span className="block text-ink-4 text-caption font-body capitalize truncate">
+                        {e.primaryMuscles[0]} &middot; {e.equipment}
+                      </span>
+                    </span>
+                    {picked && (
+                      <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })}
+              {results.length === 0 && (
+                <p className="text-ink-4 text-caption font-body py-3">
+                  Try fewer filters, or clear the muscle group.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* How long for — the question that used to be a checkbox under the
             tap target that had already committed the answer. Both options are
