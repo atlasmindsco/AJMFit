@@ -75,6 +75,7 @@ import {
   experienceFrom,
   experienceKnown,
   isBodyweightMovement,
+  loadLabel,
   nextTarget,
   parseRepRange,
   sessionFatigue,
@@ -1165,16 +1166,22 @@ export default function ProgramsPage() {
   /** True while this day's workout is running. */
   const sessionActive = selectedDay !== null && Boolean(workoutStartTime[selectedDay])
 
-  /* Tell the layout to put the chat bubble and the feedback button away while
-     a set is actually running. Only while RUNNING — browsing the day's
-     exercises is reading, and there is no reason to strip the screen for it. */
+  /* Tell the layout to put the chat bubble and the feedback button away for
+     the whole workout screen, not just a running set.
+     It used to key off `sessionActive`, on the reasoning that browsing a day's
+     exercises is reading and does not need the screen stripped. That premise
+     was wrong: the workout view carries the weight and reps boxes at the
+     bottom of every expanded card, started or not. So before Start Workout the
+     feedback pill sat on the left of them and Chea's 56px bubble on the right,
+     both over the inputs. `view` is the honest condition — this screen is for
+     training on, and nothing of ours belongs on top of it. */
   const { setSessionActive } = useSessionChrome()
   useEffect(() => {
-    setSessionActive(sessionActive)
+    setSessionActive(view === 'workout')
     // Leaving the Train tab mid-session must not leave the rest of the app
     // stripped, so the flag is cleared on the way out either way.
     return () => setSessionActive(false)
-  }, [sessionActive, setSessionActive])
+  }, [view, setSessionActive])
 
   /**
    * How many distinct exercises the client is currently training away from
@@ -2003,9 +2010,21 @@ export default function ProgramsPage() {
           The clock, the rest countdown and End lived at the bottom of a list
           of six exercises — so during a 90-second rest the client either
           scrolled to find the timer or did without it. This sits above the
-          bottom nav wherever they have scrolled to. */}
+          bottom nav wherever they have scrolled to.
+
+          "Above the bottom nav" was not what 76px bought. It cleared the tab
+          bar's CONTENT and nothing else: the nav is `bottom-0` plus
+          `pb-[env(safe-area-inset-bottom)]`, so on any phone with a home
+          indicator it stands about 98px tall. This sat at 76px, behind it,
+          with the same z-index and earlier in the DOM. Roughly 22px went
+          under the nav — the bottom edge of +30s and Skip, the two controls
+          the bar exists for.
+
+          The breakpoint was wrong too. The nav is `md:hidden`, so between
+          640px and 768px `sm:bottom-4` put this behind a nav still on
+          screen. */}
       {view === 'workout' && selectedDay !== null && workoutStartTime[selectedDay] && (
-        <div className="fixed bottom-[76px] sm:bottom-4 left-0 right-0 z-50 px-4 pointer-events-none">
+        <div className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] md:bottom-4 left-0 right-0 z-50 px-4 pointer-events-none">
           <div className="mx-auto max-w-lg pointer-events-auto flex items-center gap-2 rounded-card bg-surface-overlay/95 backdrop-blur border border-white/[0.12] shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-3 py-2.5">
             {activeTimer ? (
               <>
@@ -2705,7 +2724,18 @@ export default function ProgramsPage() {
                           /** The set the client is on: the first one not yet confirmed. */
                           const activeSet = currentLogs.findIndex((l) => !l.logged)
                           const currentIntensityLogs = intensityLogs[logKey] ?? Array.from({ length: 2 }, () => ({ weight: '', done: false }))
-                          const pr = dbPRs[exercise.name] ?? null
+                          /* Keyed on what they are ACTUALLY lifting, not what
+                             the program asked for.
+                             PRs are written under `displayName` (the swapped
+                             exercise) and were read back under `exercise.name`
+                             (the original). So a swapped slot showed the
+                             original lift's record: "Barbell Full Squat —
+                             PR 155 lbs" directly above "First time here",
+                             because the target engine reads the history of the
+                             exercise being done and correctly found none.
+                             Two names for one row is how an app tells somebody
+                             an untrue thing about their own training. */
+                          const pr = dbPRs[displayName] ?? null
                           // Check if any entered set beats the PR
                           const bestEnteredWeight = Math.max(0, ...currentLogs.map((l) => (l.logged ? Number(l.weight) || 0 : 0)))
                           // A record needs something to beat. Without the null
@@ -3167,7 +3197,11 @@ export default function ProgramsPage() {
                                               <div className="flex items-baseline gap-3">
                                                 <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Today</span>
                                                 <span className={`text-base font-display font-bold tabular-nums ${t.addLoad ? 'text-brand-orange' : 'text-white'}`}>
-                                                  {t.suggestedWeight != null ? `${t.suggestedWeight} lb` : 'Bodyweight'}
+                                                  {/* null means "no suggestion yet", which is not
+                                                      the same as "lift your bodyweight". See
+                                                      loadLabel — the rule is pinned in
+                                                      tools/verify-load-label.ts. */}
+                                                  {loadLabel(t.suggestedWeight, displayName)}
                                                   {t.suggestedReps != null && <span className="text-ink-2 font-body text-sm"> &times; {exercise.reps}</span>}
                                                 </span>
                                                 {t.addLoad && (

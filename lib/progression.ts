@@ -195,7 +195,11 @@ function isLowerBody(exerciseName: string): boolean {
  * personal-record history.
  */
 export function isBodyweightMovement(exerciseName: string): boolean {
-  return /pull.?up|chin.?up|push.?up|dip\b|inverted row|glute.?ham|bridge|plank|sit.?up|crunch|air squat|burpee|mountain climber|hanging|bodyweight/i.test(
+  // `dip\b` missed every dip in the library, because they are all named in
+  // the plural: "Dips - Triceps Version", "Dips - Chest Version". The word
+  // boundary after "dip" cannot match the "s". Caught by verify-load-label,
+  // which asked for the label on each bodyweight movement by its real name.
+  return /pull.?up|chin.?up|push.?up|dips?\b|inverted row|glute.?ham|bridge|plank|sit.?up|crunch|air squat|burpee|mountain climber|hanging|bodyweight/i.test(
     exerciseName
   )
 }
@@ -562,4 +566,23 @@ export function sessionFatigue(
     downCount: down,
     text: `${down} lifts came in under last time today. That's usually sleep, stress or food rather than training — worth an easy day before the next one.`,
   }
+}
+
+/**
+ * What to show in the "Today" slot when the engine has nothing to suggest.
+ *
+ * `nextTarget` returns `suggestedWeight: null` to mean "I do not know yet" —
+ * a first session on this exercise, or a swap with no history behind it. The
+ * workout screen rendered that as the literal string "Bodyweight", which is
+ * not an absence of an instruction but a different instruction, and a wrong
+ * one: a client with a 155 lb squat record opened a swapped squat slot and
+ * was told "Today — Bodyweight x 5".
+ *
+ * Two unknowns had been collapsed into one word. A pull-up genuinely has no
+ * load to prescribe; a barbell squat on its first session has a load nobody
+ * has worked out yet. Only the first of those is "Bodyweight".
+ */
+export function loadLabel(suggestedWeight: number | null, exerciseName: string): string {
+  if (suggestedWeight != null) return `${suggestedWeight} lb`
+  return isBodyweightMovement(exerciseName) ? 'Bodyweight' : 'Your call'
 }
