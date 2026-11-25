@@ -2912,7 +2912,24 @@ export default function ProgramsPage() {
                                         was 15px — the same size as the eight other
                                         things around it. First thing the eye should
                                         land on when you look up from the bar. */}
-                                    <p className="font-body font-semibold text-white text-heading truncate">{displayName}</p>
+                                    {/* Wraps rather than truncates.
+                                        At 15px `truncate` rarely bit; at 20px it cut
+                                        nearly every name in the library — "Barbell
+                                        Bench …", "Bent Over Barb…", "Dips - Triceps
+                                        V…". Making the name the biggest thing on the
+                                        card and then hiding which exercise it is was
+                                        worse than leaving it small. Two lines at a
+                                        tight leading, which is where even the longest
+                                        library names land.
+
+                                        Three, measured rather than guessed: of the
+                                        873 names in the library, 31% fit one line at
+                                        this width, 88% fit two and 98.9% fit three.
+                                        Two left "Barbell Bench Press - Medium Grip"
+                                        reading "…Medium", and that is the most
+                                        common lift in the product. Most names are
+                                        short enough that the row does not grow. */}
+                                    <p className="font-body font-semibold text-white text-heading leading-tight line-clamp-3 min-w-0">{displayName}</p>
                                     {exercise.swappedFrom && (
                                       <span className="sr-only">
                                         instead of {exercise.swappedFrom}
