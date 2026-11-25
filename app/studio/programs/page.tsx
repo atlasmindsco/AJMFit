@@ -421,7 +421,21 @@ export default function ProgramsPage() {
 
   // Rest timer
   const [restTimers, setRestTimers] = useState<Record<string, number>>({}) // per-exercise custom rest in seconds
-  const [activeTimer, setActiveTimer] = useState<{ key: string; remaining: number; total: number; endsAt: number } | null>(null)
+  /**
+   * `next` is what the client is resting FOR.
+   *
+   * The bar counted down and said nothing about why. "01:27" alone makes you
+   * open the card to remember what is coming, which is the one thing a rest
+   * timer exists to save you from — the whole point is that you can put the
+   * phone down.
+   */
+  const [activeTimer, setActiveTimer] = useState<{
+    key: string
+    remaining: number
+    total: number
+    endsAt: number
+    next: { name: string; set: string } | null
+  } | null>(null)
   const [editingRest, setEditingRest] = useState<string | null>(null)
   const [workoutStartTime, setWorkoutStartTime] = useState<Record<number, number>>({}) // day index → unix ms
   const [workoutElapsed, setWorkoutElapsed] = useState(0) // seconds, ticks for active workout
@@ -836,11 +850,15 @@ export default function ProgramsPage() {
    * from the clock each tick means a sleeping phone costs nothing: the timer is
    * correct the instant the screen comes back, because it was never counting.
    */
-  const startRestTimer = useCallback((exerciseKey: string, seconds: number) => {
+  const startRestTimer = useCallback((
+    exerciseKey: string,
+    seconds: number,
+    next: { name: string; set: string } | null = null
+  ) => {
     if (timerRef.current) clearInterval(timerRef.current)
     const endsAt = Date.now() + seconds * 1000
     restEndsAtRef.current = endsAt
-    setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds, endsAt })
+    setActiveTimer({ key: exerciseKey, remaining: seconds, total: seconds, endsAt, next })
     timerRef.current = setInterval(() => {
       // Read from the ref, not a captured const: addRestTime moves it.
       const left = Math.ceil((restEndsAtRef.current - Date.now()) / 1000)
@@ -2123,28 +2141,40 @@ export default function ProgramsPage() {
                     />
                   </svg>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Rest</p>
-                  <p className="text-white font-display font-bold text-3xl leading-none tabular-nums">
+                <div className="min-w-0 flex-1">
+                  <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">Rest</p>
+                  <p className="text-white font-display font-bold text-metric leading-none tabular-nums">
                     {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')}
                   </p>
+                  {/* What the rest is FOR. Without it the bar is a number,
+                      and knowing the number is not the same as being able to
+                      put the phone down — which is the only reason to have a
+                      rest timer in an app rather than on a clock. */}
+                  {activeTimer.next && (
+                    <p className="text-ink-3 text-caption font-body truncate mt-0.5">
+                      <span className="text-ink-4">Next </span>
+                      {activeTimer.next.name}
+                      <span className="text-ink-4"> &middot; {activeTimer.next.set}</span>
+                    </p>
+                  )}
                 </div>
                 {/* Another thirty seconds, where the countdown already is.
                     The only way to rest longer used to be the per-exercise
                     rest setting, which is the wrong depth for a thirty-second
                     decision — so people opened their phone's own timer, and
                     once they have done that they are in another app.
-                    44px tall, because this is tapped between heavy sets. */}
+                    48px, because this is tapped between heavy sets with
+                    shaking hands — the taplg step, not the ordinary one. */}
                 <button
                   onClick={() => addRestTime(30)}
-                  className="ml-auto h-11 px-3 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                  className="shrink-0 h-taplg px-base rounded-control bg-white/[0.08] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                   aria-label="Add thirty seconds to this rest"
                 >
                   +30s
                 </button>
                 <button
                   onClick={stopRestTimer}
-                  className="h-11 px-3 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                  className="shrink-0 h-taplg px-base rounded-control bg-white/[0.08] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                 >
                   Skip
                 </button>
@@ -3461,7 +3491,12 @@ export default function ProgramsPage() {
                                                   isSuperset: group.isSuperset,
                                                   isLastInGroup: lastInGroup,
                                                 })
-                                                if (secs > 0) startRestTimer(`${logKey}-set${si}`, secs)
+                                                if (secs > 0) {
+                                                  startRestTimer(`${logKey}-set${si}`, secs, {
+                                                    name: group.isSuperset && lastInGroup ? group.exercises[0].exercise.name : displayName,
+                                                    set: `Set ${si + 2} of ${currentLogs.length}`,
+                                                  })
+                                                }
                                               }
                                             }
                                             return (
@@ -3719,7 +3754,18 @@ export default function ProgramsPage() {
                                               isSuperset: group.isSuperset,
                                               isLastInGroup: lastInGroup,
                                             })
-                                            if (secs > 0) startRestTimer(setTimerKey, secs)
+                                            /* What they are resting FOR. After the last
+                                               partner of a superset the next round starts
+                                               back at the top of the group, so the name is
+                                               the group's first exercise rather than this
+                                               one — otherwise the bar would send them to
+                                               the movement they just finished. */
+                                            if (secs > 0) {
+                                              startRestTimer(setTimerKey, secs, {
+                                                name: group.isSuperset && lastInGroup ? group.exercises[0].exercise.name : displayName,
+                                                set: `Set ${si + 2} of ${currentLogs.length}`,
+                                              })
+                                            }
                                           }
                                         }
 

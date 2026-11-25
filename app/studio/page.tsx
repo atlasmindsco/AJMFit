@@ -24,6 +24,7 @@ import PlanPanel from '@/components/studio/PlanPanel'
 import BillingPanel from '@/components/studio/BillingPanel'
 import { isCoached, TIER_EXPERIENCE } from '@/lib/tiers'
 import AttentionStack from '@/components/studio/AttentionStack'
+import InstallHint from '@/components/studio/InstallHint'
 import { topAttention } from '@/lib/attention'
 import { fetchMyBlock, blockProgressDaysLeft } from '@/lib/programs'
 import { fetchCheckInForWeek, replyOverdueHours, weekOf } from '@/lib/check-ins'
@@ -251,6 +252,13 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Why the rest timer cannot reach a locked iPhone, and the one thing
+          that fixes it. Renders nothing for anyone already installed, anyone
+          who has dismissed it, and every desktop — which is almost everyone,
+          almost always. Above the attention stack because it is about the
+          device rather than about them, and it goes away for good on a tap. */}
+      <InstallHint />
 
       {/* Anything worth knowing before they start.
           Above Today's Training because it is context for the session, and
