@@ -1263,6 +1263,60 @@ export default function ProgramsPage() {
   }, [])
 
   /**
+   * Make sure a session is running, and hand back the id to write sets against.
+   *
+   * WHY THIS EXISTS. Logging a set did not require a session. The rows, the
+   * tick and the "Log set 1" button are all on screen before Start Workout is
+   * tapped, and tapping them did three things, two of them wrong:
+   *
+   *   - the set was NOT saved. `commitSet` writes against
+   *     `workoutIds[selectedDay]`, which only exists once a workout row has
+   *     been created, so the write was skipped — while the row still showed
+   *     the green tick, because the tick reads local state.
+   *   - the rest timer DID start, and was invisible. The countdown only
+   *     renders inside the pinned session bar, and that bar is gated on
+   *     `workoutStartTime[selectedDay]`. So the client logged a set, the
+   *     timer ran, and nothing appeared. That is the "the rest timer doesn't
+   *     count down" report, and the timer was never the problem.
+   *   - nothing told them any of this had happened.
+   *
+   * Starting on the first logged set rather than refusing the tap: nobody
+   * opens a workout, logs a set, and did not mean to train. The Start Workout
+   * button stays, because it is also what primes the audio context and asks
+   * for notification permission at a moment the browser will allow it.
+   *
+   * Deliberately lighter than the button. It does not touch focus, skipped
+   * exercises or which card is expanded — the client is already standing in
+   * the middle of the session and must not be moved.
+   */
+  const ensureSession = useCallback(async (): Promise<string | null> => {
+    if (selectedDay === null || !selected) return null
+    if (workoutStartTime[selectedDay]) return workoutIds[selectedDay] ?? null
+
+    // Before the await, so it still counts as being inside the tap.
+    primeRestAudio()
+    void primeRestNotifications()
+    const day = selectedDay
+    setWorkoutStartTime((prev) => ({ ...prev, [day]: Date.now() }))
+    setWorkoutElapsed(0)
+
+    if (!userId) return null
+    try {
+      const wid = await dbStartWorkout({
+        userId,
+        dayName: selected.name,
+        programName: currentProgram.name,
+        programPhase: currentProgram.phase,
+      })
+      setWorkoutIds((prev) => ({ ...prev, [day]: wid }))
+      return wid
+    } catch (err) {
+      console.error('[Workout] Auto-start failed:', err)
+      return null
+    }
+  }, [selectedDay, selected, workoutStartTime, workoutIds, userId, currentProgram])
+
+  /**
    * Count what has actually been logged, so End Workout can say so.
    *
    * Luis tapped Food mid-session, came back, and ended a workout he had not
@@ -2023,13 +2077,16 @@ export default function ProgramsPage() {
           The breakpoint was wrong too. The nav is `md:hidden`, so between
           640px and 768px `sm:bottom-4` put this behind a nav still on
           screen. */}
-      {view === 'workout' && selectedDay !== null && workoutStartTime[selectedDay] && (
+      {view === 'workout' && selectedDay !== null && (workoutStartTime[selectedDay] || activeTimer) && (
         <div className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] md:bottom-4 left-0 right-0 z-50 px-4 pointer-events-none">
           <div className="mx-auto max-w-lg pointer-events-auto flex items-center gap-2 rounded-card bg-surface-overlay/95 backdrop-blur border border-white/[0.12] shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-3 py-2.5">
             {activeTimer ? (
               <>
-                <div className="relative w-9 h-9 shrink-0">
-                  <svg className="w-9 h-9 -rotate-90" viewBox="0 0 36 36">
+                {/* 36px ring, 18px digits. You cannot read that from a rack
+                    with the phone on the floor, which is where it is during
+                    the rest it is timing. */}
+                <div className="relative w-12 h-12 shrink-0">
+                  <svg className="w-12 h-12 -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
                     <circle
                       cx="18" cy="18" r="15" fill="none"
@@ -2043,7 +2100,7 @@ export default function ProgramsPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Rest</p>
-                  <p className="text-white font-display font-bold text-lg leading-none tabular-nums">
+                  <p className="text-white font-display font-bold text-3xl leading-none tabular-nums">
                     {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')}
                   </p>
                 </div>
@@ -3053,15 +3110,21 @@ export default function ProgramsPage() {
                                                   onChange={(e) => {
                                                     const v = e.target.value
                                                     setTimedLogs((prev) => ({ ...prev, [logKey]: v }))
-                                                    const wid =
-                                                      selectedDay !== null ? workoutIds[selectedDay] : null
                                                     const m = Number(v)
-                                                    if (!userId || !wid || !Number.isFinite(m) || m <= 0) return
+                                                    if (!userId || !Number.isFinite(m) || m <= 0) return
                                                     if (timedSaveRef.current[logKey]) {
                                                       clearTimeout(timedSaveRef.current[logKey])
                                                     }
+                                                    // The session is ensured in the debounce rather
+                                                    // than on each keystroke: a run is often the
+                                                    // first thing in a day, and this used to read
+                                                    // workoutIds before anything had created one,
+                                                    // so the minutes were typed and dropped.
                                                     timedSaveRef.current[logKey] = setTimeout(() => {
-                                                      void saveSetSafely(`${logKey}-timed`, {
+                                                      void (async () => {
+                                                      const wid = (await ensureSession()) ?? (selectedDay !== null ? workoutIds[selectedDay] : null)
+                                                      if (!wid) return
+                                                      await saveSetSafely(`${logKey}-timed`, {
                                                         workoutId: wid,
                                                         userId,
                                                         exerciseName: displayName,
@@ -3074,6 +3137,7 @@ export default function ProgramsPage() {
                                                         durationSeconds: Math.round(m * 60),
                                                         distanceMi: Number(distanceLogs[logKey]) || null,
                                                       })
+                                                      })()
                                                     }, 500)
                                                   }}
                                                   className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -3305,8 +3369,13 @@ export default function ProgramsPage() {
                                             const prescribed = parseRepRange(exercise.reps)?.min ?? 1
                                             const doneCount = log.logged ? Number(log.reps) || 0 : Number(log.reps) || 0
                                             const setKey = `${logKey}-${si}`
-                                            const tapEffort = (n: number) => {
+                                            const tapEffort = async (n: number) => {
                                               primeRestAudio()
+                                              // A day that opens with a plank or a jump has no
+                                              // "Log set" button, so this is the tap that starts
+                                              // the session. Without it the first effort of such
+                                              // a workout ticked and was never written.
+                                              const startedWid = await ensureSession()
                                               // Tapping the effort you are already
                                               // on clears it, so an accidental tap
                                               // costs one more tap, not a retype.
@@ -3315,7 +3384,7 @@ export default function ProgramsPage() {
                                               updated[si] = { weight: '', reps: next > 0 ? String(next) : '', logged: next >= prescribed }
                                               setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
 
-                                              const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                              const wid = startedWid ?? (selectedDay !== null ? workoutIds[selectedDay] : null)
                                               if (userId && wid && next > 0) {
                                                 void saveSetSafely(setKey, {
                                                   workoutId: wid,
@@ -3350,7 +3419,7 @@ export default function ProgramsPage() {
                                                     return (
                                                       <button
                                                         key={n}
-                                                        onClick={() => tapEffort(n + 1)}
+                                                        onClick={() => void tapEffort(n + 1)}
                                                         className={`w-11 h-11 rounded-full border-2 flex items-center justify-center font-display font-bold text-sm transition-all duration-150 active:scale-90 ${
                                                           on
                                                             ? 'bg-state-success/25 border-state-success text-state-success'
@@ -3492,13 +3561,22 @@ export default function ProgramsPage() {
                                           setSetLogs((prev) => ({ ...prev, [logKey]: updated }))
                                         }
 
-                                        /** Confirm the set: tick it, rest, save. */
-                                        const commitSet = (idx: number, rows: SetRow[]) => {
+                                        /**
+                                         * Confirm the set: tick it, rest, save.
+                                         *
+                                         * `widOverride` is for the set that STARTS the session.
+                                         * `ensureSession` creates the workout row and the id comes
+                                         * back from the await, but `workoutIds` is React state and
+                                         * will not have it yet in the same tick — so without the
+                                         * override the very first set of every workout would be
+                                         * ticked and never written.
+                                         */
+                                        const commitSet = (idx: number, rows: SetRow[], widOverride?: string | null) => {
                                           const row = rows[idx]
                                           const w = needsWeight ? Number(row.weight) || null : null
                                           const r = Number(row.reps) || null
 
-                                          const wid = selectedDay !== null ? workoutIds[selectedDay] : null
+                                          const wid = widOverride ?? (selectedDay !== null ? workoutIds[selectedDay] : null)
                                           if (userId && wid) {
                                             void saveSetSafely(`${logKey}-${idx}`, {
                                               workoutId: wid,
@@ -3565,12 +3643,16 @@ export default function ProgramsPage() {
                                         }
 
                                         /** The LOG SET button. */
-                                        const logThisSet = () => {
+                                        const logThisSet = async () => {
                                           primeRestAudio()
+                                          // Starts the session if this is the first set. Awaited,
+                                          // because the id it returns is what this set is written
+                                          // against — see commitSet.
+                                          const wid = await ensureSession()
                                           const updated = [...backingLogs]
                                           updated[si] = { weight: shownWeight, reps: shownReps, logged: true }
                                           setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
-                                          commitSet(si, updated)
+                                          commitSet(si, updated, wid)
                                           if (!isLastSet) {
                                             // Zero between superset partners. Resting 90 seconds
                                             // between the two movements you are meant to do back
@@ -3688,7 +3770,7 @@ export default function ProgramsPage() {
                                                 interactions a session instead of 60. */}
                                             {isActive && !filled && (
                                               <button
-                                                onClick={logThisSet}
+                                                onClick={() => void logThisSet()}
                                                 disabled={!canLog}
                                                 className="w-full mt-1.5 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
                                               >
