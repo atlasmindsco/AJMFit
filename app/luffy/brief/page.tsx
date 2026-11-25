@@ -78,7 +78,7 @@ function X() {
 function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle?: string }) {
   return (
     <div className="mb-10">
-      <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-brand-orange mb-3">{label}</span>
+      <span className="inline-block text-label font-semibold tracking-[0.2em] uppercase text-brand-orange mb-3">{label}</span>
       <h2 className="font-display text-3xl sm:text-4xl font-bold text-brand-navy tracking-tight leading-tight">{title}</h2>
       {subtitle && <p className="mt-3 text-brand-slate text-lg max-w-2xl leading-relaxed">{subtitle}</p>}
     </div>
@@ -89,8 +89,8 @@ function StatCard({ value, label, sublabel }: { value: string; label: string; su
   return (
     <div className="bg-white rounded-card p-6 shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] border border-brand-offwhite">
       <div className="text-3xl sm:text-4xl font-display font-bold text-brand-navy tracking-tight">{value}</div>
-      <div className="text-sm font-semibold text-brand-slate mt-1 uppercase tracking-wide">{label}</div>
-      {sublabel && <div className="text-xs text-brand-slate/70 mt-1">{sublabel}</div>}
+      <div className="text-label font-semibold text-brand-slate mt-1 uppercase tracking-wide">{label}</div>
+      {sublabel && <div className="text-label text-brand-slate/70 mt-1">{sublabel}</div>}
     </div>
   )
 }
@@ -116,9 +116,9 @@ export default function BriefPage() {
         <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-control bg-brand-orange flex items-center justify-center">
-              <span className="font-display font-bold text-sm tracking-tight">AJM</span>
+              <span className="font-display font-bold text-label tracking-tight">AJM</span>
             </div>
-            <span className="text-sm font-semibold tracking-[0.15em] uppercase text-ink-2">Pricing Brief</span>
+            <span className="text-label font-semibold tracking-[0.15em] uppercase text-ink-2">Pricing Brief</span>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
             Online Fitness Coaching<br />
@@ -127,7 +127,7 @@ export default function BriefPage() {
           <p className="mt-5 text-ink-2 text-lg max-w-xl leading-relaxed">
             Competitive analysis, platform value premium, and pricing recommendations for AJM FIT, 2025-2026.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3 text-sm text-ink-3">
+          <div className="mt-8 flex flex-wrap gap-3 text-label text-ink-3">
             <span className="bg-white/10 rounded-full px-4 py-1.5">Prepared April 2026</span>
             <span className="bg-white/10 rounded-full px-4 py-1.5">13 Sources Cited</span>
             <span className="bg-white/10 rounded-full px-4 py-1.5">Confidential</span>
@@ -142,7 +142,7 @@ export default function BriefPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-4 px-5 text-sm font-semibold tracking-wide whitespace-nowrap border-b-2 transition-colors duration-200 ${
+              className={`py-4 px-5 text-label font-semibold tracking-wide whitespace-nowrap border-b-2 transition-colors duration-200 ${
                 activeTab === tab.id
                   ? 'border-brand-orange text-brand-navy'
                   : 'border-transparent text-brand-slate hover:text-brand-navy'
@@ -203,19 +203,19 @@ export default function BriefPage() {
                     }`}
                   >
                     {tier.popular && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold tracking-wider uppercase px-4 py-1 rounded-full">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-label font-bold tracking-wider uppercase px-4 py-1 rounded-full">
                         Most Popular
                       </span>
                     )}
-                    <div className="text-xs font-semibold tracking-[0.15em] uppercase mb-2" style={{ color: tier.color }}>{tier.name}</div>
+                    <div className="text-label font-semibold tracking-[0.15em] uppercase mb-2" style={{ color: tier.color }}>{tier.name}</div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-display font-bold text-brand-navy">${tier.price}</span>
-                      <span className="text-brand-slate text-sm">/mo</span>
+                      <span className="text-brand-slate text-label">/mo</span>
                     </div>
-                    <div className="text-sm text-brand-slate mt-1">${tier.weekly}/week</div>
+                    <div className="text-label text-brand-slate mt-1">${tier.weekly}/week</div>
                     <div className="mt-5 space-y-2.5">
                       {tier.features.map((f) => (
-                        <div key={f} className="flex items-start gap-2.5 text-sm text-brand-navy">
+                        <div key={f} className="flex items-start gap-2.5 text-label text-brand-navy">
                           <svg className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
@@ -224,7 +224,7 @@ export default function BriefPage() {
                       ))}
                     </div>
                     <div className="mt-6 pt-5 border-t border-brand-offwhite">
-                      <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-full px-3 py-1.5 inline-block">
+                      <div className="text-label font-semibold text-emerald-600 bg-emerald-50 rounded-full px-3 py-1.5 inline-block">
                         Market-aligned, no change needed
                       </div>
                     </div>
@@ -241,7 +241,7 @@ export default function BriefPage() {
                   <div key={tier.model} className="bg-white rounded-card p-5 border border-brand-offwhite flex flex-col sm:flex-row sm:items-center gap-4">
                     <div className="sm:w-48 flex-shrink-0">
                       <div className="font-semibold text-brand-navy">{tier.model}</div>
-                      <div className="text-sm text-brand-slate">{tier.range}/mo</div>
+                      <div className="text-label text-brand-slate">{tier.range}/mo</div>
                     </div>
                     <div className="flex-1">
                       <div className="h-6 bg-brand-offwhite rounded-full overflow-hidden relative">
@@ -253,12 +253,12 @@ export default function BriefPage() {
                     </div>
                     <div className="sm:w-24 text-right">
                       <span className="font-display font-bold text-brand-navy text-lg">${tier.avg}</span>
-                      <span className="text-xs text-brand-slate block">avg</span>
+                      <span className="text-label text-brand-slate block">avg</span>
                     </div>
                   </div>
                 ))}
                 <div className="bg-brand-navy/5 rounded-card p-5 border border-brand-navy/10 mt-2">
-                  <p className="text-sm text-brand-navy">
+                  <p className="text-label text-brand-navy">
                     <strong>Blueprint ($297)</strong> sits in the Standard 1:1 range. <strong>Accelerator ($497)</strong> at the top of Standard 1:1. <strong>Full Experience ($697)</strong> lands in Premium 1:1 territory, all defensible given AJM FIT&apos;s platform depth.
                   </p>
                 </div>
@@ -285,14 +285,14 @@ export default function BriefPage() {
                     return (
                       <div key={c.name} className="flex items-center gap-4">
                         <div className="w-48 sm:w-56 flex-shrink-0 text-right">
-                          <span className={`text-sm font-medium ${isAjm ? 'text-brand-orange font-bold' : 'text-brand-navy'}`}>{c.name}</span>
+                          <span className={`text-label font-medium ${isAjm ? 'text-brand-orange font-bold' : 'text-brand-navy'}`}>{c.name}</span>
                         </div>
                         <div className="flex-1 h-8 bg-brand-offwhite rounded-control overflow-hidden relative">
                           <div
                             className={`h-full rounded-control transition-all duration-500 ${isAjm ? 'bg-brand-orange' : 'bg-brand-navy/20'}`}
                             style={{ width: `${(c.price / 700) * 100}%` }}
                           />
-                          <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold ${isAjm ? 'text-brand-orange' : 'text-brand-navy/60'}`}>
+                          <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-label font-bold ${isAjm ? 'text-brand-orange' : 'text-brand-navy/60'}`}>
                             ${c.price}/mo
                           </span>
                         </div>
@@ -304,7 +304,7 @@ export default function BriefPage() {
 
               {/* Competitor Table */}
               <div className="bg-white rounded-card border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-label">
                   <thead>
                     <tr className="border-b border-brand-offwhite">
                       <th className="text-left p-4 font-semibold text-brand-navy">Competitor</th>
@@ -336,14 +336,14 @@ export default function BriefPage() {
               />
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
-                  <div className="text-xs font-semibold tracking-[0.15em] uppercase text-red-400 mb-3">Without Platform</div>
+                  <div className="text-label font-semibold tracking-[0.15em] uppercase text-red-400 mb-3">Without Platform</div>
                   <div className="text-3xl font-display font-bold text-brand-navy">$100, $200<span className="text-lg font-normal text-brand-slate">/mo</span></div>
-                  <p className="text-sm text-brand-slate mt-3 leading-relaxed">PDF programs, WhatsApp check-ins, spreadsheet tracking. Fragmented experience, low accountability infrastructure.</p>
+                  <p className="text-label text-brand-slate mt-3 leading-relaxed">PDF programs, WhatsApp check-ins, spreadsheet tracking. Fragmented experience, low accountability infrastructure.</p>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-emerald-200 shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] ring-2 ring-emerald-100">
-                  <div className="text-xs font-semibold tracking-[0.15em] uppercase text-emerald-600 mb-3">With Platform (AJM FIT)</div>
+                  <div className="text-label font-semibold tracking-[0.15em] uppercase text-emerald-600 mb-3">With Platform (AJM FIT)</div>
                   <div className="text-3xl font-display font-bold text-brand-navy">$200, $600+<span className="text-lg font-normal text-brand-slate">/mo</span></div>
-                  <p className="text-sm text-brand-slate mt-3 leading-relaxed">Branded portal, full tracking, AI assistant, community, accountability systems. 50-100% price premium justified by platform.</p>
+                  <p className="text-label text-brand-slate mt-3 leading-relaxed">Branded portal, full tracking, AI assistant, community, accountability systems. 50-100% price premium justified by platform.</p>
                 </div>
               </div>
             </section>
@@ -360,14 +360,14 @@ export default function BriefPage() {
                 subtitle="AJM FIT includes 12-15 features that no direct competitor offers. The platform itself is a major differentiator."
               />
               <div className="bg-white rounded-card border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-label">
                   <thead>
                     <tr className="border-b-2 border-brand-offwhite">
                       <th className="text-left p-4 font-semibold text-brand-navy">Feature</th>
                       <th className="p-4 font-semibold text-brand-orange text-center">AJM FIT</th>
-                      <th className="p-4 font-semibold text-brand-slate text-center">Future<br /><span className="font-normal text-xs">$199/mo</span></th>
-                      <th className="p-4 font-semibold text-brand-slate text-center">Caliber<br /><span className="font-normal text-xs">$200/mo</span></th>
-                      <th className="p-4 font-semibold text-brand-slate text-center">Trainwell<br /><span className="font-normal text-xs">$99/mo</span></th>
+                      <th className="p-4 font-semibold text-brand-slate text-center">Future<br /><span className="font-normal text-label">$199/mo</span></th>
+                      <th className="p-4 font-semibold text-brand-slate text-center">Caliber<br /><span className="font-normal text-label">$200/mo</span></th>
+                      <th className="p-4 font-semibold text-brand-slate text-center">Trainwell<br /><span className="font-normal text-label">$99/mo</span></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -392,7 +392,7 @@ export default function BriefPage() {
               </div>
 
               <div className="mt-8 bg-brand-orange/5 rounded-card p-6 border border-brand-orange/15">
-                <p className="text-sm text-brand-navy leading-relaxed">
+                <p className="text-label text-brand-navy leading-relaxed">
                   <strong>Key insight:</strong> Competitors charge $99-$266/mo for coaching with 4-6 platform features.
                   AJM FIT delivers 16 features including an AI assistant, community ecosystem, and comprehensive nutrition tracking, at a comparable effective cost per feature.
                   The platform alone would cost clients $30-$50/mo if purchased as standalone apps.
@@ -407,18 +407,18 @@ export default function BriefPage() {
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-2xl mb-3">AI</div>
                   <h3 className="font-display font-bold text-xl text-brand-navy">Chea AI Assistant</h3>
-                  <p className="text-sm text-brand-slate mt-2 leading-relaxed">
+                  <p className="text-label text-brand-slate mt-2 leading-relaxed">
                     Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo, AJM FIT includes it in every tier.
                   </p>
-                  <div className="mt-4 text-xs font-semibold text-brand-blue">AI fitness market: $16.9B (2025) projected $35B+ by 2030</div>
+                  <div className="mt-4 text-label font-semibold text-brand-blue">AI fitness market: $16.9B (2025) projected $35B+ by 2030</div>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-2xl mb-3">Community</div>
                   <h3 className="font-display font-bold text-xl text-brand-navy">Forum, Leaderboard & Events</h3>
-                  <p className="text-sm text-brand-slate mt-2 leading-relaxed">
+                  <p className="text-label text-brand-slate mt-2 leading-relaxed">
                     Community features drive 60-80% adherence rates vs. 10-25% for budget apps. Forums, points/leaderboards, live Q&As, and monthly challenges create accountability that no competitor offers.
                   </p>
-                  <div className="mt-4 text-xs font-semibold text-brand-blue">Justifies $20-$50/mo in additional perceived value</div>
+                  <div className="mt-4 text-label font-semibold text-brand-blue">Justifies $20-$50/mo in additional perceived value</div>
                 </div>
               </div>
             </section>
@@ -436,7 +436,7 @@ export default function BriefPage() {
                 subtitle="The primary strategic gap is the absence of a lower-entry tier, not a mispricing of existing tiers."
               />
               <div className="bg-white rounded-card border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-label">
                   <thead>
                     <tr className="border-b-2 border-brand-offwhite">
                       <th className="text-left p-4 font-semibold text-brand-navy">Tier</th>
@@ -448,31 +448,31 @@ export default function BriefPage() {
                   </thead>
                   <tbody>
                     <tr className="border-b border-brand-offwhite/50 bg-emerald-50/30">
-                      <td className="p-4 font-bold text-brand-navy">Platform Access <span className="text-xs text-emerald-600 font-semibold ml-1">NEW</span></td>
+                      <td className="p-4 font-bold text-brand-navy">Platform Access <span className="text-label text-emerald-600 font-semibold ml-1">NEW</span></td>
                       <td className="p-4 text-center text-brand-slate">, </td>
                       <td className="p-4 text-center font-display font-bold text-emerald-600 text-lg">$79/mo</td>
-                      <td className="p-4 text-center"><span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">New tier</span></td>
+                      <td className="p-4 text-center"><span className="text-label font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">New tier</span></td>
                       <td className="p-4 text-brand-slate hidden lg:table-cell">Full app access, AI assistant, community, pre-built programs. No coaching.</td>
                     </tr>
                     <tr className="border-b border-brand-offwhite/50">
                       <td className="p-4 font-bold text-brand-navy">The Blueprint</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$297</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$297</td>
-                      <td className="p-4 text-center"><span className="text-xs font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
+                      <td className="p-4 text-center"><span className="text-label font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
                       <td className="p-4 text-brand-slate hidden lg:table-cell">Well-positioned vs. Tailored CM ($347) and above Future ($199).</td>
                     </tr>
                     <tr className="border-b border-brand-offwhite/50">
                       <td className="p-4 font-bold text-brand-navy">The Accelerator</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$497</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$497</td>
-                      <td className="p-4 text-center"><span className="text-xs font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
+                      <td className="p-4 text-center"><span className="text-label font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
                       <td className="p-4 text-brand-slate hidden lg:table-cell">Matches Tailored CM all-inclusive. Video check-ins justify price.</td>
                     </tr>
                     <tr>
                       <td className="p-4 font-bold text-brand-navy">The Full Experience</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$697</td>
                       <td className="p-4 text-center font-display font-bold text-brand-navy">$697</td>
-                      <td className="p-4 text-center"><span className="text-xs font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
+                      <td className="p-4 text-center"><span className="text-label font-semibold bg-brand-offwhite text-brand-slate px-3 py-1 rounded-full">No change</span></td>
                       <td className="p-4 text-brand-slate hidden lg:table-cell">2x live sessions/week worth $288-$704/mo alone at market rates.</td>
                     </tr>
                   </tbody>
@@ -481,7 +481,7 @@ export default function BriefPage() {
 
               <div className="mt-6 bg-brand-navy rounded-card p-7 text-white">
                 <h3 className="font-display font-bold text-lg mb-3">Why a $79 self-guided tier?</h3>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm text-ink">
+                <div className="grid sm:grid-cols-2 gap-4 text-label text-ink">
                   <div className="flex items-start gap-3">
                     <span className="text-brand-orange font-bold text-lg leading-none mt-0.5">1</span>
                     <p><strong className="text-white">Captures a new market.</strong> Price-sensitive prospects excluded by the $297 floor.</p>
@@ -510,7 +510,7 @@ export default function BriefPage() {
                 subtitle="Fitness results take 3-6 months. Aligning commitment periods with outcomes improves conversion and upfront cash flow."
               />
               <div className="bg-white rounded-card border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)] overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-label">
                   <thead>
                     <tr className="border-b-2 border-brand-offwhite">
                       <th className="text-left p-4 font-semibold text-brand-navy">Commitment</th>
@@ -524,7 +524,7 @@ export default function BriefPage() {
                       <tr key={row.period} className={`border-b border-brand-offwhite/50 ${i === 0 ? '' : 'bg-emerald-50/20'}`}>
                         <td className="p-4 font-medium text-brand-navy">
                           {row.period}
-                          {row.discount && <span className="ml-2 text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">{row.discount} off</span>}
+                          {row.discount && <span className="ml-2 text-label font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">{row.discount} off</span>}
                         </td>
                         <td className="p-4 text-center font-display font-bold text-brand-navy">${row.blueprint}/mo</td>
                         <td className="p-4 text-center font-display font-bold text-brand-navy">${row.accelerator}/mo</td>
@@ -542,19 +542,19 @@ export default function BriefPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">Onboarding Fee</h3>
-                  <p className="text-sm text-brand-slate leading-relaxed">Consider a one-time $97-$147 setup fee for coached tiers. Covers the welcome call, assessment, and custom program design. Signals that your time has value from day one.</p>
+                  <p className="text-label text-brand-slate leading-relaxed">Consider a one-time $97-$147 setup fee for coached tiers. Covers the welcome call, assessment, and custom program design. Signals that your time has value from day one.</p>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">Keep Weekly Price Display</h3>
-                  <p className="text-sm text-brand-slate leading-relaxed">Displaying &quot;$74/week&quot; alongside &quot;$297/month&quot; is an effective psychological anchor. Reduces perceived cost by framing it in smaller, more digestible units. Keep this.</p>
+                  <p className="text-label text-brand-slate leading-relaxed">Displaying &quot;$74/week&quot; alongside &quot;$297/month&quot; is an effective psychological anchor. Reduces perceived cost by framing it in smaller, more digestible units. Keep this.</p>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">Reframe the Value Prop</h3>
-                  <p className="text-sm text-brand-slate leading-relaxed">Shift marketing from &quot;coaching + app&quot; to <strong>&quot;a complete fitness operating system, powered by a certified coach.&quot;</strong> Competitors charge $199-$266 for coaching alone, AJM FIT delivers more at a comparable cost per feature.</p>
+                  <p className="text-label text-brand-slate leading-relaxed">Shift marketing from &quot;coaching + app&quot; to <strong>&quot;a complete fitness operating system, powered by a certified coach.&quot;</strong> Competitors charge $199-$266 for coaching alone, AJM FIT delivers more at a comparable cost per feature.</p>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <h3 className="font-display font-bold text-lg text-brand-navy mb-2">No Higher Tier (Yet)</h3>
-                  <p className="text-sm text-brand-slate leading-relaxed">$697 is well-positioned at the ceiling. Only worth going to $800-$1,000+ if you add specialized offerings like competition prep, post-rehab, or executive wellness down the road.</p>
+                  <p className="text-label text-brand-slate leading-relaxed">$697 is well-positioned at the ceiling. Only worth going to $800-$1,000+ if you add specialized offerings like competition prep, post-rehab, or executive wellness down the road.</p>
                 </div>
               </div>
             </section>
@@ -563,7 +563,7 @@ export default function BriefPage() {
             <section>
               <SectionHeader label="Sources" title="Data sources cited in this research" />
               <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
-                <ol className="text-sm text-brand-slate space-y-2 list-decimal list-inside">
+                <ol className="text-label text-brand-slate space-y-2 list-decimal list-inside">
                   <li>TrueCoach, How Much Should I Charge for Personal Training? (2025)</li>
                   <li>WarriorBabe, Online Fitness Coaching Prices 2026 Data</li>
                   <li>PT Distinction, How to Price Your Coaching Services (2025)</li>
@@ -586,7 +586,7 @@ export default function BriefPage() {
 
       {/* Footer */}
       <footer className="bg-brand-navy text-ink-3 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-label">
           <span>Prepared for AJM FIT by Atlas Minds Co.</span>
           <span>Confidential, not for distribution</span>
         </div>

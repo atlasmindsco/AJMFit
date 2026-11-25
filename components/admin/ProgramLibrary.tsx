@@ -53,20 +53,20 @@ export default function ProgramLibrary() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-ink-3 text-sm font-body">{programs.length} program{programs.length === 1 ? '' : 's'} in your library</p>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark">{showNew ? 'Close' : 'New Program'}</button>
+        <p className="text-ink-3 text-body font-body">{programs.length} program{programs.length === 1 ? '' : 's'} in your library</p>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark">{showNew ? 'Close' : 'New Program'}</button>
       </div>
 
       {showNew && (
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-5 space-y-3">
-          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white font-body focus:outline-none focus:border-brand-orange/30" />
-          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-white font-body resize-none focus:outline-none focus:border-brand-orange/30" />
+          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body focus:outline-none focus:border-brand-orange/30" />
+          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange/30" />
           <div className="grid grid-cols-3 gap-3">
-            <select value={draft.level} onChange={(e) => setDraft({ ...draft, level: e.target.value })} className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body">{LEVELS.map((l) => <option key={l}>{l}</option>)}</select>
-            <input type="number" value={draft.days_per_week} onChange={(e) => setDraft({ ...draft, days_per_week: Number(e.target.value) })} placeholder="Days/wk" className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body" />
-            <input value={draft.split} onChange={(e) => setDraft({ ...draft, split: e.target.value })} placeholder="Split (PPL)" className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-sm text-ink font-body" />
+            <select value={draft.level} onChange={(e) => setDraft({ ...draft, level: e.target.value })} className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-label text-ink font-body">{LEVELS.map((l) => <option key={l}>{l}</option>)}</select>
+            <input type="number" value={draft.days_per_week} onChange={(e) => setDraft({ ...draft, days_per_week: Number(e.target.value) })} placeholder="Days/wk" className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-label text-ink font-body" />
+            <input value={draft.split} onChange={(e) => setDraft({ ...draft, split: e.target.value })} placeholder="Split (PPL)" className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-label text-ink font-body" />
           </div>
-          <div className="flex justify-end"><button onClick={add} disabled={busy || !draft.name.trim()} className="px-5 py-2 bg-brand-orange text-white text-xs font-display font-bold uppercase rounded-control disabled:opacity-40">{busy ? 'Saving…' : 'Create'}</button></div>
+          <div className="flex justify-end"><button onClick={add} disabled={busy || !draft.name.trim()} className="px-5 py-2 bg-brand-orange text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">{busy ? 'Saving…' : 'Create'}</button></div>
         </div>
       )}
 
@@ -74,8 +74,8 @@ export default function ProgramLibrary() {
         <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" /></div>
       ) : programs.length === 0 ? (
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-8 text-center">
-          <p className="text-white font-display font-bold text-sm">No programs yet</p>
-          <p className="text-ink-3 text-sm font-body mt-1">Create your first program to assign to clients.</p>
+          <p className="text-white font-display font-bold text-label">No programs yet</p>
+          <p className="text-ink-3 text-body font-body mt-1">Create your first program to assign to clients.</p>
         </div>
       ) : (
         programs.map((p) => {
@@ -84,12 +84,12 @@ export default function ProgramLibrary() {
             <div key={p.id} className="bg-white/[0.03] border border-white/[0.06] rounded-card p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h3 className="text-white font-display font-bold text-sm">{p.name}</h3>
-                  {p.description && <p className="text-ink-2 text-sm font-body mt-0.5">{p.description}</p>}
+                  <h3 className="text-white font-display font-bold text-heading">{p.name}</h3>
+                  {p.description && <p className="text-ink-2 text-body font-body mt-0.5">{p.description}</p>}
                   <div className="flex gap-2 mt-2 flex-wrap">
-                    {p.level && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-brand-blue/10 text-brand-blue">{p.level}</span>}
-                    {p.days_per_week && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-ink-2">{p.days_per_week} days/wk</span>}
-                    {p.split && <span className="text-2xs font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-ink-2">{p.split}</span>}
+                    {p.level && <span className="text-caption font-display uppercase tracking-wide px-2 py-1 rounded bg-brand-blue/10 text-brand-blue">{p.level}</span>}
+                    {p.days_per_week && <span className="text-caption font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-ink-2">{p.days_per_week} days/wk</span>}
+                    {p.split && <span className="text-caption font-display uppercase tracking-wide px-2 py-1 rounded bg-white/[0.06] text-ink-2">{p.split}</span>}
                   </div>
                 </div>
                 <button onClick={() => deleteProgram(p.id).then(load)} title="Delete" className="text-ink-4 hover:text-red-400 shrink-0">
@@ -98,15 +98,15 @@ export default function ProgramLibrary() {
               </div>
 
               {assigned.length > 0 && (
-                <p className="text-ink-3 text-xs font-body mt-3">Assigned to: {assigned.map((a) => a.clientName).join(', ')}</p>
+                <p className="text-ink-3 text-label font-body mt-3">Assigned to: {assigned.map((a) => a.clientName).join(', ')}</p>
               )}
 
               <div className="flex gap-2 mt-3">
-                <select value={assignTo[p.id] ?? ''} onChange={(e) => setAssignTo((prev) => ({ ...prev, [p.id]: e.target.value }))} className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2 text-sm text-ink font-body">
+                <select value={assignTo[p.id] ?? ''} onChange={(e) => setAssignTo((prev) => ({ ...prev, [p.id]: e.target.value }))} className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2 text-label text-ink font-body">
                   <option value="">Assign to client…</option>
                   {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-brand-blue text-white text-xs font-display font-bold uppercase rounded-control disabled:opacity-40">Assign</button>
+                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-brand-blue text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">Assign</button>
               </div>
             </div>
           )

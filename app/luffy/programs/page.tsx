@@ -97,14 +97,14 @@ export default function ProgramsPage() {
           >
             Programs
           </motion.h1>
-          <p className="text-ink-3 font-body text-sm mt-1">
+          <p className="text-ink-3 font-body text-body mt-1">
             Build programs and browse the exercise library
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('programs')}
-            className={`px-4 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
+            className={`px-4 py-2 rounded-control text-label font-display font-bold uppercase tracking-wide transition-all duration-200 ${
               activeTab === 'programs' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
             }`}
           >
@@ -112,7 +112,7 @@ export default function ProgramsPage() {
           </button>
           <button
             onClick={() => setActiveTab('library')}
-            className={`px-4 py-2 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${
+            className={`px-4 py-2 rounded-control text-label font-display font-bold uppercase tracking-wide transition-all duration-200 ${
               activeTab === 'library' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
             }`}
           >
@@ -138,19 +138,19 @@ export default function ProgramsPage() {
                 placeholder="Search 873 exercises..."
                 value={libSearch}
                 onChange={(e) => setLibSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-control font-body text-sm text-white placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/40 transition-colors duration-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-control font-body text-body text-white placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/40 transition-colors duration-200"
               />
             </div>
 
             {/* Muscle filter */}
             <div>
-              <p className="text-ink-4 text-2xs font-display uppercase tracking-wide mb-2">Muscle Group</p>
+              <p className="text-ink-4 text-caption font-display uppercase tracking-wide mb-2">Muscle Group</p>
               <div className="flex flex-wrap gap-1.5">
                 {MUSCLE_FILTERS.map((m) => (
                   <button
                     key={m}
                     onClick={() => setLibMuscle(m)}
-                    className={`px-2.5 py-1 rounded-control text-2xs font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
+                    className={`px-2.5 py-1 rounded-control text-caption font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libMuscle === m
                         ? 'bg-brand-orange text-white'
                         : 'bg-white/[0.04] text-ink-4 hover:text-ink-2'
@@ -164,13 +164,13 @@ export default function ProgramsPage() {
 
             {/* Equipment filter */}
             <div>
-              <p className="text-ink-4 text-2xs font-display uppercase tracking-wide mb-2">Equipment</p>
+              <p className="text-ink-4 text-caption font-display uppercase tracking-wide mb-2">Equipment</p>
               <div className="flex flex-wrap gap-1.5">
                 {EQUIPMENT_FILTERS.map((e) => (
                   <button
                     key={e}
                     onClick={() => setLibEquipment(e)}
-                    className={`px-2.5 py-1 rounded-control text-2xs font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
+                    className={`px-2.5 py-1 rounded-control text-caption font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
                         ? 'bg-brand-blue text-white'
                         : 'bg-white/[0.04] text-ink-4 hover:text-ink-2'
@@ -182,7 +182,7 @@ export default function ProgramsPage() {
               </div>
             </div>
 
-            <p className="text-ink-4 text-xs font-body">{filteredExercises.length} exercises</p>
+            <p className="text-ink-4 text-label font-body">{filteredExercises.length} exercises</p>
           </div>
 
           {/* Loading */}
@@ -216,10 +216,10 @@ export default function ProgramsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-body font-semibold text-sm truncate group-hover:text-brand-orange transition-colors duration-150">
+                    <p className="text-white font-body font-semibold text-label truncate group-hover:text-brand-orange transition-colors duration-150">
                       {ex.name}
                     </p>
-                    <p className="text-ink-4 text-2xs font-body capitalize truncate">
+                    <p className="text-ink-4 text-caption font-body capitalize truncate">
                       {ex.primaryMuscles.join(', ')}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -237,7 +237,7 @@ export default function ProgramsPage() {
           )}
 
           {!libLoading && filteredExercises.length > 60 && (
-            <p className="text-center text-ink-4 text-xs font-body py-4">
+            <p className="text-center text-ink-4 text-label font-body py-4">
               Showing 60 of {filteredExercises.length}, use search or filters to narrow down
             </p>
           )}
@@ -299,13 +299,13 @@ export default function ProgramsPage() {
                       </div>
                     ) : (
                       <div className="w-40 h-40 rounded-card bg-white/[0.03] flex items-center justify-center">
-                        <span className="font-body text-xs text-ink-4">No image</span>
+                        <span className="font-body text-label text-ink-4">No image</span>
                       </div>
                     )}
                   </div>
 
                   {selectedExercise.images.length > 1 && (
-                    <p className="text-center text-2xs font-body text-ink-4 -mt-4 mb-2">
+                    <p className="text-center text-caption font-body text-ink-4 -mt-4 mb-2">
                       Auto-cycling start / end position
                     </p>
                   )}
@@ -313,13 +313,13 @@ export default function ProgramsPage() {
                   <div className="px-6 pb-6 space-y-5">
                     {/* Badges */}
                     <div className="flex flex-wrap gap-1.5">
-                      <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.category}
                       </span>
-                      <span className="px-2 py-1 bg-white/[0.06] text-ink-3 font-display font-semibold text-2xs uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-white/[0.06] text-ink-3 font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.equipment}
                       </span>
                     </div>
@@ -327,13 +327,13 @@ export default function ProgramsPage() {
                     {/* Muscles */}
                     <div className="flex items-start gap-5">
                       <div className="flex-1">
-                        <p className="text-2xs font-display font-semibold uppercase tracking-[0.14em] text-ink-4 mb-1">Primary</p>
-                        <p className="font-display font-bold text-sm text-brand-orange capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
+                        <p className="text-caption font-display font-semibold uppercase tracking-[0.14em] text-ink-4 mb-1">Primary</p>
+                        <p className="font-display font-bold text-label text-brand-orange capitalize">{selectedExercise.primaryMuscles.join(', ')}</p>
                       </div>
                       {selectedExercise.secondaryMuscles.length > 0 && (
                         <div className="flex-1">
-                          <p className="text-2xs font-display font-semibold uppercase tracking-[0.14em] text-ink-4 mb-1">Secondary</p>
-                          <p className="font-body text-sm text-ink-2 capitalize">{selectedExercise.secondaryMuscles.join(', ')}</p>
+                          <p className="text-caption font-display font-semibold uppercase tracking-[0.14em] text-ink-4 mb-1">Secondary</p>
+                          <p className="font-body text-body text-ink-2 capitalize">{selectedExercise.secondaryMuscles.join(', ')}</p>
                         </div>
                       )}
                     </div>
@@ -341,11 +341,11 @@ export default function ProgramsPage() {
                     {/* Instructions */}
                     {selectedExercise.instructions.length > 0 && (
                       <div>
-                        <h4 className="font-display font-bold text-xs uppercase tracking-[0.12em] text-ink-4 mb-3">Instructions</h4>
+                        <h4 className="font-display font-bold text-label uppercase tracking-[0.12em] text-ink-4 mb-3">Instructions</h4>
                         <ol className="space-y-2.5">
                           {selectedExercise.instructions.map((step, i) => (
                             <li key={i} className="flex gap-3">
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-2xs font-display font-bold mt-0.5">
+                              <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-caption font-display font-bold mt-0.5">
                                 {i + 1}
                               </span>
                               <p className="font-body text-caption text-ink-2 leading-relaxed">{step}</p>

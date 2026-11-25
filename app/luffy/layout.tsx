@@ -143,10 +143,10 @@ export default function AdminLayout({
               className="h-10 w-auto"
             />
             <div>
-              <span className="font-display font-bold text-white text-sm uppercase tracking-[0.15em]">
+              <span className="font-display font-bold text-white text-label uppercase tracking-[0.15em]">
                 AJMFit
               </span>
-              <span className="block text-2xs font-display uppercase tracking-[0.3em] text-brand-orange">
+              <span className="block text-caption font-display uppercase tracking-[0.3em] text-brand-orange">
                 Admin
               </span>
             </div>
@@ -162,7 +162,7 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-control text-sm font-body font-medium transition-all duration-200 group ${
+                className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-control text-body font-body font-medium transition-all duration-200 group ${
                   isActive
                     ? 'bg-brand-orange/10 text-brand-orange'
                     : 'text-ink-3 hover:text-ink hover:bg-white/[0.04]'
@@ -181,7 +181,7 @@ export default function AdminLayout({
         <div className="px-4 py-5 border-t border-white/[0.06]">
           <Link
             href="/"
-            className="flex items-center gap-3 px-3.5 py-2.5 text-ink-4 hover:text-ink-2 text-sm font-body transition-colors duration-200"
+            className="flex items-center gap-3 px-3.5 py-2.5 text-ink-4 hover:text-ink-2 text-body font-body transition-colors duration-200"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
@@ -220,7 +220,7 @@ export default function AdminLayout({
 
             {/* Admin avatar */}
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-blue to-brand-navy flex items-center justify-center">
-              <span className="text-white text-xs font-display font-bold">AJ</span>
+              <span className="text-white text-label font-display font-bold">AJ</span>
             </div>
 
             {/* Sign out */}

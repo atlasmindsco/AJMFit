@@ -38,15 +38,15 @@ export default function ClientTraining({ userId }: { userId: string }) {
   }, [userId])
 
   if (error) {
-    return <p className="text-ink-4 text-xs font-body">Could not load sessions.</p>
+    return <p className="text-ink-4 text-label font-body">Could not load sessions.</p>
   }
   if (sessions === null) {
-    return <p className="text-ink-4 text-xs font-body">Loading sessions…</p>
+    return <p className="text-ink-4 text-label font-body">Loading sessions…</p>
   }
   if (sessions.length === 0) {
     // Seven clients are in exactly this state. Said plainly, as a fact about
     // the data rather than an accusation about the person.
-    return <p className="text-ink-3 text-xs font-body">No sessions logged yet.</p>
+    return <p className="text-ink-3 text-label font-body">No sessions logged yet.</p>
   }
 
   return (
@@ -56,18 +56,18 @@ export default function ClientTraining({ userId }: { userId: string }) {
         return (
           <div key={s.workoutId} className="rounded-control bg-white/[0.02] border border-white/[0.06] p-4">
             <div className="flex items-baseline justify-between gap-3 mb-3">
-              <p className="font-display font-bold text-white text-sm">
+              <p className="font-display font-bold text-white text-label">
                 {dayLabel(s.date)}
                 {s.dayName && <span className="text-ink-3 font-body font-normal"> · {s.dayName}</span>}
               </p>
-              {dur && <span className="text-ink-4 text-2xs font-body shrink-0">{dur}</span>}
+              {dur && <span className="text-ink-4 text-caption font-body shrink-0">{dur}</span>}
             </div>
 
             <div className="space-y-2.5">
               {s.exercises.map((e) => (
                 <div key={e.name} className="flex items-baseline justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-ink text-xs font-body">
+                    <p className="text-ink text-label font-body">
                       {e.name}
                       {/* Swapped mid-session, and what it replaced. The reason
                           they gave lives on the swap row itself. */}
@@ -75,7 +75,7 @@ export default function ClientTraining({ userId }: { userId: string }) {
                         <span className="text-ink-4"> · instead of {e.swappedFrom}</span>
                       )}
                     </p>
-                    <p className="text-ink-3 text-2xs font-body tabular-nums mt-0.5">
+                    <p className="text-ink-3 text-caption font-body tabular-nums mt-0.5">
                       {e.sets.map((set, i) => (
                         <span key={i}>
                           {i > 0 && <span className="text-ink-4">{'   '}</span>}
@@ -87,7 +87,7 @@ export default function ClientTraining({ userId }: { userId: string }) {
                   </div>
                   {e.change && (
                     <span
-                      className={`text-2xs font-display font-bold shrink-0 tabular-nums ${
+                      className={`text-caption font-display font-bold shrink-0 tabular-nums ${
                         e.change.direction === 'up' ? 'text-state-success' : 'text-state-warning'
                       }`}
                     >

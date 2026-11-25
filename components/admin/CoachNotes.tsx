@@ -77,21 +77,21 @@ export default function CoachNotes({ userId }: { userId: string }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Right shoulder — watch overhead work"
-          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-xs font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50"
+          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50"
         />
         <button
           onClick={() => void add()}
           disabled={busy || !draft.trim()}
-          className="px-4 py-2.5 rounded-control bg-white/[0.08] text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] disabled:opacity-40 transition-colors duration-200 shrink-0"
+          className="px-4 py-2.5 rounded-control bg-white/[0.08] text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] disabled:opacity-40 transition-colors duration-200 shrink-0"
         >
           Save
         </button>
       </div>
 
-      {error && <p className="text-state-warning text-2xs font-body mb-2">{error}</p>}
+      {error && <p className="text-state-warning text-caption font-body mb-2">{error}</p>}
 
       {notes.length === 0 ? (
-        <p className="text-ink-4 text-2xs font-body">
+        <p className="text-ink-4 text-caption font-body">
           Nothing yet. These are private — the client never sees them.
         </p>
       ) : (
@@ -105,20 +105,20 @@ export default function CoachNotes({ userId }: { userId: string }) {
                   : 'bg-white/[0.02] border-white/[0.06]'
               }`}
             >
-              <span className="text-ink-4 text-2xs font-body tabular-nums shrink-0 w-12">
+              <span className="text-ink-4 text-caption font-body tabular-nums shrink-0 w-12">
                 {n.pinned ? 'Pinned' : when(n.created_at)}
               </span>
-              <p className="flex-1 text-ink text-xs font-body leading-relaxed min-w-0">{n.body}</p>
+              <p className="flex-1 text-ink text-label font-body leading-relaxed min-w-0">{n.body}</p>
               <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                 <button
                   onClick={() => void act(() => (n.pinned ? unpinCoachNote(n.id) : pinCoachNote(userId, n.id)))}
-                  className="text-ink-4 hover:text-white text-2xs font-body"
+                  className="text-ink-4 hover:text-white text-caption font-body"
                 >
                   {n.pinned ? 'Unpin' : 'Pin'}
                 </button>
                 <button
                   onClick={() => void act(() => deleteCoachNote(n.id))}
-                  className="text-ink-4 hover:text-state-danger text-2xs font-body"
+                  className="text-ink-4 hover:text-state-danger text-caption font-body"
                 >
                   Delete
                 </button>

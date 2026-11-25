@@ -166,12 +166,12 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
           />
         </div>
         <div className="flex-1">
-          <h2 className={`font-display font-bold text-sm ${isDark ? 'text-white' : 'text-brand-navy'}`}>
+          <h2 className={`font-display font-bold text-heading ${isDark ? 'text-white' : 'text-brand-navy'}`}>
             Chea
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className={`text-2xs font-body ${isDark ? 'text-ink-4' : 'text-brand-slate'}`}>Online now</span>
+            <span className={`text-caption font-body ${isDark ? 'text-ink-4' : 'text-brand-slate'}`}>Online now</span>
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
             onKeyDown={handleKeyDown}
             placeholder="Message Chea..."
             disabled={isStreaming}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-body focus:outline-none transition-colors duration-200 ${
+            className={`flex-1 rounded-full px-4 py-2 text-body font-body focus:outline-none transition-colors duration-200 ${
               isDark
                 ? 'bg-white/[0.06] text-ink-2 placeholder:text-ink-4 focus:bg-white/[0.08]'
                 : 'bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:bg-[#ECEEF2]'

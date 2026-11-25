@@ -92,11 +92,11 @@ export default function AssignProgram({ userId }: { userId: string }) {
 
   return (
     <div className="sm:col-span-2 mt-1 pt-4 border-t border-white/[0.06]">
-      <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide mb-2">
+      <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-wide mb-2">
         Training program
       </p>
 
-      <p className="text-ink-2 text-sm font-body mb-3">
+      <p className="text-ink-2 text-body font-body mb-3">
         {current?.programs?.name ? (
           <>
             Currently on <span className="text-white font-semibold">{current.programs.name}</span>
@@ -114,7 +114,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
-          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body focus:outline-none focus:border-brand-blue/50"
+          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body focus:outline-none focus:border-brand-blue/50"
         >
           <option value="">Choose a program…</option>
           {custom.length > 0 && (
@@ -137,7 +137,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
         <button
           onClick={assign}
           disabled={!selected || saving}
-          className="shrink-0 px-5 py-2.5 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
+          className="shrink-0 px-5 py-2.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Assigning…' : current ? 'Replace' : 'Assign'}
         </button>
@@ -147,11 +147,11 @@ export default function AssignProgram({ userId }: { userId: string }) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional note sent with it — why this program, what to focus on"
-        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
       />
 
-      {done && <p className="text-state-success text-xs font-body mt-2">{done}</p>}
-      {error && <p className="text-state-danger text-xs font-body mt-2">{error}</p>}
+      {done && <p className="text-state-success text-label font-body mt-2">{done}</p>}
+      {error && <p className="text-state-danger text-label font-body mt-2">{error}</p>}
     </div>
   )
 }

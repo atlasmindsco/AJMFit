@@ -97,17 +97,17 @@ export default function ProductsAdmin() {
     await load()
   }
 
-  const field = 'w-full px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50'
-  const label = 'block text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-1.5'
+  const field = 'w-full px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50'
+  const label = 'block text-ink-3 text-caption font-display font-bold uppercase tracking-wide mb-1.5'
 
   return (
     <div className="max-w-3xl mx-auto">
       <header className="mb-5">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">AJM Recommends</h1>
-        <p className="text-ink-3 text-sm font-body mt-1">
+        <p className="text-ink-3 text-body font-body mt-1">
           What clients see under Nutrition. Hidden products are invisible to them.
         </p>
-        <p className="text-ink-4 text-xs font-body mt-2">
+        <p className="text-ink-4 text-label font-body mt-2">
           Every product shows &ldquo;{DISCLOSURE_SHORT}&rdquo; under its button.
         </p>
       </header>
@@ -115,7 +115,7 @@ export default function ProductsAdmin() {
       {!draft && (
         <button
           onClick={() => setDraft({ ...EMPTY, sort_order: items.length })}
-          className="w-full mb-4 py-3.5 rounded-card bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.99] transition-all"
+          className="w-full mb-4 py-3.5 rounded-card bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.99] transition-all"
         >
           + Add a product
         </button>
@@ -177,29 +177,29 @@ export default function ProductsAdmin() {
             </div>
           ))}
 
-          <p className="text-ink-4 text-xs font-body leading-relaxed">
+          <p className="text-ink-4 text-label font-body leading-relaxed">
             Describe what it is and who it suits. Avoid saying what it does to the body — &ldquo;supports
             recovery&rdquo; is a health claim with rules attached, &ldquo;this is what I use after
             training&rdquo; is not.
           </p>
 
-          {error && <p className="text-state-danger text-xs font-body">{error}</p>}
+          {error && <p className="text-state-danger text-label font-body">{error}</p>}
 
           <div className="flex gap-2 pt-1">
-            <button onClick={() => { setDraft(null); setError('') }} className="px-5 py-3 rounded-control bg-white/[0.06] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.1] transition-colors">
+            <button onClick={() => { setDraft(null); setError('') }} className="px-5 py-3 rounded-control bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.1] transition-colors">
               Cancel
             </button>
-            <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark disabled:opacity-50 transition-colors">
+            <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark disabled:opacity-50 transition-colors">
               {saving ? 'Saving…' : draft.id ? 'Save changes' : 'Add product'}
             </button>
           </div>
         </div>
       )}
 
-      {loading && <p className="text-ink-4 text-sm font-body py-8 text-center">Loading…</p>}
+      {loading && <p className="text-ink-4 text-body font-body py-8 text-center">Loading…</p>}
 
       {!loading && items.length === 0 && !draft && (
-        <p className="text-ink-4 text-sm font-body py-10 text-center">
+        <p className="text-ink-4 text-body font-body py-10 text-center">
           No products yet. Clients see an empty section until you add one.
         </p>
       )}
@@ -210,36 +210,36 @@ export default function ProductsAdmin() {
             <div className="flex items-start gap-3">
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
-                  <span className="text-white text-sm font-display font-bold truncate">{item.name}</span>
+                  <span className="text-white text-label font-display font-bold truncate">{item.name}</span>
                   {!item.is_active && (
-                    <span className="shrink-0 text-2xs font-display font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/[0.08] text-ink-2">Hidden</span>
+                    <span className="shrink-0 text-caption font-display font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/[0.08] text-ink-2">Hidden</span>
                   )}
                   {item.is_featured && (
-                    <span className="shrink-0 text-2xs font-display font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange">Featured</span>
+                    <span className="shrink-0 text-caption font-display font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange">Featured</span>
                   )}
                 </span>
-                <span className="block text-ink-3 text-xs font-body mt-0.5">
+                <span className="block text-ink-3 text-label font-body mt-0.5">
                   {item.category} · {item.merchant}
                   {clicks.get(item.id) ? ` · opened ${clicks.get(item.id)} times` : ''}
                 </span>
               </span>
               <div className="flex flex-col gap-0.5 shrink-0">
-                <button onClick={() => void move(item, -1)} disabled={i === 0} className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-xs disabled:opacity-20 transition-opacity" aria-label="Move up">&uarr;</button>
-                <button onClick={() => void move(item, 1)} disabled={i === items.length - 1} className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-xs disabled:opacity-20 transition-opacity" aria-label="Move down">&darr;</button>
+                <button onClick={() => void move(item, -1)} disabled={i === 0} className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-label disabled:opacity-20 transition-opacity" aria-label="Move up">&uarr;</button>
+                <button onClick={() => void move(item, 1)} disabled={i === items.length - 1} className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-label disabled:opacity-20 transition-opacity" aria-label="Move down">&darr;</button>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-4 mt-2.5">
-              <button onClick={() => setDraft(item)} className="text-ink-3 hover:text-white text-2xs font-body transition-colors">Edit</button>
-              <button onClick={() => void toggle(item, 'is_active')} className="text-ink-3 hover:text-white text-2xs font-body transition-colors">
+              <button onClick={() => setDraft(item)} className="text-ink-3 hover:text-white text-caption font-body transition-colors">Edit</button>
+              <button onClick={() => void toggle(item, 'is_active')} className="text-ink-3 hover:text-white text-caption font-body transition-colors">
                 {item.is_active ? 'Hide from clients' : 'Show to clients'}
               </button>
-              <button onClick={() => void toggle(item, 'is_featured')} className="text-ink-3 hover:text-white text-2xs font-body transition-colors">
+              <button onClick={() => void toggle(item, 'is_featured')} className="text-ink-3 hover:text-white text-caption font-body transition-colors">
                 {item.is_featured ? 'Unfeature' : 'Feature'}
               </button>
-              <a href={item.external_url} target="_blank" rel="noopener noreferrer" className="text-ink-3 hover:text-white text-2xs font-body transition-colors">Test link ↗</a>
+              <a href={item.external_url} target="_blank" rel="noopener noreferrer" className="text-ink-3 hover:text-white text-caption font-body transition-colors">Test link ↗</a>
               <button
                 onClick={async () => { await deleteRecommendation(item.id); await load() }}
-                className="text-ink-4 hover:text-state-danger text-2xs font-body transition-colors ml-auto"
+                className="text-ink-4 hover:text-state-danger text-caption font-body transition-colors ml-auto"
               >
                 Delete
               </button>

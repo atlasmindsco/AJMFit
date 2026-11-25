@@ -173,7 +173,7 @@ export default function BulkMealUpload({
         <p className="font-display font-bold text-white text-base">
           Drop all your meal photos here
         </p>
-        <p className="text-ink-3 text-xs font-body mt-1.5 max-w-md mx-auto leading-relaxed">
+        <p className="text-ink-3 text-label font-body mt-1.5 max-w-md mx-auto leading-relaxed">
           As many at once as you like. Name a file after its meal
           (<span className="font-mono text-ink-2">b4.jpg</span>) and it goes straight there;
           anything else is matched in order to the meals still missing a picture, and you
@@ -192,21 +192,21 @@ export default function BulkMealUpload({
       {rows.length > 0 && (
         <div className="mt-4 rounded-card bg-surface-raised border border-white/[0.10] overflow-hidden">
           <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/[0.08]">
-            <p className="text-ink-2 text-xs font-body">
+            <p className="text-ink-2 text-label font-body">
               {pending} to upload
               {doneCount > 0 && <span className="text-state-success"> · {doneCount} done</span>}
               {guesses > 0 && <span className="text-state-warning"> · {guesses} matched by order, check them</span>}
             </p>
             <div className="flex items-center gap-3">
               {doneCount > 0 && !running && (
-                <button onClick={clearDone} className="text-ink-3 hover:text-white text-2xs font-body transition-colors">
+                <button onClick={clearDone} className="text-ink-3 hover:text-white text-caption font-body transition-colors">
                   Clear finished
                 </button>
               )}
               <button
                 onClick={() => void uploadAll()}
                 disabled={running || pending === 0}
-                className="px-4 py-2 rounded-control bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide disabled:opacity-40 hover:bg-brand-orangedark transition-colors"
+                className="px-4 py-2 rounded-control bg-brand-orange text-white text-caption font-display font-bold uppercase tracking-wide disabled:opacity-40 hover:bg-brand-orangedark transition-colors"
               >
                 {running ? 'Uploading…' : `Upload ${pending}`}
               </button>
@@ -222,13 +222,13 @@ export default function BulkMealUpload({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-ink-2 text-2xs font-mono truncate">{row.file.name}</p>
+                  <p className="text-ink-2 text-caption font-mono truncate">{row.file.name}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <select
                       value={row.mealId ?? ''}
                       onChange={(e) => reassign(i, e.target.value)}
                       disabled={running || row.status === 'done'}
-                      className="bg-[#222] border border-white/[0.12] rounded-control text-white text-2xs font-body px-2 py-1 max-w-[260px] disabled:opacity-50"
+                      className="bg-[#222] border border-white/[0.12] rounded-control text-white text-caption font-body px-2 py-1 max-w-[260px] disabled:opacity-50"
                     >
                       <option value="">— not assigned —</option>
                       {ordered.map((m) => (
@@ -238,20 +238,20 @@ export default function BulkMealUpload({
                       ))}
                     </select>
                     {row.how === 'order' && row.status === 'ready' && (
-                      <span className="text-state-warning text-2xs font-body">guessed</span>
+                      <span className="text-state-warning text-caption font-body">guessed</span>
                     )}
                     {row.how === 'filename' && row.status === 'ready' && (
-                      <span className="text-ink-4 text-2xs font-body">from filename</span>
+                      <span className="text-ink-4 text-caption font-body">from filename</span>
                     )}
                   </div>
                 </div>
 
                 <div className="shrink-0 text-right">
-                  {row.status === 'uploading' && <span className="text-brand-blue text-2xs font-body">uploading…</span>}
-                  {row.status === 'done' && <span className="text-state-success text-2xs font-body">done</span>}
-                  {row.status === 'failed' && <span className="text-state-danger text-2xs font-body">{row.message ?? 'failed'}</span>}
+                  {row.status === 'uploading' && <span className="text-brand-blue text-caption font-body">uploading…</span>}
+                  {row.status === 'done' && <span className="text-state-success text-caption font-body">done</span>}
+                  {row.status === 'failed' && <span className="text-state-danger text-caption font-body">{row.message ?? 'failed'}</span>}
                   {row.status === 'ready' && !running && (
-                    <button onClick={() => remove(i)} className="text-ink-4 hover:text-state-danger text-2xs font-body transition-colors">
+                    <button onClick={() => remove(i)} className="text-ink-4 hover:text-state-danger text-caption font-body transition-colors">
                       remove
                     </button>
                   )}

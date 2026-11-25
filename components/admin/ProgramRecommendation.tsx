@@ -178,8 +178,8 @@ export default function ProgramRecommendation({
   if (!match.ready) {
     return (
       <div className="rounded-card bg-surface-raised border border-white/[0.10] p-6">
-        <h3 className="font-display font-bold text-white text-sm uppercase tracking-wide">Recommended program</h3>
-        <p className="text-ink-3 text-sm font-body mt-2 leading-relaxed">
+        <h3 className="font-display font-bold text-white text-heading uppercase tracking-wide">Recommended program</h3>
+        <p className="text-ink-3 text-body font-body mt-2 leading-relaxed">
           {Object.keys(answers ?? {}).length === 0
             ? `${clientName ?? 'This client'} has not filled in the assessment yet, so there is nothing to match on.`
             : 'The assessment is missing goal, days or location, so no template matches cleanly.'}{' '}
@@ -195,41 +195,41 @@ export default function ProgramRecommendation({
   return (
     <div className="rounded-card bg-surface-raised border border-white/[0.10] overflow-hidden">
       <div className="px-6 py-5 border-b border-white/[0.08]">
-        <h3 className="font-display font-bold text-white text-sm uppercase tracking-wide">Recommended program</h3>
+        <h3 className="font-display font-bold text-white text-heading uppercase tracking-wide">Recommended program</h3>
         <p className="font-display font-extrabold text-white text-lg mt-1.5 leading-tight">
           {data.programName ?? match.splitLabel}
         </p>
-        <p className="text-ink-3 text-xs font-body mt-1">
+        <p className="text-ink-3 text-label font-body mt-1">
           {match.goal ? GOAL_LABELS[match.goal] : ''} · {match.days} days ·{' '}
           {match.location ? LOCATION_LABELS[match.location].toLowerCase() : ''}
         </p>
       </div>
 
       <div className="px-6 py-5 border-b border-white/[0.08]">
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.14em] mb-2.5">
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.14em] mb-2.5">
           Recommended because
         </p>
         <ul className="space-y-1.5">
           {match.because.map((b) => (
-            <li key={b} className="text-ink-2 text-sm font-body flex gap-2">
+            <li key={b} className="text-ink-2 text-body font-body flex gap-2">
               <span className="text-ink-4">·</span>
               {b}
             </li>
           ))}
         </ul>
         {answers?.experience && (
-          <p className="text-ink-4 text-2xs font-body mt-3">{EXPERIENCE_WORDS[answers.experience] ?? ''}</p>
+          <p className="text-ink-4 text-caption font-body mt-3">{EXPERIENCE_WORDS[answers.experience] ?? ''}</p>
         )}
       </div>
 
       {/* Flags, loudest first. An empty state here is worth saying out loud:
           "nothing to flag" is information, and silence looks like a bug. */}
       <div className="px-6 py-5 border-b border-white/[0.08]">
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.14em] mb-2.5">
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.14em] mb-2.5">
           Before you assign
         </p>
         {match.flags.length === 0 ? (
-          <p className="text-ink-3 text-sm font-body">
+          <p className="text-ink-3 text-body font-body">
             Nothing to flag. No injuries mentioned, equipment matches, sessions fit the time they gave.
           </p>
         ) : (
@@ -244,13 +244,13 @@ export default function ProgramRecommendation({
                 }`}
               >
                 <p
-                  className={`font-display font-bold text-xs uppercase tracking-wide ${
+                  className={`font-display font-bold text-label uppercase tracking-wide ${
                     f.level === 'warn' ? 'text-state-warning' : 'text-ink-2'
                   }`}
                 >
                   {f.title}
                 </p>
-                <p className="text-ink-2 text-sm font-body mt-1 leading-relaxed">{f.detail}</p>
+                <p className="text-ink-2 text-body font-body mt-1 leading-relaxed">{f.detail}</p>
               </li>
             ))}
           </ul>
@@ -259,20 +259,20 @@ export default function ProgramRecommendation({
 
       {answers?.injuries?.trim() && (
         <div className="px-6 py-5 border-b border-white/[0.08]">
-          <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.14em] mb-2">
+          <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.14em] mb-2">
             What they wrote
           </p>
-          <p className="text-ink-2 text-sm font-body leading-relaxed">{answers.injuries}</p>
+          <p className="text-ink-2 text-body font-body leading-relaxed">{answers.injuries}</p>
           {answers.anythingElse?.trim() && (
-            <p className="text-ink-2 text-sm font-body leading-relaxed mt-2">{answers.anythingElse}</p>
+            <p className="text-ink-2 text-body font-body leading-relaxed mt-2">{answers.anythingElse}</p>
           )}
         </div>
       )}
 
       <div className="px-6 py-5">
-        {error && <p className="text-state-danger text-xs font-body mb-3">{error}</p>}
+        {error && <p className="text-state-danger text-label font-body mb-3">{error}</p>}
         {assigned ? (
-          <p className="text-state-success text-sm font-body">
+          <p className="text-state-success text-body font-body">
             Assigned. {clientName ?? 'They'} can start training now.
           </p>
         ) : (
@@ -280,18 +280,18 @@ export default function ProgramRecommendation({
             <button
               onClick={() => void assign()}
               disabled={assigning || !data.programId}
-              className="px-5 py-2.5 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
+              className="px-5 py-2.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
             >
               {assigning ? 'Assigning…' : 'Assign this program'}
             </button>
             <Link
               href="/luffy/programs"
-              className="text-ink-2 hover:text-white text-xs font-display font-bold uppercase tracking-wide transition-colors"
+              className="text-ink-2 hover:text-white text-label font-display font-bold uppercase tracking-wide transition-colors"
             >
               Edit it first
             </Link>
             {warns.length > 0 && (
-              <span className="text-state-warning text-2xs font-body">
+              <span className="text-state-warning text-caption font-body">
                 {warns.length} thing{warns.length === 1 ? '' : 's'} worth changing first
               </span>
             )}

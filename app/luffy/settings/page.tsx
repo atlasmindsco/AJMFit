@@ -9,8 +9,8 @@ import { fetchCoachSettings, saveCoachSettings, DEFAULT_COACH_SETTINGS, type Coa
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-sm text-ink font-body focus:outline-none focus:border-brand-orange/30'
-const labelCls = 'text-ink-4 text-2xs font-display uppercase tracking-wide block mb-2'
+  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30'
+const labelCls = 'text-ink-4 text-caption font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [
   { name: 'The Blueprint', price: '$19.97/mo', features: 'Self-guided, full app access' },
@@ -66,8 +66,8 @@ export default function SettingsPage() {
 
   const SaveBar = (
     <div className="mt-6 flex items-center justify-end gap-3">
-      {saved && <span className="text-emerald-400 text-xs font-body">Saved ✓</span>}
-      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
+      {saved && <span className="text-emerald-400 text-label font-body">Saved ✓</span>}
+      <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
         {saving ? 'Saving…' : 'Save Changes'}
       </button>
     </div>
@@ -76,8 +76,8 @@ export default function SettingsPage() {
   const toggle = (label: string, description: string, key: keyof CoachSettings) => (
     <div className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
       <div>
-        <p className="text-white font-body font-semibold text-sm">{label}</p>
-        <p className="text-ink-4 text-xs font-body">{description}</p>
+        <p className="text-white font-body font-semibold text-label">{label}</p>
+        <p className="text-ink-4 text-label font-body">{description}</p>
       </div>
       <button onClick={() => set(key, !s[key] as never)} className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${s[key] ? 'bg-brand-orange' : 'bg-white/[0.08]'}`}>
         <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200 ${s[key] ? 'left-[22px]' : 'left-0.5'}`} />
@@ -95,7 +95,7 @@ export default function SettingsPage() {
 
       <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="flex gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-card p-1.5">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-ink-4 hover:text-ink-2'}`}>
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-wide transition-all duration-200 ${activeTab === tab.key ? 'bg-brand-orange text-white' : 'text-ink-4 hover:text-ink-2'}`}>
             {tab.label}
           </button>
         ))}
@@ -103,7 +103,7 @@ export default function SettingsPage() {
 
       {activeTab === 'profile' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-          <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Coach Profile</h2>
+          <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-6">Coach Profile</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className={labelCls}>Full Name</label><input className={inputCls} value={s.full_name} onChange={(e) => set('full_name', e.target.value)} /></div>
             <div><label className={labelCls}>Email</label><input type="email" className={inputCls} value={s.email} onChange={(e) => set('email', e.target.value)} /></div>
@@ -122,7 +122,7 @@ export default function SettingsPage() {
       {activeTab === 'business' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-            <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Business Settings</h2>
+            <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-6">Business Settings</h2>
             <div className="space-y-4">
               <div><label className={labelCls}>Business Name</label><input className={inputCls} value={s.business_name} onChange={(e) => set('business_name', e.target.value)} /></div>
               <div><label className={labelCls}>Website</label><input type="url" className={inputCls} value={s.website} onChange={(e) => set('website', e.target.value)} /></div>
@@ -131,11 +131,11 @@ export default function SettingsPage() {
             {SaveBar}
           </div>
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-            <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Pricing Tiers</h2>
+            <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-6">Pricing Tiers</h2>
             <div className="space-y-3">
               {TIERS.map((tier) => (
                 <div key={tier.name} className="flex items-center justify-between p-4 rounded-control bg-white/[0.02] border border-white/[0.04]">
-                  <div><p className="text-white font-body font-semibold text-sm">{tier.name}</p><p className="text-ink-4 text-xs font-body">{tier.features}</p></div>
+                  <div><p className="text-white font-body font-semibold text-label">{tier.name}</p><p className="text-ink-4 text-label font-body">{tier.features}</p></div>
                   <span className="text-brand-orange font-display font-bold text-lg">{tier.price}</span>
                 </div>
               ))}
@@ -146,7 +146,7 @@ export default function SettingsPage() {
 
       {activeTab === 'notifications' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-          <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Notification Preferences</h2>
+          <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-6">Notification Preferences</h2>
           <div className="space-y-4">
             {toggle('New client applications', 'When someone applies for coaching', 'notify_new_application')}
             {toggle('Client messages', 'When a client sends you a message', 'notify_new_message')}
@@ -159,14 +159,14 @@ export default function SettingsPage() {
       {activeTab === 'billing' && (
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6">
-            <h2 className="font-display font-bold text-sm uppercase tracking-[0.15em] text-white mb-6">Revenue</h2>
+            <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-6">Revenue</h2>
             <div className="flex items-baseline gap-3">
               <p className="font-display font-extrabold text-3xl text-brand-orange">
                 {revenue === null ? ', ' : `$${(revenue / 100).toLocaleString()}`}
               </p>
-              <span className="text-ink-4 text-xs font-display uppercase tracking-wide">this month</span>
+              <span className="text-ink-4 text-label font-display uppercase tracking-wide">this month</span>
             </div>
-            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-ink text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.1] transition-colors duration-200">
+            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="inline-block mt-5 px-5 py-2.5 bg-white/[0.06] text-ink text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-white/[0.1] transition-colors duration-200">
               Manage payments in Stripe →
             </a>
           </div>

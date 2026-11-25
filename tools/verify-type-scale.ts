@@ -94,15 +94,24 @@ ok(sizeHits.length === 0, 'nothing reaches past the scale', sizeHits.length ? `\
 console.log('\nNO CONTROL DECLARES ITSELF SMALLER THAN A THUMB\n')
 ok(tapHits.length === 0, `no explicit height under ${TAP_PX}px on a control`, tapHits.length ? `\n         ${tapHits.join('\n         ')}` : 'clean')
 
-/* ── The client app is off the legacy steps ───────────────────────────── */
-/* These are what the audit's phases 4 and 7 removed. The screens a paying
-   client uses now name their type by job, and the point of saying so here
-   is that one `text-xs` added in a hurry puts a screen back in the
-   three-pixel band without anybody noticing.
-   The trainer portal and the marketing site are left out on purpose: they
-   still use the old names, and failing on them would make this check noise
-   rather than a rule. */
-const CLIENT_DIRS = ['app/studio/', 'components/studio/', 'components/forms/']
+/* ── The app is off the legacy steps ──────────────────────────────────── */
+/* Both halves of the product now name their type by job: the client studio
+   and the trainer portal. One `text-xs` added in a hurry puts a screen back
+   in the three-pixel band without anybody noticing, so it fails the build.
+
+   The marketing site is deliberately left out. It is a different surface —
+   desktop-first, its own typographic treatment, read once rather than used
+   at arm's length in a gym — and converting it would be a change to the
+   brand rather than to readability. CheaChat and EmptyState are in because
+   both render inside the studio. */
+const CLIENT_DIRS = [
+  'app/studio/',
+  'app/luffy/',
+  'components/studio/',
+  'components/admin/',
+  'components/forms/',
+  'components/chat/',
+]
 const LEGACY = /\btext-(2xs|xs|sm)\b/g
 const legacyHits: string[] = []
 for (const file of files) {
@@ -113,11 +122,11 @@ for (const file of files) {
   })
 }
 
-console.log('\nTHE CLIENT APP NAMES ITS TYPE BY JOB\n')
-console.log('        app/studio, components/studio, components/forms — the screens a paying client sees')
+console.log('\nTHE APP NAMES ITS TYPE BY JOB\n')
+console.log('        the client studio and the trainer portal — everything used at arm\'s length')
 ok(
   legacyHits.length === 0,
-  'no 2xs, xs or sm left in the client app',
+  'no 2xs, xs or sm left in the studio or the portal',
   legacyHits.length ? `${legacyHits.length} left\n         ${legacyHits.slice(0, 12).join('\n         ')}` : 'clean'
 )
 
