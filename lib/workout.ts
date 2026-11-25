@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { localDate, localWeekStart } from '@/lib/dates'
 import type { TrainedDay } from '@/lib/rotation'
 import type { SessionPoint } from '@/lib/progress-lines'
+import { STALE_AFTER_HOURS, type ActiveWorkout } from '@/lib/active-workout'
 
 export type IntensityTechnique = 'dropset' | 'restpause' | 'partial'
 
@@ -75,19 +76,29 @@ export async function endWorkout(workoutId: string, durationSeconds: number) {
 }
 
 /**
- * Close out any workout left open from a previous day. Without this, an
- * un-ended session stays "active" and its timer accumulates for days. We stamp
- * a modest estimated duration so it shows up as a completed workout in history.
+ * Close out any workout left open past the resume window. Without this, an
+ * un-ended session stays "active" and its timer accumulates for days.
+ *
+ * Swept on the same constant that decides whether a session can still be
+ * resumed, so there is no band where a workout is too old to offer back and
+ * too young to close.
+ *
+ * NOTE ON WHO CALLS THIS. It runs when the client opens their programs page,
+ * which means it never runs for the clients it was written for. Arun's only
+ * session has been open since 8 November and Alexandro's since 10 October,
+ * because neither of them came back — and coming back is the trigger. The
+ * server-side sweep in /api/cron/close-workouts is what actually reaches
+ * them; this stays because closing a client's own stale session the moment
+ * they return is still the right thing to do, and it needs no cron to work.
  */
 export async function autoCloseStaleWorkouts(userId: string): Promise<void> {
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  const cutoff = new Date(Date.now() - STALE_AFTER_HOURS * 3600_000)
   const { data: stale } = await db
     .from('workouts')
     .select('id')
     .eq('user_id', userId)
     .is('ended_at', null)
-    .lt('started_at', todayStart.toISOString())
+    .lt('started_at', cutoff.toISOString())
   for (const w of (stale ?? []) as { id: string }[]) {
     await db
       .from('workouts')
@@ -409,18 +420,24 @@ export interface WorkoutSetRow {
 /**
  * Returns the most recent workout for this user that hasn't been ended, or null.
  * Includes all sets already logged for that workout.
+ *
+ * The window is STALE_AFTER_HOURS and not "since local midnight", which is
+ * what it used to be. Midnight made a session started at 11:30pm
+ * unresumable at 12:01am — and `autoCloseStaleWorkouts` swept on the same
+ * boundary, so the row was then closed with the client never offered it
+ * back. Two thresholds either side of one line is how a workout ends up
+ * alive in the table and dead on the screen. Both now read the same constant.
  */
 export async function fetchInProgressWorkout(
   userId: string
 ): Promise<{ workout: InProgressWorkoutRow; sets: WorkoutSetRow[] } | null> {
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  const since = new Date(Date.now() - STALE_AFTER_HOURS * 3600_000)
   const { data: workout, error: wErr } = await db
     .from('workouts')
     .select('id, day_name, program_name, program_phase, started_at')
     .eq('user_id', userId)
     .is('ended_at', null)
-    .gte('started_at', todayStart.toISOString())
+    .gte('started_at', since.toISOString())
     .order('started_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -746,4 +763,59 @@ export async function fetchLiftHistory(userId: string): Promise<Record<string, S
     out[name] = Object.keys(perWorkout).map((id) => perWorkout[id])
   }
   return out
+}
+
+/**
+ * The running session, reduced to what a bar on another screen needs.
+ *
+ * Built on fetchInProgressWorkout rather than a second query of its own, so
+ * the two can never disagree about what counts as still running.
+ */
+export async function fetchActiveWorkout(userId: string): Promise<ActiveWorkout | null> {
+  const found = await fetchInProgressWorkout(userId)
+  if (!found) return null
+  const { workout, sets } = found
+
+  // Distinct exercises, in the order they were first logged. Intensity sets
+  // are part of an exercise the client has already reached, so they count
+  // toward neither the position nor a new name.
+  const touched: string[] = []
+  const seen = new Set<string>()
+  let logged = 0
+  for (const s of sets) {
+    if (!s.completed) continue
+    logged++
+    if (s.is_intensity_set) continue
+    if (seen.has(s.exercise_name)) continue
+    seen.add(s.exercise_name)
+    touched.push(s.exercise_name)
+  }
+
+  return {
+    id: workout.id,
+    dayName: workout.day_name ?? '',
+    programName: workout.program_name,
+    startedAt: workout.started_at,
+    exercisesTouched: touched,
+    loggedSets: logged,
+  }
+}
+
+/**
+ * Close a session the client has decided not to finish.
+ *
+ * Deliberately NOT a delete. The sets they logged are things they actually
+ * did and they stay in their history; what ends is the session. Duration is
+ * left null rather than invented, the same reasoning as the stale sweep —
+ * a workout nobody timed should show no time, not a confident guess.
+ *
+ * There was no way to do this at all before. "Until they finish it or
+ * explicitly abandon it" had only one of those two.
+ */
+export async function abandonWorkout(workoutId: string): Promise<void> {
+  const { error } = await db
+    .from('workouts')
+    .update({ ended_at: new Date().toISOString(), duration_seconds: null })
+    .eq('id', workoutId)
+  if (error) throw error
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import TravelSwitch from '@/components/studio/TravelSwitch'
 import { useSessionChrome } from '@/components/studio/SessionChrome'
+import { pickDay } from '@/lib/active-workout'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import MuscleMap from '@/components/exercises/MuscleMap'
@@ -1175,7 +1176,7 @@ export default function ProgramsPage() {
      feedback pill sat on the left of them and Chea's 56px bubble on the right,
      both over the inputs. `view` is the honest condition — this screen is for
      training on, and nothing of ours belongs on top of it. */
-  const { setSessionActive } = useSessionChrome()
+  const { setSessionActive, refreshActive } = useSessionChrome()
   useEffect(() => {
     setSessionActive(view === 'workout')
     // Leaving the Train tab mid-session must not leave the rest of the app
@@ -1309,12 +1310,14 @@ export default function ProgramsPage() {
         programPhase: currentProgram.phase,
       })
       setWorkoutIds((prev) => ({ ...prev, [day]: wid }))
+      // So the resume bar knows about it the moment they open Food.
+      refreshActive()
       return wid
     } catch (err) {
       console.error('[Workout] Auto-start failed:', err)
       return null
     }
-  }, [selectedDay, selected, workoutStartTime, workoutIds, userId, currentProgram])
+  }, [selectedDay, selected, workoutStartTime, workoutIds, userId, currentProgram, refreshActive])
 
   /**
    * Count what has actually been logged, so End Workout can say so.
@@ -1471,6 +1474,9 @@ export default function ProgramsPage() {
       try {
         await dbEndWorkout(workoutId, elapsed)
         if (userId) loadHistory(userId)
+        // Clear the resume bar. Leaving it up after a finished session is the
+        // same failure as not showing it during a live one, in reverse.
+        refreshActive()
         /* Tell the coach, but only ever once, and only on the first one.
            The server decides whether this is their first — the client just
            says a session ended. Fire and forget: a notification must never
@@ -1729,8 +1735,30 @@ export default function ProgramsPage() {
         // above, which also covers a reload from any of the six screens.
         if (!data) return
         const { workout, sets } = data
-        const dayIdx = weeklyPlan.findIndex((d) => d.name === workout.day_name)
-        if (dayIdx === -1) return
+
+        /* Which day is this?
+           It used to be `findIndex(d => d.name === workout.day_name)` and a
+           bare `return` on -1 — no error, no log, nothing on screen, and the
+           workout still open in the database. A client on a customised
+           program only had to rename a day between starting and coming back.
+           pickDay tries the name, then identifies the day by the exercises
+           actually logged in the session, which survive a rename. */
+        const dayIdx = pickDay(
+          workout.day_name ?? '',
+          weeklyPlan.map((d) => ({ name: d.name, exercises: d.exercises.map((e) => e.name) })),
+          Array.from(new Set(sets.filter((s) => !s.is_intensity_set).map((s) => s.exercise_name)))
+        )
+        if (dayIdx === -1) {
+          /* Genuinely unmatchable: the program it belongs to is gone. The
+             session is NOT discarded — the resume bar in the layout is still
+             showing it, with the day it was started as and a way to end it.
+             Said out loud here because a silent -1 is what caused this. */
+          console.warn(
+            `[In-progress workout] "${workout.day_name}" matches no day in the current plan ` +
+              `(${weeklyPlan.length} days, ${sets.length} sets logged). Left open for the resume bar.`
+          )
+          return
+        }
 
         setWorkoutIds((prev) => ({ ...prev, [dayIdx]: workout.id }))
         setWorkoutStartTime((prev) => ({ ...prev, [dayIdx]: new Date(workout.started_at).getTime() }))

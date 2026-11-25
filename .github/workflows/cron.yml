@@ -35,6 +35,11 @@ on:
     # Same times vercel.json asked for. GitHub cron is UTC.
     - cron: '0 12 * * *' # digest, noon
     - cron: '0 22 * * *' # reminders, 10pm
+    # Stale workouts, 9am UTC. Before the digest, so the digest's "last
+    # trained" reads are not looking at sessions that were opened and
+    # abandoned. Also well clear of the evening, when a session legitimately
+    # running past midnight is still inside its 18-hour resume window.
+    - cron: '0 9 * * *' # close-workouts
   # So a run can be forced from the Actions tab without waiting for the clock,
   # and so the first one can be proved to work the day this lands.
   workflow_dispatch:
@@ -44,7 +49,7 @@ on:
         required: true
         default: both
         type: choice
-        options: [both, digest, reminders]
+        options: [both, digest, reminders, close-workouts]
       dry:
         description: Decide everything, send nothing
         required: false
@@ -68,6 +73,22 @@ jobs:
             echo "Add it with the same value as CRON_SECRET in Vercel, then re-run."
             exit 1
           fi
+
+      - name: Close stale workouts
+        # Sessions opened and never finished. The client-side sweep only runs
+        # when somebody opens their programs page, so it never reaches the
+        # clients who left — which is all of them. See the route's comment.
+        if: github.event_name == 'schedule' && github.event.schedule == '0 9 * * *' || inputs.job == 'both' || inputs.job == 'close-workouts'
+        run: |
+          DRY=""
+          if [ "${{ inputs.dry }}" = "true" ]; then DRY="?dry=1"; fi
+          echo "Calling /api/cron/close-workouts$DRY"
+          CODE=$(curl -sS -o /tmp/out.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://ajmfit.com/api/cron/close-workouts$DRY")
+          echo "HTTP $CODE"
+          cat /tmp/out.json; echo
+          case "$CODE" in 2*) ;; *) echo "::error::close-workouts returned $CODE"; exit 1;; esac
 
       - name: Digest
         if: github.event_name == 'schedule' && github.event.schedule == '0 12 * * *' || inputs.job == 'both' || inputs.job == 'digest'

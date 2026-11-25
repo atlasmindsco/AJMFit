@@ -8,6 +8,7 @@ import CheaChat from '@/components/chat/CheaChat'
 import ResumeSession from '@/components/studio/ResumeSession'
 import MembershipPaywall from '@/components/studio/MembershipPaywall'
 import FeedbackButton from '@/components/studio/FeedbackButton'
+import ActiveWorkoutBar from '@/components/studio/ActiveWorkoutBar'
 import { SessionChromeProvider, useSessionChrome } from '@/components/studio/SessionChrome'
 import { NAV_TABS, PROFILE_LINKS, owns } from '@/lib/nav'
 import { signedAvatarUrl } from '@/lib/avatar'
@@ -159,7 +160,7 @@ export default function ClientPortalLayout({
   }
 
   return (
-    <SessionChromeProvider>
+    <SessionChromeProvider userId={studioUserId}>
     <div className="min-h-screen bg-surface-base">
       {/* Top Navbar */}
       <nav className="bg-surface-base border-b border-white/[0.06] sticky top-0 z-50">
@@ -326,25 +327,50 @@ export default function ClientPortalLayout({
 }
 
 /**
- * The two things that float over every screen, and the one screen they should
- * not float over.
+ * What sits in the bottom corner, and what gets to take it over.
  *
- * The chat bubble and the feedback button are both there for the app's
- * benefit rather than the client's. During a running set they sit on top of
- * the one screen that has earned the whole display — the exercise, the
- * weight, the reps, and what was lifted last time. Both step aside while a
- * workout is actually running and come back the moment it ends.
+ * Three things want that strip of screen and only one of them can have it:
  *
- * Its own component so it can read the session flag; the layout above it
+ *   The chat bubble and the feedback button float over every screen. Both
+ *   are there for the app's benefit rather than the client's, and on the
+ *   training screen they sit on top of the one display that has earned the
+ *   whole of it — the exercise, the weight, the reps, and what was lifted
+ *   last time. They step aside for it entirely.
+ *
+ *   The resume bar outranks both of them everywhere else. A client who has
+ *   left a session open needs the way back more than they need a chat
+ *   bubble, and stacking it above them would put a third fixed element into
+ *   a corner that is already how this app got crowded.
+ *
+ * Its own component so it can read the session context; the layout above it
  * provides it.
  */
 function FloatingChrome() {
   const [chatOpen, setChatOpen] = useState(false)
-  const { sessionActive } = useSessionChrome()
+  const pathname = usePathname()
+  const { sessionActive, active, refreshActive } = useSessionChrome()
 
   // Not merely hidden: an open chat window would otherwise stay on screen
   // over the session it was told to get out of the way of.
   if (sessionActive) return null
+
+  /* A workout is open and they are looking at something else. The training
+     screen sets sessionActive, so this never doubles up with the in-session
+     bar that screen draws for itself.
+
+     totalExercises is 0 here on purpose: the layout does not load the
+     client's plan and must not start, for a bar. progressLine shows the day
+     name alone rather than inventing a denominator, and the real count is on
+     the training screen where the plan already is.
+
+     Not on the training screen itself. That page rehydrates the session on
+     mount and draws its own in-session bar, so the only thing this would add
+     is a Resume button pointing at the page you are already on — and a flash
+     of it during the moment between the bar loading and the rehydrate
+     setting sessionActive. */
+  if (active && !pathname?.startsWith('/studio/programs')) {
+    return <ActiveWorkoutBar workout={active} totalExercises={0} onAbandoned={refreshActive} />
+  }
 
   return (
     <>
