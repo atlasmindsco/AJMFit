@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { authoriseCron } from '@/lib/cron-auth'
 import { findDuplicates, duplicateHeadline } from '@/lib/duplicate-subs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendMail } from '@/lib/email'
@@ -25,20 +26,22 @@ const waitLabel = (d: number) => (d === 0 ? 'today' : d === 1 ? '1 day' : `${d} 
  * Sends NOTHING when there is nothing waiting. A digest that arrives every day
  * saying "all clear" is one you stop opening.
  *
- * Scheduled by vercel.json. Vercel sets CRON_SECRET as a bearer token when the
- * env var is configured; without it we fall back to the x-vercel-cron header.
- * The response body never contains client data, so the worst an unauthorized
- * caller achieves is making the coach's own digest arrive early.
+ * Scheduled by vercel.json and by .github/workflows/cron.yml. Both
+ * authenticate with a bearer CRON_SECRET; see lib/cron-auth. There is no
+ * header fallback any more - this used to say the worst an unauthorized
+ * caller could do was make the coach's digest arrive early, which was true
+ * here and false of the three routes that copied the same check.
  */
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET
-  if (secret) {
-    if (request.headers.get('authorization') !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  } else if (!request.headers.get('x-vercel-cron')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  /* One door, in lib/cron-auth. Every route used to carry its own copy of
+     this, and every copy fell back to the x-vercel-cron header when
+     CRON_SECRET was unset - which is how production actually stood, so all
+     four were reachable by anyone who sent that header. */
+  const auth = authoriseCron({
+    secret: process.env.CRON_SECRET,
+    authorization: request.headers.get('authorization'),
+  })
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
   // The other two crons have had a dry mode from the start; this one did
   // not, so the only way to check it was to send Anthony a real email — which

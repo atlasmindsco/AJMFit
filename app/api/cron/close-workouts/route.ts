@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { authoriseCron } from '@/lib/cron-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { STALE_AFTER_HOURS } from '@/lib/active-workout'
 
@@ -33,14 +34,15 @@ export const dynamic = 'force-dynamic'
  * measured. A workout nobody timed should show no time.
  */
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET
-  if (secret) {
-    if (request.headers.get('authorization') !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  } else if (!request.headers.get('x-vercel-cron')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  /* One door, in lib/cron-auth. Every route used to carry its own copy of
+     this, and every copy fell back to the x-vercel-cron header when
+     CRON_SECRET was unset - which is how production actually stood, so all
+     four were reachable by anyone who sent that header. */
+  const auth = authoriseCron({
+    secret: process.env.CRON_SECRET,
+    authorization: request.headers.get('authorization'),
+  })
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
   const dryRun = new URL(request.url).searchParams.get('dry') === '1'
   const cutoff = new Date(Date.now() - STALE_AFTER_HOURS * 3600_000).toISOString()
