@@ -405,7 +405,6 @@ export default function ProgramsPage() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
   const [exerciseDB, setExerciseDB] = useState<ExerciseDB[]>([])
-  const [imagePreview, setImagePreview] = useState<Record<string, boolean>>({})
   const [expandedWorkoutExercise, setExpandedWorkoutExercise] = useState<string | null>(null)
   /**
    * One row per set.
@@ -1840,19 +1839,17 @@ export default function ProgramsPage() {
     return null
   }
 
-  // Auto-cycle image for a given exercise name
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setImagePreview((prev) => {
-        const next = { ...prev }
-        for (const key of Object.keys(next)) {
-          next[key] = !next[key]
-        }
-        return next
-      })
-    }, 2500)
-    return () => clearInterval(interval)
-  }, [])
+  /* The exercise thumbnails used to flip between the start and end position
+     every 2.5 seconds, on one interval that ran for as long as the tab was
+     open, on every screen, whether or not a thumbnail was visible.
+     Two reasons it is gone. It costs battery on a page somebody has open for
+     an hour with the screen held awake — which is what this page does. And
+     movement in the corner of the eye during a working set is the cheapest
+     possible way to spend somebody's attention: the demo is a tap away in
+     the header for anyone who actually wants to see the movement.
+     The thumbnail now shows the start position and holds still. The separate
+     start/end toggle on the exercise DETAIL page is untouched — there, the
+     movement is the point and the client went looking for it. */
 
   /**
    * Push held sets whenever the connection looks alive again.
@@ -2713,7 +2710,6 @@ export default function ProgramsPage() {
                           const isSwapped = displayName !== exercise.name
                           const alternatives = getAlternatives(exercise.name)
                           const dbMatch = matchedExercises.get(exercise.name) ?? null
-                          const showEnd = imagePreview[exercise.name] ?? false
                           // In a running session the one exercise on screen is
                           // always open: there is nothing to collapse it to.
                           // isOpen is worked out below, once currentLogs exists.
@@ -2846,7 +2842,7 @@ export default function ProgramsPage() {
                                   {dbMatch?.images[0] ? (
                                     <>
                                       <img
-                                        src={dbMatch.images[showEnd && dbMatch.images[1] ? 1 : 0]}
+                                        src={dbMatch.images[0]}
                                         alt=""
                                         className="w-full h-full object-cover transition-opacity duration-[1200ms]"
                                         loading="lazy"
@@ -2862,7 +2858,7 @@ export default function ProgramsPage() {
                                     </>
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                      <span className="text-ink-4 text-xs font-display font-bold">{seriesPrefix}</span>
+                                      <span className="text-ink-4 text-label font-display font-bold">{seriesPrefix}</span>
                                     </div>
                                   )}
                                 </button>
@@ -2874,9 +2870,13 @@ export default function ProgramsPage() {
                                 >
                                   <div className="flex items-center gap-1.5">
                                     {group.isSuperset && (
-                                      <span className="text-state-success text-2xs font-display font-bold">{seriesPrefix}</span>
+                                      <span className="text-state-success text-caption font-display font-bold">{seriesPrefix}</span>
                                     )}
-                                    <p className="font-body font-semibold text-white text-sm truncate">{displayName}</p>
+                                    {/* The exercise is what the card is ABOUT, and it
+                                        was 15px — the same size as the eight other
+                                        things around it. First thing the eye should
+                                        land on when you look up from the bar. */}
+                                    <p className="font-body font-semibold text-white text-heading truncate">{displayName}</p>
                                     {exercise.swappedFrom && (
                                       <span className="sr-only">
                                         instead of {exercise.swappedFrom}
@@ -2898,7 +2898,14 @@ export default function ProgramsPage() {
                                         No bench
                                       </span>
                                     )}
-                                    {intensityEnabled && selectedTechnique && (
+                                    {/* Only once the card is open.
+                                        Swapped and No bench say the program is not
+                                        what it was, which is worth knowing from the
+                                        list. The technique is a setting chosen
+                                        inside this card — on a collapsed row it is a
+                                        third pill competing with the exercise name
+                                        for a reader who has not opened it yet. */}
+                                    {isOpen && intensityEnabled && selectedTechnique && (
                                       <span
                                         className={`text-badge font-display font-bold px-1.5 py-0.5 rounded bg-white/5 shrink-0`}
                                         style={{ color: TECHNIQUE_META[selectedTechnique].color, backgroundColor: `${TECHNIQUE_META[selectedTechnique].color}22` }}
@@ -2916,7 +2923,7 @@ export default function ProgramsPage() {
                                       conversation — coaching must not compete
                                       with execution. */}
                                   {exercise.note && (
-                                    <p className="text-brand-blue text-xs font-body mt-1 leading-relaxed">
+                                    <p className="text-brand-blue text-body font-body mt-1 leading-relaxed">
                                       {exercise.note}
                                     </p>
                                   )}
@@ -2932,21 +2939,35 @@ export default function ProgramsPage() {
                                         preview it would be a countdown from a
                                         workout nobody has started. */}
                                     {sessionActive && activeSet >= 0 && (
-                                      <p className="text-white text-xs font-display font-bold shrink-0">
+                                      <p className="text-white text-label font-display font-bold shrink-0">
                                         Set {activeSet + 1} of {currentLogs.length}
                                       </p>
                                     )}
-                                    <p className="text-ink-3 text-xs font-body">
-                                      Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
-                                    </p>
-                                    {pr && (
-                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-state-warning/15 text-state-warning flex items-center gap-0.5">
-                                        <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
-                                        </svg>
-                                        PR: {pr.weight} lbs
-                                      </span>
+                                    {/* The prescription, while the card is shut.
+                                        Open, the set rows below are the same
+                                        information as five numbered lines with the
+                                        rep target in each box, and this becomes a
+                                        caption restating what is already on screen
+                                        in a larger form. */}
+                                    {!isOpen && (
+                                      <p className="text-ink-3 text-label font-body">
+                                        Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
+                                      </p>
                                     )}
+                                    {/* The PR badge is gone, not enlarged.
+                                        It duplicated the "Current PR — 155 lbs × 5,
+                                        Oct 10" row two lines below, which is better
+                                        in every way: dated, says the reps, and
+                                        readable. A standing record is reference, and
+                                        the decision this card is for is made from
+                                        Last and Today. The moment a PR is SET is
+                                        news and already has PRCelebration.
+
+                                        It was also 9px with a 10px trophy, and read
+                                        the original exercise's record on a swapped
+                                        slot until yesterday — so the one thing it
+                                        reliably did was state something untrue in
+                                        type nobody could read. */}
                                   </div>
                                 </button>
 
@@ -2986,7 +3007,7 @@ export default function ProgramsPage() {
                                     onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                     className="text-right shrink-0 flex flex-col items-end"
                                   >
-                                    <p className="text-brand-orange text-xs font-display font-bold">
+                                    <p className="text-brand-orange text-label font-display font-bold">
                                       {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
                                     </p>
                                     <svg className={`w-4 h-4 text-ink-4 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -3015,11 +3036,11 @@ export default function ProgramsPage() {
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                             </svg>
                                             {isNewPR ? (
-                                              <span className="text-state-warning text-2xs font-display font-bold uppercase tracking-wide">
+                                              <span className="text-state-warning text-caption font-display font-bold uppercase tracking-wide">
                                                 New PR!
                                               </span>
                                             ) : (
-                                              <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
+                                              <span className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">
                                                 Current PR
                                               </span>
                                             )}
@@ -3028,7 +3049,7 @@ export default function ProgramsPage() {
                                             <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-ink-2'}`}>
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
-                                            <span className="text-ink-4 text-2xs font-body ml-2">{pr.date}</span>
+                                            <span className="text-ink-4 text-caption font-body ml-2">{pr.date}</span>
                                           </div>
                                         </div>
                                       )}
@@ -3046,7 +3067,7 @@ export default function ProgramsPage() {
                                               <svg className="w-3.5 h-3.5 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                               </svg>
-                                              <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">Rest Timer</span>
+                                              <span className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">Rest Timer</span>
                                             </div>
                                             {isEditingThis ? (
                                               <div className="flex items-center gap-1.5">
@@ -3057,7 +3078,7 @@ export default function ProgramsPage() {
                                                       setRestTimers((prev) => ({ ...prev, [restKey]: sec }))
                                                       setEditingRest(null)
                                                     }}
-                                                    className={`px-2 py-1 rounded text-2xs font-display font-bold transition-colors duration-150 ${
+                                                    className={`px-2 py-1 rounded text-caption font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
                                                         ? 'bg-brand-blue text-white'
                                                         : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
@@ -3110,13 +3131,13 @@ export default function ProgramsPage() {
                                           return (
                                             <>
                                               {past[0]?.durationSeconds != null && (
-                                                <p className="text-ink-3 text-2xs font-body mb-2">
+                                                <p className="text-ink-3 text-caption font-body mb-2">
                                                   <span className="text-ink-4">Last time: </span>
                                                   {Math.round(past[0].durationSeconds / 60)} min
                                                 </p>
                                               )}
                                               <div
-                                                className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
+                                                className={`mb-2 px-base py-snug rounded-control border text-body font-body leading-relaxed ${
                                                   tt.isProgression
                                                     ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
                                                     : 'bg-white/[0.03] border-white/[0.08] text-ink-2'
@@ -3170,7 +3191,7 @@ export default function ProgramsPage() {
                                                   }}
                                                   className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
-                                                <span className="text-ink-3 text-xs font-body">
+                                                <span className="text-ink-3 text-label font-body">
                                                   minutes
                                                 </span>
                                               </div>
@@ -3221,7 +3242,7 @@ export default function ProgramsPage() {
                                                     className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     aria-label="Distance in miles, optional"
                                                   />
-                                                  <span className="text-ink-3 text-xs font-body">
+                                                  <span className="text-ink-3 text-label font-body">
                                                     miles <span className="text-ink-4">(optional)</span>
                                                   </span>
                                                 </div>
@@ -3229,7 +3250,7 @@ export default function ProgramsPage() {
 
                                               {/* Pace, the moment both are in. */}
                                               {Number(typed) > 0 && Number(distanceLogs[logKey]) > 0 && (
-                                                <p className="text-ink-3 text-2xs font-body mt-2">
+                                                <p className="text-ink-3 text-caption font-body mt-2">
                                                   {(() => {
                                                     const sec = (Number(typed) * 60) / Number(distanceLogs[logKey])
                                                     return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')} per mile`
@@ -3246,7 +3267,7 @@ export default function ProgramsPage() {
                                         // jump; nothing about that is a good idea.
                                         if (isExplosiveMovement(displayName)) {
                                           return (
-                                            <div className="mb-2 px-3 py-2 rounded-control border border-white/[0.08] bg-white/[0.03] text-ink-2 text-xs font-body leading-relaxed">
+                                            <div className="mb-2 px-base py-snug rounded-control border border-white/[0.08] bg-white/[0.03] text-ink-2 text-body font-body leading-relaxed">
                                               {explosiveGuidance(displayName)}
                                             </div>
                                           )
@@ -3277,27 +3298,34 @@ export default function ProgramsPage() {
                                                 target buried in a sentence — and
                                                 both are what the client is
                                                 actually deciding between. */}
-                                            <div className="mb-2 mt-2 rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 space-y-1.5">
+                                            {/* The two numbers the client is choosing
+                                                between, now sized like it. Today is the
+                                                decision and gets the metric step; Last
+                                                is the evidence for it and sits a clear
+                                                two steps below. They were 16px and 15px
+                                                — a 1px difference, which is no
+                                                difference at arm's length. */}
+                                            <div className="mb-2 mt-2 rounded-control bg-white/[0.03] border border-white/[0.07] px-card py-base space-y-tight">
                                               {prevSets.length > 0 && (
                                                 <div className="flex items-baseline gap-3">
-                                                  <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Last</span>
-                                                  <span className="text-ink-2 text-sm font-body tabular-nums">
+                                                  <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide w-14 shrink-0">Last</span>
+                                                  <span className="text-ink-2 text-label font-body tabular-nums">
                                                     {Number(prevSets[0].weight)} lb &middot; {prevSets.map((s) => s.reps).join(', ')}
                                                   </span>
                                                 </div>
                                               )}
                                               <div className="flex items-baseline gap-3">
-                                                <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide w-12 shrink-0">Today</span>
-                                                <span className={`text-base font-display font-bold tabular-nums ${t.addLoad ? 'text-brand-orange' : 'text-white'}`}>
+                                                <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide w-14 shrink-0">Today</span>
+                                                <span className={`text-metric font-display font-bold tabular-nums ${t.addLoad ? 'text-brand-orange' : 'text-white'}`}>
                                                   {/* null means "no suggestion yet", which is not
                                                       the same as "lift your bodyweight". See
                                                       loadLabel — the rule is pinned in
                                                       tools/verify-load-label.ts. */}
                                                   {loadLabel(t.suggestedWeight, displayName)}
-                                                  {t.suggestedReps != null && <span className="text-ink-2 font-body text-sm"> &times; {exercise.reps}</span>}
+                                                  {t.suggestedReps != null && <span className="text-ink-2 font-body text-label"> &times; {exercise.reps}</span>}
                                                 </span>
                                                 {t.addLoad && (
-                                                  <span className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide ml-auto shrink-0">
+                                                  <span className="text-brand-orange text-caption font-display font-bold uppercase tracking-wide ml-auto shrink-0">
                                                     &uarr; Up
                                                   </span>
                                                 )}
@@ -3339,7 +3367,7 @@ export default function ProgramsPage() {
                                               </div>
                                             )}
                                             <div
-                                              className={`mb-2 px-3 py-2 rounded-control border text-xs font-body leading-relaxed ${
+                                              className={`mb-2 px-base py-snug rounded-control border text-body font-body leading-relaxed ${
                                                 t.addLoad
                                                   ? 'bg-brand-orange/[0.10] border-brand-orange/30 text-brand-orange'
                                                   : t.attention
@@ -3366,16 +3394,16 @@ export default function ProgramsPage() {
                                         if (!coaching || !(treatAsBeginner || firstTime)) return null
                                         return (
                                           <div className="mt-2 mb-3 px-3 py-2.5 rounded-control bg-brand-blue/[0.07] border border-brand-blue/20">
-                                            <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
+                                            <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide mb-1.5">
                                               {firstTime && !treatAsBeginner ? 'First time on this one' : 'Get these right'}
                                             </p>
                                             <ul className="space-y-1">
                                               {coaching.cues.slice(0, 2).map((cue, i) => (
-                                                <li key={i} className="text-ink text-xs font-body leading-relaxed">{cue}</li>
+                                                <li key={i} className="text-ink text-label font-body leading-relaxed">{cue}</li>
                                               ))}
                                             </ul>
                                             {treatAsBeginner && (
-                                              <p className="text-state-warning/90 text-xs font-body leading-relaxed mt-2">
+                                              <p className="text-state-warning/90 text-label font-body leading-relaxed mt-2">
                                                 Watch out: {coaching.mistake}
                                               </p>
                                             )}
@@ -3438,7 +3466,7 @@ export default function ProgramsPage() {
                                             }
                                             return (
                                               <div key={si} className="flex items-center gap-3">
-                                                <span className={`text-xs font-display font-bold w-6 shrink-0 ${log.logged ? 'text-state-success' : 'text-ink-4'}`}>
+                                                <span className={`text-label font-display font-bold w-6 shrink-0 ${log.logged ? 'text-state-success' : 'text-ink-4'}`}>
                                                   {si + 1}
                                                 </span>
                                                 <div className="flex items-center gap-2 flex-wrap">
@@ -3476,7 +3504,7 @@ export default function ProgramsPage() {
                                               lib/conditioning.ts is waiting on. */}
                                           {currentLogs.every((l) => l.logged) && (
                                             <div className="flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5 mt-1">
-                                              <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">
+                                              <span className="text-ink-2 text-caption font-display font-bold uppercase tracking-wide">
                                                 How did they feel?
                                               </span>
                                               {[
@@ -3523,12 +3551,12 @@ export default function ProgramsPage() {
                                           nothing — "SET | WEIGHT (LBS) | REPS"
                                           sitting over a 20-minute row. */}
                                       {!explosive && currentLogs.length > 0 && (
-                                        <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 mb-2`}>
-                                          <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                        <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_44px]' : 'grid-cols-[32px_1fr_44px]'} gap-2 mb-2`}>
+                                          <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide text-center">Set</span>
                                           {needsWeight && (
-                                            <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                            <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
                                           )}
-                                          <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">{hold ? 'Seconds' : explosive ? 'Efforts' : 'Reps'}</span>
+                                          <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">{hold ? 'Seconds' : explosive ? 'Efforts' : 'Reps'}</span>
                                           <span />
                                         </div>
                                       )}
@@ -3728,8 +3756,8 @@ export default function ProgramsPage() {
 
                                         return (
                                           <div key={si} className={`rounded-control mb-1 ${isActive && !filled ? 'bg-white/[0.04] px-1.5 py-1.5' : ''}`}>
-                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_36px]' : 'grid-cols-[32px_1fr_36px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
-                                              <span className={`text-xs font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-ink-4'}`}>{si + 1}</span>
+                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_44px]' : 'grid-cols-[32px_1fr_44px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
+                                              <span className={`text-label font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-ink-4'}`}>{si + 1}</span>
                                               {/* The suggestion is a PLACEHOLDER, not a value.
                                                   It used to be a real value, which meant tapping
                                                   in put the caret inside "115" and typing gave
@@ -3748,7 +3776,7 @@ export default function ProgramsPage() {
                                                   value={log.weight}
                                                   onFocus={selectAllOnFocus}
                                                   onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
+                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                   aria-label={`Set ${si + 1} weight in pounds`}
                                                 />
                                               )}
@@ -3759,7 +3787,7 @@ export default function ProgramsPage() {
                                                 value={log.reps}
                                                 onFocus={selectAllOnFocus}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-base font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
+                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                 aria-label={`Set ${si + 1} ${hold ? 'seconds held' : explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
@@ -3779,12 +3807,21 @@ export default function ProgramsPage() {
                                                       updated[si] = { ...updated[si], logged: false }
                                                       setSetLogs((prevLogs) => ({ ...prevLogs, [logKey]: updated }))
                                                     }}
-                                                    className="w-6 h-6 rounded-full bg-state-success/20 flex items-center justify-center hover:bg-state-success/30 transition-colors duration-150"
+                                                    /* 24px circle, 44px hit area. Correcting
+                                                       a mistyped set is a two-attempt tap at
+                                                       24px with a wet thumb, and the whole
+                                                       point of the tick is that fixing a
+                                                       mistake is easy. The ring itself stays
+                                                       small — the target around it does not
+                                                       have to be visible to work. */
+                                                    className="w-tap h-tap -m-[10px] rounded-full flex items-center justify-center active:scale-95 transition-transform duration-150"
                                                     aria-label={`Set ${si + 1} logged. Tap to edit.`}
                                                   >
-                                                    <svg className="w-3.5 h-3.5 text-state-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                    </svg>
+                                                    <span className="w-6 h-6 rounded-full bg-state-success/20 flex items-center justify-center">
+                                                      <svg className="w-3.5 h-3.5 text-state-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                      </svg>
+                                                    </span>
                                                   </button>
                                                 ) : (
                                                   <div className="w-6 h-6 rounded-full bg-white/[0.04] border border-white/[0.08]" />
@@ -3800,7 +3837,11 @@ export default function ProgramsPage() {
                                               <button
                                                 onClick={() => void logThisSet()}
                                                 disabled={!canLog}
-                                                className="w-full mt-1.5 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
+                                                /* The most-pressed control in the product,
+                                                   at 14px in a 40px box. 48px and the label
+                                                   step, because this is tapped with shaking
+                                                   hands at the end of a heavy set. */
+                                                className="w-full mt-snug h-taplg rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
                                               >
                                                 Log set {si + 1}
                                               </button>
@@ -3817,7 +3858,7 @@ export default function ProgramsPage() {
                                                   <button
                                                     key={secs}
                                                     onClick={() => handleLogChange('reps', String(secs))}
-                                                    className={`px-3 py-1.5 rounded-control text-2xs font-display font-bold transition-colors duration-150 ${
+                                                    className={`px-3 py-1.5 rounded-control text-caption font-display font-bold transition-colors duration-150 ${
                                                       shownReps === String(secs)
                                                         ? 'bg-brand-blue text-white'
                                                         : 'bg-white/[0.05] text-ink-2 hover:text-white'
@@ -3830,7 +3871,7 @@ export default function ProgramsPage() {
                                             )}
 
                                             {bodyweightLooking && (
-                                              <p className="ml-8 mr-10 mb-1.5 text-state-warning/80 text-2xs font-body">
+                                              <p className="ml-8 mr-10 mb-1.5 text-state-warning/80 text-caption font-body">
                                                 That looks like your bodyweight. This one is already loaded by you — put ADDED weight here, or 0 if there is none.
                                               </p>
                                             )}
@@ -3858,7 +3899,7 @@ export default function ProgramsPage() {
                                           wrong weight to ask it at. */}
                                       {!explosive && currentLogs.length > 0 && currentLogs.every((l) => l.logged) && (
                                         <div className="mt-3 flex items-center gap-2 flex-wrap rounded-control bg-white/[0.03] border border-white/[0.07] px-3 py-2.5">
-                                          <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">
+                                          <span className="text-ink-2 text-caption font-display font-bold uppercase tracking-wide">
                                             {treatAsBeginner ? 'Could you have done more?' : 'Reps left in the tank?'}
                                           </span>
                                           {/* What the program actually asked for.
@@ -3867,7 +3908,7 @@ export default function ProgramsPage() {
                                               question with no target gets. The program has always
                                               known the number; it just never said it. */}
                                           {exercise.targetRir != null && (
-                                            <span className="text-ink-4 text-2xs font-body">
+                                            <span className="text-ink-4 text-caption font-body">
                                               aim for {exercise.targetRir}
                                             </span>
                                           )}
@@ -3936,7 +3977,7 @@ export default function ProgramsPage() {
                                             <svg className="w-3.5 h-3.5 text-ink-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
-                                            <span className="text-ink-2 text-2xs font-display font-bold uppercase tracking-wide">Intensity Technique</span>
+                                            <span className="text-ink-2 text-caption font-display font-bold uppercase tracking-wide">Intensity Technique</span>
                                           </div>
                                           <button
                                             onClick={() => {
@@ -3971,7 +4012,7 @@ export default function ProgramsPage() {
                                                 <button
                                                   key={key}
                                                   onClick={() => setIntensityChoice((prev) => ({ ...prev, [logKey]: key }))}
-                                                  className={`py-2 px-2 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
+                                                  className={`py-2 px-2 rounded-control text-caption font-display font-bold uppercase tracking-wide transition-all duration-150 border ${
                                                     isSelected ? '' : 'bg-white/[0.03] border-white/[0.06] text-ink-3 hover:text-ink-2 hover:bg-white/[0.05]'
                                                   }`}
                                                   style={
@@ -3990,13 +4031,13 @@ export default function ProgramsPage() {
                                         {/* Intensity set logger */}
                                         {intensityEnabled && selectedTechnique && (
                                           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-                                            <p className="text-ink-4 text-2xs font-body leading-relaxed mb-3">
+                                            <p className="text-ink-4 text-caption font-body leading-relaxed mb-3">
                                               {TECHNIQUE_META[selectedTechnique].hint}
                                             </p>
                                             <div className="grid grid-cols-[32px_1fr_40px] gap-2 mb-1.5">
-                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Set</span>
-                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
-                                              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide text-center">Fail</span>
+                                              <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide text-center">Set</span>
+                                              <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">Weight (lbs)</span>
+                                              <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide text-center">Fail</span>
                                             </div>
                                             {currentIntensityLogs.map((iLog, idx) => {
                                               const meta = TECHNIQUE_META[selectedTechnique]
@@ -4030,7 +4071,7 @@ export default function ProgramsPage() {
                                                   style={iLog.done ? { backgroundColor: `${meta.color}15` } : undefined}
                                                 >
                                                   <span
-                                                    className="text-xs font-display font-bold text-center"
+                                                    className="text-label font-display font-bold text-center"
                                                     style={{ color: iLog.done ? meta.color : 'rgba(255,255,255,0.3)' }}
                                                   >
                                                     {idx + 1}
@@ -4065,7 +4106,7 @@ export default function ProgramsPage() {
                                                 </div>
                                               )
                                             })}
-                                            <p className="text-ink-4 text-2xs font-body mt-2 text-center">
+                                            <p className="text-ink-4 text-caption font-body mt-2 text-center">
                                               To failure, check when complete
                                             </p>
                                           </div>
@@ -4077,7 +4118,7 @@ export default function ProgramsPage() {
                                           Rendered unconditionally, so a 20-minute
                                           row session read "Target: 20 min reps". */}
                                       {!timed && (
-                                        <p className="text-ink-4 text-2xs font-body mt-2 text-center">
+                                        <p className="text-ink-4 text-caption font-body mt-2 text-center">
                                           Target: {exercise.reps}{hold ? '' : explosive ? ' efforts' : ' reps'}
                                         </p>
                                       )}
@@ -4097,7 +4138,7 @@ export default function ProgramsPage() {
                                           <svg className="w-3.5 h-3.5 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                                           </svg>
-                                          <span className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
+                                          <span className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">
                                             {isSwapped ? 'Change substitute' : 'Swap exercise'}
                                           </span>
                                         </button>
@@ -4125,14 +4166,14 @@ export default function ProgramsPage() {
                       <button
                         onClick={() => goToExercise(focusIndex - 1)}
                         disabled={focusIndex === 0}
-                        className="px-4 py-3 rounded-control bg-white/[0.06] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-30 disabled:active:scale-100"
+                        className="px-card h-taplg rounded-control bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200 disabled:opacity-30 disabled:active:scale-100"
                       >
                         Back
                       </button>
                       {focusIndex < selected.exercises.length - 1 ? (
                         <button
                           onClick={() => goToExercise(focusIndex + 1)}
-                          className="flex-1 min-w-0 px-4 py-3 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
+                          className="flex-1 min-w-0 px-card h-taplg rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
                         >
                           <span className="block truncate">
                             Next: {swappedExercises[`${selectedDay}-${selected.exercises[focusIndex + 1].name}`] ?? selected.exercises[focusIndex + 1].name}
@@ -4141,7 +4182,7 @@ export default function ProgramsPage() {
                       ) : (
                         <button
                           onClick={() => setConfirmEnd(tallySession())}
-                          className="flex-1 px-4 py-3 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+                          className="flex-1 px-card h-taplg rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
                         >
                           Finish Workout
                         </button>
@@ -4154,7 +4195,7 @@ export default function ProgramsPage() {
                           setSkipped((prev) => ({ ...prev, [key]: true }))
                           if (focusIndex < selected.exercises.length - 1) goToExercise(focusIndex + 1)
                         }}
-                        className="w-full py-2.5 text-ink-4 text-2xs font-display font-bold uppercase tracking-wide hover:text-ink-2 transition-colors duration-200"
+                        className="w-full h-tap text-ink-4 text-caption font-display font-bold uppercase tracking-wide hover:text-ink-2 transition-colors duration-200"
                       >
                         Skip this exercise
                       </button>
