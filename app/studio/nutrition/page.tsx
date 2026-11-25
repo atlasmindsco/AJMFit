@@ -102,7 +102,7 @@ function NutritionTabs({
           key={value}
           onClick={() => onSection(value)}
           aria-pressed={section === value}
-          className={`shrink-0 px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
+          className={`shrink-0 px-4 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-wide border transition-colors ${
             section === value
               ? 'bg-brand-navy border-brand-navy text-white shadow-sm'
               : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
@@ -611,7 +611,7 @@ export default function NutritionPage() {
       <div className="mb-4 flex items-center justify-end">
         <a
           href="/studio/setup-nutrition"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-blue to-brand-bluedark text-white rounded-control font-display font-bold text-sm uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue transition-[transform,box-shadow] duration-200"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-blue to-brand-bluedark text-white rounded-control font-display font-bold text-label uppercase tracking-[0.08em] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue transition-[transform,box-shadow] duration-200"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-5.971m0 0V9.348m0 9.295h4.992m-9.992 2.964h9.987M2.985 9.348h16.338M21.984 19.644v2.986m0 0v-2.986m0 2.986H4.014M4.014 19.644h17.97m0 0h-9.987" />
@@ -634,7 +634,7 @@ export default function NutritionPage() {
                 <h1 className="font-display font-extrabold text-xl text-brand-navy tracking-tight">Today&apos;s Nutrition</h1>
                 <a
                   href="/studio/setup-nutrition?edit=true"
-                  className="px-3 py-1 text-xs font-display font-semibold uppercase tracking-wide rounded bg-brand-navy/[0.08] text-brand-navy hover:bg-brand-navy/[0.12] transition-colors"
+                  className="px-3 py-1 text-label font-display font-semibold uppercase tracking-wide rounded bg-brand-navy/[0.08] text-brand-navy hover:bg-brand-navy/[0.12] transition-colors"
                 >
                   Edit
                 </a>
@@ -652,7 +652,7 @@ export default function NutritionPage() {
                       alert('Error deleting nutrition setup')
                     }
                   }}
-                  className="px-3 py-1 text-xs font-display font-semibold uppercase tracking-wide rounded bg-red-500/[0.1] text-red-600 hover:bg-red-500/[0.15] transition-colors"
+                  className="px-3 py-1 text-label font-display font-semibold uppercase tracking-wide rounded bg-red-500/[0.1] text-red-600 hover:bg-red-500/[0.15] transition-colors"
                 >
                   Delete
                 </button>
@@ -668,7 +668,7 @@ export default function NutritionPage() {
                 const left = remaining(totals.calories, targets.calories)
                 if (!left) {
                   return (
-                    <span className="text-brand-navy text-sm font-body font-semibold">
+                    <span className="text-brand-navy text-body font-body font-semibold">
                       {totals.calories.toLocaleString()} kcal eaten
                     </span>
                   )
@@ -682,7 +682,7 @@ export default function NutritionPage() {
                     >
                       {left.label}
                     </span>
-                    <span className="block text-brand-slate text-2xs font-body mt-1">
+                    <span className="block text-brand-slate text-caption font-body mt-1">
                       {eatenLine(totals.calories, targets.calories)} kcal
                     </span>
                   </span>
@@ -696,7 +696,7 @@ export default function NutritionPage() {
               />
             </div>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-brand-slate text-xs font-body">{Math.round(calPct)}% of daily goal</span>
+              <span className="text-brand-slate text-label font-body">{Math.round(calPct)}% of daily goal</span>
               {/* The remainder moved up to be the headline. Repeating it
                   here would be the same number twice on one card. */}
             </div>
@@ -704,7 +704,7 @@ export default function NutritionPage() {
             {/* Why this number is this number. A target a client does not
                 understand is a target they stop following. */}
             {maintenance !== null && (
-              <p className="text-brand-slate text-xs font-body mt-3 leading-relaxed">
+              <p className="text-brand-slate text-label font-body mt-3 leading-relaxed">
                 You burn roughly{' '}
                 <span className="text-brand-navy font-semibold">{maintenance.toLocaleString()}</span> kcal a
                 day.{' '}
@@ -742,14 +742,14 @@ export default function NutritionPage() {
                       const left = remaining(macro.current, macro.goal)
                       if (!left) {
                         return (
-                          <span className="font-display font-bold text-brand-navy text-sm">
+                          <span className="font-display font-bold text-brand-navy text-label">
                             {Math.round(macro.current)}{macro.unit}
                           </span>
                         )
                       }
                       return (
                         <span
-                          className={`font-display font-bold text-sm ${
+                          className={`font-display font-bold text-label ${
                             left.isOver ? 'text-brand-orange' : 'text-brand-navy'
                           }`}
                         >
@@ -759,8 +759,8 @@ export default function NutritionPage() {
                     })()}
                   </div>
                 </div>
-                <span className="font-body font-semibold text-brand-navy text-xs mt-1.5">{macro.label}</span>
-                <span className="text-brand-slate text-2xs font-body">
+                <span className="font-body font-semibold text-brand-navy text-label mt-1.5">{macro.label}</span>
+                <span className="text-brand-slate text-caption font-body">
                   {Math.round(macro.current)} / {macro.goal}{macro.unit}
                 </span>
               </div>
@@ -768,7 +768,7 @@ export default function NutritionPage() {
           </div>
             <button
               onClick={toggleMacros}
-              className="text-brand-slate hover:text-brand-navy text-xs font-body underline underline-offset-2 transition-colors"
+              className="text-brand-slate hover:text-brand-navy text-label font-body underline underline-offset-2 transition-colors"
             >
               {showAllMacros ? 'Hide carbs and fat' : 'Show carbs and fat'}
             </button>
@@ -782,15 +782,15 @@ export default function NutritionPage() {
       {lastChange?.reason && lastChange.source !== 'setup' && (
         <div className="mb-6 p-4 rounded-card bg-brand-orange/[0.05] border border-brand-orange/20">
           <div className="flex items-baseline justify-between gap-3 mb-1">
-            <p className="font-display font-bold text-brand-navy text-sm">Your targets changed</p>
-            <span className="shrink-0 text-brand-slate text-2xs font-body">
+            <p className="font-display font-bold text-brand-navy text-label">Your targets changed</p>
+            <span className="shrink-0 text-brand-slate text-caption font-body">
               {new Date(lastChange.created_at).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
               })}
             </span>
           </div>
-          <p className="text-brand-slate text-xs font-body leading-relaxed">{lastChange.reason}</p>
+          <p className="text-brand-slate text-label font-body leading-relaxed">{lastChange.reason}</p>
         </div>
       )}
 
@@ -800,13 +800,13 @@ export default function NutritionPage() {
         className="w-full text-left flex items-center justify-between gap-4 mb-6 p-4 rounded-card bg-brand-blue/[0.05] border border-brand-blue/20 hover:bg-brand-blue/[0.08] transition-colors"
       >
         <div className="min-w-0">
-          <p className="font-display font-bold text-brand-navy text-sm">Not sure what to eat?</p>
-          <p className="text-brand-slate text-xs font-body mt-0.5">
+          <p className="font-display font-bold text-brand-navy text-label">Not sure what to eat?</p>
+          <p className="text-brand-slate text-label font-body mt-0.5">
             Meal ideas that fit your targets, portion sizes you can judge by eye, and what to order when you
             are out.
           </p>
         </div>
-        <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-wide">
+        <span className="shrink-0 text-brand-blue font-display font-bold text-label uppercase tracking-wide">
           Open
         </span>
       </button>
@@ -815,8 +815,8 @@ export default function NutritionPage() {
         <div className="lg:col-span-8 space-y-4">
           <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06] flex items-center justify-between">
-              <h2 className="font-display font-bold text-sm text-brand-navy">Meal Plan</h2>
-              <span className="text-brand-slate text-xs font-body">
+              <h2 className="font-display font-bold text-heading text-brand-navy">Meal Plan</h2>
+              <span className="text-brand-slate text-label font-body">
                 {meals.filter((m) => logsByMeal(m.id).length > 0).length} / {meals.length} logged
               </span>
             </div>
@@ -846,12 +846,12 @@ export default function NutritionPage() {
                           )}
                         </div>
                         <div className="text-left">
-                          <p className="font-body font-semibold text-brand-navy text-sm">{meal.name}</p>
-                          <p className="text-brand-slate text-xs font-body">{formatTime(meal.scheduled_time)}</p>
+                          <p className="font-body font-semibold text-brand-navy text-label">{meal.name}</p>
+                          <p className="text-brand-slate text-label font-body">{formatTime(meal.scheduled_time)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-brand-navy text-sm font-display font-bold">{mealCalories} kcal</span>
+                        <span className="text-brand-navy text-label font-display font-bold">{mealCalories} kcal</span>
                         <svg className={`w-4 h-4 text-brand-slate transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                         </svg>
@@ -870,7 +870,7 @@ export default function NutritionPage() {
                           <div className="px-5 pb-4">
                             {mealLogs.length > 0 ? (
                               <div className="bg-[#FAFBFD] rounded-control border border-brand-navy/[0.04] overflow-hidden">
-                                <table className="w-full text-xs font-body">
+                                <table className="w-full text-label font-body">
                                   <thead>
                                     <tr className="text-brand-slate uppercase tracking-wide">
                                       <th className="text-left px-3 py-2 font-semibold">Food</th>
@@ -892,30 +892,30 @@ export default function NutritionPage() {
                                                 value={editForm.quantity}
                                                 onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
                                                 placeholder="Portion size (e.g. 10 oz)"
-                                                className="px-2 py-1 border border-brand-blue/30 rounded text-xs bg-white w-full"
+                                                className="px-2 py-1 border border-brand-blue/30 rounded text-label bg-white w-full"
                                               />
                                               <div className="flex gap-1">
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 0.5)}
-                                                  className="px-2 py-1 text-xs bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   0.5x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 1)}
-                                                  className="px-2 py-1 text-xs bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   1x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 1.5)}
-                                                  className="px-2 py-1 text-xs bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   1.5x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 2)}
-                                                  className="px-2 py-1 text-xs bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   2x
                                                 </button>
@@ -925,7 +925,7 @@ export default function NutritionPage() {
                                             <>
                                               {item.food_name}
                                               {item.serving_size && (
-                                                <span className="text-brand-slate text-2xs ml-1">({item.serving_size})</span>
+                                                <span className="text-brand-slate text-caption ml-1">({item.serving_size})</span>
                                               )}
                                             </>
                                           )}
@@ -937,7 +937,7 @@ export default function NutritionPage() {
                                               value={editForm.calories}
                                               onChange={(e) => setEditForm({ ...editForm, calories: e.target.value })}
                                               placeholder="0"
-                                              className="px-2 py-1 border border-brand-blue/30 rounded text-xs bg-white w-16 text-right"
+                                              className="px-2 min-h-tap border border-brand-blue/30 rounded text-body bg-white w-20 text-right"
                                             />
                                           ) : (
                                             item.calories
@@ -950,7 +950,7 @@ export default function NutritionPage() {
                                               value={editForm.protein}
                                               onChange={(e) => setEditForm({ ...editForm, protein: e.target.value })}
                                               placeholder="0"
-                                              className="px-2 py-1 border border-brand-blue/30 rounded text-xs bg-white w-14 text-right"
+                                              className="px-2 min-h-tap border border-brand-blue/30 rounded text-body bg-white w-16 text-right"
                                             />
                                           ) : (
                                             `${item.protein}g`
@@ -963,7 +963,7 @@ export default function NutritionPage() {
                                               value={editForm.carbs}
                                               onChange={(e) => setEditForm({ ...editForm, carbs: e.target.value })}
                                               placeholder="0"
-                                              className="px-2 py-1 border border-brand-blue/30 rounded text-xs bg-white w-14 text-right"
+                                              className="px-2 min-h-tap border border-brand-blue/30 rounded text-body bg-white w-16 text-right"
                                             />
                                           ) : (
                                             `${item.carbs}g`
@@ -976,7 +976,7 @@ export default function NutritionPage() {
                                               value={editForm.fats}
                                               onChange={(e) => setEditForm({ ...editForm, fats: e.target.value })}
                                               placeholder="0"
-                                              className="px-2 py-1 border border-brand-blue/30 rounded text-xs bg-white w-14 text-right"
+                                              className="px-2 min-h-tap border border-brand-blue/30 rounded text-body bg-white w-16 text-right"
                                             />
                                           ) : (
                                             `${item.fats}g`
@@ -988,13 +988,13 @@ export default function NutritionPage() {
                                               <button
                                                 onClick={() => handleUpdateFood(item.id)}
                                                 disabled={submitting}
-                                                className="text-emerald-600 hover:text-emerald-700 disabled:opacity-50 font-semibold text-xs"
+                                                className="text-emerald-600 hover:text-emerald-700 disabled:opacity-50 font-semibold text-label"
                                               >
                                                 Save
                                               </button>
                                               <button
                                                 onClick={() => setEditingId(null)}
-                                                className="text-brand-slate hover:text-brand-navy font-semibold text-xs"
+                                                className="text-brand-slate hover:text-brand-navy font-semibold text-label"
                                               >
                                                 Cancel
                                               </button>
@@ -1012,13 +1012,13 @@ export default function NutritionPage() {
                                                     fats: item.fats.toString(),
                                                   })
                                                 }}
-                                                className="text-brand-blue hover:text-brand-bluedark text-xs font-semibold"
+                                                className="text-brand-blue hover:text-brand-bluedark text-label font-semibold"
                                               >
                                                 Edit
                                               </button>
                                               <button
                                                 onClick={() => handleDeleteFood(item.id)}
-                                                className="text-red-400 hover:text-red-600 text-xs font-semibold"
+                                                className="text-red-400 hover:text-red-600 text-label font-semibold"
                                               >
                                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1033,14 +1033,14 @@ export default function NutritionPage() {
                                 </table>
                               </div>
                             ) : (
-                              <p className="text-brand-slate text-xs font-body italic py-2">No food logged yet.</p>
+                              <p className="text-brand-slate text-label font-body italic py-2">No food logged yet.</p>
                             )}
 
                             {isAdding ? (
                               <div className="mt-3 bg-[#FAFBFD] rounded-control border border-brand-blue/20 p-3">
                                 {analysisSource && (
                                   <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-2">
-                                    <div className="flex items-center gap-2 text-2xs font-display font-bold uppercase tracking-wide text-emerald-700">
+                                    <div className="flex items-center gap-2 text-caption font-display font-bold uppercase tracking-wide text-emerald-700">
                                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                       </svg>
@@ -1064,11 +1064,11 @@ export default function NutritionPage() {
                                   </div>
                                 )}
                                 {analysisError && (
-                                  <div className="text-red-600 text-2xs font-body mb-2">{analysisError}</div>
+                                  <div className="text-red-600 text-caption font-body mb-2">{analysisError}</div>
                                 )}
                                 <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2 mb-2">
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Food</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Food</span>
                                     {/* The lookup lands ~600ms after you stop typing and fills
                                         the macros. Every setAddForm here updates from prev
                                         rather than a captured addForm: spreading the captured
@@ -1093,7 +1093,7 @@ export default function NutritionPage() {
                                           }
                                           runTypedLookup(next)
                                         }}
-                                        className="w-full px-3 py-2 pr-9 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                        className="w-full px-3 py-2 pr-9 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                       />
                                       {typedLookupActive && (
                                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-brand-blue/20 border-t-brand-blue rounded-full animate-spin" />
@@ -1109,7 +1109,7 @@ export default function NutritionPage() {
                                       The unit list is now filtered to what could
                                       plausibly measure this particular food. */}
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-slate mb-1">
                                       How much
                                     </span>
                                     <div className="flex gap-1.5">
@@ -1127,7 +1127,7 @@ export default function NutritionPage() {
                                             applyServing(formatServing(n, servingUnit))
                                           }
                                         }}
-                                        className="w-20 shrink-0 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        className="w-20 shrink-0 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                       />
                                       {/* Opens a readable list rather than the
                                           phone's scrolling wheel of truncated
@@ -1135,7 +1135,7 @@ export default function NutritionPage() {
                                       <button
                                         type="button"
                                         onClick={() => setUnitSheetOpen(true)}
-                                        className="flex-1 min-w-0 flex items-center justify-between gap-2 px-2.5 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body text-left hover:border-brand-navy/25 focus:outline-none focus:border-brand-blue/50 transition-colors duration-150"
+                                        className="flex-1 min-w-0 flex items-center justify-between gap-2 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-left hover:border-brand-navy/25 focus:outline-none focus:border-brand-blue/50 transition-colors duration-150"
                                       >
                                         <span className="truncate text-brand-navy">{UNITS[servingUnit].label}</span>
                                         <svg className="w-3.5 h-3.5 text-brand-slate shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1154,7 +1154,7 @@ export default function NutritionPage() {
                                             setServingAmount(String(q))
                                             applyServing(formatServing(q, servingUnit))
                                           }}
-                                          className={`px-2 py-0.5 rounded text-2xs font-body transition-colors duration-150 ${
+                                          className={`px-2 py-0.5 rounded text-caption font-body transition-colors duration-150 ${
                                             Number(servingAmount) === q
                                               ? 'bg-brand-blue text-white'
                                               : 'bg-brand-navy/[0.05] text-brand-slate hover:bg-brand-navy/[0.1]'
@@ -1166,7 +1166,7 @@ export default function NutritionPage() {
                                     </div>
                                   </label>
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Calories</span>
                                     <input
                                       type="number"
                                       inputMode="numeric"
@@ -1176,13 +1176,13 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, calories: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 mb-2">
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -1192,11 +1192,11 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, protein: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-orange mb-1">Carbs (g)</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-orange mb-1">Carbs (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -1206,11 +1206,11 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, carbs: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                   <label className="block">
-                                    <span className="block text-2xs font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Fats (g)</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-slate mb-1">Fats (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -1220,7 +1220,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, fats: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-sm bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
                                     />
                                   </label>
                                 </div>
@@ -1228,13 +1228,13 @@ export default function NutritionPage() {
                                   <button
                                     onClick={() => handleAddFood(meal.id)}
                                     disabled={submitting || !addForm.name.trim()}
-                                    className="px-4 py-2 bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-bluedark disabled:opacity-50 transition-colors duration-200"
+                                    className="px-4 py-2 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-bluedark disabled:opacity-50 transition-colors duration-200"
                                   >
                                     {submitting ? 'Adding...' : 'Add Food'}
                                   </button>
                                   <button
                                     onClick={resetAddState}
-                                    className="px-4 py-2 bg-white border border-brand-navy/10 text-brand-slate text-xs font-display font-bold uppercase tracking-wide rounded-control hover:bg-[#FAFBFD] transition-colors duration-200"
+                                    className="px-4 py-2 bg-white border border-brand-navy/10 text-brand-slate text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-[#FAFBFD] transition-colors duration-200"
                                   >
                                     Cancel
                                   </button>
@@ -1248,7 +1248,7 @@ export default function NutritionPage() {
                                   second trip to the barcode scanner. */}
                               {usualFoods.length > 0 && (
                                 <div className="mt-3">
-                                  <p className="text-brand-slate text-2xs font-display font-bold uppercase tracking-wide mb-1.5">
+                                  <p className="text-brand-slate text-caption font-display font-bold uppercase tracking-wide mb-1.5">
                                     Your usual
                                   </p>
                                   <div className="flex gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -1263,10 +1263,10 @@ export default function NutritionPage() {
                                           title={`${f.food_name} · ${f.serving_size ?? '1 serving'} · eaten ${f.times}x`}
                                           className="shrink-0 max-w-[168px] text-left px-3 py-2 rounded-control border border-brand-navy/[0.10] bg-white hover:border-brand-blue/40 hover:bg-brand-blue/[0.03] active:scale-[0.97] disabled:opacity-50 transition-all duration-150"
                                         >
-                                          <span className="block text-brand-navy text-xs font-body font-semibold truncate">
+                                          <span className="block text-brand-navy text-label font-body font-semibold truncate">
                                             {busy ? 'Adding…' : f.food_name}
                                           </span>
-                                          <span className="block text-brand-slate text-2xs font-body truncate">
+                                          <span className="block text-brand-slate text-caption font-body truncate">
                                             {Math.round(f.calories)} cal
                                             {f.serving_size ? ` · ${f.serving_size}` : ''}
                                             {f.times >= 3 ? ` · ${f.times}x` : ''}
@@ -1282,14 +1282,14 @@ export default function NutritionPage() {
                                 <button
                                   onClick={() => setSearchMealId(meal.id)}
                                   disabled={analyzing !== null}
-                                  className="py-2 bg-brand-blue rounded-control text-white text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 bg-brand-blue rounded-control text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                   </svg>
                                   Search
                                 </button>
-                                <label className="cursor-pointer py-2 border border-dashed border-brand-orange/30 rounded-control text-brand-orange text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-orange/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5">
+                                <label className="cursor-pointer py-2 border border-dashed border-brand-orange/30 rounded-control text-brand-orange text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orange/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5">
                                   {analyzing === meal.id ? (
                                     <>
                                       <span className="w-3 h-3 border-2 border-brand-orange/30 border-t-brand-orange rounded-full animate-spin" />
@@ -1323,7 +1323,7 @@ export default function NutritionPage() {
                                     setScanningMealId(meal.id)
                                   }}
                                   disabled={analyzing !== null}
-                                  className="py-2 border border-dashed border-brand-blue/30 rounded-control text-brand-blue text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 border border-dashed border-brand-blue/30 rounded-control text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.5v15m3-15v15m3-15v15m3-15v15m3-15v15m3-15v15M21 4.5v15" />
@@ -1335,7 +1335,7 @@ export default function NutritionPage() {
                                     macroFieldsTouchedRef.current = false
                                     setAddingToMeal(meal.id)
                                   }}
-                                  className="py-2 border border-dashed border-brand-navy/15 rounded-control text-brand-slate text-xs font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blue transition-colors duration-200"
+                                  className="py-2 border border-dashed border-brand-navy/15 rounded-control text-brand-slate text-label font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blue transition-colors duration-200"
                                 >
                                   + Manual
                                 </button>
@@ -1354,7 +1354,7 @@ export default function NutritionPage() {
 
           <motion.div custom={2} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
-              <h2 className="font-display font-bold text-sm text-brand-navy">Weekly Calorie Trend</h2>
+              <h2 className="font-display font-bold text-heading text-brand-navy">Weekly Calorie Trend</h2>
             </div>
             <div className="p-5">
               <div className="flex items-end gap-2 h-36">
@@ -1365,7 +1365,7 @@ export default function NutritionPage() {
                   const label = dateObj.toLocaleDateString('en-US', { weekday: 'short' })
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-2xs font-display font-bold text-brand-navy">
+                      <span className="text-caption font-display font-bold text-brand-navy">
                         {day.calories > 0 ? day.calories : '--'}
                       </span>
                       <div className="w-full rounded-t-md overflow-hidden" style={{ height: `${Math.max(heightPct, 4)}%` }}>
@@ -1375,7 +1375,7 @@ export default function NutritionPage() {
                           }`}
                         />
                       </div>
-                      <span className="text-2xs font-body text-brand-slate">{label}</span>
+                      <span className="text-caption font-body text-brand-slate">{label}</span>
                     </div>
                   )
                 })}
@@ -1397,18 +1397,18 @@ export default function NutritionPage() {
                 ).length
                 return (
                   <div className="mt-4 pt-4 border-t border-brand-navy/[0.06] flex flex-wrap items-baseline gap-x-6 gap-y-1.5">
-                    <p className="text-brand-slate text-xs font-body">
+                    <p className="text-brand-slate text-label font-body">
                       Average{' '}
                       <span className="text-brand-navy font-semibold">{avg.toLocaleString()}</span> cal across{' '}
                       {logged.length} logged {logged.length === 1 ? 'day' : 'days'}
                     </p>
-                    <p className="text-brand-slate text-xs font-body">
+                    <p className="text-brand-slate text-label font-body">
                       On target{' '}
                       <span className="text-brand-navy font-semibold">
                         {onTargetDays} of {logged.length}
                       </span>
                     </p>
-                    <p className="text-brand-slate text-2xs font-body w-full leading-relaxed">
+                    <p className="text-brand-slate text-caption font-body w-full leading-relaxed">
                       The average is what moves the scale. One day either way barely registers.
                     </p>
                   </div>
@@ -1421,7 +1421,7 @@ export default function NutritionPage() {
         <div className="lg:col-span-4 space-y-4">
           <motion.div custom={3} variants={fadeIn} initial="hidden" animate="visible" className="bg-white rounded-card border border-brand-navy/[0.06]">
             <div className="px-5 py-4 border-b border-brand-navy/[0.06]">
-              <h2 className="font-display font-bold text-sm text-brand-navy">Hydration</h2>
+              <h2 className="font-display font-bold text-heading text-brand-navy">Hydration</h2>
             </div>
             <div className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -1443,7 +1443,7 @@ export default function NutritionPage() {
                 </div>
                 <div className="text-right">
                   <span className="font-display font-extrabold text-2xl text-brand-blue">{waterOz}</span>
-                  <span className="text-brand-slate text-sm font-body"> / {WATER_GOAL_OZ} oz</span>
+                  <span className="text-brand-slate text-body font-body"> / {WATER_GOAL_OZ} oz</span>
                 </div>
               </div>
               <div className="w-full h-3 bg-[#E5E7EB] rounded-full overflow-hidden">
@@ -1452,13 +1452,13 @@ export default function NutritionPage() {
                   style={{ width: `${waterPct}%` }}
                 />
               </div>
-              <p className="text-brand-slate text-2xs font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
+              <p className="text-brand-slate text-caption font-body mt-2 text-center">Each + adds 8 oz (one cup)</p>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <p className="mt-8 text-brand-slate text-2xs font-body italic text-center max-w-2xl mx-auto leading-relaxed">
+      <p className="mt-8 text-brand-slate text-caption font-body italic text-center max-w-2xl mx-auto leading-relaxed">
         Macro values are estimates. Photo recognition uses AI and the USDA FoodData Central database; portion sizes may be off. Always review and adjust entries to match what you actually ate.
       </p>
     </div>

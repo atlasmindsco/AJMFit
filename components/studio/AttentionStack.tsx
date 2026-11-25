@@ -49,12 +49,12 @@ export default function AttentionStack({ cards }: { cards: AttentionCard[] }) {
           <span className={`w-1 shrink-0 ${STRIPE[card.tone]}`} aria-hidden="true" />
           <Link href={card.href} className="flex items-center gap-3 flex-1 min-w-0 py-3.5 pr-2">
             <span className="min-w-0 flex-1">
-              <span className="block font-display font-bold text-white text-sm leading-snug">{card.title}</span>
+              <span className="block font-display font-bold text-white text-label leading-snug">{card.title}</span>
               {card.detail && (
-                <span className="block text-ink-3 text-xs font-body mt-0.5 leading-relaxed">{card.detail}</span>
+                <span className="block text-ink-3 text-label font-body mt-0.5 leading-relaxed">{card.detail}</span>
               )}
             </span>
-            <span className="shrink-0 text-ink-4 text-sm" aria-hidden="true">&rsaquo;</span>
+            <span className="shrink-0 text-ink-4 text-label" aria-hidden="true">&rsaquo;</span>
           </Link>
           {card.dismissible && (
             <button

@@ -110,7 +110,7 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
       <div className="relative w-full max-w-md bg-[#0F1729] rounded-card overflow-hidden border border-white/10">
         <div className="px-5 py-3 flex items-center justify-between border-b border-white/10">
-          <h3 className="font-display font-bold text-sm text-white tracking-tight">Scan Barcode</h3>
+          <h3 className="font-display font-bold text-heading text-white tracking-tight">Scan Barcode</h3>
           <button
             onClick={onClose}
             className="text-ink-2 hover:text-white transition-colors duration-150"
@@ -146,11 +146,11 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
 
         <div className="px-5 py-3 text-center">
           {error ? (
-            <p className="text-red-300 text-xs font-body">{error}</p>
+            <p className="text-red-300 text-label font-body">{error}</p>
           ) : status === 'starting' ? (
-            <p className="text-ink-2 text-xs font-body">Starting camera...</p>
+            <p className="text-ink-2 text-label font-body">Starting camera...</p>
           ) : (
-            <p className="text-ink-2 text-xs font-body">Point the camera at a product barcode</p>
+            <p className="text-ink-2 text-label font-body">Point the camera at a product barcode</p>
           )}
         </div>
       </div>

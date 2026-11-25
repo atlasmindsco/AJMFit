@@ -118,9 +118,9 @@ export default function ClientMessagesPage() {
             : 'bg-brand-orange/[0.10] border-brand-orange/30 hover:bg-brand-orange/[0.16]'
         }`}
       >
-        <span className="block font-display font-bold text-white text-sm">Weekly update</span>
+        <span className="block font-display font-bold text-white text-label">Weekly update</span>
         <span
-          className={`block text-2xs font-body mt-0.5 ${
+          className={`block text-caption font-body mt-0.5 ${
             checkInDone ? 'text-ink-3' : 'text-brand-orange'
           }`}
         >
@@ -131,8 +131,8 @@ export default function ClientMessagesPage() {
         href="/studio/schedule"
         className="flex-1 px-4 py-3 rounded-card bg-surface-raised border border-white/[0.10] text-center hover:border-white/[0.18] transition-colors duration-200"
       >
-        <span className="block font-display font-bold text-white text-sm">Schedule</span>
-        <span className="block text-ink-3 text-2xs font-body mt-0.5">Calls and training days</span>
+        <span className="block font-display font-bold text-white text-label">Schedule</span>
+        <span className="block text-ink-3 text-caption font-body mt-0.5">Calls and training days</span>
       </Link>
     </div>
 
@@ -150,8 +150,8 @@ export default function ClientMessagesPage() {
             <Image src="/AJMfit.png" alt="Coach Anthony" width={40} height={40} className="w-full h-full object-contain p-1" />
           </div>
           <div className="flex-1">
-            <h2 className="font-display font-bold text-sm text-brand-navy">Coach Anthony</h2>
-            <span className="text-2xs font-body text-brand-slate">Usually replies within a day</span>
+            <h2 className="font-display font-bold text-heading text-brand-navy">Coach Anthony</h2>
+            <span className="text-caption font-body text-brand-slate">Usually replies within a day</span>
           </div>
         </div>
 
@@ -163,8 +163,8 @@ export default function ClientMessagesPage() {
             </div>
           ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center px-6">
-              <p className="text-brand-navy font-display font-bold text-sm">Say hi to Coach Anthony</p>
-              <p className="text-brand-slate text-xs font-body mt-1">Questions about your program, form, or nutrition? Send a message.</p>
+              <p className="text-brand-navy font-display font-bold text-label">Say hi to Coach Anthony</p>
+              <p className="text-brand-slate text-label font-body mt-1">Questions about your program, form, or nutrition? Send a message.</p>
             </div>
           ) : (
             messages.map((msg, i) => {
@@ -207,7 +207,7 @@ export default function ClientMessagesPage() {
               onKeyDown={handleKeyDown}
               placeholder="Message Coach Anthony..."
               disabled={!userId}
-              className="flex-1 rounded-full px-4 py-2 text-sm font-body bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:bg-[#ECEEF2] disabled:opacity-50"
+              className="flex-1 rounded-full px-4 py-2 text-body font-body bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:outline-none focus:bg-[#ECEEF2] disabled:opacity-50"
             />
             <button
               onClick={send}

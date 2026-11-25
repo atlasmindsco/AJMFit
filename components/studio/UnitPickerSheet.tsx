@@ -81,7 +81,7 @@ export default function UnitPickerSheet({
                     {o.label}
                   </p>
                   {(o.detail || o.calories) && (
-                    <p className="text-brand-slate text-xs font-body mt-0.5">
+                    <p className="text-brand-slate text-label font-body mt-0.5">
                       {[o.detail, o.calories].filter(Boolean).join('  ·  ')}
                     </p>
                   )}

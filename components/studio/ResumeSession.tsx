@@ -12,16 +12,16 @@ export default function ResumeSession({ title = 'Sign in to continue' }: { title
     <div className="p-8 max-w-md mx-auto">
       <div className="bg-white rounded-card border border-brand-navy/[0.06] p-8 text-center">
         <h1 className="font-display font-extrabold text-2xl text-brand-navy mb-2">{title}</h1>
-        <p className="text-brand-slate text-sm font-body mb-6">
+        <p className="text-brand-slate text-body font-body mb-6">
           Please log in to access your studio.
         </p>
         <Link
           href="/members"
-          className="inline-block w-full py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-bluedark transition-colors duration-200"
+          className="inline-block w-full py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-bluedark transition-colors duration-200"
         >
           Go to Login
         </Link>
-        <p className="text-brand-slate text-xs font-body mt-6">
+        <p className="text-brand-slate text-label font-body mt-6">
           Don&rsquo;t have an account?{' '}
           <Link href="/apply" className="text-brand-blue underline">
             Apply for coaching

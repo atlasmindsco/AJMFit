@@ -61,24 +61,24 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
   const row = (
     <div className="flex items-start gap-3">
       <div className="min-w-0 flex-1">
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em]">
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.15em]">
           Next, to get you set up
         </p>
         <p className="font-display font-bold text-white text-base mt-1">{next.label}</p>
         {next.coach ? (
-          <p className="text-brand-blue text-xs font-body mt-1">
+          <p className="text-brand-blue text-label font-body mt-1">
             Waiting on Anthony &mdash; nothing for you to do here.
           </p>
         ) : (
-          next.hint && <p className="text-ink-3 text-xs font-body mt-1">{next.hint}</p>
+          next.hint && <p className="text-ink-3 text-label font-body mt-1">{next.hint}</p>
         )}
       </div>
       <div className="shrink-0 text-right">
-        <span className="text-ink-4 text-xs font-body tabular-nums">
+        <span className="text-ink-4 text-label font-body tabular-nums">
           {doneCount} of {steps.length}
         </span>
         {!next.coach && next.href && (
-          <p className="text-brand-orange text-xs font-display font-bold uppercase tracking-[0.12em] mt-1">
+          <p className="text-brand-orange text-label font-display font-bold uppercase tracking-[0.12em] mt-1">
             Start &rarr;
           </p>
         )}

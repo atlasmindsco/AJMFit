@@ -13,8 +13,8 @@ import {
   type CheckIn,
 } from '@/lib/check-ins'
 
-const labelCls = 'font-display font-bold text-white text-sm'
-const hintCls = 'text-ink-3 text-xs font-body mt-0.5 mb-2.5'
+const labelCls = 'font-display font-bold text-white text-label'
+const hintCls = 'text-ink-3 text-label font-body mt-0.5 mb-2.5'
 
 /** 1-5 selector. Words, not bare numbers — "3" means nothing on its own. */
 function Scale({
@@ -46,8 +46,8 @@ function Scale({
         ))}
       </div>
       <div className="flex justify-between mt-1.5">
-        <span className="text-ink-4 text-2xs font-body">{low}</span>
-        <span className="text-ink-4 text-2xs font-body">{high}</span>
+        <span className="text-ink-4 text-caption font-body">{low}</span>
+        <span className="text-ink-4 text-caption font-body">{high}</span>
       </div>
     </div>
   )
@@ -206,13 +206,13 @@ export default function CheckInPage() {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Update sent</h1>
-        <p className="text-ink-2 text-sm font-body mt-2 max-w-sm mx-auto leading-relaxed">
+        <p className="text-ink-2 text-body font-body mt-2 max-w-sm mx-auto leading-relaxed">
           Anthony has it. He&rsquo;ll come back to you with what to change, if anything — you&rsquo;ll see his reply
           here and in your messages.
         </p>
         <Link
           href="/studio"
-          className="inline-block mt-6 px-5 py-3 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark transition-colors duration-200"
+          className="inline-block mt-6 px-5 py-3 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark transition-colors duration-200"
         >
           Back to dashboard
         </Link>
@@ -226,14 +226,14 @@ export default function CheckInPage() {
     <div className="max-w-xl mx-auto">
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Weekly update</h1>
-        <p className="text-ink-3 text-sm font-body mt-1">
+        <p className="text-ink-3 text-body font-body mt-1">
           Three taps. This is what Anthony uses to decide what changes next week.
         </p>
       </header>
 
       {existing && (
         <div className="bg-brand-blue/[0.08] border border-brand-blue/25 rounded-card p-4 mb-4">
-          <p className="text-ink-2 text-xs font-body">
+          <p className="text-ink-2 text-label font-body">
             You already sent this week&rsquo;s check-in. Changing anything below updates it.
           </p>
         </div>
@@ -246,7 +246,7 @@ export default function CheckInPage() {
           inputs still exist, under "Add more", for the times the count is
           wrong or they weighed in this morning. */}
       <div className="bg-white/[0.03] border border-white/[0.08] rounded-card px-4 py-3 mb-3">
-        <p className="text-ink-2 text-sm font-body">
+        <p className="text-ink-2 text-body font-body">
           <span className="text-white font-semibold">
             {workouts.trim() === '' ? 'No' : workouts} workout{workouts.trim() === '1' ? '' : 's'}
           </span>{' '}
@@ -288,7 +288,7 @@ export default function CheckInPage() {
             did. Bodyweight leads because it is the one that feeds a trend. */}
         <button
           onClick={() => setShowMore((v) => !v)}
-          className="w-full text-left text-ink-3 hover:text-ink-2 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+          className="w-full text-left text-ink-3 hover:text-ink-2 text-label font-display font-bold uppercase tracking-wide transition-colors duration-200"
         >
           {showMore ? 'Less' : 'Add more'} {showMore ? '↑' : '↓'}
         </button>
@@ -341,7 +341,7 @@ export default function CheckInPage() {
             rows={2}
             value={win}
             onChange={(e) => setWin(e.target.value)}
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
             placeholder="Squatted 185 for the first time"
           />
         </div>
@@ -353,7 +353,7 @@ export default function CheckInPage() {
             rows={2}
             value={obstacle}
             onChange={(e) => setObstacle(e.target.value)}
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
             placeholder="Travelled Thursday and Friday, missed both sessions"
           />
         </div>
@@ -363,12 +363,12 @@ export default function CheckInPage() {
         <button
           onClick={submit}
           disabled={!canSubmit || saving}
-          className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
+          className="w-full py-4 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Sending…' : existing ? 'Update check-in' : 'Send check-in'}
         </button>
         {!canSubmit && (
-          <p className="text-ink-4 text-xs font-body text-center">
+          <p className="text-ink-4 text-label font-body text-center">
             Rate eating, energy and training to send. The rest is optional.
           </p>
         )}
@@ -376,20 +376,20 @@ export default function CheckInPage() {
 
       {answered.length > 0 && (
         <div className="mt-6">
-          <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+          <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-2">
             Anthony&rsquo;s past replies
           </p>
           <div className="space-y-2">
             {answered.slice(0, 4).map((c) => (
               <div key={c.id} className="bg-surface-raised rounded-card border border-white/[0.10] p-4">
-                <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">
+                <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">
                   Week of{' '}
                   {new Date(c.week_of + 'T00:00:00').toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                   })}
                 </p>
-                <p className="text-ink text-sm font-body mt-1.5 whitespace-pre-wrap leading-relaxed">
+                <p className="text-ink text-body font-body mt-1.5 whitespace-pre-wrap leading-relaxed">
                   {c.coach_response}
                 </p>
               </div>

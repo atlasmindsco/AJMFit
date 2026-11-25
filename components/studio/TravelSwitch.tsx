@@ -60,37 +60,37 @@ export default function TravelSwitch({
 
   return (
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
-      <p className="font-display font-bold text-white text-sm">{swapLabel(twin.location)}</p>
-      <p className="text-ink-3 text-sm font-body mt-1.5 leading-relaxed max-w-lg">
+      <p className="font-display font-bold text-white text-label">{swapLabel(twin.location)}</p>
+      <p className="text-ink-3 text-body font-body mt-1.5 leading-relaxed max-w-lg">
         {swapDetail(twin.location)}
       </p>
 
-      {error && <p className="text-state-danger text-xs font-body mt-3">{error}</p>}
+      {error && <p className="text-state-danger text-label font-body mt-3">{error}</p>}
 
       {confirming ? (
         <div className="flex flex-wrap items-center gap-3 mt-4">
           <button
             onClick={() => void go()}
             disabled={busy}
-            className="px-4 py-2 rounded-control bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
+            className="px-4 py-2 rounded-control bg-brand-orange text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
           >
             {busy ? 'Switching…' : `Switch to ${twin.location === 'home' ? 'dumbbells' : 'full gym'}`}
           </button>
           <button
             onClick={() => setConfirming(false)}
             disabled={busy}
-            className="text-ink-3 hover:text-white text-2xs font-body transition-colors"
+            className="text-ink-3 hover:text-white text-caption font-body transition-colors"
           >
             Not now
           </button>
-          <span className="text-ink-4 text-2xs font-body">
+          <span className="text-ink-4 text-caption font-body">
             You keep your week and everything you have logged.
           </span>
         </div>
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className="mt-4 px-4 py-2 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] hover:text-white transition-colors"
+          className="mt-4 px-4 py-2 rounded-control bg-white/[0.06] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] hover:text-white transition-colors"
         >
           {twin.location === 'home' ? 'Use dumbbells instead' : 'Go back to the gym version'}
         </button>

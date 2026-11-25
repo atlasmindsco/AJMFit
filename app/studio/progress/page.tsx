@@ -17,7 +17,7 @@ import {
 const inputCls =
   'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
 
-const labelCls = 'text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]'
+const labelCls = 'text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]'
 
 /**
  * Where a client logs bodyweight and measurements and sees them move.
@@ -152,7 +152,7 @@ export default function ProgressPage() {
     <div className="max-w-2xl mx-auto">
       <header className="mb-6">
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">Progress</h1>
-        <p className="text-ink-3 text-sm font-body mt-1">
+        <p className="text-ink-3 text-body font-body mt-1">
           Weigh in once a week, same day, same time. One number on its own means nothing — the direction is what counts.
         </p>
       </header>
@@ -184,7 +184,7 @@ export default function ProgressPage() {
                   >
                     {trend.change28dLb > 0 ? '+' : ''}
                     {trend.change28dLb}
-                    <span className="text-ink-4 text-sm font-body ml-1">lbs</span>
+                    <span className="text-ink-4 text-body font-body ml-1">lbs</span>
                   </p>
                 </div>
               )}
@@ -199,14 +199,14 @@ export default function ProgressPage() {
           matter teaches the client that none of the rewards mean anything. */}
       {earned.length > 0 && (
         <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
-          <p className="font-display font-bold text-white text-sm mb-3">What you&rsquo;ve done so far</p>
+          <p className="font-display font-bold text-white text-label mb-3">What you&rsquo;ve done so far</p>
           <div className="space-y-2.5">
             {earned.map((m) => (
               <div key={m.key} className="flex items-start gap-3">
                 <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-white text-sm font-display font-bold">{m.label}</p>
-                  <p className="text-ink-3 text-xs font-body mt-0.5 leading-relaxed">{m.detail}</p>
+                  <p className="text-white text-label font-display font-bold">{m.label}</p>
+                  <p className="text-ink-3 text-label font-body mt-0.5 leading-relaxed">{m.detail}</p>
                 </div>
               </div>
             ))}
@@ -216,7 +216,7 @@ export default function ProgressPage() {
 
       {/* Log */}
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
-        <p className="font-display font-bold text-white text-sm mb-3">Log today</p>
+        <p className="font-display font-bold text-white text-label mb-3">Log today</p>
 
         {/* One field.
             Weight used to sit beside Waist, which made the screen read as two
@@ -238,7 +238,7 @@ export default function ProgressPage() {
 
         <button
           onClick={() => setShowMeasurements((v) => !v)}
-          className="text-ink-3 hover:text-ink-2 text-xs font-body mt-3 transition-colors duration-200"
+          className="text-ink-3 hover:text-ink-2 text-label font-body mt-3 transition-colors duration-200"
         >
           {showMeasurements ? '− Hide measurements' : '+ Add measurements (optional)'}
         </button>
@@ -267,7 +267,7 @@ export default function ProgressPage() {
         <button
           onClick={save}
           disabled={saving || !hasSomething}
-          className="w-full mt-4 py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
+          className="w-full mt-4 py-3.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Saving…' : saved ? 'Saved' : 'Save'}
         </button>
@@ -279,19 +279,19 @@ export default function ProgressPage() {
       {rows.length > 0 && (
         <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
           <div className="px-5 py-4 border-b border-white/[0.10]">
-            <p className="font-display font-bold text-white text-sm">History</p>
+            <p className="font-display font-bold text-white text-label">History</p>
           </div>
           <div className="divide-y divide-white/[0.06]">
             {rows.slice(0, 12).map((r) => (
               <div key={r.id} className="px-5 py-3 flex items-center justify-between">
-                <span className="text-ink-2 text-sm font-body">
+                <span className="text-ink-2 text-body font-body">
                   {new Date(r.recorded_on + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric',
                   })}
                 </span>
-                <span className="text-white text-sm font-body tabular-nums">
+                <span className="text-white text-body font-body tabular-nums">
                   {r.weight_lb != null && <>{Number(r.weight_lb)} lbs</>}
                   {r.waist_in != null && (
                     <span className="text-ink-3 ml-3">waist {Number(r.waist_in)}&quot;</span>

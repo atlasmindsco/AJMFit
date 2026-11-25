@@ -24,9 +24,9 @@ import { fetchMyOnboarding, saveMyOnboarding, type OnboardingAnswers } from '@/l
 import { fetchMyTier } from '@/lib/scheduling'
 
 const inputCls =
-  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-sm font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/60 transition-colors'
-const labelCls = 'block text-ink-2 text-xs font-display font-bold uppercase tracking-[0.12em] mb-2'
-const hintCls = 'text-ink-3 text-xs font-body mb-2.5'
+  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/60 transition-colors'
+const labelCls = 'block text-ink-2 text-label font-display font-bold uppercase tracking-[0.12em] mb-2'
+const hintCls = 'text-ink-3 text-label font-body mb-2.5'
 
 function Segmented({
   value,
@@ -50,10 +50,10 @@ function Segmented({
               : 'bg-white/[0.03] border-white/[0.10] hover:bg-white/[0.06]'
           }`}
         >
-          <span className={`block font-display font-bold text-sm ${value === o.key ? 'text-white' : 'text-ink-2'}`}>
+          <span className={`block font-display font-bold text-label ${value === o.key ? 'text-white' : 'text-ink-2'}`}>
             {o.label}
           </span>
-          {o.sub && <span className="block text-ink-3 text-2xs font-body mt-0.5">{o.sub}</span>}
+          {o.sub && <span className="block text-ink-3 text-caption font-body mt-0.5">{o.sub}</span>}
         </button>
       ))}
     </div>
@@ -152,7 +152,7 @@ export default function CoachingAssessmentPage() {
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight">
           {alreadyFilled ? 'Answers updated' : 'Anthony is building your program'}
         </h1>
-        <p className="text-ink-3 text-sm font-body mt-3 max-w-md mx-auto leading-relaxed">
+        <p className="text-ink-3 text-body font-body mt-3 max-w-md mx-auto leading-relaxed">
           {alreadyFilled
             ? 'He will see the changes before your next check-in.'
             : 'He reviews this and assigns your program, usually the same day. You will get a message when it is ready.'}
@@ -160,7 +160,7 @@ export default function CoachingAssessmentPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <button
             onClick={() => router.push('/studio')}
-            className="px-6 py-3 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition"
+            className="px-6 py-3 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition"
           >
             Go to dashboard
           </button>
@@ -175,7 +175,7 @@ export default function CoachingAssessmentPage() {
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
           Before Anthony builds your program
         </h1>
-        <p className="text-ink-3 text-sm font-body mt-2 max-w-lg">
+        <p className="text-ink-3 text-body font-body mt-2 max-w-lg">
           Eight questions, about two minutes. He reads every one of these before he assigns anything.
         </p>
       </motion.div>
@@ -253,7 +253,7 @@ export default function CoachingAssessmentPage() {
                 key={o.k}
                 type="button"
                 onClick={() => set('sessionMinutes')(o.k)}
-                className={`py-3 rounded-control border font-display font-bold text-sm transition-colors duration-150 ${
+                className={`py-3 rounded-control border font-display font-bold text-label transition-colors duration-150 ${
                   answers.sessionMinutes === o.k
                     ? 'bg-brand-blue/[0.14] border-brand-blue/50 text-white'
                     : 'bg-white/[0.03] border-white/[0.10] text-ink-2 hover:bg-white/[0.06]'
@@ -304,7 +304,7 @@ export default function CoachingAssessmentPage() {
         </div>
 
         {error && (
-          <p className="px-3.5 py-2.5 rounded-control bg-state-danger/10 border border-state-danger/25 text-state-danger text-xs font-body">
+          <p className="px-3.5 py-2.5 rounded-control bg-state-danger/10 border border-state-danger/25 text-state-danger text-label font-body">
             {error}
           </p>
         )}
@@ -315,12 +315,12 @@ export default function CoachingAssessmentPage() {
           <button
             type="submit"
             disabled={saving || !canSubmit}
-            className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-40"
+            className="w-full py-4 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.99] transition disabled:opacity-40"
           >
             {saving ? 'Sending…' : alreadyFilled ? 'Save changes' : 'Send to Anthony'}
           </button>
           {!canSubmit && (
-            <p className="text-ink-3 text-xs font-body mt-2.5 text-center">
+            <p className="text-ink-3 text-label font-body mt-2.5 text-center">
               Answer questions 1 to 4 and he has what he needs.
             </p>
           )}

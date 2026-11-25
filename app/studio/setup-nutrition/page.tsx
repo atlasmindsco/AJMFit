@@ -230,7 +230,7 @@ export default function SetupNutritionPage() {
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
                 Before we start
               </h1>
-              <p className="text-center text-sm font-body text-brand-slate mt-2">
+              <p className="text-center text-body font-body text-brand-slate mt-2">
                 Tick anything that applies. If none do, carry straight on.
               </p>
 
@@ -246,12 +246,12 @@ export default function SetupNutritionPage() {
                       onChange={(e) => setHealth((p) => ({ ...p, [q.key]: e.target.checked }))}
                       className="mt-0.5 w-4 h-4 shrink-0 accent-brand-blue"
                     />
-                    <span className="font-body text-sm text-brand-navy leading-snug">{q.label}</span>
+                    <span className="font-body text-body text-brand-navy leading-snug">{q.label}</span>
                   </label>
                 ))}
               </div>
 
-              <p className="text-xs font-body text-brand-slate mt-4 leading-relaxed">
+              <p className="text-label font-body text-brand-slate mt-4 leading-relaxed">
                 Anthony is a certified personal trainer, not a dietitian. Some situations need
                 nutrition advice from a medical professional, and this is how we catch them.
               </p>
@@ -259,7 +259,7 @@ export default function SetupNutritionPage() {
               <button
                 type="button"
                 onClick={handleScreenContinue}
-                className="mt-6 w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+                className="mt-6 w-full py-3.5 bg-brand-navy text-white font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
               >
                 Continue
               </button>
@@ -270,22 +270,22 @@ export default function SetupNutritionPage() {
                 Let&apos;s do this properly
               </h1>
               <div className="mt-6 p-4 rounded-control bg-brand-blue/[0.06] border border-brand-blue/20">
-                <p className="font-body text-sm text-brand-navy leading-relaxed">{blockMessage}</p>
+                <p className="font-body text-body text-brand-navy leading-relaxed">{blockMessage}</p>
               </div>
-              <p className="text-sm font-body text-brand-slate mt-4 leading-relaxed">
+              <p className="text-body font-body text-brand-slate mt-4 leading-relaxed">
                 Your training plan is unaffected. This only pauses automatic calorie and macro
                 targets.
               </p>
               <div className="mt-8 flex gap-3">
                 <button
                   onClick={() => setStep('screen')}
-                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
+                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
                 >
                   Back
                 </button>
                 <Link
                   href="/studio/messages"
-                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 transition-all text-center"
+                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 transition-all text-center"
                 >
                   Message Anthony
                 </Link>
@@ -296,42 +296,42 @@ export default function SetupNutritionPage() {
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
                 {isEditing ? 'Update Nutrition' : 'Nutrition Setup'}
               </h1>
-              <p className="text-center text-sm font-body text-brand-slate mt-2">
+              <p className="text-center text-body font-body text-brand-slate mt-2">
                 Let's calculate your personalized macro targets
               </p>
 
               <form className="mt-8 space-y-5">
                 {/* Current Weight */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Current Weight (lbs)
                   </label>
                   <input
                     type="number"
                     value={setup.currentWeight || ''}
                     onChange={(e) => handleChange('currentWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="180"
                   />
                 </div>
 
                 {/* Goal Weight */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Goal Weight (lbs)
                   </label>
                   <input
                     type="number"
                     value={setup.goalWeight || ''}
                     onChange={(e) => handleChange('goalWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="170"
                   />
                 </div>
 
                 {/* Height */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Height
                   </label>
                   <div className="flex gap-3">
@@ -344,11 +344,11 @@ export default function SetupNutritionPage() {
                           setHeightFeet(feet)
                           handleChange('height', feet * 12 + (heightInches || 0))
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="5"
                         min="0"
                       />
-                      <p className="text-xs text-brand-navy/40 mt-1 font-body">Feet</p>
+                      <p className="text-label text-brand-navy/40 mt-1 font-body">Feet</p>
                     </div>
                     <div className="flex-1">
                       <input
@@ -359,39 +359,39 @@ export default function SetupNutritionPage() {
                           setHeightInches(inches)
                           handleChange('height', (heightFeet || 0) * 12 + inches)
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="10"
                         min="0"
                         max="11"
                       />
-                      <p className="text-xs text-brand-navy/40 mt-1 font-body">Inches</p>
+                      <p className="text-label text-brand-navy/40 mt-1 font-body">Inches</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Age */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Age
                   </label>
                   <input
                     type="number"
                     value={setup.age || ''}
                     onChange={(e) => handleChange('age', parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="25"
                   />
                 </div>
 
                 {/* Sex */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Sex
                   </label>
                   <select
                     value={setup.sex}
                     onChange={(e) => handleChange('sex', e.target.value as Sex)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -403,13 +403,13 @@ export default function SetupNutritionPage() {
                     Both are pre-filled from onboarding where we already have
                     them, so for most clients this is a confirmation. */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Your day job
                   </label>
                   <select
                     value={setup.jobActivity ?? 'sedentary'}
                     onChange={(e) => handleChange('jobActivity', e.target.value as JobActivity)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     {JOB_ACTIVITY_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -420,13 +420,13 @@ export default function SetupNutritionPage() {
                 </div>
 
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Training days per week
                   </label>
                   <select
                     value={setup.trainingDaysPerWeek ?? 3}
                     onChange={(e) => handleChange('trainingDaysPerWeek', parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => (
                       <option key={d} value={d}>
@@ -435,7 +435,7 @@ export default function SetupNutritionPage() {
                     ))}
                   </select>
                   {prefilled && (
-                    <p className="text-xs text-brand-navy/40 mt-1.5 font-body">
+                    <p className="text-label text-brand-navy/40 mt-1.5 font-body">
                       Filled in from what you told us at onboarding. Change it if it has moved.
                     </p>
                   )}
@@ -443,13 +443,13 @@ export default function SetupNutritionPage() {
 
                 {/* Fitness Goal */}
                 <div>
-                  <label className="block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
+                  <label className="block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/60 mb-2">
                     Fitness Goal
                   </label>
                   <select
                     value={setup.goal}
                     onChange={(e) => handleChange('goal', e.target.value as FitnessGoal)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="lose_fat">Lose Fat</option>
                     <option value="build_muscle">Build Muscle</option>
@@ -458,12 +458,12 @@ export default function SetupNutritionPage() {
                   </select>
                 </div>
 
-                {error && <p className="text-sm font-body text-red-500">{error}</p>}
+                {error && <p className="text-body font-body text-red-500">{error}</p>}
 
                 <button
                   type="button"
                   onClick={handleContinue}
-                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+                  className="w-full py-3.5 bg-brand-navy text-white font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
                 >
                   Continue
                 </button>
@@ -474,17 +474,17 @@ export default function SetupNutritionPage() {
               <h1 className="font-display font-extrabold text-2xl uppercase tracking-[0.05em] text-brand-navy text-center">
                 Your Macro Targets
               </h1>
-              <p className="text-center text-sm font-body text-brand-slate mt-2">
+              <p className="text-center text-body font-body text-brand-slate mt-2">
                 Based on your goal and activity level
               </p>
 
               <div className="mt-8 space-y-4">
                 {/* Summary */}
                 <div className="bg-blue-50 border border-blue-200 rounded-control p-4">
-                  <p className="text-sm font-body text-brand-navy">
+                  <p className="text-body font-body text-brand-navy">
                     <strong>Goal:</strong> {getGoalLabel(setup.goal)}
                   </p>
-                  <p className="text-sm font-body text-brand-navy mt-1">
+                  <p className="text-body font-body text-brand-navy mt-1">
                     <strong>Activity:</strong>{' '}
                     {JOB_ACTIVITY_OPTIONS.find((o) => o.value === setup.jobActivity)?.label ??
                       getActivityLevelLabel(setup.activityLevel)}
@@ -493,17 +493,17 @@ export default function SetupNutritionPage() {
                       ? 'not training yet'
                       : `training ${setup.trainingDaysPerWeek}x a week`}
                   </p>
-                  <p className="text-sm font-body text-brand-navy mt-1">
+                  <p className="text-body font-body text-brand-navy mt-1">
                     <strong>Target Weight:</strong> {setup.goalWeight} lbs
                   </p>
                 </div>
 
                 {/* Calories */}
                 <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-control p-5 text-white">
-                  <p className="text-sm font-display uppercase tracking-[0.1em] opacity-90">Daily Calories</p>
+                  <p className="text-label font-display uppercase tracking-[0.1em] opacity-90">Daily Calories</p>
                   <p className="text-4xl font-display font-bold mt-2">{calculated.dailyCalories}</p>
                   {calculated.calorieDeficitOrSurplus !== 0 && (
-                    <p className="text-sm mt-2 opacity-90">
+                    <p className="text-label mt-2 opacity-90">
                       {calculated.calorieDeficitOrSurplus > 0
                         ? `+${calculated.calorieDeficitOrSurplus} surplus`
                         : `${calculated.calorieDeficitOrSurplus} deficit`}
@@ -515,27 +515,27 @@ export default function SetupNutritionPage() {
                     understand is a target they abandon in week three. */}
                 <div className="rounded-control border border-brand-navy/[0.08] divide-y divide-brand-navy/[0.06]">
                   <div className="flex justify-between px-4 py-2.5">
-                    <span className="text-sm font-body text-brand-slate">You burn about</span>
-                    <span className="text-sm font-body font-semibold text-brand-navy">
+                    <span className="text-body font-body text-brand-slate">You burn about</span>
+                    <span className="text-body font-body font-semibold text-brand-navy">
                       {calculated.maintenanceCalories} cal/day
                     </span>
                   </div>
                   {calculated.expectedLbsPerWeek !== 0 && (
                     <div className="flex justify-between px-4 py-2.5">
-                      <span className="text-sm font-body text-brand-slate">
+                      <span className="text-body font-body text-brand-slate">
                         Expected {calculated.expectedLbsPerWeek < 0 ? 'loss' : 'gain'}
                       </span>
-                      <span className="text-sm font-body font-semibold text-brand-navy">
+                      <span className="text-body font-body font-semibold text-brand-navy">
                         {Math.abs(calculated.expectedLbsPerWeek)} lbs/week
                       </span>
                     </div>
                   )}
                   {calculated.weeksToGoal !== null && (
                     <div className="flex justify-between px-4 py-2.5">
-                      <span className="text-sm font-body text-brand-slate">
+                      <span className="text-body font-body text-brand-slate">
                         {setup.goalWeight} lbs by about
                       </span>
-                      <span className="text-sm font-body font-semibold text-brand-navy">
+                      <span className="text-body font-body font-semibold text-brand-navy">
                         {new Date(
                           Date.now() + calculated.weeksToGoal * 7 * 86400000
                         ).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -546,7 +546,7 @@ export default function SetupNutritionPage() {
 
                 {calculated.clamp && (
                   <div className="p-4 rounded-control bg-brand-orange/[0.06] border border-brand-orange/20">
-                    <p className="font-body text-sm text-brand-navy leading-relaxed">
+                    <p className="font-body text-body text-brand-navy leading-relaxed">
                       {clampExplanation(calculated.clamp, setup.sex)}
                     </p>
                   </div>
@@ -555,23 +555,23 @@ export default function SetupNutritionPage() {
                 {/* Macros */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-control p-4">
-                    <p className="text-xs font-display uppercase tracking-[0.1em] text-orange-900">Protein</p>
+                    <p className="text-label font-display uppercase tracking-[0.1em] text-orange-900">Protein</p>
                     <p className="text-2xl font-display font-bold text-orange-700 mt-1">{calculated.proteinGrams}g</p>
-                    <p className="text-xs text-orange-600 mt-1">{Math.round(calculated.proteinGrams * 4)} cal</p>
+                    <p className="text-label text-orange-600 mt-1">{Math.round(calculated.proteinGrams * 4)} cal</p>
                   </div>
                   <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-control p-4">
-                    <p className="text-xs font-display uppercase tracking-[0.1em] text-green-900">Carbs</p>
+                    <p className="text-label font-display uppercase tracking-[0.1em] text-green-900">Carbs</p>
                     <p className="text-2xl font-display font-bold text-green-700 mt-1">{calculated.carbGrams}g</p>
-                    <p className="text-xs text-green-600 mt-1">{Math.round(calculated.carbGrams * 4)} cal</p>
+                    <p className="text-label text-green-600 mt-1">{Math.round(calculated.carbGrams * 4)} cal</p>
                   </div>
                   <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-control p-4">
-                    <p className="text-xs font-display uppercase tracking-[0.1em] text-yellow-900">Fat</p>
+                    <p className="text-label font-display uppercase tracking-[0.1em] text-yellow-900">Fat</p>
                     <p className="text-2xl font-display font-bold text-yellow-700 mt-1">{calculated.fatGrams}g</p>
-                    <p className="text-xs text-yellow-600 mt-1">{Math.round(calculated.fatGrams * 9)} cal</p>
+                    <p className="text-label text-yellow-600 mt-1">{Math.round(calculated.fatGrams * 9)} cal</p>
                   </div>
                 </div>
 
-                <p className="text-xs font-body text-brand-slate leading-relaxed">
+                <p className="text-label font-body text-brand-slate leading-relaxed">
                   These are a starting estimate from your height, weight, age and activity, not a
                   measurement of you. Anthony will adjust them from what your weight actually does
                   over the next few weeks.
@@ -581,14 +581,14 @@ export default function SetupNutritionPage() {
               <div className="mt-8 flex gap-3">
                 <button
                   onClick={() => setStep('form')}
-                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
+                  className="flex-1 py-3.5 bg-gray-200 text-gray-800 font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-gray-300 transition-colors"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-sm uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] disabled:opacity-60 transition-all"
+                  className="flex-1 py-3.5 bg-brand-navy text-white font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 active:scale-[0.98] disabled:opacity-60 transition-all"
                 >
                   {loading ? 'Saving...' : isEditing ? 'Update & Continue' : 'Confirm & Continue'}
                 </button>

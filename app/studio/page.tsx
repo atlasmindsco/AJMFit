@@ -239,14 +239,14 @@ export default function ClientDashboard() {
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
             {firstName ? `Hey, ${firstName}` : 'Hey'}
           </h1>
-          {!loading && week && <p className="text-ink-3 text-sm font-body mt-1">{week}</p>}
+          {!loading && week && <p className="text-ink-3 text-body font-body mt-1">{week}</p>}
         </div>
         {!loading && weekStreak > 0 && (
           <div className="shrink-0 text-right">
             <span className="font-display font-extrabold text-4xl sm:text-5xl leading-none text-outline-light tabular-nums">
               {weekStreak}
             </span>
-            <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.18em] mt-1">
+            <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.18em] mt-1">
               {weekStreak === 1 ? 'Week streak' : 'Weeks straight'}
             </p>
           </div>
@@ -311,7 +311,7 @@ export default function ClientDashboard() {
           for attention, which is the whole point of the page. */}
       <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="mb-5 bg-surface-raised rounded-card border border-white/[0.10] p-6">
         {loading ? (
-          <p className="text-ink-4 text-sm font-body py-6 text-center">Loading…</p>
+          <p className="text-ink-4 text-body font-body py-6 text-center">Loading…</p>
         ) : today && shape.rest ? (
           /* A rest day is a planned part of the week, not an absence.
              Offering the next session every single day quietly implies you
@@ -320,33 +320,33 @@ export default function ClientDashboard() {
              of the way. Training anyway stays one tap away and is phrased as
              a choice, never as catching up. */
           <>
-            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.18em]">
+            <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.18em]">
               Rest day
             </p>
             <p className="font-display font-extrabold text-2xl text-white mt-2 leading-tight">
               Nothing scheduled
             </p>
-            <p className="text-ink-2 text-sm font-body mt-2 leading-relaxed">
+            <p className="text-ink-2 text-body font-body mt-2 leading-relaxed">
               {shape.nextLabel
                 ? `Next session ${shape.nextLabel} — ${today.day.name}.`
                 : `Next session is ${today.day.name}.`}
             </p>
             <Link
               href={`/studio/programs?day=${today.index}`}
-              className="inline-block mt-5 text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+              className="inline-block mt-5 text-ink-3 hover:text-white text-body font-body transition-colors duration-200"
             >
               Train anyway →
             </Link>
           </>
         ) : today ? (
           <>
-            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.18em]">
+            <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.18em]">
               Today
             </p>
             <p className="font-display font-extrabold text-3xl text-white mt-1.5 leading-tight">
               {today.day.name}
             </p>
-            <p className="text-ink-2 text-sm font-body mt-1.5">
+            <p className="text-ink-2 text-body font-body mt-1.5">
               {today.day.muscles}
               {today.day.exercises.length > 0 && (
                 <span className="text-ink-3">
@@ -361,15 +361,15 @@ export default function ClientDashboard() {
                 read without opening anything. */}
             <div className="space-y-1.5 mt-5 mb-6">
               {today.day.exercises.slice(0, 3).map((ex) => (
-                <div key={ex.name} className="flex items-baseline gap-2 text-sm font-body">
+                <div key={ex.name} className="flex items-baseline gap-2 text-body font-body">
                   <span className="text-ink-2 truncate">{ex.name}</span>
-                  <span className="text-ink-4 text-xs ml-auto shrink-0 tabular-nums">
+                  <span className="text-ink-4 text-label ml-auto shrink-0 tabular-nums">
                     {ex.sets} × {ex.reps}
                   </span>
                 </div>
               ))}
               {today.day.exercises.length > 3 && (
-                <p className="text-ink-4 text-xs font-body">
+                <p className="text-ink-4 text-label font-body">
                   + {today.day.exercises.length - 3} more
                 </p>
               )}
@@ -387,31 +387,31 @@ export default function ClientDashboard() {
             <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
             <Link
               href="/studio/programs"
-              className="block w-full text-center mt-4 py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center mt-4 py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
             >
               Start Training
             </Link>
           </>
         ) : tier === 'blueprint' ? (
           <>
-            <p className="text-ink-2 text-sm font-body mt-1 mb-4">
+            <p className="text-ink-2 text-body font-body mt-1 mb-4">
               Pick your program: goal, days per week, gym or home. Ready in seconds.
             </p>
             <Link
               href="/studio/programs"
-              className="block w-full text-center py-3 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
             >
               Pick Your Program
             </Link>
           </>
         ) : (
           <>
-            <p className="text-ink-2 text-sm font-body mt-1 mb-4">
+            <p className="text-ink-2 text-body font-body mt-1 mb-4">
               Coach Anthony hasn&rsquo;t assigned your program yet. Browse the exercise library in the meantime.
             </p>
             <Link
               href="/studio/programs"
-              className="block w-full text-center py-3 bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center py-3 bg-white/[0.06] text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-white/[0.10] active:scale-[0.98] transition-transform duration-200"
             >
               Browse Exercises
             </Link>
@@ -421,8 +421,8 @@ export default function ClientDashboard() {
 
       {alreadySubscribed && (
         <div className="mb-5 px-5 py-4 rounded-card bg-state-success/[0.08] border border-state-success/25">
-          <p className="font-display font-bold text-sm text-white">You&rsquo;re already subscribed</p>
-          <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">
+          <p className="font-display font-bold text-label text-white">You&rsquo;re already subscribed</p>
+          <p className="text-ink-2 text-label font-body mt-1 leading-relaxed">
             No need to pay again &mdash; your membership is active and everything below is yours. If something
             looks wrong, message Anthony on the Coach tab rather than signing up a second time.
           </p>
@@ -439,7 +439,7 @@ export default function ClientDashboard() {
           The week streak is not repeated here: it is already in the greeting
           at the top of this screen. */}
       {!loading && lift && (
-        <p className="mb-5 px-5 py-3.5 rounded-card bg-white/[0.03] border border-white/[0.08] text-ink-2 text-sm font-body">
+        <p className="mb-5 px-5 py-3.5 rounded-card bg-white/[0.03] border border-white/[0.08] text-ink-2 text-body font-body">
           {lift}
         </p>
       )}
@@ -460,8 +460,8 @@ export default function ClientDashboard() {
           className="group flex items-center justify-between gap-4 mb-5 px-5 py-4 rounded-card bg-surface-raised border border-white/[0.10] hover:border-white/[0.18] transition-colors duration-200"
         >
           <div className="min-w-0">
-            <p className="font-display font-bold text-sm text-white">My Plan</p>
-            <p className="text-ink-3 text-xs font-body mt-0.5 truncate">{myProgram.name}</p>
+            <p className="font-display font-bold text-label text-white">My Plan</p>
+            <p className="text-ink-3 text-label font-body mt-0.5 truncate">{myProgram.name}</p>
           </div>
           <span className="shrink-0 text-ink-3 group-hover:text-white text-lg leading-none transition-colors duration-200" aria-hidden="true">
             &rsaquo;
@@ -496,11 +496,11 @@ export default function ClientDashboard() {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="font-display font-bold text-sm text-white">Pick your training program</p>
-              <p className="text-ink-3 text-xs font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
+              <p className="font-display font-bold text-label text-white">Pick your training program</p>
+              <p className="text-ink-3 text-label font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
             </div>
           </div>
-          <span className="shrink-0 text-brand-blue font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+          <span className="shrink-0 text-brand-blue font-display font-bold text-label uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
             Choose →
           </span>
         </Link>
@@ -521,13 +521,13 @@ export default function ClientDashboard() {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="font-display font-bold text-sm text-white">Start your first workout</p>
-              <p className="text-ink-3 text-xs font-body mt-0.5">
+              <p className="font-display font-bold text-label text-white">Start your first workout</p>
+              <p className="text-ink-3 text-label font-body mt-0.5">
                 Your program is ready. Open it, pick today&rsquo;s session, and log your first set — that&rsquo;s the whole thing.
               </p>
             </div>
           </div>
-          <span className="shrink-0 text-brand-orange font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+          <span className="shrink-0 text-brand-orange font-display font-bold text-label uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
             Start →
           </span>
         </Link>
@@ -547,11 +547,11 @@ export default function ClientDashboard() {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="font-display font-bold text-sm text-white">Fill out your onboarding form</p>
-              <p className="text-ink-3 text-xs font-body mt-0.5">Coach Anthony uses it to build your plan and prep your onboarding call. About 3 minutes.</p>
+              <p className="font-display font-bold text-label text-white">Fill out your onboarding form</p>
+              <p className="text-ink-3 text-label font-body mt-0.5">Coach Anthony uses it to build your plan and prep your onboarding call. About 3 minutes.</p>
             </div>
           </div>
-          <span className="shrink-0 text-brand-orange font-display font-bold text-xs uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+          <span className="shrink-0 text-brand-orange font-display font-bold text-label uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
             Start →
           </span>
         </Link>

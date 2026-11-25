@@ -206,7 +206,7 @@ export default function ProgramBuilder({
         <div className="flex items-center gap-3 mb-4">
           <button
             onClick={() => setOpenDay(null)}
-            className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+            className="text-ink-3 hover:text-ink-2 text-label font-display font-semibold uppercase tracking-wide transition-colors duration-200"
           >
             &lsaquo; My week
           </button>
@@ -222,14 +222,14 @@ export default function ProgramBuilder({
             would orphan every session logged under the old one. It does
             migrate — saying so is what stops the rename feeling risky. */}
         {editing && day.key && (
-          <p className="text-ink-4 text-2xs font-body mt-1.5 mb-4">
+          <p className="text-ink-4 text-caption font-body mt-1.5 mb-4">
             Rename it freely &mdash; your logged sessions come with it.
           </p>
         )}
         {!(editing && day.key) && <div className="mb-4" />}
 
         {day.exercises.length === 0 ? (
-          <p className="text-ink-4 text-sm font-body text-center py-10">
+          <p className="text-ink-4 text-body font-body text-center py-10">
             Nothing here yet. Add your first exercise.
           </p>
         ) : (
@@ -249,7 +249,7 @@ export default function ProgramBuilder({
               >
                 <div className="flex items-start gap-3">
                   <span
-                    className={`text-xs font-display font-bold mt-1 w-4 shrink-0 ${
+                    className={`text-label font-display font-bold mt-1 w-4 shrink-0 ${
                       inSuperset ? 'text-state-success' : 'text-ink-4'
                     }`}
                   >
@@ -259,8 +259,8 @@ export default function ProgramBuilder({
                     onClick={() => setConfiguring(i)}
                     className="flex-1 min-w-0 text-left"
                   >
-                    <span className="block text-white text-sm font-body">{ex.exerciseName}</span>
-                    <span className="block text-ink-3 text-xs font-body mt-0.5">
+                    <span className="block text-white text-body font-body">{ex.exerciseName}</span>
+                    <span className="block text-ink-3 text-label font-body mt-0.5">
                       {ex.sets} &times; {ex.reps} &middot; {ex.restSeconds === 0 ? 'no rest' : `${ex.restSeconds}s rest`}
                     </span>
                   </button>
@@ -271,7 +271,7 @@ export default function ProgramBuilder({
                     <button
                       onClick={() => move(i, i - 1)}
                       disabled={i === 0}
-                      className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-xs disabled:opacity-20 active:scale-95 transition-all duration-150"
+                      className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-label disabled:opacity-20 active:scale-95 transition-all duration-150"
                       aria-label="Move up"
                     >
                       &uarr;
@@ -279,7 +279,7 @@ export default function ProgramBuilder({
                     <button
                       onClick={() => move(i, i + 1)}
                       disabled={i === day.exercises.length - 1}
-                      className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-xs disabled:opacity-20 active:scale-95 transition-all duration-150"
+                      className="w-7 h-6 rounded bg-white/[0.05] text-ink-2 text-label disabled:opacity-20 active:scale-95 transition-all duration-150"
                       aria-label="Move down"
                     >
                       &darr;
@@ -299,7 +299,7 @@ export default function ProgramBuilder({
                 {i < day.exercises.length - 1 && (
                   <button
                     onClick={() => togglePair(i)}
-                    className={`mt-2 ml-7 px-2.5 py-1 rounded-control text-2xs font-display font-bold uppercase tracking-wide transition-colors duration-150 ${
+                    className={`mt-2 ml-7 px-2.5 py-1 rounded-control text-caption font-display font-bold uppercase tracking-wide transition-colors duration-150 ${
                       pairedWithNext
                         ? 'bg-state-success/15 text-state-success hover:bg-state-success/25'
                         : 'bg-white/[0.05] text-ink-3 hover:text-ink-2'
@@ -315,20 +315,20 @@ export default function ProgramBuilder({
         )}
 
         {day.exercises.some((e) => e.supersetGroup) && (
-          <p className="text-ink-4 text-2xs font-body mt-3 leading-relaxed">
+          <p className="text-ink-4 text-caption font-body mt-3 leading-relaxed">
             Supersets run back to back with no rest between them. You rest after the last one.
           </p>
         )}
 
         <button
           onClick={() => setPicking(true)}
-          className="w-full mt-3 py-3.5 rounded-card bg-brand-blue/[0.12] border border-brand-blue/30 text-brand-blue text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-blue/20 active:scale-[0.99] transition-all duration-200"
+          className="w-full mt-3 py-3.5 rounded-card bg-brand-blue/[0.12] border border-brand-blue/30 text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/20 active:scale-[0.99] transition-all duration-200"
         >
           + Add exercise
         </button>
 
         {day.exercises.length > 0 && (
-          <p className="text-ink-4 text-xs font-body text-center mt-3">
+          <p className="text-ink-4 text-label font-body text-center mt-3">
             {day.exercises.length} {day.exercises.length === 1 ? 'exercise' : 'exercises'} &middot; roughly {minutes} min
           </p>
         )}
@@ -379,10 +379,10 @@ export default function ProgramBuilder({
             className="flex items-center gap-2 px-4 py-3.5 rounded-card bg-surface-raised border border-white/[0.10] hover:border-white/[0.18] transition-colors duration-200"
           >
             <button onClick={() => setOpenDay(i)} className="flex items-center gap-3 min-w-0 flex-1 text-left">
-              <span className="text-ink-4 text-xs font-display font-bold w-5 shrink-0">{i + 1}</span>
+              <span className="text-ink-4 text-label font-display font-bold w-5 shrink-0">{i + 1}</span>
               <span className="min-w-0 flex-1">
-                <span className="block text-white text-sm font-display font-bold truncate">{d.name || `Day ${i + 1}`}</span>
-                <span className="block text-ink-3 text-xs font-body mt-0.5">
+                <span className="block text-white text-label font-display font-bold truncate">{d.name || `Day ${i + 1}`}</span>
+                <span className="block text-ink-3 text-label font-body mt-0.5">
                   {d.exercises.length === 0
                     ? 'Rest day — tap to add exercises'
                     : `${d.exercises.length} ${d.exercises.length === 1 ? 'exercise' : 'exercises'} · roughly ${estimateMinutes(d.exercises)} min`}
@@ -408,12 +408,12 @@ export default function ProgramBuilder({
       <button
         onClick={() => setProgram((p) => ({ ...p, days: [...p.days, { name: `Day ${p.days.length + 1}`, exercises: [] }] }))}
         disabled={program.days.length >= 7}
-        className="w-full mt-2 py-3 rounded-card bg-white/[0.04] border border-white/[0.07] text-ink-3 text-xs font-display font-bold uppercase tracking-wide hover:text-ink-2 disabled:opacity-30 transition-colors duration-200"
+        className="w-full mt-2 py-3 rounded-card bg-white/[0.04] border border-white/[0.07] text-ink-3 text-label font-display font-bold uppercase tracking-wide hover:text-ink-2 disabled:opacity-30 transition-colors duration-200"
       >
         + Add a day
       </button>
 
-      {!block.ok && <p className="text-state-warning/90 text-xs font-body mt-4 text-center">{block.reason}</p>}
+      {!block.ok && <p className="text-state-warning/90 text-label font-body mt-4 text-center">{block.reason}</p>}
 
       {/* A live second pair of eyes. Always reachable, never in the way —
           tapping it opens the full review with the volume bars. */}
@@ -428,10 +428,10 @@ export default function ProgramBuilder({
                 warnCount > 0 ? 'bg-state-warning' : 'bg-state-success'
               }`}
             />
-            <span className="flex-1 text-ink-2 text-xs font-body">
+            <span className="flex-1 text-ink-2 text-label font-body">
               {healthSummary(health.findings) ?? 'Looks balanced — all six groups covered'}
             </span>
-            <span className="text-ink-4 text-xs shrink-0">Review &rsaquo;</span>
+            <span className="text-ink-4 text-label shrink-0">Review &rsaquo;</span>
           </span>
         </button>
       )}
@@ -439,14 +439,14 @@ export default function ProgramBuilder({
       <div className="flex gap-2 mt-3">
         <button
           onClick={onCancel}
-          className="px-5 py-3.5 rounded-control bg-white/[0.06] text-ink-2 text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+          className="px-5 py-3.5 rounded-control bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
         >
           Cancel
         </button>
         <button
           onClick={attemptSave}
           disabled={!block.ok || saving}
-          className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
+          className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
         >
           {saving ? 'Saving…' : saveLabel}
         </button>

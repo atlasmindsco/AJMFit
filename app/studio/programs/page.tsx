@@ -1943,11 +1943,11 @@ export default function ProgramsPage() {
       role="alert"
       className="mb-4 flex items-start gap-3 rounded-control bg-state-danger/[0.10] border border-state-danger/30 px-4 py-3"
     >
-      <span className="text-state-danger text-sm font-body leading-relaxed flex-1">{writeError}</span>
+      <span className="text-state-danger text-body font-body leading-relaxed flex-1">{writeError}</span>
       <button
         onClick={() => setWriteError(null)}
         aria-label="Dismiss"
-        className="text-state-danger/70 hover:text-state-danger text-xs font-display font-bold shrink-0 mt-0.5"
+        className="text-state-danger/70 hover:text-state-danger text-label font-display font-bold shrink-0 mt-0.5"
       >
         ✕
       </button>
@@ -1977,18 +1977,18 @@ export default function ProgramsPage() {
         <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
           You have unsaved changes
         </h2>
-        <p className="text-ink-2 text-sm font-body mt-1.5 leading-relaxed">
+        <p className="text-ink-2 text-body font-body mt-1.5 leading-relaxed">
           Leave now and this program goes back to how it was.
         </p>
         <button
           onClick={() => setLeaveGuard(null)}
-          className="w-full mt-5 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+          className="w-full mt-5 py-3.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
         >
           Keep editing
         </button>
         <button
           onClick={() => leaveGuard.discard()}
-          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-body font-body transition-colors duration-200"
         >
           Discard changes
         </button>
@@ -2084,7 +2084,7 @@ export default function ProgramsPage() {
             this screen with no program — one of them for 168 days. */}
         <button
           onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-          className="text-ink-3 hover:text-ink-2 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+          className="text-ink-3 hover:text-ink-2 text-label font-display font-bold uppercase tracking-wide transition-colors duration-200"
         >
           Or build your own in the meantime
         </button>
@@ -2188,7 +2188,7 @@ export default function ProgramsPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-state-success" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">Training</p>
+                  <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">Training</p>
                   <p className="text-white font-display font-bold text-lg leading-none tabular-nums">
                     {Math.floor(workoutElapsed / 3600) > 0 && `${Math.floor(workoutElapsed / 3600)}:`}
                     {Math.floor((workoutElapsed % 3600) / 60).toString().padStart(2, '0')}:
@@ -2196,13 +2196,13 @@ export default function ProgramsPage() {
                   </p>
                 </div>
                 {pendingSets > 0 && (
-                  <span className="ml-2 px-2 py-1 rounded-control bg-state-warning/15 text-state-warning text-2xs font-body shrink-0">
+                  <span className="ml-2 px-2 py-1 rounded-control bg-state-warning/15 text-state-warning text-caption font-body shrink-0">
                     {pendingSets} syncing
                   </span>
                 )}
                 <button
                   onClick={() => setConfirmEnd(tallySession())}
-                  className="ml-auto px-4 py-2 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] hover:text-white active:scale-95 transition-all duration-150"
+                  className="ml-auto px-4 py-2 rounded-control bg-white/[0.08] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:bg-white/[0.12] hover:text-white active:scale-95 transition-all duration-150"
                 >
                   End
                 </button>
@@ -2320,11 +2320,11 @@ export default function ProgramsPage() {
                 <h1 className="font-display font-extrabold text-xl text-white tracking-tight">
                   {currentProgram.name}
                 </h1>
-                <span className="text-2xs font-display font-bold px-2 py-0.5 rounded bg-white/10 text-ink-2">
+                <span className="text-caption font-display font-bold px-2 py-0.5 rounded bg-white/10 text-ink-2">
                   {currentProgram.level}
                 </span>
               </div>
-              <p className="text-ink-3 text-sm font-body mt-1 max-w-md">
+              <p className="text-ink-3 text-body font-body mt-1 max-w-md">
                 Your program. Train and log against it. Swap any exercise you can&rsquo;t do.
               </p>
             </div>
@@ -2334,7 +2334,7 @@ export default function ProgramsPage() {
                   training flow. Changing the program now lives in one place:
                   the CHANGING MY PROGRAM section at the bottom of this screen.
                   Nothing was removed, it stopped being in two places. */}
-              <span className="text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
+              <span className="text-caption font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
                 Self-Guided
               </span>
             </div>
@@ -2350,10 +2350,10 @@ export default function ProgramsPage() {
           return (
             <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
               <div className="flex items-baseline justify-between mb-2.5">
-                <p className="font-display font-bold text-white text-sm">
+                <p className="font-display font-bold text-white text-label">
                   Week {prog.week} of {prog.totalWeeks}
                 </p>
-                <p className="text-ink-3 text-2xs font-body">
+                <p className="text-ink-3 text-caption font-body">
                   {prog.isFinalWeek
                     ? 'Final week — results at the end'
                     : `${prog.daysLeft} days to go`}
@@ -2376,8 +2376,8 @@ export default function ProgramsPage() {
           const p = PROGRESSION[(programGoal ?? 'muscle') as ProgressionGoal]
           const item = (label: string, body: string) => (
             <div>
-              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">{label}</p>
-              <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">{body}</p>
+              <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]">{label}</p>
+              <p className="text-ink-2 text-label font-body mt-1 leading-relaxed">{body}</p>
             </div>
           )
           return (
@@ -2400,13 +2400,13 @@ export default function ProgramsPage() {
                   screen and the only filled button. */}
               {todayIndex >= 0 && weeklyPlan[todayIndex] && weeklyPlan[todayIndex].exercises.length > 0 && (
                 <div className="bg-surface-raised rounded-card border border-brand-blue/30 p-6 mb-4">
-                  <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-[0.18em]">
+                  <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-[0.18em]">
                     Today
                   </p>
                   <p className="font-display font-extrabold text-2xl text-white mt-1.5 leading-tight">
                     {weeklyPlan[todayIndex].name}
                   </p>
-                  <p className="text-ink-2 text-sm font-body mt-1.5">
+                  <p className="text-ink-2 text-body font-body mt-1.5">
                     {weeklyPlan[todayIndex].muscles}
                     <span className="text-ink-3">
                       {' · '}
@@ -2435,13 +2435,13 @@ export default function ProgramsPage() {
                   Changing it is a separate section at the bottom, under its
                   own rule, because a client opening this screen to train
                   should never be one mis-tap from rebuilding their week. */}
-              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.18em] mb-2">
+              <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em] mb-2">
                 Using my program
               </p>
               <div className="bg-surface-raised rounded-card border border-white/[0.10] overflow-hidden">
                 <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
-                  <h2 className="font-display font-bold text-white text-sm">Your week</h2>
-                  <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">
+                  <h2 className="font-display font-bold text-white text-heading">Your week</h2>
+                  <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">
                     {weeklyPlan.filter((d) => d.completed).length} of{' '}
                     {weeklyPlan.filter((d) => d.exercises.length > 0).length} done
                   </span>
@@ -2502,7 +2502,7 @@ export default function ProgramsPage() {
                             {/* Info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className={`font-display font-bold text-sm ${isRest ? 'text-ink-4' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
+                                <p className={`font-display font-bold text-label ${isRest ? 'text-ink-4' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
                                   {day.name}
                                 </p>
                                 {i === todayIndex && (
@@ -2511,7 +2511,7 @@ export default function ProgramsPage() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-ink-4 text-xs font-body">
+                              <p className="text-ink-4 text-label font-body">
                                 Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
                               </p>
                             </div>
@@ -2542,7 +2542,7 @@ export default function ProgramsPage() {
                   exercise itself, because a rack being taken is a thing you
                   discover while training. Everything else is a decision you
                   make sitting down. */}
-              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.18em] mt-8 mb-2">
+              <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em] mt-8 mb-2">
                 Changing my program
               </p>
 
@@ -2560,8 +2560,8 @@ export default function ProgramsPage() {
                   { label: 'Level', value: currentProgram.level },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-0">
-                    <span className="text-ink-2 text-sm font-body shrink-0">{item.label}</span>
-                    <span className="text-white font-body font-semibold text-sm text-right">{item.value}</span>
+                    <span className="text-ink-2 text-body font-body shrink-0">{item.label}</span>
+                    <span className="text-white font-body font-semibold text-label text-right">{item.value}</span>
                   </div>
                 ))}
 
@@ -2579,7 +2579,7 @@ export default function ProgramsPage() {
                   href="/studio/schedule"
                   className="flex items-center justify-between gap-4 py-2.5 border-b border-white/[0.06] group"
                 >
-                  <span className="text-ink-2 text-sm font-body shrink-0">Which days I train</span>
+                  <span className="text-ink-2 text-body font-body shrink-0">Which days I train</span>
                   <span className="text-ink-3 group-hover:text-white text-lg leading-none transition-colors duration-200" aria-hidden="true">
                     &rsaquo;
                   </span>
@@ -2589,13 +2589,13 @@ export default function ProgramsPage() {
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => { setBuilderMoved(null); void openStartFrom() }}
-                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
                     >
                       Edit my program
                     </button>
                     <button
                       onClick={openMyPrograms}
-                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-xs font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
+                      className="flex-1 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:text-white hover:border-white/[0.16] transition-colors duration-200"
                     >
                       My programs
                     </button>
@@ -2620,10 +2620,10 @@ export default function ProgramsPage() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
-                    <span className="text-xs font-display font-semibold uppercase tracking-wide">Back to Program</span>
+                    <span className="text-label font-display font-semibold uppercase tracking-wide">Back to Program</span>
                   </button>
                   <h2 className="font-display font-bold text-lg text-white">Workout Overview</h2>
-                  <p className="text-ink-3 text-xs font-body mt-0.5">{selected.muscles}</p>
+                  <p className="text-ink-3 text-label font-body mt-0.5">{selected.muscles}</p>
                 </div>
 
                 {/* Keep what you changed.
@@ -2634,11 +2634,11 @@ export default function ProgramsPage() {
                     to keep. */}
                 {activeSwapCount > 0 && (
                   <div className="mx-4 mt-4 rounded-control bg-brand-blue/[0.08] border border-brand-blue/25 px-4 py-3.5">
-                    <p className="text-white text-sm font-display font-bold">
+                    <p className="text-white text-label font-display font-bold">
                       You&rsquo;ve changed {activeSwapCount}{' '}
                       {activeSwapCount === 1 ? 'exercise' : 'exercises'}
                     </p>
-                    <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">
+                    <p className="text-ink-2 text-label font-body mt-1 leading-relaxed">
                       Save them into your own program and this is what you&rsquo;ll train next
                       week too. You keep your place in the block and everything you&rsquo;ve
                       logged.
@@ -2646,7 +2646,7 @@ export default function ProgramsPage() {
                     <button
                       onClick={() => void keepSwapsInProgram()}
                       disabled={keepingSwaps}
-                      className="mt-3 px-3.5 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/85 disabled:opacity-40 active:scale-[0.98] transition-all duration-200"
+                      className="mt-3 px-3.5 py-2 rounded-control bg-brand-blue text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/85 disabled:opacity-40 active:scale-[0.98] transition-all duration-200"
                     >
                       {keepingSwaps ? 'Saving…' : 'Keep these changes'}
                     </button>
@@ -2655,7 +2655,7 @@ export default function ProgramsPage() {
 
                 {keptSwaps !== null && (
                   <div className="mx-4 mt-4 rounded-control bg-state-success/[0.08] border border-state-success/25 px-4 py-3">
-                    <p className="text-state-success text-xs font-body leading-relaxed">
+                    <p className="text-state-success text-label font-body leading-relaxed">
                       Saved to your program &mdash; {keptSwaps}{' '}
                       {keptSwaps === 1 ? 'exercise' : 'exercises'} changed for good. Find it
                       any time under My programs.
@@ -2696,10 +2696,10 @@ export default function ProgramsPage() {
                       ))}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide">
+                      <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">
                         Exercise {focusIndex + 1} of {selected.exercises.length}
                       </p>
-                      <p className="text-ink-4 text-2xs font-body">
+                      <p className="text-ink-4 text-caption font-body">
                         {exerciseProgress.filter((p) => p.complete).length} done
                         {exerciseProgress.some((p) => p.skipped) &&
                           ` · ${exerciseProgress.filter((p) => p.skipped).length} skipped`}
@@ -2713,11 +2713,11 @@ export default function ProgramsPage() {
                     <div key={group.label}>
                       {/* Series header */}
                       <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">
+                        <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]">
                           {group.label}
                         </p>
                         {group.isSuperset && (
-                          <span className="text-state-success text-2xs font-display font-bold uppercase tracking-wide">
+                          <span className="text-state-success text-caption font-display font-bold uppercase tracking-wide">
                             Superset
                           </span>
                         )}
@@ -2733,7 +2733,7 @@ export default function ProgramsPage() {
                           are: an experienced lifter does not need telling
                           twice a week forever. */}
                       {group.isSuperset && treatAsBeginner && (
-                        <p className="text-ink-3 text-xs font-body mb-2.5 leading-relaxed">
+                        <p className="text-ink-3 text-label font-body mb-2.5 leading-relaxed">
                           Do one set of each, back to back, then rest. That&rsquo;s one round.
                         </p>
                       )}
@@ -3082,7 +3082,7 @@ export default function ProgramsPage() {
                                             )}
                                           </div>
                                           <div className="text-right">
-                                            <span className={`text-sm font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-ink-2'}`}>
+                                            <span className={`text-label font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-ink-2'}`}>
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
                                             <span className="text-ink-4 text-caption font-body ml-2">{pr.date}</span>
@@ -3129,7 +3129,7 @@ export default function ProgramsPage() {
                                                 onClick={() => setEditingRest(exercise.name)}
                                                 className="flex items-center gap-1.5 text-ink-2 hover:text-ink transition-colors duration-200"
                                               >
-                                                <span className="text-sm font-display font-bold">{customSec}s</span>
+                                                <span className="text-label font-display font-bold">{customSec}s</span>
                                                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                   <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
                                                 </svg>
@@ -3517,7 +3517,7 @@ export default function ProgramsPage() {
                                                       <button
                                                         key={n}
                                                         onClick={() => void tapEffort(n + 1)}
-                                                        className={`w-11 h-11 rounded-full border-2 flex items-center justify-center font-display font-bold text-sm transition-all duration-150 active:scale-90 ${
+                                                        className={`w-11 h-11 rounded-full border-2 flex items-center justify-center font-display font-bold text-label transition-all duration-150 active:scale-90 ${
                                                           on
                                                             ? 'bg-state-success/25 border-state-success text-state-success'
                                                             : 'bg-white/[0.03] border-white/[0.12] text-ink-4 hover:border-white/25'
@@ -3572,7 +3572,7 @@ export default function ProgramsPage() {
                                                       rir: q.key,
                                                     })
                                                   }}
-                                                  className={`h-11 min-w-11 px-3 rounded-control text-sm font-display font-bold transition-colors duration-150 ${
+                                                  className={`h-11 min-w-11 px-3 rounded-control text-label font-display font-bold transition-colors duration-150 ${
                                                     rirByExercise[logKey] === q.key
                                                       ? 'bg-brand-blue text-white'
                                                       : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
@@ -3995,7 +3995,7 @@ export default function ProgramsPage() {
                                                     rir: n,
                                                   })
                                                 }}
-                                                className={`h-11 min-w-11 px-3 rounded-control text-sm font-display font-bold transition-colors duration-150 ${
+                                                className={`h-11 min-w-11 px-3 rounded-control text-label font-display font-bold transition-colors duration-150 ${
                                                   on
                                                     ? 'bg-brand-blue text-white'
                                                     : isTarget
@@ -4135,7 +4135,7 @@ export default function ProgramsPage() {
                                                     value={iLog.weight}
                                                     onFocus={selectAllOnFocus}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
-                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-sm font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-body font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     style={{ borderColor: iLog.done ? `${meta.color}55` : undefined }}
                                                   />
                                                   <div className="flex items-center justify-center">
@@ -4270,7 +4270,7 @@ export default function ProgramsPage() {
                       {pendingSets > 0 && (
                         <div className="flex items-center gap-2 rounded-card bg-state-warning/10 border border-state-warning/25 px-4 py-2.5">
                           <span className="w-2 h-2 rounded-full bg-state-warning shrink-0" />
-                          <p className="text-state-warning text-2xs font-body">
+                          <p className="text-state-warning text-caption font-body">
                             {pendingSets} {pendingSets === 1 ? 'set is' : 'sets are'} saved on this phone and waiting for signal. Keep
                             training — they&rsquo;ll sync on their own.
                           </p>
@@ -4278,7 +4278,7 @@ export default function ProgramsPage() {
                       )}
                       <button
                         onClick={() => setConfirmEnd(tallySession())}
-                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-ink-2 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
+                        className="w-full py-4 bg-white/[0.04] border border-white/[0.08] text-ink-2 text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-white/[0.06] hover:text-white active:scale-[0.98] transition-all duration-200"
                       >
                         End Workout
                       </button>
@@ -4314,7 +4314,7 @@ export default function ProgramsPage() {
                           }
                         }
                       }}
-                      className="w-full py-4 bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-4 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
                     >
                       Start Workout
                     </button>
@@ -4348,7 +4348,7 @@ export default function ProgramsPage() {
               <div className="flex items-center gap-2 mb-4">
                 <button
                   onClick={() => askBeforeLeavingBuilder(leaveBuilderBack)}
-                  className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                  className="text-ink-3 hover:text-ink-2 text-label font-display font-semibold uppercase tracking-wide transition-colors duration-200"
                 >
                   ‹ Back
                 </button>
@@ -4380,11 +4380,11 @@ export default function ProgramsPage() {
               <div className="flex items-center justify-between gap-3 mb-4">
                 <button
                   onClick={() => setView('preview')}
-                  className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide transition-colors duration-200"
+                  className="text-ink-3 hover:text-ink-2 text-label font-display font-semibold uppercase tracking-wide transition-colors duration-200"
                 >
                   ‹ Back
                 </button>
-                <span className="text-ink-4 text-2xs font-body">
+                <span className="text-ink-4 text-caption font-body">
                   {myPrograms.length} of {MAX_CUSTOM_PROGRAMS}
                 </span>
               </div>
@@ -4395,14 +4395,14 @@ export default function ProgramsPage() {
                   rotation matches them by name. Silence here would look like
                   the history had been lost. */}
               {builderMoved !== null && (
-                <p className="text-state-success/90 text-xs font-body mb-4 px-3.5 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
+                <p className="text-state-success/90 text-label font-body mb-4 px-3.5 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
                   Saved. {builderMoved} logged {builderMoved === 1 ? 'session' : 'sessions'} moved across to the
                   renamed {builderMoved === 1 ? 'day' : 'days'}, so nothing is lost.
                 </p>
               )}
 
               {myPrograms.length === 0 ? (
-                <p className="text-ink-4 text-sm font-body text-center py-10">
+                <p className="text-ink-4 text-body font-body text-center py-10">
                   Nothing saved yet. Customize the program you&rsquo;re on, or build one from scratch.
                 </p>
               ) : (
@@ -4420,19 +4420,19 @@ export default function ProgramsPage() {
                               onChange={(e) => setRenaming({ id: p.id, name: e.target.value })}
                               onKeyDown={(e) => { if (e.key === 'Enter') void commitRename(); if (e.key === 'Escape') setRenaming(null) }}
                               onBlur={() => void commitRename()}
-                              className="w-full px-2.5 py-1.5 rounded-control bg-white/[0.06] border border-brand-blue/40 text-white text-sm font-display font-bold focus:outline-none"
+                              className="w-full px-2.5 py-1.5 rounded-control bg-white/[0.06] border border-brand-blue/40 text-white text-body font-display font-bold focus:outline-none"
                               aria-label="Program name"
                             />
                           ) : (
-                            <span className="block text-white text-sm font-display font-bold truncate">{p.name}</span>
+                            <span className="block text-white text-label font-display font-bold truncate">{p.name}</span>
                           )}
-                          <span className="block text-ink-3 text-xs font-body mt-0.5">
+                          <span className="block text-ink-3 text-label font-body mt-0.5">
                             {p.days_per_week ?? 0} {p.days_per_week === 1 ? 'day' : 'days'} a week
                           </span>
                         </span>
                         <button
                           onClick={() => openBuilder(p.id, p.id)}
-                          className="shrink-0 px-3 py-2 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+                          className="shrink-0 px-3 py-2 rounded-control bg-white/[0.06] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
                         >
                           Edit
                         </button>
@@ -4461,7 +4461,7 @@ export default function ProgramsPage() {
                               )
                             }
                           }}
-                          className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
+                          className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
                         >
                           Use
                         </button>
@@ -4469,7 +4469,7 @@ export default function ProgramsPage() {
                       <div className="flex items-center gap-4 mt-2">
                         <button
                           onClick={() => { setRenaming({ id: p.id, name: p.name }); }}
-                          className="text-ink-4 hover:text-ink-2 text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-ink-2 text-caption font-body transition-colors duration-150"
                         >
                           Rename
                         </button>
@@ -4484,7 +4484,7 @@ export default function ProgramsPage() {
                             setMyPrograms(await fetchMyCustomPrograms(userId))
                           }}
                           disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
-                          className="text-ink-4 hover:text-ink-2 disabled:opacity-40 text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-ink-2 disabled:opacity-40 text-caption font-body transition-colors duration-150"
                         >
                           Duplicate
                         </button>
@@ -4494,7 +4494,7 @@ export default function ProgramsPage() {
                             await deleteCustomProgram(p.id)
                             setMyPrograms(await fetchMyCustomPrograms(userId))
                           }}
-                          className="text-ink-4 hover:text-state-danger text-2xs font-body transition-colors duration-150"
+                          className="text-ink-4 hover:text-state-danger text-caption font-body transition-colors duration-150"
                         >
                           Delete
                         </button>
@@ -4507,12 +4507,12 @@ export default function ProgramsPage() {
               <button
                 onClick={() => setView('startFrom')}
                 disabled={myPrograms.length >= MAX_CUSTOM_PROGRAMS}
-                className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-2 text-sm font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
+                className="w-full mt-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:text-white disabled:opacity-30 transition-colors duration-200"
               >
                 + Build another
               </button>
               {myPrograms.length >= MAX_CUSTOM_PROGRAMS && (
-                <p className="text-ink-4 text-xs font-body text-center mt-2">
+                <p className="text-ink-4 text-label font-body text-center mt-2">
                   Delete one to make room.
                 </p>
               )}
@@ -4532,7 +4532,7 @@ export default function ProgramsPage() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
-                    <span className="text-xs font-display font-semibold uppercase tracking-wide">Back to Workout</span>
+                    <span className="text-label font-display font-semibold uppercase tracking-wide">Back to Workout</span>
                   </button>
                   <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
                     {selectedExerciseData.name}
@@ -4542,12 +4542,12 @@ export default function ProgramsPage() {
                   {selectedExerciseDB && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {selectedExerciseDB.primaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-orange/15 text-brand-orange text-2xs font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-orange/15 text-brand-orange text-caption font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-2xs font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-caption font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -4564,7 +4564,7 @@ export default function ProgramsPage() {
                   {/* Setup section */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
+                      <h3 className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-3">Setup</h3>
                       <div className="grid grid-cols-3 gap-3">
                         <SetupCard icon="equipment" label="Equipment" value={selectedExerciseDB.equipment} />
                         <SetupCard icon="level" label="Level" value={selectedExerciseDB.level} />
@@ -4576,7 +4576,7 @@ export default function ProgramsPage() {
                   {/* Target muscles with MuscleMap */}
                   {selectedExerciseDB && (
                     <div>
-                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
+                      <h3 className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-3">Target</h3>
                       <div className="flex flex-col sm:flex-row gap-4 items-start">
                         <div className="w-full sm:w-48 shrink-0">
                           <MuscleMap
@@ -4593,8 +4593,8 @@ export default function ProgramsPage() {
                                 <div className="w-4 h-4 rounded-control bg-brand-orange" />
                               </div>
                               <div>
-                                <p className="text-white font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-wide">Primary</p>
+                                <p className="text-white font-body font-semibold text-label capitalize">{m}</p>
+                                <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-wide">Primary</p>
                               </div>
                             </div>
                           ))}
@@ -4604,8 +4604,8 @@ export default function ProgramsPage() {
                                 <div className="w-4 h-4 rounded-control bg-brand-blue" />
                               </div>
                               <div>
-                                <p className="text-ink-2 font-body font-semibold text-sm capitalize">{m}</p>
-                                <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">Secondary</p>
+                                <p className="text-ink-2 font-body font-semibold text-label capitalize">{m}</p>
+                                <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
                           ))}
@@ -4617,14 +4617,14 @@ export default function ProgramsPage() {
                   {/* Instructions */}
                   {selectedExerciseDB && selectedExerciseDB.instructions.length > 0 && (
                     <div>
-                      <h3 className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
+                      <h3 className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-3">Instructions</h3>
                       <ol className="space-y-3">
                         {selectedExerciseDB.instructions.map((step, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-2xs font-display font-bold mt-0.5">
+                            <span className="shrink-0 w-6 h-6 rounded-full bg-state-success/10 text-state-success flex items-center justify-center text-caption font-display font-bold mt-0.5">
                               {i + 1}
                             </span>
-                            <p className="text-ink-2 text-sm font-body leading-relaxed">{step}</p>
+                            <p className="text-ink-2 text-body font-body leading-relaxed">{step}</p>
                           </li>
                         ))}
                       </ol>
@@ -4646,7 +4646,7 @@ export default function ProgramsPage() {
         {prList.length > 0 && (
           <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
             <div className="px-5 py-4 border-b border-white/[0.10]">
-              <h2 className="font-display font-bold text-sm text-white">Personal Records</h2>
+              <h2 className="font-display font-bold text-heading text-white">Personal Records</h2>
             </div>
             <div className="p-4 space-y-2">
               {prList.map((pr) => (
@@ -4655,15 +4655,15 @@ export default function ProgramsPage() {
                   className="flex items-center justify-between gap-3 rounded-control bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
                 >
                   <div className="min-w-0">
-                    <p className="text-white text-sm font-body font-semibold truncate">{pr.exercise_name}</p>
-                    <p className="text-ink-3 text-xs font-body mt-0.5">
+                    <p className="text-white text-body font-body font-semibold truncate">{pr.exercise_name}</p>
+                    <p className="text-ink-3 text-label font-body mt-0.5">
                       {new Date(pr.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       {pr.previous_weight ? ` · up from ${Number(pr.previous_weight)} lbs` : ''}
                     </p>
                   </div>
-                  <span className="shrink-0 font-display font-extrabold text-white text-sm tabular-nums">
+                  <span className="shrink-0 font-display font-extrabold text-white text-label tabular-nums">
                     {Number(pr.weight)}
-                    <span className="text-ink-3 text-xs font-body"> lbs × {pr.reps}</span>
+                    <span className="text-ink-3 text-label font-body"> lbs × {pr.reps}</span>
                   </span>
                 </div>
               ))}
@@ -4674,16 +4674,16 @@ export default function ProgramsPage() {
         {/* Recent Workout Logs */}
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10] flex items-center justify-between">
-            <h2 className="font-display font-bold text-sm text-white">Workout History</h2>
+            <h2 className="font-display font-bold text-heading text-white">Workout History</h2>
             {history.length > 0 && (
-              <span className="text-ink-4 text-2xs font-display font-bold uppercase tracking-wide">
+              <span className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">
                 {history.length} logged
               </span>
             )}
           </div>
           <div className="p-4">
             {history.length === 0 ? (
-              <p className="text-ink-3 text-sm font-body leading-relaxed px-1">
+              <p className="text-ink-3 text-body font-body leading-relaxed px-1">
                 Your logged workouts will show up here. Start a session above and log your sets to build your history.
               </p>
             ) : (
@@ -4694,8 +4694,8 @@ export default function ProgramsPage() {
                     className="flex items-center justify-between gap-3 rounded-control bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5"
                   >
                     <div className="min-w-0">
-                      <p className="text-white text-sm font-body font-semibold truncate">{w.day_name}</p>
-                      <p className="text-ink-3 text-xs font-body mt-0.5">
+                      <p className="text-white text-body font-body font-semibold truncate">{w.day_name}</p>
+                      <p className="text-ink-3 text-label font-body mt-0.5">
                         {formatHistoryDate(w)} &middot; {w.set_count} {w.set_count === 1 ? 'set' : 'sets'}
                         {w.duration_seconds ? ` · ${formatDuration(w.duration_seconds)}` : ''}
                       </p>
@@ -4719,15 +4719,15 @@ export default function ProgramsPage() {
         {/* Your Coach */}
         <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className="bg-surface-raised rounded-card border border-white/[0.10]">
           <div className="px-5 py-4 border-b border-white/[0.10]">
-            <h2 className="font-display font-bold text-sm text-white">Your Coach</h2>
+            <h2 className="font-display font-bold text-heading text-white">Your Coach</h2>
           </div>
           <div className="p-5">
-            <p className="text-ink-3 text-sm font-body leading-relaxed">
+            <p className="text-ink-3 text-body font-body leading-relaxed">
               A personalized program built around your goals is on the way. In the meantime, follow this sample routine and message Coach Anthony anytime.
             </p>
             <a
               href="/studio/messages"
-              className="mt-4 inline-block text-brand-blue text-sm font-display font-bold uppercase tracking-wide hover:underline"
+              className="mt-4 inline-block text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:underline"
             >
               Message Coach →
             </a>
@@ -4799,7 +4799,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
           🏆
         </motion.div>
         <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-state-warning">New PR!</p>
-        <p className="text-white font-body font-semibold text-sm mt-1">{name}</p>
+        <p className="text-white font-body font-semibold text-label mt-1">{name}</p>
         <p className="text-ink-2 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
       </motion.div>
     </div>
@@ -4861,7 +4861,7 @@ function SetupCard({ icon, label, value }: { icon: string; label: string; value:
       </div>
       <div className="text-center">
         <p className="text-ink-4 text-badge font-display font-bold uppercase tracking-wide">{label}</p>
-        <p className="text-white text-xs font-body font-semibold capitalize mt-0.5">{value}</p>
+        <p className="text-white text-label font-body font-semibold capitalize mt-0.5">{value}</p>
       </div>
     </div>
   )
@@ -4903,14 +4903,14 @@ function BlockComplete({
         transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full max-w-md px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
       >
-        <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.2em]">
+        <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.2em]">
           Plan complete
         </p>
         <h2 className="font-display font-extrabold text-2xl text-white tracking-tight mt-2 mb-4">
           {review.weeks} weeks done
         </h2>
 
-        <p className="text-ink-2 text-sm font-body leading-relaxed mb-5">{review.headline}</p>
+        <p className="text-ink-2 text-body font-body leading-relaxed mb-5">{review.headline}</p>
 
         <div className="flex items-start gap-3 mb-5">
           {[
@@ -4920,7 +4920,7 @@ function BlockComplete({
           ].map(([value, label]) => (
             <div key={label} className="flex-1">
               <p className="font-display font-extrabold text-xl text-white tabular-nums">{value}</p>
-              <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">
+              <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.15em] mt-0.5">
                 {label}
               </p>
             </div>
@@ -4931,9 +4931,9 @@ function BlockComplete({
           <div className="rounded-control border border-white/[0.08] divide-y divide-white/[0.06] mb-5">
             {movers.map((l) => (
               <div key={l.exercise} className="flex items-center justify-between px-3.5 py-2.5 gap-3">
-                <span className="text-ink-2 text-xs font-body truncate">{l.exercise}</span>
+                <span className="text-ink-2 text-label font-body truncate">{l.exercise}</span>
                 <span
-                  className={`shrink-0 text-xs font-body font-semibold tabular-nums ${
+                  className={`shrink-0 text-label font-body font-semibold tabular-nums ${
                     l.change > 0 ? 'text-state-success' : 'text-state-warning'
                   }`}
                 >
@@ -4945,27 +4945,27 @@ function BlockComplete({
         )}
 
         {review.weightChangeLb !== null && review.weightChangeLb !== 0 && (
-          <p className="text-ink-3 text-xs font-body mb-5">
+          <p className="text-ink-3 text-label font-body mb-5">
             Bodyweight {review.weightChangeLb > 0 ? 'up' : 'down'}{' '}
             {Math.abs(review.weightChangeLb)} lbs across the block.
           </p>
         )}
 
         <div className="rounded-control bg-brand-blue/[0.08] border border-brand-blue/25 px-4 py-3.5 mb-6">
-          <p className="font-display font-bold text-white text-sm">{next.title}</p>
-          <p className="text-ink-2 text-xs font-body leading-relaxed mt-1">{next.detail}</p>
+          <p className="font-display font-bold text-white text-label">{next.title}</p>
+          <p className="text-ink-2 text-label font-body leading-relaxed mt-1">{next.detail}</p>
         </div>
 
         <div className="flex gap-2.5">
           <button
             onClick={onPickNew}
-            className="flex-1 py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+            className="flex-1 py-3.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
           >
             Choose next
           </button>
           <button
             onClick={onKeepGoing}
-            className="flex-1 py-3.5 bg-white/[0.06] text-ink-2 text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
+            className="flex-1 py-3.5 bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-white/[0.12] transition-colors duration-200"
           >
             Keep this one
           </button>
@@ -5079,16 +5079,16 @@ function SwapSheet({
         role="dialog"
         aria-label={`Swap ${exerciseName}`}
       >
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em]">Swap</p>
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.15em]">Swap</p>
         <h2 className="font-display font-extrabold text-xl text-white tracking-tight mt-1">{exerciseName}</h2>
 
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Why?</p>
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mt-5 mb-2">Why?</p>
         <div className="flex gap-1.5 flex-wrap">
           {reasons.map((r) => (
             <button
               key={r.key}
               onClick={() => setReason(r.key)}
-              className={`px-3 py-2 rounded-control text-xs font-body transition-colors duration-150 ${
+              className={`px-3 py-2 rounded-control text-label font-body transition-colors duration-150 ${
                 reason === r.key ? 'bg-brand-blue text-white' : 'bg-white/[0.06] text-ink-2 hover:text-white'
               }`}
             >
@@ -5103,7 +5103,7 @@ function SwapSheet({
             is a step most people skip, by quietly avoiding the movement
             instead. */}
         {reason === 'hurts' && (
-          <p className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.10] border border-state-warning/25 text-state-warning text-xs font-body leading-relaxed">
+          <p className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.10] border border-state-warning/25 text-state-warning text-label font-body leading-relaxed">
             Swap it for today &mdash; Coach Anthony will see that this one didn&rsquo;t feel right. If it is sharp
             pain, or it is still there next session, message him so he can look at it properly.
           </p>
@@ -5198,7 +5198,7 @@ function SwapSheet({
             <select
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              className="w-full px-3 h-tap rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-label font-body focus:outline-none focus:border-brand-blue/50"
+              className="w-full px-3 h-tap rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
               aria-label="Equipment"
             >
               {EQUIPMENT_FILTERS.map((f) => (
@@ -5253,7 +5253,7 @@ function SwapSheet({
             day quietly reverts overnight. */}
         {chosen && (
           <div className="mt-5 pt-4 border-t border-white/[0.08]">
-            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-2">
+            <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mb-2">
               For how long?
             </p>
             <div className="space-y-1.5">
@@ -5261,8 +5261,8 @@ function SwapSheet({
                 onClick={() => onPick(chosen, false, reason)}
                 className="w-full py-3 px-3.5 rounded-control bg-white/[0.06] text-left hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
               >
-                <span className="block text-white text-sm font-display font-bold">Just today</span>
-                <span className="block text-ink-3 text-2xs font-body mt-0.5">
+                <span className="block text-white text-label font-display font-bold">Just today</span>
+                <span className="block text-ink-3 text-caption font-body mt-0.5">
                   Your program is unchanged and comes back as it was next session.
                 </span>
               </button>
@@ -5270,8 +5270,8 @@ function SwapSheet({
                 onClick={() => onPick(chosen, true, reason)}
                 className="w-full py-3 px-3.5 rounded-control bg-brand-blue text-left hover:bg-brand-blue/85 active:scale-[0.98] transition-all duration-200"
               >
-                <span className="block text-white text-sm font-display font-bold">Every time from now on</span>
-                <span className="block text-white/70 text-2xs font-body mt-0.5">
+                <span className="block text-white text-label font-display font-bold">Every time from now on</span>
+                <span className="block text-white/70 text-caption font-body mt-0.5">
                   {chosen} replaces {exerciseName} in your program until you undo it.
                 </span>
               </button>
@@ -5282,14 +5282,14 @@ function SwapSheet({
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
           >
             Cancel
           </button>
           {isSwapped && (
             <button
               onClick={onReset}
-              className="flex-1 py-3 rounded-control bg-brand-orange/15 text-brand-orange text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orange/25 active:scale-[0.98] transition-all duration-200"
+              className="flex-1 py-3 rounded-control bg-brand-orange/15 text-brand-orange text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orange/25 active:scale-[0.98] transition-all duration-200"
             >
               Undo swap
             </button>
@@ -5352,11 +5352,11 @@ function DemoSheet({
         {data && (
           <div className="flex flex-wrap gap-1.5 mt-4">
             {data.primaryMuscles.map((m) => (
-              <span key={m} className="px-2 py-0.5 rounded-control bg-brand-orange/15 text-brand-orange text-2xs font-display font-bold uppercase tracking-wide capitalize">
+              <span key={m} className="px-2 py-0.5 rounded-control bg-brand-orange/15 text-brand-orange text-caption font-display font-bold uppercase tracking-wide capitalize">
                 {m}
               </span>
             ))}
-            <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-2xs font-body capitalize">{data.equipment}</span>
+            <span className="px-2 py-0.5 rounded-control bg-white/[0.06] text-ink-2 text-caption font-body capitalize">{data.equipment}</span>
           </div>
         )}
 
@@ -5366,30 +5366,30 @@ function DemoSheet({
             was any good, written for someone holding a dumbbell. */}
         {coaching && (
           <div className="mt-5">
-            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-2">Get these right</p>
+            <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mb-2">Get these right</p>
             <ul className="space-y-2">
               {coaching.cues.map((cue, i) => (
-                <li key={i} className="flex gap-2.5 text-white text-sm font-body leading-relaxed">
+                <li key={i} className="flex gap-2.5 text-white text-body font-body leading-relaxed">
                   <span className="text-brand-blue shrink-0">&bull;</span>
                   {cue}
                 </li>
               ))}
             </ul>
             <div className="mt-3 px-3 py-2.5 rounded-control bg-state-warning/[0.08] border border-state-warning/20">
-              <p className="text-state-warning text-2xs font-display font-bold uppercase tracking-wide mb-1">Common mistake</p>
-              <p className="text-ink-2 text-sm font-body leading-relaxed">{coaching.mistake}</p>
+              <p className="text-state-warning text-caption font-display font-bold uppercase tracking-wide mb-1">Common mistake</p>
+              <p className="text-ink-2 text-body font-body leading-relaxed">{coaching.mistake}</p>
             </div>
           </div>
         )}
 
         {data && data.instructions.length > 0 && (
           <details className="mt-4">
-            <summary className="text-brand-blue text-xs font-body cursor-pointer">
+            <summary className="text-brand-blue text-label font-body cursor-pointer">
               {coaching ? 'Full step-by-step' : 'Step-by-step'} ({data.instructions.length} steps)
             </summary>
             <ol className="space-y-2 mt-2">
               {data.instructions.map((step, i) => (
-                <li key={i} className="flex gap-2.5 text-ink-2 text-sm font-body leading-relaxed">
+                <li key={i} className="flex gap-2.5 text-ink-2 text-body font-body leading-relaxed">
                   <span className="text-ink-4 font-display font-bold shrink-0">{i + 1}</span>
                   {step}
                 </li>
@@ -5435,7 +5435,7 @@ function ConfirmEnd({
         aria-label="End workout"
       >
         <h2 className="font-display font-extrabold text-xl text-white tracking-tight">End this workout?</h2>
-        <p className="text-ink-2 text-sm font-body leading-relaxed mt-2">
+        <p className="text-ink-2 text-body font-body leading-relaxed mt-2">
           {short ? (
             <>
               You&rsquo;ve logged <span className="text-state-warning font-semibold">{logged} of {planned} sets</span>. Anything
@@ -5450,13 +5450,13 @@ function ConfirmEnd({
         <div className="flex gap-2 mt-6">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+            className="flex-1 py-3 rounded-control bg-white/[0.06] text-white text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
           >
             Keep going
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+            className="flex-1 py-3 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
           >
             End
           </button>
@@ -5527,7 +5527,7 @@ function WorkoutComplete({
   const stat = (value: string, label: string) => (
     <div className="flex-1">
       <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
-      <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
+      <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
     </div>
   )
 
@@ -5542,7 +5542,7 @@ function WorkoutComplete({
       >
         {/* Two moments that only happen once, said in the line that was
             already there rather than as a second screen to dismiss. */}
-        <p className="font-display font-bold text-2xs uppercase tracking-[0.25em] text-brand-orange">
+        <p className="font-display font-bold text-caption uppercase tracking-[0.25em] text-brand-orange">
           {summary.firstEver ? 'First one done' : summary.weekDone ? "That's the week" : 'Session complete'}
         </p>
         <h2 className="font-display font-extrabold text-3xl text-white tracking-tight mt-2">
@@ -5565,23 +5565,23 @@ function WorkoutComplete({
         {pendingSets > 0 ? (
           <div className="flex items-center justify-center gap-2 mb-5 px-3 py-2.5 rounded-control bg-state-warning/10 border border-state-warning/25">
             <span className="w-2 h-2 rounded-full bg-state-warning shrink-0" />
-            <p className="text-state-warning text-2xs font-body">
+            <p className="text-state-warning text-caption font-body">
               {pendingSets} {pendingSets === 1 ? 'set is' : 'sets are'} still waiting for signal. They&rsquo;ll sync on their own.
             </p>
           </div>
         ) : (
-          <p className="text-ink-4 text-2xs font-body mb-5">All sets saved.</p>
+          <p className="text-ink-4 text-caption font-body mb-5">All sets saved.</p>
         )}
 
         {/* Records first: the one thing worth reading twice. */}
         {summary.records.length > 0 && (
           <div className="text-left mb-4 px-3 py-3 rounded-control bg-state-warning/[0.10] border border-state-warning/25">
-            <p className="text-state-warning text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+            <p className="text-state-warning text-caption font-display font-bold uppercase tracking-[0.15em] mb-2">
               {summary.records.length === 1 ? 'Personal record' : `${summary.records.length} personal records`}
             </p>
             <ul className="space-y-1.5">
               {summary.records.map((r) => (
-                <li key={r.exerciseName} className="text-ink text-xs font-body leading-relaxed">
+                <li key={r.exerciseName} className="text-ink text-label font-body leading-relaxed">
                   <span className="text-white font-semibold">{r.exerciseName}</span> &mdash; {r.text}
                 </li>
               ))}
@@ -5593,15 +5593,15 @@ function WorkoutComplete({
             using a comparison it had already made on every exercise. */}
         {summary.improvements.length > 0 && (
           <div className="text-left mb-4 px-3 py-3 rounded-control bg-brand-orange/[0.08] border border-brand-orange/20">
-            <p className="text-brand-orange text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2">
+            <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.15em] mb-2">
               Up on last time
             </p>
             <ul className="space-y-1">
               {summary.improvements.slice(0, 4).map((line) => (
-                <li key={line} className="text-ink text-xs font-body">{line}</li>
+                <li key={line} className="text-ink text-label font-body">{line}</li>
               ))}
               {summary.improvements.length > 4 && (
-                <li className="text-ink-3 text-xs font-body">+ {summary.improvements.length - 4} more</li>
+                <li className="text-ink-3 text-label font-body">+ {summary.improvements.length - 4} more</li>
               )}
             </ul>
           </div>
@@ -5611,26 +5611,26 @@ function WorkoutComplete({
             receptive to "take it easy"; the same sentence on every exercise
             during the session would read as nagging. */}
         {summary.fatigue && (
-          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
+          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
             {summary.fatigue}
           </p>
         )}
 
         {summary.firstEver && (
-          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-brand-blue/[0.08] border border-brand-blue/20">
+          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-brand-blue/[0.08] border border-brand-blue/20">
             That&rsquo;s your first session logged. Everything from here gets measured against it.
           </p>
         )}
 
         {summary.weekDone && !summary.firstEver && (
-          <p className="text-left text-ink-2 text-xs font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
+          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
             Every session this week done. Rest is part of it &mdash; the next one will keep.
           </p>
         )}
 
         {/* Closes the loop rather than ending on a full stop. */}
         {summary.nextUp && (
-          <p className="text-ink-3 text-xs font-body mb-5">
+          <p className="text-ink-3 text-label font-body mb-5">
             Next up: <span className="text-ink-2 font-semibold">{summary.nextUp}</span>
           </p>
         )}
@@ -5641,9 +5641,9 @@ function WorkoutComplete({
             fields deep — has never been used by anybody. */}
         {askWeight && (
           <div className="flex items-center gap-3 mb-4 px-3.5 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-left">
-            <label htmlFor="weigh-in" className="text-ink-2 text-sm font-body flex-1">
+            <label htmlFor="weigh-in" className="text-ink-2 text-body font-body flex-1">
               Weigh in?
-              <span className="block text-ink-4 text-2xs font-body mt-0.5">Optional</span>
+              <span className="block text-ink-4 text-caption font-body mt-0.5">Optional</span>
             </label>
             <input
               id="weigh-in"
@@ -5655,14 +5655,14 @@ function WorkoutComplete({
               aria-label="Bodyweight in pounds"
               className="w-20 px-2.5 py-2 rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
-            <span className="text-ink-3 text-xs font-body">lbs</span>
+            <span className="text-ink-3 text-label font-body">lbs</span>
           </div>
         )}
 
         <button
           onClick={() => void finish()}
           disabled={weighing}
-          className="w-full py-3.5 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+          className="w-full py-3.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
         >
           {weighing ? 'Saving…' : weightOk ? 'Save & finish' : 'Done'}
         </button>

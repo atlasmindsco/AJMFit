@@ -56,14 +56,14 @@ export default function ProgramReview({
       >
         <div className="px-5 pt-5 pb-4 border-b border-white/[0.08] shrink-0">
           <p className="font-display font-extrabold text-xl text-white tracking-tight">Your week</p>
-          <p className="text-ink-3 text-xs font-body mt-1">
+          <p className="text-ink-3 text-label font-body mt-1">
             {trainingDays} training {trainingDays === 1 ? 'day' : 'days'} &middot; {volume.totalSets} sets
           </p>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5">
           {/* ── The shape of the week ── */}
-          <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mb-3">
+          <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mb-3">
             Sets per muscle group
           </p>
           <div className="space-y-2">
@@ -72,7 +72,7 @@ export default function ProgramReview({
               const days = volume.daysByGroup[group.key]?.length ?? 0
               return (
                 <div key={group.key} className="flex items-center gap-3">
-                  <span className="w-[4.5rem] shrink-0 text-ink-2 text-xs font-body">{group.label}</span>
+                  <span className="w-[4.5rem] shrink-0 text-ink-2 text-label font-body">{group.label}</span>
                   <span className="flex-1 h-5 rounded bg-white/[0.04] overflow-hidden">
                     <span
                       className={`block h-full rounded transition-all duration-300 ${
@@ -81,7 +81,7 @@ export default function ProgramReview({
                       style={{ width: sets === 0 ? '3px' : `${Math.max(6, (sets / peak) * 100)}%` }}
                     />
                   </span>
-                  <span className="w-[5.5rem] shrink-0 text-right text-ink-3 text-2xs font-body tabular-nums">
+                  <span className="w-[5.5rem] shrink-0 text-right text-ink-3 text-caption font-body tabular-nums">
                     {sets === 0 ? 'none' : `${sets} over ${days} ${days === 1 ? 'day' : 'days'}`}
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export default function ProgramReview({
 
           {/* ── Anything worth saying ── */}
           {findings.length === 0 ? (
-            <p className="text-state-success/80 text-sm font-body mt-6 px-3.5 py-3 rounded-control bg-state-success/[0.07] border border-state-success/20">
+            <p className="text-state-success/80 text-body font-body mt-6 px-3.5 py-3 rounded-control bg-state-success/[0.07] border border-state-success/20">
               Nothing to flag. All six groups covered and the week is balanced.
             </p>
           ) : (
@@ -101,8 +101,8 @@ export default function ProgramReview({
                   key={`${f.code}-${i}`}
                   className="px-3.5 py-3 rounded-control bg-state-warning/[0.08] border border-state-warning/25"
                 >
-                  <p className="text-state-warning text-sm font-display font-bold leading-snug">{f.title}</p>
-                  {f.detail && <p className="text-ink-2 text-xs font-body mt-1 leading-relaxed">{f.detail}</p>}
+                  <p className="text-state-warning text-label font-display font-bold leading-snug">{f.title}</p>
+                  {f.detail && <p className="text-ink-2 text-label font-body mt-1 leading-relaxed">{f.detail}</p>}
                 </div>
               ))}
               {notes.map((f, i) => (
@@ -110,14 +110,14 @@ export default function ProgramReview({
                   key={`${f.code}-${i}`}
                   className="px-3.5 py-3 rounded-control bg-white/[0.03] border border-white/[0.08]"
                 >
-                  <p className="text-ink text-sm font-body leading-snug">{f.title}</p>
-                  {f.detail && <p className="text-ink-3 text-xs font-body mt-1 leading-relaxed">{f.detail}</p>}
+                  <p className="text-ink text-body font-body leading-snug">{f.title}</p>
+                  {f.detail && <p className="text-ink-3 text-label font-body mt-1 leading-relaxed">{f.detail}</p>}
                 </div>
               ))}
             </div>
           )}
 
-          <p className="text-ink-4 text-2xs font-body mt-5 leading-relaxed">
+          <p className="text-ink-4 text-caption font-body mt-5 leading-relaxed">
             None of this stops you saving. It&rsquo;s your program &mdash; this is just a second pair of eyes.
           </p>
         </div>
@@ -125,14 +125,14 @@ export default function ProgramReview({
         <div className="shrink-0 px-5 py-4 border-t border-white/[0.08] flex gap-2">
           <button
             onClick={onBack}
-            className="px-5 py-3.5 rounded-control bg-white/[0.06] text-ink-2 text-sm font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
+            className="px-5 py-3.5 rounded-control bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.10] active:scale-[0.98] transition-all duration-200"
           >
             Keep editing
           </button>
           <button
             onClick={onSave}
             disabled={saving}
-            className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
+            className="flex-1 py-3.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40"
           >
             {saving ? 'Saving…' : warns.length > 0 ? `${saveLabel} anyway` : saveLabel}
           </button>

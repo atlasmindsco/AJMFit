@@ -177,7 +177,7 @@ export default function ClientPortalLayout({
                   priority
                   className="h-9 w-auto"
                 />
-                <span className="font-display font-bold text-white text-sm uppercase tracking-[0.15em]">
+                <span className="font-display font-bold text-white text-label uppercase tracking-[0.15em]">
                   AJM Fit
                 </span>
               </Link>
@@ -190,7 +190,7 @@ export default function ClientPortalLayout({
                     <Link
                       key={tab.href}
                       href={tab.href}
-                      className={`px-4 py-2 rounded-control text-sm font-body font-medium transition-all duration-200 ${
+                      className={`px-4 py-2 rounded-control text-body font-body font-medium transition-all duration-200 ${
                         isActive
                           ? 'bg-white/[0.10] text-white'
                           : 'text-ink-3 hover:text-ink-2 hover:bg-white/[0.06]'
@@ -229,13 +229,13 @@ export default function ClientPortalLayout({
                       onError={() => setAvatarUrl(null)}
                     />
                   ) : (
-                    <span className="text-white text-sm font-display font-bold">
+                    <span className="text-white text-label font-display font-bold">
                       {initials || '·'}
                     </span>
                   )}
                 </div>
                 {firstName && (
-                  <span className="text-ink text-sm font-body hidden sm:block max-w-[140px] truncate">
+                  <span className="text-ink text-body font-body hidden sm:block max-w-[140px] truncate">
                     {firstName}
                   </span>
                 )}
@@ -261,7 +261,7 @@ export default function ClientPortalLayout({
                         href={link.href}
                         role="menuitem"
                         onClick={() => setProfileOpen(false)}
-                        className={`block px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
+                        className={`block px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
                           pathname === link.href
                             ? 'bg-white/[0.10] text-white'
                             : 'text-ink-2 hover:bg-white/[0.06] hover:text-white'
@@ -277,7 +277,7 @@ export default function ClientPortalLayout({
                         setProfileOpen(false)
                         void handleSignOut()
                       }}
-                      className="block w-full text-left px-3.5 py-2.5 rounded-control text-sm font-body text-ink-3 hover:bg-white/[0.06] hover:text-white transition-colors duration-150"
+                      className="block w-full text-left px-3.5 py-2.5 rounded-control text-body font-body text-ink-3 hover:bg-white/[0.06] hover:text-white transition-colors duration-150"
                     >
                       Sign out
                     </button>
@@ -313,7 +313,7 @@ export default function ClientPortalLayout({
                 }`}
               >
                 {icon(tab.d)}
-                <span className="text-2xs font-display font-bold uppercase tracking-wide">{tab.label}</span>
+                <span className="text-caption font-display font-bold uppercase tracking-wide">{tab.label}</span>
               </Link>
             )
           })}

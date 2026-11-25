@@ -92,14 +92,14 @@ export default function StartFrom({
       }`}
     >
       <span className={`font-display font-bold text-base ${primary ? 'text-white' : 'text-ink'}`}>{title}</span>
-      <span className="block text-ink-3 text-xs font-body mt-1 leading-relaxed">{sub}</span>
+      <span className="block text-ink-3 text-label font-body mt-1 leading-relaxed">{sub}</span>
     </button>
   )
 
   const Back = ({ to, label }: { to: Step; label: string }) => (
     <button
       onClick={() => setStep(to)}
-      className="text-ink-3 hover:text-ink-2 text-xs font-display font-semibold uppercase tracking-wide mb-4 transition-colors duration-200"
+      className="text-ink-3 hover:text-ink-2 text-label font-display font-semibold uppercase tracking-wide mb-4 transition-colors duration-200"
     >
       &lsaquo; {label}
     </button>
@@ -111,7 +111,7 @@ export default function StartFrom({
       {step === 'door' && (
         <>
           <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">Change your program</h2>
-          <p className="text-ink-3 text-sm font-body mt-1.5 mb-6 leading-relaxed">
+          <p className="text-ink-3 text-body font-body mt-1.5 mb-6 leading-relaxed">
             Take a ready-made one, or build your own. Either way your logs, your weights and your
             progression targets carry straight over.
           </p>
@@ -122,10 +122,10 @@ export default function StartFrom({
               className="w-full flex items-center gap-3 px-5 py-3.5 mb-5 rounded-card bg-brand-blue/[0.10] border border-brand-blue/30 text-left hover:bg-brand-blue/[0.16] transition-colors duration-200 active:scale-[0.99]"
             >
               <span className="flex-1 min-w-0">
-                <span className="block font-display font-bold text-sm text-white">
+                <span className="block font-display font-bold text-label text-white">
                   My programs ({savedCount})
                 </span>
-                <span className="block text-ink-3 text-xs font-body mt-0.5">
+                <span className="block text-ink-3 text-label font-body mt-0.5">
                   Switch to one you already built, or edit it.
                 </span>
               </span>
@@ -135,7 +135,7 @@ export default function StartFrom({
 
           {onPickReadyMade && (
             <>
-              <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2.5">
+              <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-2.5">
                 Ready-made
               </p>
               <Door
@@ -148,7 +148,7 @@ export default function StartFrom({
           )}
 
           <p
-            className={`text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em] mb-2.5 ${
+            className={`text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em] mb-2.5 ${
               onPickReadyMade ? 'mt-6' : ''
             }`}
           >
@@ -160,13 +160,13 @@ export default function StartFrom({
               which turns a reasonable rule into a surprise at the worst
               moment — with a program half designed in your head. */}
           {atLimit ? (
-            <p className="text-state-warning/90 text-xs font-body mb-3">
+            <p className="text-state-warning/90 text-label font-body mb-3">
               You&rsquo;re holding all {MAX_CUSTOM_PROGRAMS} of your saved programs. Delete one from My
               programs to build another.
             </p>
           ) : (
             savedCount > 0 && (
-              <p className="text-ink-4 text-xs font-body mb-3">
+              <p className="text-ink-4 text-label font-body mb-3">
                 {savedCount} of {MAX_CUSTOM_PROGRAMS} saved programs used.
               </p>
             )
@@ -197,7 +197,7 @@ export default function StartFrom({
 
           <button
             onClick={onCancel}
-            className="w-full mt-5 py-3 text-ink-3 hover:text-ink-2 text-xs font-display font-bold uppercase tracking-wide transition-colors duration-200"
+            className="w-full mt-5 py-3 text-ink-3 hover:text-ink-2 text-label font-display font-bold uppercase tracking-wide transition-colors duration-200"
           >
             Never mind
           </button>
@@ -209,14 +209,14 @@ export default function StartFrom({
         <>
           <Back to="door" label="Back" />
           <h2 className="font-display font-extrabold text-xl text-white tracking-tight">Which program?</h2>
-          <p className="text-ink-3 text-sm font-body mt-1 mb-5">
+          <p className="text-ink-3 text-body font-body mt-1 mb-5">
             You&rsquo;ll get your own copy. The original stays exactly as it is.
           </p>
 
-          {loading && <p className="text-ink-4 text-sm font-body py-8 text-center">Loading&hellip;</p>}
+          {loading && <p className="text-ink-4 text-body font-body py-8 text-center">Loading&hellip;</p>}
 
           {library && library.length === 0 && !loading && (
-            <p className="text-ink-4 text-sm font-body py-8 text-center">
+            <p className="text-ink-4 text-body font-body py-8 text-center">
               Couldn&rsquo;t load the library. Try again in a moment.
             </p>
           )}
@@ -228,8 +228,8 @@ export default function StartFrom({
                 onClick={() => onCopy(p.id)}
                 className="w-full text-left px-4 py-3.5 rounded-card bg-surface-raised border border-white/[0.10] hover:border-white/[0.18] transition-colors duration-200 active:scale-[0.99]"
               >
-                <span className="block text-white text-sm font-display font-bold leading-snug">{p.name}</span>
-                <span className="block text-ink-3 text-xs font-body mt-1">
+                <span className="block text-white text-label font-display font-bold leading-snug">{p.name}</span>
+                <span className="block text-ink-3 text-label font-body mt-1">
                   {p.days_per_week ? `${p.days_per_week} days a week` : 'Flexible'}
                   {p.split ? ` · ${p.split}` : ''}
                 </span>
@@ -246,7 +246,7 @@ export default function StartFrom({
           <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
             How many days a week?
           </h2>
-          <p className="text-ink-3 text-sm font-body mt-1 mb-5">
+          <p className="text-ink-3 text-body font-body mt-1 mb-5">
             Be honest about what you&rsquo;ll actually do. You can change this later.
           </p>
 
@@ -276,7 +276,7 @@ export default function StartFrom({
           <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
             How do you want to split it?
           </h2>
-          <p className="text-ink-3 text-sm font-body mt-1 mb-5">
+          <p className="text-ink-3 text-body font-body mt-1 mb-5">
             This just names your {days} days. You choose every exercise.
           </p>
 
@@ -288,8 +288,8 @@ export default function StartFrom({
                 className="w-full text-left px-5 py-4 rounded-card bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14] transition-all duration-200 active:scale-[0.99]"
               >
                 <span className="font-display font-bold text-base text-ink">{t.label}</span>
-                <span className="block text-ink-3 text-xs font-body mt-0.5">{t.sub}</span>
-                <span className="block text-ink-4 text-2xs font-body mt-1.5">{t.dayNames.join(' · ')}</span>
+                <span className="block text-ink-3 text-label font-body mt-0.5">{t.sub}</span>
+                <span className="block text-ink-4 text-caption font-body mt-1.5">{t.dayNames.join(' · ')}</span>
               </button>
             ))}
           </div>

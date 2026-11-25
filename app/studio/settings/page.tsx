@@ -135,8 +135,8 @@ export default function StudioSettingsPage() {
       <ProfilePhoto userId={userId} initials={initials} />
 
       <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5">
-        <p className="font-display font-bold text-white text-sm">Time zone</p>
-        <p className="text-ink-3 text-xs font-body mt-0.5 mb-3.5 leading-relaxed">
+        <p className="font-display font-bold text-white text-label">Time zone</p>
+        <p className="text-ink-3 text-label font-body mt-0.5 mb-3.5 leading-relaxed">
           Decides when your day rolls over. Your food and workouts reset at midnight here, not anywhere else.
         </p>
 
@@ -154,7 +154,7 @@ export default function StudioSettingsPage() {
           ))}
         </select>
 
-        <p className="text-ink-3 text-xs font-body mt-3">
+        <p className="text-ink-3 text-label font-body mt-3">
           Today is{' '}
           <span className="text-ink-2">
             {new Date(localDate() + 'T00:00:00').toLocaleDateString('en-US', {
@@ -251,8 +251,8 @@ function NotificationPrefs({ userId }: { userId: string }) {
 
   return (
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mt-4">
-      <p className="font-display font-bold text-white text-sm">Notifications</p>
-      <p className="text-ink-3 text-xs font-body mt-0.5 mb-4 leading-relaxed">
+      <p className="font-display font-bold text-white text-label">Notifications</p>
+      <p className="text-ink-3 text-label font-body mt-0.5 mb-4 leading-relaxed">
         Messages from Coach Anthony always come through &mdash; that&rsquo;s what you&rsquo;re here for.
       </p>
 
@@ -277,8 +277,8 @@ function NotificationPrefs({ userId }: { userId: string }) {
               />
             </button>
             <span className="min-w-0">
-              <span className="block text-white text-sm font-body">{row.label}</span>
-              <span className="block text-ink-3 text-xs font-body mt-0.5">{row.hint}</span>
+              <span className="block text-white text-body font-body">{row.label}</span>
+              <span className="block text-ink-3 text-label font-body mt-0.5">{row.hint}</span>
             </span>
           </label>
         ))}
@@ -288,7 +288,7 @@ function NotificationPrefs({ userId }: { userId: string }) {
           A reminder at 6am to someone who trains at 7pm is worse than none. */}
       <div className="mt-4 pt-4 border-t border-white/[0.06]">
         <label className="block">
-          <span className="block text-white text-sm font-body">Send reminders around</span>
+          <span className="block text-white text-body font-body">Send reminders around</span>
           <select
             value={prefs.send_hour}
             onChange={(e) => write({ ...prefs, send_hour: Number(e.target.value) })}
@@ -301,7 +301,7 @@ function NotificationPrefs({ userId }: { userId: string }) {
             ))}
           </select>
         </label>
-        <p className="text-ink-3 text-xs font-body mt-2">
+        <p className="text-ink-3 text-label font-body mt-2">
           Your time.{saved && <span className="text-state-success"> Saved.</span>}
         </p>
       </div>

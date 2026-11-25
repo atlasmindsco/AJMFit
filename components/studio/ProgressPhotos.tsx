@@ -80,8 +80,8 @@ export default function ProgressPhotos({
 
   return (
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
-      <p className="font-display font-bold text-white text-sm">Progress photos</p>
-      <p className="text-ink-3 text-xs font-body mt-0.5 mb-3.5 leading-relaxed">
+      <p className="font-display font-bold text-white text-label">Progress photos</p>
+      <p className="text-ink-3 text-label font-body mt-0.5 mb-3.5 leading-relaxed">
         Optional, and only Anthony can see them. Same spot, same light, once a month is plenty — photos show
         changes the scale misses entirely.
       </p>
@@ -104,12 +104,12 @@ export default function ProgressPhotos({
                   unoptimized
                 />
               ) : (
-                <span className="text-ink-4 text-xs font-body">
+                <span className="text-ink-4 text-label font-body">
                   {busy === p.key ? 'Uploading…' : '+ Add'}
                 </span>
               )}
             </button>
-            <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide text-center mt-1.5">
+            <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide text-center mt-1.5">
               {p.label}
             </p>
             <input
@@ -125,7 +125,7 @@ export default function ProgressPhotos({
         ))}
       </div>
 
-      {error && <p className="text-state-danger text-xs font-body mt-2">{error}</p>}
+      {error && <p className="text-state-danger text-label font-body mt-2">{error}</p>}
     </div>
   )
 }

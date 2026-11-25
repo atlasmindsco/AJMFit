@@ -89,18 +89,18 @@ export default function BillingPanel({ userId }: { userId: string }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-display font-bold text-white text-sm">
+          <p className="font-display font-bold text-white text-label">
             {sub.tier ? TIER_LABELS[sub.tier as Tier] ?? sub.tier : 'Your plan'}
           </p>
-          <p className={`text-xs font-body mt-1 leading-relaxed ${urgent ? 'text-state-danger' : 'text-ink-3'}`}>
+          <p className={`text-label font-body mt-1 leading-relaxed ${urgent ? 'text-state-danger' : 'text-ink-3'}`}>
             {line()}
           </p>
-          {error && <p className="text-state-danger text-xs font-body mt-1.5">{error}</p>}
+          {error && <p className="text-state-danger text-label font-body mt-1.5">{error}</p>}
         </div>
         <button
           onClick={openPortal}
           disabled={opening}
-          className={`shrink-0 px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-[0.12em] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 ${
+          className={`shrink-0 px-4 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-[0.12em] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 ${
             urgent
               ? 'bg-brand-orange text-white hover:bg-brand-orangedark'
               : 'bg-white/[0.06] text-ink-2 hover:bg-white/[0.12] hover:text-white'

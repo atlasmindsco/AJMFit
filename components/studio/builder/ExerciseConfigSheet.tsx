@@ -59,7 +59,7 @@ export default function ExerciseConfigSheet({
       >
         <p className="font-display font-extrabold text-lg text-white tracking-tight">{exercise.exerciseName}</p>
 
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Sets</p>
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mt-5 mb-2">Sets</p>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSets((s) => Math.max(1, s - 1))}
@@ -81,7 +81,7 @@ export default function ExerciseConfigSheet({
         {/* A plank is held, not repeated. The library says which exercises
             those are (force === 'static'), and asking for a rep count on one
             is what Alex reported from a real session. */}
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mt-5 mb-2">
           {hold ? 'Hold for' : 'Reps'}
         </p>
         <div className="flex flex-wrap gap-1.5">
@@ -89,7 +89,7 @@ export default function ExerciseConfigSheet({
             <button
               key={r}
               onClick={() => { setReps(r); setCustomReps(false) }}
-              className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
+              className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
                 !customReps && reps === r ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
@@ -98,7 +98,7 @@ export default function ExerciseConfigSheet({
           ))}
           <button
             onClick={() => setCustomReps(true)}
-            className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
+            className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
               customReps ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
             }`}
           >
@@ -114,13 +114,13 @@ export default function ExerciseConfigSheet({
           />
         )}
 
-        <p className="text-ink-3 text-2xs font-display font-bold uppercase tracking-wide mt-5 mb-2">Rest between sets</p>
+        <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide mt-5 mb-2">Rest between sets</p>
         <div className="flex flex-wrap gap-1.5">
           {REST_PRESETS.map((s) => (
             <button
               key={s}
               onClick={() => setRest(s)}
-              className={`px-3.5 py-2.5 rounded-control text-sm font-body transition-colors duration-150 ${
+              className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
                 rest === s ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
@@ -130,7 +130,7 @@ export default function ExerciseConfigSheet({
         </div>
 
         <details className="mt-5">
-          <summary className="text-ink-3 text-xs font-body cursor-pointer">Add a note</summary>
+          <summary className="text-ink-3 text-label font-body cursor-pointer">Add a note</summary>
           <input
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -145,13 +145,13 @@ export default function ExerciseConfigSheet({
             buttons instead: one keeps, one does not, and both say which. */}
         <button
           onClick={commit}
-          className="w-full mt-6 py-3.5 rounded-control bg-brand-blue text-white text-sm font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
+          className="w-full mt-6 py-3.5 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
         >
           Save
         </button>
         <button
           onClick={onClose}
-          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-sm font-body transition-colors duration-200"
+          className="w-full mt-2 py-3 rounded-control text-ink-3 hover:text-white text-body font-body transition-colors duration-200"
         >
           Cancel
         </button>

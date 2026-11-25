@@ -268,8 +268,8 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               </svg>
             </button>
             <div>
-              <p className="font-display font-bold text-sm text-brand-navy">{selected ? 'Serving size' : 'Add food'}</p>
-              <p className="text-brand-slate text-xs font-body">to {meal.name}</p>
+              <p className="font-display font-bold text-label text-brand-navy">{selected ? 'Serving size' : 'Add food'}</p>
+              <p className="text-brand-slate text-label font-body">to {meal.name}</p>
             </div>
           </div>
 
@@ -285,7 +285,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search foods, e.g. chicken noodle soup"
-                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
                 aria-label="Search foods"
               />
               {query && (
@@ -315,7 +315,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
-              <p className="text-emerald-700 text-xs font-body">
+              <p className="text-emerald-700 text-label font-body">
                 <span className="font-semibold">{justAdded}</span> added to {meal.name}. Search to add more.
               </p>
             </motion.div>
@@ -331,14 +331,14 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <h2 className="font-display font-bold text-lg text-brand-navy leading-tight">{selected.name}</h2>
                   {selected.verified && <VerifiedShield />}
                 </div>
-                {selected.brand && <p className="text-brand-slate text-sm font-body mt-0.5">{selected.brand}</p>}
+                {selected.brand && <p className="text-brand-slate text-body font-body mt-0.5">{selected.brand}</p>}
               </div>
 
               <div className="space-y-3">
                 {/* Tapping this opens a list you can read, rather than the
                     operating system's scrolling wheel of truncated labels. */}
                 <div>
-                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">Serving size</span>
+                  <span className="text-brand-slate text-label font-display font-bold uppercase tracking-wide">Serving size</span>
                   <button
                     onClick={() => setUnitSheetOpen(true)}
                     disabled={choices.length < 2}
@@ -347,7 +347,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                     <span className="min-w-0">
                       <span className="block text-base font-body text-brand-navy truncate">{choice?.label ?? '—'}</span>
                       {choice && choice.gramsPerUnit > 0 && choice.unit !== 'g' && (
-                        <span className="block text-brand-slate text-xs font-body mt-0.5">
+                        <span className="block text-brand-slate text-label font-body mt-0.5">
                           {Math.round(choice.gramsPerUnit)} g each
                         </span>
                       )}
@@ -361,7 +361,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                 </div>
 
                 <div>
-                  <span className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide">
+                  <span className="text-brand-slate text-label font-display font-bold uppercase tracking-wide">
                     How {choice?.unit === 'g' || choice?.unit === 'oz' ? 'much' : 'many'}
                   </span>
                   <div className="mt-1.5 flex items-center gap-2">
@@ -379,7 +379,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                       step={choice?.unit === 'g' ? 1 : 0.25}
                       value={qtyText}
                       onChange={(e) => setQtyText(e.target.value)}
-                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-sm font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
                       aria-label={`Amount in ${choice?.unit ?? 'servings'}`}
                     />
                     <button
@@ -398,7 +398,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                         <button
                           key={n}
                           onClick={() => setQtyText(String(n))}
-                          className={`px-2.5 py-1 rounded-full text-xs font-body border transition-colors duration-150 ${
+                          className={`px-2.5 py-1 rounded-full text-label font-body border transition-colors duration-150 ${
                             qty === n
                               ? 'bg-brand-blue text-white border-brand-blue'
                               : 'bg-white text-brand-slate border-brand-navy/10 hover:bg-[#FAFBFD]'
@@ -412,7 +412,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
 
                   {/* What that works out to on a scale. */}
                   {choice && choice.gramsPerUnit > 0 && choice.unit !== 'g' && qty > 0 && (
-                    <p className="mt-2 text-brand-slate text-xs font-body">
+                    <p className="mt-2 text-brand-slate text-label font-body">
                       ≈ {Math.round(qty * choice.gramsPerUnit)} g
                     </p>
                   )}
@@ -423,20 +423,20 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                 <div className="bg-[#FAFBFD] rounded-card border border-brand-navy/[0.06] p-4">
                   <div className="flex items-baseline justify-center gap-1.5 mb-4">
                     <span className="font-display font-bold text-3xl text-brand-navy">{preview.calories}</span>
-                    <span className="text-brand-slate text-sm font-body">kcal</span>
+                    <span className="text-brand-slate text-body font-body">kcal</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
                       <p className="font-display font-bold text-base text-brand-blue">{preview.protein}g</p>
-                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Protein</p>
+                      <p className="text-brand-slate text-caption font-body uppercase tracking-wide">Protein</p>
                     </div>
                     <div>
                       <p className="font-display font-bold text-base text-brand-orange">{preview.carbs}g</p>
-                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Carbs</p>
+                      <p className="text-brand-slate text-caption font-body uppercase tracking-wide">Carbs</p>
                     </div>
                     <div>
                       <p className="font-display font-bold text-base text-brand-slate">{preview.fats}g</p>
-                      <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">Fats</p>
+                      <p className="text-brand-slate text-caption font-body uppercase tracking-wide">Fats</p>
                     </div>
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               <button
                 onClick={handleAdd}
                 disabled={saving || qty <= 0}
-                className="w-full py-3 bg-brand-blue text-white font-display font-bold text-sm uppercase tracking-wide rounded-control hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
+                className="w-full py-3 bg-brand-blue text-white font-display font-bold text-label uppercase tracking-wide rounded-control hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
               >
                 {saving ? 'Adding…' : `Add to ${meal.name}`}
               </button>
@@ -453,19 +453,19 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
           ) : (
             <div className="p-4">
               {showRecentsHeading && (
-                <p className="text-brand-slate text-xs font-display font-bold uppercase tracking-wide mb-2">
+                <p className="text-brand-slate text-label font-display font-bold uppercase tracking-wide mb-2">
                   Your usual
                 </p>
               )}
-              {error && <p className="text-red-500 text-xs font-body mb-3">{error}</p>}
+              {error && <p className="text-red-500 text-label font-body mb-3">{error}</p>}
               {searching && (
-                <div className="flex items-center gap-2 py-3 text-brand-slate text-xs font-body">
+                <div className="flex items-center gap-2 py-3 text-brand-slate text-label font-body">
                   <span className="w-3.5 h-3.5 border-2 border-brand-blue/30 border-t-brand-blue rounded-full animate-spin" />
                   Searching…
                 </div>
               )}
               {!searching && query.trim().length >= 2 && results.length === 0 && !error && (
-                <p className="text-brand-slate text-xs font-body py-3">
+                <p className="text-brand-slate text-label font-body py-3">
                   No matches. Try fewer words (brand + food works best), or use Photo, Barcode, or Manual entry instead.
                 </p>
               )}
@@ -478,10 +478,10 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-body font-semibold text-sm text-brand-navy truncate">{hit.name}</p>
+                          <p className="font-body font-semibold text-label text-brand-navy truncate">{hit.name}</p>
                           {hit.verified && <VerifiedShield />}
                         </div>
-                        <p className="text-brand-slate text-xs font-body truncate">
+                        <p className="text-brand-slate text-label font-body truncate">
                           {hit.per100
                             ? `${Math.round((hit.per100.calories * hit.servings[0].grams) / 100)} cal, ${hit.servings[0].label}`
                             : `${hit.fixed?.calories ?? 0} cal, ${hit.servings[0].label}`}

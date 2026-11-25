@@ -69,19 +69,19 @@ export default function ActiveWorkoutBar({
     return (
       <div className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] md:bottom-4 left-0 right-0 z-[55] px-4">
         <div className="mx-auto max-w-lg rounded-card bg-surface-overlay border border-white/[0.12] shadow-[0_8px_30px_rgba(0,0,0,0.5)] p-4">
-          <p className="text-white text-sm font-body mb-1">End this session?</p>
-          <p className="text-ink-3 text-xs font-body mb-3">{abandonWarning(workout)}</p>
+          <p className="text-white text-body font-body mb-1">End this session?</p>
+          <p className="text-ink-3 text-label font-body mb-3">{abandonWarning(workout)}</p>
           <div className="flex gap-2">
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 h-12 rounded-control bg-white/[0.08] text-white text-xs font-display font-bold uppercase tracking-wide active:scale-[0.98] transition-transform duration-150"
+              className="flex-1 h-12 rounded-control bg-white/[0.08] text-white text-label font-display font-bold uppercase tracking-wide active:scale-[0.98] transition-transform duration-150"
             >
               Keep training
             </button>
             <button
               onClick={() => void abandon()}
               disabled={busy}
-              className="flex-1 h-12 rounded-control bg-state-danger/20 border border-state-danger/40 text-state-danger text-xs font-display font-bold uppercase tracking-wide active:scale-[0.98] transition-transform duration-150 disabled:opacity-50"
+              className="flex-1 h-12 rounded-control bg-state-danger/20 border border-state-danger/40 text-state-danger text-label font-display font-bold uppercase tracking-wide active:scale-[0.98] transition-transform duration-150 disabled:opacity-50"
             >
               {busy ? 'Ending…' : 'End session'}
             </button>
@@ -100,10 +100,10 @@ export default function ActiveWorkoutBar({
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="text-brand-blue text-2xs font-display font-bold uppercase tracking-wide">
+          <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">
             Workout in progress
           </p>
-          <p className="text-white text-xs font-body truncate">
+          <p className="text-white text-label font-body truncate">
             {progressLine(workout, totalExercises)}
             {clock && <span className="text-ink-3 tabular-nums"> · {clock}</span>}
           </p>
@@ -124,7 +124,7 @@ export default function ActiveWorkoutBar({
 
         <button
           onClick={() => router.push('/studio/programs')}
-          className="h-11 px-5 shrink-0 rounded-control bg-brand-blue text-white text-xs font-display font-bold uppercase tracking-[0.1em] hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
+          className="h-11 px-5 shrink-0 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
         >
           Resume
         </button>

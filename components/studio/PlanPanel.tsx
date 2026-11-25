@@ -24,13 +24,13 @@ export default function PlanPanel({
 
   return (
     <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-6">
-      <p className="text-ink-2 text-sm font-body leading-relaxed">{t.headline}</p>
+      <p className="text-ink-2 text-body font-body leading-relaxed">{t.headline}</p>
 
       <ul className="mt-3 space-y-1.5">
         {t.includes.map((line) => (
           <li key={line} className="flex items-start gap-2.5">
             <span className="mt-[7px] w-1 h-1 rounded-full bg-brand-orange shrink-0" />
-            <span className="text-ink-2 text-xs font-body leading-relaxed">{line}</span>
+            <span className="text-ink-2 text-label font-body leading-relaxed">{line}</span>
           </li>
         ))}
       </ul>
@@ -38,17 +38,17 @@ export default function PlanPanel({
       {/* When the program gets looked at again. The client is paying for the
           cadence as much as the program, and it was the one part of the deal
           the app knew and never said. */}
-      <p className="mt-3 text-ink-3 text-2xs font-body">
+      <p className="mt-3 text-ink-3 text-caption font-body">
         <span className="text-ink-2">Your program:</span> {t.programReview.toLowerCase()}.
       </p>
 
       {t.weeklyCheckIn && (
         <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="font-display font-bold text-sm text-white">
+            <p className="font-display font-bold text-label text-white">
               {checkInDone ? 'Update sent this week' : 'Your weekly update'}
             </p>
-            <p className="text-ink-3 text-xs font-body mt-0.5">
+            <p className="text-ink-3 text-label font-body mt-0.5">
               {checkInDone
                 ? t.responseHours
                   ? `Anthony replies within ${t.responseHours} hours.`
@@ -59,7 +59,7 @@ export default function PlanPanel({
           {!checkInDone && (
             <Link
               href="/studio/check-in"
-              className="shrink-0 px-4 py-2.5 rounded-control bg-brand-orange text-white text-xs font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
+              className="shrink-0 px-4 py-2.5 rounded-control bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200"
             >
               Start
             </Link>

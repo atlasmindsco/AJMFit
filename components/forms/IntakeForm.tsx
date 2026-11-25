@@ -83,9 +83,9 @@ const tierOptions = [
 // ---- Styles ----
 
 const inputBase =
-  'w-full px-5 py-4 bg-brand-offwhite border border-brand-navy/10 rounded-control text-brand-navy font-body text-sm placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200'
-const labelBase = 'block font-display font-semibold text-xs uppercase tracking-[0.15em] text-brand-navy/70 mb-2'
-const errorBase = 'text-red-600 text-xs font-body mt-1'
+  'w-full px-5 py-4 bg-brand-offwhite border border-brand-navy/10 rounded-control text-brand-navy font-body text-body placeholder:text-brand-slate/50 focus:border-brand-blue/50 focus:outline-none transition-colors duration-200'
+const labelBase = 'block font-display font-semibold text-label uppercase tracking-[0.15em] text-brand-navy/70 mb-2'
+const errorBase = 'text-red-600 text-label font-body mt-1'
 
 // ---- Component ----
 
@@ -208,10 +208,10 @@ export default function IntakeForm() {
       </div>
 
       <div className="flex items-center justify-between mb-8">
-        <span className="font-display font-semibold text-xs uppercase tracking-[0.2em] text-brand-slate">
+        <span className="font-display font-semibold text-label uppercase tracking-[0.2em] text-brand-slate">
           Step {step + 1} of 3
         </span>
-        <span className="font-display font-semibold text-xs uppercase tracking-[0.2em] text-brand-blue">
+        <span className="font-display font-semibold text-label uppercase tracking-[0.2em] text-brand-blue">
           {step === 0 && 'Your Info'}
           {step === 1 && 'Your Goals'}
           {step === 2 && 'Final Details'}
@@ -277,7 +277,7 @@ export default function IntakeForm() {
                       key={opt.value}
                       type="button"
                       onClick={() => toggleEquipment(opt.value)}
-                      className={`px-4 py-3 rounded-control text-sm font-display font-semibold uppercase tracking-wide border transition-colors duration-200 text-center ${
+                      className={`px-4 py-3 rounded-control text-label font-display font-semibold uppercase tracking-wide border transition-colors duration-200 text-center ${
                         currentEquipment.includes(opt.value)
                           ? 'bg-brand-orange border-brand-orange text-white'
                           : 'bg-transparent border-brand-navy/15 text-brand-slate hover:border-brand-navy/30'
@@ -339,7 +339,7 @@ export default function IntakeForm() {
                     <button
                       type="button"
                       onClick={() => setValue('billingCycle', 'monthly')}
-                      className={`relative z-10 px-5 py-2 font-display font-bold text-xs uppercase tracking-[0.12em] transition-colors duration-200 ${
+                      className={`relative z-10 px-5 py-2 font-display font-bold text-label uppercase tracking-[0.12em] transition-colors duration-200 ${
                         watch('billingCycle') === 'monthly' ? 'text-white' : 'text-brand-navy'
                       }`}
                     >
@@ -348,7 +348,7 @@ export default function IntakeForm() {
                     <button
                       type="button"
                       onClick={() => setValue('billingCycle', 'weekly')}
-                      className={`relative z-10 px-5 py-2 font-display font-bold text-xs uppercase tracking-[0.12em] transition-colors duration-200 ${
+                      className={`relative z-10 px-5 py-2 font-display font-bold text-label uppercase tracking-[0.12em] transition-colors duration-200 ${
                         watch('billingCycle') === 'weekly' ? 'text-white' : 'text-brand-navy'
                       }`}
                     >
@@ -380,7 +380,7 @@ export default function IntakeForm() {
                         }`}
                       >
                         {opt.featured && (
-                          <div className="bg-brand-orange text-white text-center py-1.5 font-display font-bold text-2xs uppercase tracking-[0.2em]">
+                          <div className="bg-brand-orange text-white text-center py-1.5 font-display font-bold text-caption uppercase tracking-[0.2em]">
                             Most Popular
                           </div>
                         )}
@@ -403,11 +403,11 @@ export default function IntakeForm() {
                             )}
                           </span>
                           <div className="flex-1 flex items-baseline justify-between gap-2">
-                            <span className="font-display font-bold text-sm uppercase tracking-wide text-brand-navy">
+                            <span className="font-display font-bold text-label uppercase tracking-wide text-brand-navy">
                               {opt.label}
                             </span>
                             <span className="font-display font-extrabold text-lg text-brand-navy shrink-0">
-                              ${displayPrice}<span className="text-xs font-semibold text-brand-slate">{priceLabel}</span>
+                              ${displayPrice}<span className="text-label font-semibold text-brand-slate">{priceLabel}</span>
                             </span>
                           </div>
                         </label>
@@ -421,14 +421,14 @@ export default function IntakeForm() {
                               className="overflow-hidden"
                             >
                               <div className="px-5 pb-4 border-t border-brand-navy/[0.06]">
-                                <p className="mt-3 text-xs font-body text-brand-slate italic">
+                                <p className="mt-3 text-label font-body text-brand-slate italic">
                                   {opt.tagline}
                                 </p>
                                 <ul className="mt-3 flex flex-col gap-1.5">
                                   {opt.features.map((feature, i) => (
                                     <li key={i} className="flex items-start gap-2">
-                                      <span className="mt-0.5 shrink-0 text-2xs text-brand-orange">◆</span>
-                                      <span className="text-xs font-body text-brand-slate leading-relaxed">
+                                      <span className="mt-0.5 shrink-0 text-caption text-brand-orange">◆</span>
+                                      <span className="text-label font-body text-brand-slate leading-relaxed">
                                         {feature}
                                       </span>
                                     </li>
@@ -460,7 +460,7 @@ export default function IntakeForm() {
         {/* Submission error */}
         {submitError && (
           <div className="mt-6 rounded-control bg-red-50 border border-red-200 px-4 py-3">
-            <p className="text-red-700 text-sm font-body">{submitError}</p>
+            <p className="text-red-700 text-body font-body">{submitError}</p>
           </div>
         )}
 

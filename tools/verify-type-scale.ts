@@ -15,10 +15,12 @@
  *      reaching past it is how the three-pixel band happened.
  *   2. Any tap target declared smaller than 44px by an explicit h-[Npx].
  *
- * It deliberately does NOT fail on the legacy named steps (2xs, xs, sm).
- * Those are 433 usages migrating screen by screen through the audit's
- * phases 4 and 7, and a check that is red for weeks is a check people learn
- * to run with --force.
+ * It also holds the line on the legacy steps, but only where they are
+ * actually gone. 2xs, xs and sm were 433 usages migrating screen by screen
+ * through the audit's phases 4 and 7; the client app is now clear of them,
+ * so the client app is guarded. The trainer portal and the marketing site
+ * still use them and are deliberately not failed on — a check that stays
+ * red for weeks is one people learn to run with --force.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -91,6 +93,33 @@ ok(sizeHits.length === 0, 'nothing reaches past the scale', sizeHits.length ? `\
 
 console.log('\nNO CONTROL DECLARES ITSELF SMALLER THAN A THUMB\n')
 ok(tapHits.length === 0, `no explicit height under ${TAP_PX}px on a control`, tapHits.length ? `\n         ${tapHits.join('\n         ')}` : 'clean')
+
+/* ── The client app is off the legacy steps ───────────────────────────── */
+/* These are what the audit's phases 4 and 7 removed. The screens a paying
+   client uses now name their type by job, and the point of saying so here
+   is that one `text-xs` added in a hurry puts a screen back in the
+   three-pixel band without anybody noticing.
+   The trainer portal and the marketing site are left out on purpose: they
+   still use the old names, and failing on them would make this check noise
+   rather than a rule. */
+const CLIENT_DIRS = ['app/studio/', 'components/studio/', 'components/forms/']
+const LEGACY = /\btext-(2xs|xs|sm)\b/g
+const legacyHits: string[] = []
+for (const file of files) {
+  const rel = relative(ROOT, file).replace(/\\/g, '/')
+  if (!CLIENT_DIRS.some((d) => rel.startsWith(d))) continue
+  readFileSync(file, 'utf8').split(/\r?\n/).forEach((line, i) => {
+    for (const m of line.matchAll(LEGACY)) legacyHits.push(`${rel}:${i + 1}  ${m[0]}`)
+  })
+}
+
+console.log('\nTHE CLIENT APP NAMES ITS TYPE BY JOB\n')
+console.log('        app/studio, components/studio, components/forms — the screens a paying client sees')
+ok(
+  legacyHits.length === 0,
+  'no 2xs, xs or sm left in the client app',
+  legacyHits.length ? `${legacyHits.length} left\n         ${legacyHits.slice(0, 12).join('\n         ')}` : 'clean'
+)
 
 /* ── 2. The config still says what this file assumes ──────────────────── */
 console.log('\nTHE SCALE ITSELF\n')

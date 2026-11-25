@@ -139,20 +139,20 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
           <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className={`${card} p-5 mb-4`}>
             {editing ? (
               <>
-                <p className="font-display font-bold text-brand-navy text-sm">
+                <p className="font-display font-bold text-brand-navy text-label">
                   {prefs.setAt ? 'Your food preferences' : 'First, what do you eat?'}
                 </p>
-                <p className="text-brand-slate text-xs font-body mt-0.5 mb-4 leading-relaxed">
+                <p className="text-brand-slate text-label font-body mt-0.5 mb-4 leading-relaxed">
                   This filters everything below. Nothing here is shared beyond Anthony.
                 </p>
 
-                <label className="block font-display font-semibold text-2xs uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
+                <label className="block font-display font-semibold text-caption uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
                   How you eat
                 </label>
                 <select
                   value={draft.eatingPattern}
                   onChange={(e) => setDraft((p) => ({ ...p, eatingPattern: e.target.value as EatingPattern }))}
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
                 >
                   {EATING_PATTERNS.map((p) => (
                     <option key={p.value} value={p.value}>
@@ -161,7 +161,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                   ))}
                 </select>
 
-                <label className="block font-display font-semibold text-2xs uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
+                <label className="block font-display font-semibold text-caption uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
                   Allergies
                 </label>
                 <div className="flex flex-wrap gap-1.5 mb-4">
@@ -171,7 +171,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                       <button
                         key={a.value}
                         onClick={() => toggleAllergen(a.value)}
-                        className={`px-3 py-1.5 rounded-control text-xs font-body border transition-colors ${
+                        className={`px-3 py-1.5 rounded-control text-label font-body border transition-colors ${
                           on
                             ? 'bg-brand-orange/10 border-brand-orange/40 text-brand-orange'
                             : 'bg-brand-offwhite border-brand-navy/[0.08] text-brand-navy/60 hover:border-brand-navy/20'
@@ -183,31 +183,31 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                   })}
                 </div>
 
-                <label className="block font-display font-semibold text-2xs uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
+                <label className="block font-display font-semibold text-caption uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
                   Anything else you cannot eat
                 </label>
                 <input
                   value={draft.allergenNotes}
                   onChange={(e) => setDraft((p) => ({ ...p, allergenNotes: e.target.value }))}
                   placeholder="Kiwi, sulphites"
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
                 />
 
-                <label className="block font-display font-semibold text-2xs uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
+                <label className="block font-display font-semibold text-caption uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
                   Foods you would rather not eat
                 </label>
                 <input
                   value={draft.dislikes}
                   onChange={(e) => setDraft((p) => ({ ...p, dislikes: e.target.value }))}
                   placeholder="Tofu, cottage cheese"
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-sm text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
                 />
 
                 <div className="flex gap-2">
                   <button
                     onClick={save}
                     disabled={saving}
-                    className="px-5 py-2.5 bg-brand-navy text-white font-display font-bold text-xs uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 disabled:opacity-60 transition-all"
+                    className="px-5 py-2.5 bg-brand-navy text-white font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/90 disabled:opacity-60 transition-all"
                   >
                     {saving ? 'Saving…' : 'Save'}
                   </button>
@@ -217,7 +217,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                         setDraft(prefs)
                         setEditing(false)
                       }}
-                      className="px-5 py-2.5 bg-brand-navy/[0.06] text-brand-navy font-display font-bold text-xs uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/[0.1] transition-colors"
+                      className="px-5 py-2.5 bg-brand-navy/[0.06] text-brand-navy font-display font-bold text-label uppercase tracking-[0.12em] rounded-control hover:bg-brand-navy/[0.1] transition-colors"
                     >
                       Cancel
                     </button>
@@ -227,7 +227,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
             ) : (
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="font-body text-sm text-brand-navy">
+                  <p className="font-body text-body text-brand-navy">
                     {EATING_PATTERNS.find((p) => p.value === prefs.eatingPattern)?.label}
                     {prefs.allergens.length > 0 && (
                       <>
@@ -239,12 +239,12 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                     )}
                   </p>
                   {prefs.dislikes.trim() && (
-                    <p className="text-brand-slate text-xs font-body mt-0.5">Avoiding: {prefs.dislikes}</p>
+                    <p className="text-brand-slate text-label font-body mt-0.5">Avoiding: {prefs.dislikes}</p>
                   )}
                 </div>
                 <button
                   onClick={() => setEditing(true)}
-                  className="shrink-0 px-3 py-1.5 text-xs font-display font-semibold uppercase tracking-wide rounded bg-brand-navy/[0.08] text-brand-navy hover:bg-brand-navy/[0.12] transition-colors"
+                  className="shrink-0 px-3 py-1.5 text-label font-display font-semibold uppercase tracking-wide rounded bg-brand-navy/[0.08] text-brand-navy hover:bg-brand-navy/[0.12] transition-colors"
                 >
                   Change
                 </button>
@@ -258,7 +258,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
               presenting the result as safe is how someone gets hurt. */}
           {!editing && hasUncheckableNote(prefs) && (
             <div className="mb-4 p-4 rounded-card bg-brand-orange/[0.06] border border-brand-orange/20">
-              <p className="font-body text-sm text-brand-navy leading-relaxed">
+              <p className="font-body text-body text-brand-navy leading-relaxed">
                 You told us about <span className="font-semibold">{prefs.allergenNotes}</span>. We cannot check
                 the meals below against that automatically, so please read the ingredients yourself. Anthony
                 can see this note too.
@@ -278,7 +278,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                 key={s.value}
                 onClick={() => setSlot(s.value)}
                 aria-pressed={slot === s.value}
-                className={`px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
+                className={`px-4 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-wide border transition-colors ${
                   slot === s.value
                     ? 'bg-brand-blue border-brand-blue text-white shadow-sm'
                     : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
@@ -290,7 +290,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
             <button
               onClick={() => setQuickOnly((q) => !q)}
               aria-pressed={quickOnly}
-              className={`ml-auto px-4 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide border transition-colors ${
+              className={`ml-auto px-4 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-wide border transition-colors ${
                 quickOnly
                   ? 'bg-brand-navy border-brand-navy text-white shadow-sm'
                   : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
@@ -303,10 +303,10 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
           {/* Meals */}
           {meals.length === 0 ? (
             <div className={`${card} p-8 text-center`}>
-              <p className="font-body text-sm text-brand-navy">
+              <p className="font-body text-body text-brand-navy">
                 Nothing in the library matches that combination yet.
               </p>
-              <p className="text-brand-slate text-xs font-body mt-1.5">
+              <p className="text-brand-slate text-label font-body mt-1.5">
                 Message Anthony and he will put some options together for you.
               </p>
             </div>
@@ -330,8 +330,8 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
       {tab === 'portions' && (
         <>
           <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className={`${card} p-5 mb-4`}>
-            <p className="font-display font-bold text-brand-navy text-sm">Your hand is the measuring cup</p>
-            <p className="text-brand-slate text-xs font-body mt-1 mb-4 leading-relaxed">
+            <p className="font-display font-bold text-brand-navy text-label">Your hand is the measuring cup</p>
+            <p className="text-brand-slate text-label font-body mt-1 mb-4 leading-relaxed">
               Your hand scales with you, travels with you, and works in a restaurant. These are approximate on
               purpose. Getting roughly right every day beats getting exactly right for a week.
             </p>
@@ -342,12 +342,12 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                   className="flex items-start gap-4 p-3.5 rounded-control bg-brand-offwhite border border-brand-navy/[0.06]"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-display font-bold text-brand-navy text-sm">{p.component}</p>
-                    <p className="text-brand-slate text-xs font-body mt-0.5">{p.note}</p>
+                    <p className="font-display font-bold text-brand-navy text-label">{p.component}</p>
+                    <p className="text-brand-slate text-label font-body mt-0.5">{p.note}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-body font-semibold text-brand-navy text-sm">{p.perMeal}</p>
-                    <p className="text-brand-slate text-2xs font-body">per meal</p>
+                    <p className="font-body font-semibold text-brand-navy text-label">{p.perMeal}</p>
+                    <p className="text-brand-slate text-caption font-body">per meal</p>
                   </div>
                 </div>
               ))}
@@ -355,8 +355,8 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
           </motion.div>
 
           <motion.div custom={1} variants={fadeIn} initial="hidden" animate="visible" className={`${card} p-5`}>
-            <p className="font-display font-bold text-brand-navy text-sm">Building a plate</p>
-            <p className="text-brand-slate text-xs font-body mt-1 mb-3 leading-relaxed">
+            <p className="font-display font-bold text-brand-navy text-label">Building a plate</p>
+            <p className="text-brand-slate text-label font-body mt-1 mb-3 leading-relaxed">
               Protein first, then vegetables, then carbs, then fats. In that order, every time. Most people who
               struggle are not eating too much of everything, they are eating too little protein and too much of
               the last two.
@@ -377,10 +377,10 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                 animate="visible"
                 className={`${card} p-5`}
               >
-                <p className="font-display font-bold text-brand-navy text-sm mb-2.5">{s.title}</p>
+                <p className="font-display font-bold text-brand-navy text-label mb-2.5">{s.title}</p>
                 <ul className="space-y-1.5">
                   {s.rules.map((r) => (
-                    <li key={r} className="flex gap-2 text-brand-slate text-xs font-body leading-relaxed">
+                    <li key={r} className="flex gap-2 text-brand-slate text-label font-body leading-relaxed">
                       <span className="text-brand-blue shrink-0">•</span>
                       <span>{r}</span>
                     </li>
@@ -391,10 +391,10 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
           </div>
 
           <div className="p-5 rounded-card bg-brand-blue/[0.05] border border-brand-blue/20">
-            <p className="font-display font-bold text-brand-navy text-sm mb-2.5">If you went off plan</p>
+            <p className="font-display font-bold text-brand-navy text-label mb-2.5">If you went off plan</p>
             <ul className="space-y-1.5">
               {OFF_PLAN_GUIDANCE.map((g) => (
-                <li key={g} className="flex gap-2 text-brand-navy/70 text-xs font-body leading-relaxed">
+                <li key={g} className="flex gap-2 text-brand-navy/70 text-label font-body leading-relaxed">
                   <span className="text-brand-blue shrink-0">•</span>
                   <span>{g}</span>
                 </li>
@@ -439,14 +439,14 @@ function MealCard({
       )}
       <div className="p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="font-body font-semibold text-brand-navy text-sm leading-snug">{meal.name}</p>
-        <span className="shrink-0 text-brand-slate text-2xs font-body">
+        <p className="font-body font-semibold text-brand-navy text-label leading-snug">{meal.name}</p>
+        <span className="shrink-0 text-brand-slate text-caption font-body">
           {meal.prep === 0 ? 'no prep' : `${meal.prep} min`}
         </span>
       </div>
       <div className="flex items-center gap-3 mt-2.5">
-        <span className="font-display font-bold text-brand-navy text-sm">{meal.calories} cal</span>
-        <span className="text-brand-blue text-xs font-body font-semibold">{meal.protein}g protein</span>
+        <span className="font-display font-bold text-brand-navy text-label">{meal.calories} cal</span>
+        <span className="text-brand-blue text-label font-body font-semibold">{meal.protein}g protein</span>
       </div>
 
       {/* How much of each thing. The card used to give a name and a macro line
@@ -457,7 +457,7 @@ function MealCard({
       {portions.length > 0 && (
         <ul className="mt-2.5 space-y-1">
           {portions.map((x, i) => (
-            <li key={i} className="flex items-baseline gap-2 text-xs font-body">
+            <li key={i} className="flex items-baseline gap-2 text-label font-body">
               <span className="font-display font-bold text-brand-navy shrink-0 tabular-nums">{x.amount}</span>
               <span className="text-brand-navy/70 leading-snug">{x.food}</span>
             </li>
@@ -466,19 +466,19 @@ function MealCard({
       )}
       <button
         onClick={onToggle}
-        className="mt-2.5 text-brand-slate hover:text-brand-navy text-xs font-body underline underline-offset-2 transition-colors"
+        className="mt-2.5 text-brand-slate hover:text-brand-navy text-label font-body underline underline-offset-2 transition-colors"
       >
         {open ? 'Hide swaps' : 'Swap this'}
       </button>
       {open && (
         <div className="mt-2.5 pt-2.5 border-t border-brand-navy/[0.06] space-y-1.5">
           {swaps.length === 0 ? (
-            <p className="text-brand-slate text-xs font-body">No close match in your list yet.</p>
+            <p className="text-brand-slate text-label font-body">No close match in your list yet.</p>
           ) : (
             swaps.map((s) => (
               <div key={s.id} className="flex items-baseline justify-between gap-3">
-                <span className="text-brand-navy/80 text-xs font-body leading-snug">{s.name}</span>
-                <span className="shrink-0 text-brand-slate text-2xs font-body">
+                <span className="text-brand-navy/80 text-label font-body leading-snug">{s.name}</span>
+                <span className="shrink-0 text-brand-slate text-caption font-body">
                   {s.calories} cal · {s.protein}g
                 </span>
               </div>

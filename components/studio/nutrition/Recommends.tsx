@@ -56,18 +56,18 @@ export default function Recommends({ initialCategory }: { initialCategory?: stri
     <div>
       {/* Before any product. This is the point of the screen as much as the
           products are. */}
-      <p className="text-brand-slate text-sm font-body leading-relaxed mb-5 p-4 rounded-card bg-brand-navy/[0.03] border border-brand-navy/[0.08]">
+      <p className="text-brand-slate text-body font-body leading-relaxed mb-5 p-4 rounded-card bg-brand-navy/[0.03] border border-brand-navy/[0.08]">
         {DISCLOSURE_FULL}
       </p>
 
       {items === null && (
-        <p className="text-brand-slate text-sm font-body py-10 text-center">Loading&hellip;</p>
+        <p className="text-brand-slate text-body font-body py-10 text-center">Loading&hellip;</p>
       )}
 
       {items !== null && shown.length === 0 && (
         <div className="py-10 text-center">
-          <p className="font-display font-bold text-brand-navy text-sm">Nothing here yet</p>
-          <p className="text-brand-slate text-xs font-body mt-1">
+          <p className="font-display font-bold text-brand-navy text-label">Nothing here yet</p>
+          <p className="text-brand-slate text-label font-body mt-1">
             Anthony adds things here when he finds something worth the money.
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function Recommends({ initialCategory }: { initialCategory?: stri
 
       {shown.map((group) => (
         <section key={group.category} className="mb-7">
-          <h2 className="font-display font-bold text-brand-navy text-xs uppercase tracking-[0.12em] mb-3">
+          <h2 className="font-display font-bold text-brand-navy text-label uppercase tracking-[0.12em] mb-3">
             {group.category}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -95,9 +95,9 @@ export default function Recommends({ initialCategory }: { initialCategory?: stri
                     className="w-full h-28 object-contain rounded-control bg-brand-navy/[0.02] mb-3"
                   />
                 )}
-                <p className="font-display font-bold text-brand-navy text-sm leading-snug">{item.name}</p>
+                <p className="font-display font-bold text-brand-navy text-label leading-snug">{item.name}</p>
                 {item.why_recommended && (
-                  <p className="text-brand-slate text-xs font-body mt-1.5 leading-relaxed flex-1">
+                  <p className="text-brand-slate text-label font-body mt-1.5 leading-relaxed flex-1">
                     {item.why_recommended}
                   </p>
                 )}
@@ -106,19 +106,19 @@ export default function Recommends({ initialCategory }: { initialCategory?: stri
                   {hasDetail(item) && (
                     <button
                       onClick={() => setOpen(item)}
-                      className="px-3 py-2.5 rounded-control bg-brand-navy/[0.06] text-brand-navy text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-navy/[0.1] transition-colors"
+                      className="px-3 py-2.5 rounded-control bg-brand-navy/[0.06] text-brand-navy text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-navy/[0.1] transition-colors"
                     >
                       Details
                     </button>
                   )}
                   <button
                     onClick={() => openProduct(item)}
-                    className="flex-1 px-3 py-2.5 rounded-control bg-brand-navy text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-navy/90 active:scale-[0.98] transition-all"
+                    className="flex-1 px-3 py-2.5 rounded-control bg-brand-navy text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-navy/90 active:scale-[0.98] transition-all"
                   >
                     View on {item.merchant} &nearr;
                   </button>
                 </div>
-                <p className="text-brand-slate/70 text-2xs font-body mt-2">
+                <p className="text-brand-slate/70 text-caption font-body mt-2">
                   {item.disclosure_note || DISCLOSURE_SHORT}
                 </p>
               </motion.div>
@@ -176,30 +176,30 @@ function DetailSheet({
             &times;
           </button>
         </div>
-        <p className="text-brand-slate text-2xs font-body uppercase tracking-wide">{item.category}</p>
+        <p className="text-brand-slate text-caption font-body uppercase tracking-wide">{item.category}</p>
 
         {sections.map(([heading, body]) =>
           body ? (
             <div key={heading} className="mt-4">
-              <p className="font-display font-bold text-brand-navy text-2xs uppercase tracking-[0.12em]">
+              <p className="font-display font-bold text-brand-navy text-caption uppercase tracking-[0.12em]">
                 {heading}
               </p>
-              <p className="text-brand-slate text-sm font-body mt-1 leading-relaxed">{body}</p>
+              <p className="text-brand-slate text-body font-body mt-1 leading-relaxed">{body}</p>
             </div>
           ) : null
         )}
 
-        <p className="mt-5 p-3 rounded-control bg-brand-navy/[0.03] text-brand-slate text-xs font-body leading-relaxed">
+        <p className="mt-5 p-3 rounded-control bg-brand-navy/[0.03] text-brand-slate text-label font-body leading-relaxed">
           {SAFETY_NOTE}
         </p>
 
-        <p className="text-brand-slate/70 text-2xs font-body mt-3">
+        <p className="text-brand-slate/70 text-caption font-body mt-3">
           {item.disclosure_note || DISCLOSURE_SHORT}
         </p>
 
         <button
           onClick={onOpen}
-          className="w-full mt-3 py-3.5 rounded-control bg-brand-navy text-white text-sm font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-navy/90 active:scale-[0.98] transition-all"
+          className="w-full mt-3 py-3.5 rounded-control bg-brand-navy text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-navy/90 active:scale-[0.98] transition-all"
         >
           View on {item.merchant} &nearr;
         </button>

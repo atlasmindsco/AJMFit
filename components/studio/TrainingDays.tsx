@@ -98,7 +98,7 @@ export default function TrainingDays() {
       <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide mb-1">
         Your training days
       </h2>
-      <p className="text-ink-2 text-sm font-body mb-4">
+      <p className="text-ink-2 text-body font-body mb-4">
         Tell us which days you train and we&rsquo;ll remind you on those days and stay
         quiet on the rest. Your program rotates at your pace either way &mdash; this only
         changes when we get in touch.
@@ -113,7 +113,7 @@ export default function TrainingDays() {
               onClick={() => toggle(d)}
               aria-label={FULL[d]}
               aria-pressed={on}
-              className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
+              className={`py-3 rounded-control border font-display font-bold text-label transition-all duration-150 active:scale-95 ${
                 on
                   ? 'bg-brand-blue/[0.15] border-brand-blue/50 text-white'
                   : 'bg-white/[0.03] border-white/[0.08] text-ink-3 hover:bg-white/[0.06]'
@@ -125,31 +125,31 @@ export default function TrainingDays() {
         })}
       </div>
 
-      {error && <p className="text-state-danger text-xs font-body mt-3">{error}</p>}
+      {error && <p className="text-state-danger text-label font-body mt-3">{error}</p>}
 
       <div className="flex flex-wrap items-center gap-3 mt-4">
         <button
           onClick={() => void save()}
           disabled={!dirty || busy}
-          className="px-4 py-2 rounded-control bg-brand-orange text-white text-2xs font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
+          className="px-4 py-2 rounded-control bg-brand-orange text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-orangedark disabled:opacity-40 transition-colors"
         >
           {busy ? 'Saving…' : 'Save my days'}
         </button>
 
         {dirty && picked.length === 0 && (
-          <span className="text-ink-3 text-2xs font-body">
+          <span className="text-ink-3 text-caption font-body">
             Nothing selected &mdash; saving turns workout reminders off.
           </span>
         )}
         {!dirty && justSaved && (
-          <span className="text-state-success text-2xs font-body">
+          <span className="text-state-success text-caption font-body">
             {saved.length === 0
               ? 'Saved. No workout reminders.'
               : `Saved. We'll remind you ${saved.length === 7 ? 'every day' : `on ${saved.map((d) => FULL[d]).join(', ')}`}.`}
           </span>
         )}
         {!dirty && !justSaved && saved.length > 0 && (
-          <span className="text-ink-4 text-2xs font-body">
+          <span className="text-ink-4 text-caption font-body">
             {saved.length} {saved.length === 1 ? 'day' : 'days'} a week
           </span>
         )}

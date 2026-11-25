@@ -75,36 +75,36 @@ export default function MembershipPaywall() {
         </div>
 
         <div className="rounded-card border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-transparent p-8 sm:p-10">
-          <span className="inline-block rounded-full bg-brand-orange/15 px-3 py-1 font-display font-bold text-2xs uppercase tracking-[0.2em] text-brand-orange">
+          <span className="inline-block rounded-full bg-brand-orange/15 px-3 py-1 font-display font-bold text-caption uppercase tracking-[0.2em] text-brand-orange">
             Application approved
           </span>
 
           <h1 className="mt-5 font-display font-extrabold text-2xl sm:text-3xl uppercase tracking-tight text-white">
             Start your membership
           </h1>
-          <p className="mt-3 text-ink-2 text-sm font-body leading-relaxed">
+          <p className="mt-3 text-ink-2 text-body font-body leading-relaxed">
             You&rsquo;re in. Begin your 7-day free trial to unlock your custom plan, nutrition tracking,
             and direct access to Coach Anthony. No charge today, cancel anytime during the trial.
           </p>
 
-          {error && <p className="mt-4 text-red-300 text-sm font-body">{error}</p>}
+          {error && <p className="mt-4 text-red-300 text-body font-body">{error}</p>}
 
           <button
             onClick={start}
             disabled={loading}
-            className="mt-7 w-full py-4 rounded-control bg-brand-orange text-white font-display font-bold text-sm uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-60"
+            className="mt-7 w-full py-4 rounded-control bg-brand-orange text-white font-display font-bold text-label uppercase tracking-[0.12em] hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-60"
           >
             {loading ? 'Starting…' : 'Start 7-day free trial'}
           </button>
 
-          <p className="mt-4 text-ink-4 text-xs font-body">
+          <p className="mt-4 text-ink-4 text-label font-body">
             Secure checkout via Stripe.
           </p>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="mt-6 text-ink-3 hover:text-ink-2 text-sm font-body transition-colors duration-200"
+          className="mt-6 text-ink-3 hover:text-ink-2 text-body font-body transition-colors duration-200"
         >
           Sign out
         </button>

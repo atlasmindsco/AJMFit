@@ -157,7 +157,7 @@ export default function BlueprintPicker({
       }`}
     >
       <span className={`font-display font-bold text-base ${active ? 'text-white' : 'text-ink'}`}>{title}</span>
-      {sub && <span className="block text-ink-3 text-xs font-body mt-0.5">{sub}</span>}
+      {sub && <span className="block text-ink-3 text-label font-body mt-0.5">{sub}</span>}
     </button>
   )
 
@@ -180,9 +180,9 @@ export default function BlueprintPicker({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-card bg-white/[0.03] border border-white/[0.08] p-4 mb-5"
     >
-      <p className="text-ink-4 text-2xs font-display font-bold uppercase tracking-[0.15em]">Your program</p>
+      <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]">Your program</p>
       <p className="text-white font-display font-bold text-base mt-1">{title}</p>
-      <p className="text-ink-3 text-xs font-body mt-1">
+      <p className="text-ink-3 text-label font-body mt-1">
         {GOAL_LABELS[goal!]} · {LOCATION_LABELS[location!].toLowerCase()} · {days} days a week
       </p>
     </motion.div>
@@ -207,8 +207,8 @@ export default function BlueprintPicker({
       setTrainingDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort((a, b) => a - b)))
     return (
       <div className="mb-5">
-        <p className="text-ink-2 text-sm font-body mb-1">Which days will you train?</p>
-        <p className="text-ink-3 text-xs font-body mb-3">
+        <p className="text-ink-2 text-body font-body mb-1">Which days will you train?</p>
+        <p className="text-ink-3 text-label font-body mb-3">
           Optional. We&rsquo;ll remind you on those days and stay quiet on the rest.
         </p>
         <div className="grid grid-cols-7 gap-1.5">
@@ -220,7 +220,7 @@ export default function BlueprintPicker({
                 onClick={() => toggle(d)}
                 aria-label={full[d]}
                 aria-pressed={on}
-                className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
+                className={`py-3 rounded-control border font-display font-bold text-label transition-all duration-150 active:scale-95 ${
                   on
                     ? 'bg-brand-blue/[0.15] border-brand-blue/50 text-white'
                     : 'bg-white/[0.03] border-white/[0.08] text-ink-3 hover:bg-white/[0.06]'
@@ -232,7 +232,7 @@ export default function BlueprintPicker({
           })}
         </div>
         {days !== null && trainingDays.length > 0 && trainingDays.length !== days && (
-          <p className="text-state-warning/80 text-xs font-body mt-2">
+          <p className="text-state-warning/80 text-label font-body mt-2">
             You picked a {days}-day program and {trainingDays.length}{' '}
             {trainingDays.length === 1 ? 'day' : 'days'}. That&rsquo;s fine &mdash; the program just rotates at your pace.
           </p>
@@ -247,7 +247,7 @@ export default function BlueprintPicker({
       <button
         onClick={start}
         disabled={disabled || submitting}
-        className="w-full py-4 bg-brand-orange text-white text-sm font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+        className="w-full py-4 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
       >
         {submitting ? 'Setting up…' : 'Start Training'}
       </button>
@@ -258,16 +258,16 @@ export default function BlueprintPicker({
     <div className="max-w-xl mx-auto">
       {/* Header */}
       <div className="text-center mb-6">
-        <span className="inline-block text-2xs font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
+        <span className="inline-block text-caption font-display font-bold px-2.5 py-1 rounded bg-brand-orange/15 text-brand-orange uppercase tracking-wide">
           Blueprint
         </span>
         <h1 className="font-display font-extrabold text-2xl text-white tracking-tight mt-3">
           {firstName ? `Let's get you set up, ${firstName}` : "Let's set up your program"}
         </h1>
-        <p className="text-ink-3 text-sm font-body mt-1">
+        <p className="text-ink-3 text-body font-body mt-1">
           Answer {isNew ? 'three' : 'four'} questions to get your program
         </p>
-        <p className="text-ink-4 text-xs font-body mt-2.5">
+        <p className="text-ink-4 text-label font-body mt-2.5">
           {isNew
             ? 'Full body and upper/lower splits, 3-4 days a week — the right place to start.'
             : '2-6 days a week • Full Body, Upper/Lower, Torso/Limbs, Push/Pull/Legs, Bro Split, plus hybrid tracks with running and conditioning • Gym or dumbbells at home'}
@@ -395,12 +395,12 @@ export default function BlueprintPicker({
                   substitutes. */}
               {location === 'home' && (
                 <div className="mt-5 px-4 py-3.5 rounded-card bg-white/[0.04] border border-white/[0.08]">
-                  <p className="text-ink-2 text-xs font-body leading-relaxed">
+                  <p className="text-ink-2 text-label font-body leading-relaxed">
                     At home you&rsquo;ll need <span className="text-white font-semibold">dumbbells</span> and
                     a <span className="text-white font-semibold">doorway pull-up bar</span>. The bar is about
                     $25 and there&rsquo;s no honest way to train your back without one.
                   </p>
-                  <p className="font-display font-bold text-white text-sm mt-4">
+                  <p className="font-display font-bold text-white text-label mt-4">
                     Got a bench, sturdy chair or step?
                   </p>
                   <div className="grid grid-cols-2 gap-2 mt-2.5">
@@ -414,7 +414,7 @@ export default function BlueprintPicker({
                           setHasBench(o.value)
                           setStep(2)
                         }}
-                        className={`py-3 rounded-control border font-display font-bold text-sm transition-all duration-150 active:scale-95 ${
+                        className={`py-3 rounded-control border font-display font-bold text-label transition-all duration-150 active:scale-95 ${
                           hasBench === o.value
                             ? 'bg-brand-orange/[0.14] border-brand-orange/50 text-white'
                             : 'bg-white/[0.04] border-white/[0.08] text-ink-2 hover:text-white'
@@ -424,7 +424,7 @@ export default function BlueprintPicker({
                       </button>
                     ))}
                   </div>
-                  <p className="text-ink-4 text-2xs font-body mt-2.5 leading-relaxed">
+                  <p className="text-ink-4 text-caption font-body mt-2.5 leading-relaxed">
                     No bench is fine — we&rsquo;ll swap six exercises for floor versions and tell you which.
                   </p>
                 </div>
@@ -436,7 +436,7 @@ export default function BlueprintPicker({
           {experience !== null && step === 2 && (
             <motion.div key="days" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <h2 className="font-display font-bold text-white text-lg mb-2">How many days a week?</h2>
-              <p className="text-ink-3 text-xs font-body mb-4">
+              <p className="text-ink-3 text-label font-body mb-4">
                 Pick what you can actually keep to. Consistency beats the perfect split.
               </p>
               {/* Said at the moment of the decision, and only when it applies.
@@ -448,7 +448,7 @@ export default function BlueprintPicker({
                   This is not a gate. Someone who wants six days can have six
                   days; they should just know what they are choosing. */}
               {days !== null && days >= 5 && (
-                <p className="text-ink-2 text-xs font-body mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] leading-relaxed">
+                <p className="text-ink-2 text-label font-body mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] leading-relaxed">
                   {days} days is a serious commitment. If you are new to lifting or coming back
                   after time off, three or four is where most people stick &mdash; and you can
                   always move up.
@@ -475,7 +475,7 @@ export default function BlueprintPicker({
               </div>
 
               {days !== null && !needsSplitChoice && summary(splitsForDays[0]?.label ?? '')}
-              {error && <p className="text-state-danger text-sm font-body mb-3">{error}</p>}
+              {error && <p className="text-state-danger text-body font-body mb-3">{error}</p>}
               {days !== null && !needsSplitChoice && startButton(false)}
             </motion.div>
           )}
@@ -497,7 +497,7 @@ export default function BlueprintPicker({
               </div>
 
               {splitKey && summary(splitsForDays.find((o) => o.key === splitKey)?.label ?? '')}
-              {error && <p className="text-state-danger text-sm font-body mb-3">{error}</p>}
+              {error && <p className="text-state-danger text-body font-body mb-3">{error}</p>}
               {startButton(!splitKey)}
             </motion.div>
           )}
@@ -516,7 +516,7 @@ export default function BlueprintPicker({
               <span className="font-display font-bold text-base text-ink">
                 None of these? Build your own
               </span>
-              <span className="block text-ink-3 text-xs font-body mt-0.5">
+              <span className="block text-ink-3 text-label font-body mt-0.5">
                 Choose your own exercises, sets and reps — any number of days.
               </span>
             </button>
@@ -547,7 +547,7 @@ export default function BlueprintPicker({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
-            <span className="text-xs font-display font-semibold uppercase tracking-wide">Back</span>
+            <span className="text-label font-display font-semibold uppercase tracking-wide">Back</span>
           </button>
         )}
       </div>

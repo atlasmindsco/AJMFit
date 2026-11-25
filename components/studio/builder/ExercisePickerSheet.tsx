@@ -89,10 +89,10 @@ export default function ExercisePickerSheet({
       >
         <div className="px-4 pt-4 pb-3 border-b border-white/[0.08] shrink-0 space-y-3">
           <div className="flex items-center gap-3">
-            <p className="font-display font-bold text-white text-sm flex-1">Add an exercise</p>
+            <p className="font-display font-bold text-white text-label flex-1">Add an exercise</p>
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-control bg-white/[0.08] text-ink-2 text-2xs font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
+              className="px-3 py-1.5 rounded-control bg-white/[0.08] text-ink-2 text-caption font-display font-bold uppercase tracking-wide hover:text-white active:scale-95 transition-all duration-150"
             >
               Done
             </button>
@@ -114,7 +114,7 @@ export default function ExercisePickerSheet({
                 <button
                   key={g.key}
                   onClick={() => setGroup(on ? null : g.key)}
-                  className={`shrink-0 px-3 py-2 rounded-control text-xs font-display font-bold transition-colors duration-150 ${
+                  className={`shrink-0 px-3 py-2 rounded-control text-label font-display font-bold transition-colors duration-150 ${
                     on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
                   }`}
                 >
@@ -128,7 +128,7 @@ export default function ExercisePickerSheet({
             <select
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-xs font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
             >
               {EQUIPMENT_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -137,7 +137,7 @@ export default function ExercisePickerSheet({
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-xs font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
             >
               {TYPE_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -149,8 +149,8 @@ export default function ExercisePickerSheet({
         <div className="flex-1 overflow-y-auto">
           {results.length === 0 ? (
             <div className="p-8 text-center">
-              <p className="text-ink-3 text-sm font-body">Nothing matches that.</p>
-              <p className="text-ink-4 text-xs font-body mt-1">
+              <p className="text-ink-3 text-body font-body">Nothing matches that.</p>
+              <p className="text-ink-4 text-label font-body mt-1">
                 Try fewer filters. If it genuinely isn&rsquo;t here, Anthony can add it.
               </p>
               {/* "Tell Anthony" used to be advice with nothing behind it — the
@@ -161,13 +161,13 @@ export default function ExercisePickerSheet({
                 <button
                   onClick={onRequest}
                   disabled={requested}
-                  className="mt-4 px-4 py-2.5 rounded-control bg-brand-blue/15 border border-brand-blue/30 text-brand-blue text-xs font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 disabled:opacity-50 active:scale-[0.98] transition-all duration-150"
+                  className="mt-4 px-4 py-2.5 rounded-control bg-brand-blue/15 border border-brand-blue/30 text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 disabled:opacity-50 active:scale-[0.98] transition-all duration-150"
                 >
                   {requested ? 'Sent to Anthony ✓' : `Ask Anthony to add "${search.trim().slice(0, 28)}"`}
                 </button>
               )}
               {requested && (
-                <p className="text-ink-4 text-2xs font-body mt-2">
+                <p className="text-ink-4 text-caption font-body mt-2">
                   He&rsquo;ll see it with the rest of your feedback.
                 </p>
               )}
@@ -193,13 +193,13 @@ export default function ExercisePickerSheet({
                       )}
                     </div>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-white text-sm font-body truncate">{ex.name}</span>
-                      <span className="block text-ink-3 text-2xs font-body capitalize">
+                      <span className="block text-white text-body font-body truncate">{ex.name}</span>
+                      <span className="block text-ink-3 text-caption font-body capitalize">
                         {ex.primaryMuscles[0]} &middot; {ex.equipment} &middot; {ex.mechanic ?? ex.category}
                       </span>
                     </span>
                     {on ? (
-                      <span className="shrink-0 text-state-success text-2xs font-display font-bold uppercase tracking-wide">
+                      <span className="shrink-0 text-state-success text-caption font-display font-bold uppercase tracking-wide">
                         Added
                       </span>
                     ) : (
@@ -211,7 +211,7 @@ export default function ExercisePickerSheet({
                 )
               })}
               {results.length > shown.length && (
-                <p className="px-4 py-4 text-ink-4 text-xs font-body text-center">
+                <p className="px-4 py-4 text-ink-4 text-label font-body text-center">
                   Showing {shown.length} of {results.length}. Narrow it down to see the rest.
                 </p>
               )}

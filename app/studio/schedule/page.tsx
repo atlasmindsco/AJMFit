@@ -98,7 +98,7 @@ export default function SchedulePage() {
         <h1 className="font-display font-bold text-white text-2xl uppercase tracking-[0.04em]">
           Schedule
         </h1>
-        <p className="text-ink-3 text-sm font-body mt-1">
+        <p className="text-ink-3 text-body font-body mt-1">
           {tier ? `${TIER_LABELS[tier]} plan` : 'Book your calls with Coach Anthony'}
         </p>
       </header>
@@ -117,7 +117,7 @@ export default function SchedulePage() {
           <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide mb-1">
             Coaching calls
           </h2>
-          <p className="text-ink-2 text-sm font-body">
+          <p className="text-ink-2 text-body font-body">
             Your plan is self-guided, full app access plus M-F messaging with Coach
             Anthony. Live welcome and weekly calls come with the Accelerator and Full
             Experience plans; upgrade any time to add them.
@@ -133,20 +133,20 @@ export default function SchedulePage() {
               Welcome call
             </h2>
             {onboardingDone && (
-              <span className="text-xs font-body font-medium text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">
+              <span className="text-label font-body font-medium text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">
                 Booked
               </span>
             )}
           </div>
 
           {onboardingDone ? (
-            <p className="text-ink-2 text-sm font-body">
+            <p className="text-ink-2 text-body font-body">
               Your welcome call is on the books, see it under Upcoming below. Need a
               different time? Use the reschedule link in your Calendly confirmation email.
             </p>
           ) : (
             <>
-              <p className="text-ink-2 text-sm font-body mb-4">
+              <p className="text-ink-2 text-body font-body mb-4">
                 Let&rsquo;s kick things off. Pick a time for your welcome call so Coach
                 Anthony can build your plan around your goals, schedule, and equipment.
               </p>
@@ -169,13 +169,13 @@ export default function SchedulePage() {
               <h2 className="font-display font-semibold text-white text-lg uppercase tracking-wide">
                 {wc.label}
               </h2>
-              <span className="text-xs font-body font-medium text-ink-2 bg-white/[0.06] px-2.5 py-1 rounded-full">
+              <span className="text-label font-body font-medium text-ink-2 bg-white/[0.06] px-2.5 py-1 rounded-full">
                 {used} / {wc.quota} this week
               </span>
             </div>
 
             {remaining === 0 ? (
-              <p className="text-ink-2 text-sm font-body">
+              <p className="text-ink-2 text-body font-body">
                 You&rsquo;ve booked all {wc.quota}{' '}
                 {wc.quota === 1 ? 'of this' : 'of these'} week&rsquo;s{' '}
                 {wc.label.toLowerCase()}
@@ -183,7 +183,7 @@ export default function SchedulePage() {
               </p>
             ) : (
               <>
-                <p className="text-ink-2 text-sm font-body mb-4">
+                <p className="text-ink-2 text-body font-body mb-4">
                   {remaining} {remaining === 1 ? 'slot' : 'slots'} left this week.
                 </p>
                 <CalendlyEmbed url={calendlyUrl(wc.slug)} prefill={prefill} />
@@ -211,10 +211,10 @@ export default function SchedulePage() {
                 className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-card px-4 py-3"
               >
                 <div>
-                  <p className="text-white text-sm font-body font-medium">
+                  <p className="text-white text-body font-body font-medium">
                     {s.type || 'Session'}
                   </p>
-                  <p className="text-ink-3 text-xs font-body mt-0.5">
+                  <p className="text-ink-3 text-label font-body mt-0.5">
                     {new Date(s.starts_at).toLocaleString(undefined, {
                       weekday: 'short',
                       month: 'short',
@@ -230,7 +230,7 @@ export default function SchedulePage() {
                     href={s.join_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-body font-semibold text-brand-orange hover:text-[#ff7d2e] transition-colors"
+                    className="text-label font-body font-semibold text-brand-orange hover:text-[#ff7d2e] transition-colors"
                   >
                     Join →
                   </a>
