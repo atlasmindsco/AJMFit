@@ -178,14 +178,14 @@ export default function ClientMessagesPage() {
                     </div>
                   )}
                   <div className="max-w-[75%]">
-                    <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed ${
+                    <div className={`px-3.5 py-2.5 text-caption font-body leading-relaxed ${
                       isClient
                         ? 'bg-brand-blue text-white rounded-card rounded-br-md'
                         : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                     }`}>
                       {msg.body}
                     </div>
-                    <p className={`text-[9px] font-body mt-0.5 px-1 text-brand-slate/40 ${isClient ? 'text-right' : ''}`}>
+                    <p className={`text-badge font-body mt-0.5 px-1 text-brand-slate/40 ${isClient ? 'text-right' : ''}`}>
                       {formatMsgTime(msg.created_at)}
                     </p>
                   </div>

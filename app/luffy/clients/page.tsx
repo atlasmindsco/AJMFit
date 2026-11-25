@@ -312,7 +312,7 @@ export default function ClientsPage() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-white text-sm font-body font-semibold">{client.name}</p>
-                          <span className={`text-[9px] font-display uppercase tracking-wide px-2 py-0.5 rounded ${statusBadge.className}`}>
+                          <span className={`text-badge font-display uppercase tracking-wide px-2 py-0.5 rounded ${statusBadge.className}`}>
                             {statusBadge.label}
                           </span>
                         </div>

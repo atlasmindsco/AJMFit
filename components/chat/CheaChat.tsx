@@ -209,7 +209,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
 
                 {/* Bubble */}
                 <div className="max-w-[75%]">
-                  <div className={`px-3.5 py-2.5 text-[13px] font-body leading-relaxed whitespace-pre-wrap ${
+                  <div className={`px-3.5 py-2.5 text-caption font-body leading-relaxed whitespace-pre-wrap ${
                     isUser
                       ? 'bg-brand-blue text-white rounded-card rounded-br-md'
                       : isDark
@@ -235,7 +235,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                             router.push(l.route)
                             onNavigate?.()
                           }}
-                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-brand-blue text-white text-[12px] font-body font-semibold hover:bg-brand-bluedark active:scale-95 transition-all duration-200"
+                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-brand-blue text-white text-caption font-body font-semibold hover:bg-brand-bluedark active:scale-95 transition-all duration-200"
                         >
                           {l.label}
                           <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -246,7 +246,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                     </div>
                   )}
 
-                  <p className={`text-[9px] font-body mt-0.5 px-1 ${
+                  <p className={`text-badge font-body mt-0.5 px-1 ${
                     isUser ? 'text-right' : ''
                   } ${isDark ? 'text-white/15' : 'text-brand-slate/40'}`}>
                     {formatTime(msg.timestamp)}

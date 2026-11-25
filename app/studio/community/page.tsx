@@ -127,7 +127,7 @@ export default function CommunityPage() {
                   <div className="mt-3 pt-3 border-t border-white/[0.06] space-y-3">
                     {comments.map((c) => (
                       <div key={c.id} className="flex gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-display font-bold">{initials(c.author_name ?? 'M')}</span></div>
+                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0"><span className="text-white text-badge font-display font-bold">{initials(c.author_name ?? 'M')}</span></div>
                         <div className="flex-1"><p className="text-ink text-xs font-body"><span className="font-semibold text-white">{c.author_name ?? 'Member'}</span> · {timeAgo(c.created_at)}</p><p className="text-ink-2 text-sm font-body">{c.body}</p></div>
                       </div>
                     ))}

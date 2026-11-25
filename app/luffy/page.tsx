@@ -245,7 +245,7 @@ export default function AdminDashboard() {
                                     weekly and the only place they showed was a
                                     separate tab. */}
                                 {proposals.has(client.id) && (
-                                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-brand-orange/15 text-brand-orange text-[9px] font-display font-bold uppercase tracking-wide">
+                                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-brand-orange/15 text-brand-orange text-badge font-display font-bold uppercase tracking-wide">
                                     Nutrition change waiting
                                   </span>
                                 )}

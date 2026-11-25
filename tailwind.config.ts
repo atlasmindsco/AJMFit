@@ -73,10 +73,83 @@ const config: Config = {
         '2xs': ['0.75rem', { lineHeight: '1rem' }],        // 12px, was 11px
         xs: ['0.875rem', { lineHeight: '1.25rem' }],       // 14px, was 13px
         sm: ['0.9375rem', { lineHeight: '1.375rem' }],     // 15px
+
+        /* ── THE ROLE SCALE ──────────────────────────────────────────────
+         *
+         * The sizes above are named after how big they are, which is why
+         * raising them has never fixed the readability complaints. An audit
+         * of the client app found 53% of its text at 12px or 14px, with
+         * 2xs, xs and sm all living inside a THREE-PIXEL BAND. Three sizes
+         * that close cannot express hierarchy: at arm's length in a gym
+         * they are the same size, so everything shouts at one volume and
+         * nothing is readable at a glance even though each item is
+         * technically legible. The problem was never that text was small.
+         * It was that nothing was large.
+         *
+         * So these are named after the JOB, not the measurement, and the
+         * gaps between them are deliberate — no two steps within 2px.
+         *
+         * Why 17 for body and not 16: Barlow is narrow and runs small for
+         * its nominal size, so 16px reads like most apps at 15. 17 is a
+         * comfortable line without the reflow cost of 18.
+         *
+         * 13px is the FLOOR. Nothing in the product goes below it, and
+         * tools/verify-type-scale.ts fails the build on anything that
+         * tries. 21 hardcoded text-[9px] labels existed when this was
+         * written, directly contradicting the comment above saying 12px
+         * was the minimum — a rule nothing enforced.
+         *
+         * Migration is deliberately gradual. These coexist with the old
+         * names so screens move over one at a time; see the audit's phases
+         * 4 and 7. Nothing is removed until nothing uses it.
+         */
+        metric: ['2rem', { lineHeight: '2.125rem' }],        // 32px — the one number that owns the screen
+        title: ['1.5rem', { lineHeight: '1.75rem' }],        // 24px — page title
+        heading: ['1.25rem', { lineHeight: '1.625rem' }],    // 20px — section, card, exercise name
+        body: ['1.0625rem', { lineHeight: '1.625rem' }],     // 17px — read as a sentence; set rows; inputs
+        label: ['0.9375rem', { lineHeight: '1.25rem' }],     // 15px — secondary lines, nav
+        caption: ['0.8125rem', { lineHeight: '1.125rem' }],  // 13px — units, timestamps. The floor.
+        /* Size and line-height only. A fontSize token that also sets
+         * letterSpacing emits it in the same rule as the font-size, so it
+         * races `tracking-wide` on the same element and which one wins
+         * depends on stylesheet order. Most badges in this app already
+         * carry a tracking utility; leave that to them. */
+        badge: ['0.8125rem', { lineHeight: '0.875rem' }],    // 13px — status pills
       },
       fontFamily: {
         display: ['var(--font-barlow-condensed)', 'sans-serif'],
         body: ['var(--font-barlow)', 'sans-serif'],
+      },
+
+      /* ── SPACING AND TAP TARGETS ───────────────────────────────────────
+       *
+       * Named by job, same reasoning as the type scale. Card padding across
+       * the studio ranges from 12 to 16px, gaps between cards from 8 to 12,
+       * and section breaks from 16 to 24 — all of it chosen a component at a
+       * time, which is why screens read as crowded even where no single
+       * element is wrong. Six steps on a 4px base, and the big one is the
+       * section break, because that is the gap doing the work of telling
+       * the eye where one thing ends.
+       *
+       * tap and taplg are hit areas, not icon sizes. An icon can stay 16 or
+       * 20px inside a 44px box, and should — the audit counted 30 controls
+       * on the workout screen with boxes of 32px or less, which is a
+       * two-attempt tap with a sweaty thumb. 44 is the platform minimum;
+       * 48 is for anything pressed between heavy sets: Log Set, +30s, Skip,
+       * the weight and rep steppers.
+       *
+       * These extend Tailwind's numeric scale rather than replacing it, so
+       * p-4 keeps working while screens migrate.
+       */
+      spacing: {
+        tight: '4px',    // a label to its own value
+        snug: '8px',     // rows inside a card
+        base: '12px',    // between grouped elements
+        stack: '16px',   // between sibling cards
+        card: '20px',    // card inner padding
+        section: '32px', // between sections
+        tap: '44px',     // minimum hit area, anywhere
+        taplg: '48px',   // pressed between heavy sets
       },
       animation: {
         marquee: 'marquee 30s linear infinite',

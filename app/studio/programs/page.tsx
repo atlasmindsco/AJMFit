@@ -2473,7 +2473,7 @@ export default function ProgramsPage() {
                                   {day.name}
                                 </p>
                                 {i === todayIndex && (
-                                  <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-[9px] font-display font-bold uppercase tracking-wide shrink-0">
+                                  <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-badge font-display font-bold uppercase tracking-wide shrink-0">
                                     Today
                                   </span>
                                 )}
@@ -2883,7 +2883,7 @@ export default function ProgramsPage() {
                                       </span>
                                     )}
                                     {isSwapped && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
+                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
                                         Swapped
                                       </span>
                                     )}
@@ -2894,13 +2894,13 @@ export default function ProgramsPage() {
                                         explanation has learned that the app
                                         changes things behind their back. */}
                                     {exercise.swappedFrom && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-white/[0.07] text-ink-3 shrink-0">
+                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-white/[0.07] text-ink-3 shrink-0">
                                         No bench
                                       </span>
                                     )}
                                     {intensityEnabled && selectedTechnique && (
                                       <span
-                                        className={`text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-white/5 shrink-0`}
+                                        className={`text-badge font-display font-bold px-1.5 py-0.5 rounded bg-white/5 shrink-0`}
                                         style={{ color: TECHNIQUE_META[selectedTechnique].color, backgroundColor: `${TECHNIQUE_META[selectedTechnique].color}22` }}
                                       >
                                         {TECHNIQUE_META[selectedTechnique].label}
@@ -2940,7 +2940,7 @@ export default function ProgramsPage() {
                                       Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
                                     </p>
                                     {pr && (
-                                      <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-state-warning/15 text-state-warning flex items-center gap-0.5">
+                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-state-warning/15 text-state-warning flex items-center gap-0.5">
                                         <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
                                           <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                         </svg>
@@ -4608,11 +4608,11 @@ export default function ProgramsPage() {
                       </p>
                     </div>
                     {w.ended_at ? (
-                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-state-success bg-state-success/10 px-2 py-0.5 rounded-full">
+                      <span className="shrink-0 text-badge font-display font-bold uppercase tracking-wide text-state-success bg-state-success/10 px-2 py-0.5 rounded-full">
                         Done
                       </span>
                     ) : (
-                      <span className="shrink-0 text-[9px] font-display font-bold uppercase tracking-wide text-state-warning bg-state-warning/10 px-2 py-0.5 rounded-full">
+                      <span className="shrink-0 text-badge font-display font-bold uppercase tracking-wide text-state-warning bg-state-warning/10 px-2 py-0.5 rounded-full">
                         Active
                       </span>
                     )}
@@ -4738,7 +4738,7 @@ function ExerciseImageCycler({ images, name }: { images: string[]; name: string 
           style={{ opacity: showEnd ? 1 : 0 }}
         />
       )}
-      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-control text-[9px] font-display font-semibold text-ink-2 uppercase tracking-wide backdrop-blur-sm">
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded-control text-badge font-display font-semibold text-ink-2 uppercase tracking-wide backdrop-blur-sm">
         {showEnd && images[1] ? 'End' : 'Start'}
       </div>
     </div>
@@ -4767,7 +4767,7 @@ function SetupCard({ icon, label, value }: { icon: string; label: string; value:
         )}
       </div>
       <div className="text-center">
-        <p className="text-ink-4 text-[9px] font-display font-bold uppercase tracking-wide">{label}</p>
+        <p className="text-ink-4 text-badge font-display font-bold uppercase tracking-wide">{label}</p>
         <p className="text-white text-xs font-body font-semibold capitalize mt-0.5">{value}</p>
       </div>
     </div>

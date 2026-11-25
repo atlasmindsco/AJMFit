@@ -85,7 +85,7 @@ export default async function BlueprintWelcome({
             <p className="mt-5 text-brand-slate font-body text-lg leading-relaxed">One step left:</p>
 
             <div className="mt-8 bg-brand-offwhite border-l-4 border-brand-orange rounded-control p-6 text-left">
-              <ol className="space-y-3 text-brand-navy font-body text-[15px] leading-relaxed">
+              <ol className="space-y-3 text-brand-navy font-body text-label leading-relaxed">
                 <li>
                   <strong>1.</strong>{' '}
                   {email ? (

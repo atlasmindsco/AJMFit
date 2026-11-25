@@ -223,10 +223,10 @@ export default function ProgramsPage() {
                       {ex.primaryMuscles.join(', ')}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-brand-orange/70 bg-brand-orange/10 px-1.5 py-0.5 rounded">
+                      <span className="text-badge font-display font-semibold uppercase tracking-wide text-brand-orange/70 bg-brand-orange/10 px-1.5 py-0.5 rounded">
                         {ex.level}
                       </span>
-                      <span className="text-[9px] font-display font-semibold uppercase tracking-wide text-ink-4 bg-white/[0.04] px-1.5 py-0.5 rounded capitalize">
+                      <span className="text-badge font-display font-semibold uppercase tracking-wide text-ink-4 bg-white/[0.04] px-1.5 py-0.5 rounded capitalize">
                         {ex.equipment}
                       </span>
                     </div>
@@ -293,7 +293,7 @@ export default function ProgramsPage() {
                             style={{ opacity: showEndImage ? 1 : 0 }}
                           />
                         )}
-                        <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/50 rounded text-[9px] font-display font-semibold text-ink uppercase tracking-[0.1em]">
+                        <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/50 rounded text-badge font-display font-semibold text-ink uppercase tracking-[0.1em]">
                           {showEndImage && selectedExercise.images[1] ? 'End' : 'Start'}
                         </div>
                       </div>
@@ -348,7 +348,7 @@ export default function ProgramsPage() {
                               <span className="shrink-0 w-5 h-5 rounded-full bg-brand-orange/15 text-brand-orange flex items-center justify-center text-2xs font-display font-bold mt-0.5">
                                 {i + 1}
                               </span>
-                              <p className="font-body text-[13px] text-ink-2 leading-relaxed">{step}</p>
+                              <p className="font-body text-caption text-ink-2 leading-relaxed">{step}</p>
                             </li>
                           ))}
                         </ol>

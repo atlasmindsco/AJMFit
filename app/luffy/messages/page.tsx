@@ -111,9 +111,11 @@ export default function MessagesPage() {
           Client Messages
         </button>
         <button onClick={() => setActiveView('chea')} className={`px-5 py-2.5 rounded-control text-xs font-display font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 ${activeView === 'chea' ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'}`}>
-          <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark flex items-center justify-center">
-            <span className="text-white text-[6px] font-display font-bold">CH</span>
-          </div>
+          {/* The dot used to hold the letters "CH" at 6px, inside a 16px
+              circle, two inches from a button that says "Chea AI". Nobody
+              has ever read it. Removing the text is the fix the audit asks
+              for before enlarging anything. */}
+          <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangedark shrink-0" aria-hidden="true" />
           Chea AI
         </button>
       </div>
