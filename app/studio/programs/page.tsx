@@ -601,6 +601,11 @@ export default function ProgramsPage() {
 
   // Workout history (Recent Logs) + PR celebration
   const [history, setHistory] = useState<WorkoutHistoryRow[]>([])
+  /* Has anything been logged for today?
+     Read from history rather than a flag set when a session ends, so it is
+     still right after a reload, and on a second visit later the same
+     evening. */
+  const trainedToday = history.some((w) => w.date === localDate() && w.ended_at)
   const [prCelebration, setPrCelebration] = useState<{ name: string; weight: number } | null>(null)
   // Shown after End Workout. Finishing a session used to clear the screen with
   // no acknowledgement at all — the one behaviour the product most wants to
@@ -2436,8 +2441,13 @@ export default function ProgramsPage() {
                   screen and the only filled button. */}
               {todayIndex >= 0 && weeklyPlan[todayIndex] && weeklyPlan[todayIndex].exercises.length > 0 && (
                 <div className="bg-surface-raised rounded-card border border-brand-blue/30 p-6 mb-4">
+                  {/* "Today" is wrong thirty seconds after they finished
+                      today's session, which is now exactly where Done lands
+                      them. Once something is logged for today, the same
+                      banner is the NEXT one — so it says so, and the button
+                      below it stops reading as a second helping. */}
                   <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-[0.18em]">
-                    Today
+                    {trainedToday ? 'Next up' : 'Today'}
                   </p>
                   <p className="font-display font-extrabold text-2xl text-white mt-1.5 leading-tight">
                     {weeklyPlan[todayIndex].name}
