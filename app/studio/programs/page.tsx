@@ -606,6 +606,8 @@ export default function ProgramsPage() {
      still right after a reload, and on a second visit later the same
      evening. */
   const trainedToday = history.some((w) => w.date === localDate() && w.ended_at)
+  /* Is the next-up card showing its exercise list? Collapsed by default. */
+  const [peek, setPeek] = useState(false)
   const [prCelebration, setPrCelebration] = useState<{ name: string; weight: number } | null>(null)
   // Shown after End Workout. Finishing a session used to clear the screen with
   // no acknowledgement at all — the one behaviour the product most wants to
@@ -2460,6 +2462,58 @@ export default function ProgramsPage() {
                       {weeklyPlan[todayIndex].duration ? ` · ${weeklyPlan[todayIndex].duration}` : ''}
                     </span>
                   </p>
+                  {/* What is in it, without leaving the page.
+                      Opening the day already showed this, and that is a
+                      navigation away from the week for a question — "what am
+                      I actually in for" — that is usually asked in passing,
+                      often the evening before. Collapsed by default so the
+                      page keeps its shape for anybody not asking it.
+                      Names only, with the prescription. No thumbnails: this
+                      is a glance, and eight images is a different screen. */}
+                  <button
+                    onClick={() => setPeek((v) => !v)}
+                    aria-expanded={peek}
+                    className="w-full mt-4 min-h-tap flex items-center gap-2 text-ink-3 text-label font-body hover:text-ink-2 transition-colors duration-200"
+                  >
+                    <span>{peek ? 'Hide exercises' : "What's in it"}</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${peek ? 'rotate-90' : ''}`}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                    </svg>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {peek && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        {weeklyPlan[todayIndex].exercises.map((ex, i) => {
+                          // The substitute, where they have one — otherwise the
+                          // card would promise a movement the session replaces.
+                          const shown = swappedExercises[`${todayIndex}-${ex.name}`] ?? ex.name
+                          return (
+                            <li
+                              key={`${ex.name}-${i}`}
+                              className="flex items-baseline justify-between gap-3 py-2 border-b border-white/[0.06] last:border-b-0"
+                            >
+                              <span className="text-ink text-label font-body min-w-0">{shown}</span>
+                              <span className="text-ink-4 text-caption font-body tabular-nums shrink-0">
+                                {ex.sets} &times; {ex.reps}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+
                   <button
                     onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
                     className="w-full mt-5 py-4 bg-brand-blue text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
