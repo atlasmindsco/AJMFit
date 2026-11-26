@@ -406,7 +406,7 @@ export default function BriefPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-2xl mb-3">AI</div>
-                  <h3 className="font-display font-bold text-xl text-brand-navy">Chea AI Assistant</h3>
+                  <h3 className="font-display font-bold text-xl text-brand-navy">Kid Striker AI Assistant</h3>
                   <p className="text-label text-brand-slate mt-2 leading-relaxed">
                     Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo, AJM FIT includes it in every tier.
                   </p>

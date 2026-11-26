@@ -53,7 +53,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
       role: 'assistant',
       content: portal === 'admin'
         ? "What's up Coach! Need help with ISSA references, program design, or a client question?"
-        : "Hey! I'm Chea, your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
+        : "Hey! I'm Kid Striker, your AI fitness assistant. Ask me anything about training, nutrition, or exercises!",
       timestamp: new Date(),
     },
   ])
@@ -156,18 +156,18 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
       <div className={`px-4 py-3 border-b flex items-center gap-3 shrink-0 ${
         isDark ? 'border-white/[0.06]' : 'border-brand-navy/[0.06]'
       }`}>
-        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-brand-blue">
+        <div className="relative w-11 h-11 shrink-0 flex items-end justify-center">
           <Image
-            src="/chea-avatar.jpg"
-            alt="Chea"
-            width={300}
-            height={300}
-            className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
+            src="/kid-striker.webp"
+            alt=""
+            width={190}
+            height={184}
+            className="w-11 h-auto select-none"
           />
         </div>
         <div className="flex-1">
           <h2 className={`font-display font-bold text-heading ${isDark ? 'text-white' : 'text-brand-navy'}`}>
-            Chea
+            Kid Striker
           </h2>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -196,13 +196,13 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
               >
                 {/* Avatar */}
                 {!isUser && (
-                  <div className={`relative w-7 h-7 rounded-full overflow-hidden shrink-0 bg-brand-blue ${showAvatar ? 'visible' : 'invisible'}`}>
+                  <div className={`relative w-7 shrink-0 flex items-end ${showAvatar ? 'visible' : 'invisible'}`}>
                     <Image
-                      src="/chea-avatar.jpg"
+                      src="/kid-striker.webp"
                       alt=""
-                      width={200}
-                      height={200}
-                      className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
+                      width={190}
+                      height={184}
+                      className="w-7 h-auto select-none"
                     />
                   </div>
                 )}
@@ -270,7 +270,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Message Chea..."
+            placeholder="Message Kid Striker..."
             disabled={isStreaming}
             className={`flex-1 rounded-full px-4 py-2 text-body font-body focus:outline-none transition-colors duration-200 ${
               isDark

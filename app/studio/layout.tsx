@@ -382,22 +382,40 @@ function FloatingChrome() {
         </div>
       )}
 
+      {/* Kid Striker, standing on the interface rather than sitting in a
+          badge.
+          The blue disc with a white ring is gone on purpose: a character
+          clipped into a circle reads as a photograph in a button, which is
+          the one thing the whole point of having a character argues against.
+          His own silhouette is the shape now — the asset is transparent, so
+          the hair and the ears are the edge.
+          The tap target is still a square at least 44px across; it is simply
+          invisible. An icon can be any shape, a target cannot. */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-brand-blue flex items-center justify-center shadow-[0_4px_20px_rgba(26,123,255,0.4)] hover:shadow-[0_6px_30px_rgba(26,123,255,0.5)] active:scale-95 transition-all duration-200 overflow-hidden border-2 border-white/20"
-        aria-label={chatOpen ? 'Close Chea' : 'Chat with Chea'}
+        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-[68px] h-[68px] flex items-end justify-center active:scale-90 transition-transform duration-150 motion-reduce:transition-none motion-reduce:active:scale-100"
+        aria-label={chatOpen ? 'Close Kid Striker' : 'Ask Kid Striker, AI Assistant'}
       >
         {chatOpen ? (
-          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+          // Closing is a utility action and gets a utility control: the
+          // character staying put while the window shuts would look like the
+          // tap had failed.
+          <span className="w-11 h-11 rounded-full bg-surface-overlay/90 backdrop-blur border border-white/[0.14] flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </span>
         ) : (
           <Image
-            src="/chea-avatar.jpg"
-            alt="Chat with Chea"
-            width={300}
-            height={300}
-            className="absolute left-1/2 top-1/2 w-[230%] h-[230%] max-w-none object-cover -translate-x-[29%] -translate-y-[37%]"
+            src="/kid-striker.webp"
+            alt=""
+            width={190}
+            height={184}
+            // A soft ground shadow rather than a glow. He is standing on the
+            // screen, not emitting from it, and over the near-black studio a
+            // glow is just a smudge.
+            className="w-[68px] h-auto select-none pointer-events-none drop-shadow-[0_6px_10px_rgba(0,0,0,0.55)]"
+            priority
           />
         )}
       </button>
