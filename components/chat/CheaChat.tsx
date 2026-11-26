@@ -158,7 +158,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
       }`}>
         <div className="relative w-11 h-11 shrink-0 flex items-end justify-center">
           <Image
-            src="/kid-striker.webp"
+            src="/kid-striker-head.webp"
             alt=""
             width={190}
             height={184}
@@ -198,7 +198,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                 {!isUser && (
                   <div className={`relative w-7 shrink-0 flex items-end ${showAvatar ? 'visible' : 'invisible'}`}>
                     <Image
-                      src="/kid-striker.webp"
+                      src="/kid-striker-head.webp"
                       alt=""
                       width={190}
                       height={184}

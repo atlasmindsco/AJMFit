@@ -393,7 +393,7 @@ function FloatingChrome() {
           invisible. An icon can be any shape, a target cannot. */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-[68px] h-[68px] flex items-end justify-center active:scale-90 transition-transform duration-150 motion-reduce:transition-none motion-reduce:active:scale-100"
+        className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] md:bottom-6 right-4 md:right-6 z-50 w-[86px] h-[100px] flex items-end justify-center active:scale-90 transition-transform duration-150 motion-reduce:transition-none motion-reduce:active:scale-100"
         aria-label={chatOpen ? 'Close Kid Striker' : 'Ask Kid Striker, AI Assistant'}
       >
         {chatOpen ? (
@@ -409,12 +409,12 @@ function FloatingChrome() {
           <Image
             src="/kid-striker.webp"
             alt=""
-            width={190}
-            height={184}
+            width={224}
+            height={262}
             // A soft ground shadow rather than a glow. He is standing on the
             // screen, not emitting from it, and over the near-black studio a
             // glow is just a smudge.
-            className="w-[68px] h-auto select-none pointer-events-none drop-shadow-[0_6px_10px_rgba(0,0,0,0.55)]"
+            className="w-[86px] h-auto select-none pointer-events-none drop-shadow-[0_8px_12px_rgba(0,0,0,0.6)]"
             priority
           />
         )}
