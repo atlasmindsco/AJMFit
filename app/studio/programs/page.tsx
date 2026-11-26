@@ -4,6 +4,10 @@ import Link from 'next/link'
 import TravelSwitch from '@/components/studio/TravelSwitch'
 import { useSessionChrome } from '@/components/studio/SessionChrome'
 import { pickDay } from '@/lib/active-workout'
+import Image from 'next/image'
+import { sessionTotals, prHeadline, recordDetail, encouragement } from '@/lib/session-summary'
+import { durationLabel } from '@/lib/coach-training'
+import ShareSheet from '@/components/studio/ShareSheet'
 import { filterLibrary, MUSCLE_GROUPS, EQUIPMENT_FILTERS } from '@/lib/builder-rules'
 import { groupForMuscle, rankForSwap, resultsHeading } from '@/lib/swap-search'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -605,6 +609,7 @@ export default function ProgramsPage() {
     dayName: string
     seconds: number
     sets: number
+    reps: number
     volume: number
     /** Set when several lifts came in under last time. */
     fatigue: string | null
@@ -1365,20 +1370,20 @@ export default function ProgramsPage() {
     const elapsed = workoutElapsed
     const workoutId = workoutIds[selectedDay]
 
-    // Tally the session before the logs are cleared.
-    let doneSets = 0
-    let volume = 0
-    for (const ex of selected?.exercises ?? []) {
-      const rows = setLogs[`${selectedDay}-${ex.name}`] ?? []
-      for (const row of rows) {
-        const w = Number(row.weight)
-        const r = Number(row.reps)
-        if (row.logged && !isNaN(w) && !isNaN(r)) {
-          doneSets++
-          volume += w * r
-        }
-      }
-    }
+    /* Tally the session before the logs are cleared.
+       The counting rules live in sessionTotals and are pinned in
+       verify-session-summary, because what counts is not obvious — an
+       unticked row is a plan rather than a fact, and a bodyweight set is
+       reps with no load.
+       Intensity sets are left out of the totals, and not by preference:
+       intensityLogs records a weight and whether it was reached, and never a
+       rep count, so there is no honest number to add. */
+    const countedRows = (selected?.exercises ?? []).flatMap(
+      (ex) => setLogs[`${selectedDay}-${ex.name}`] ?? []
+    )
+    const totals = sessionTotals(countedRows)
+    const doneSets = totals.sets
+    const volume = totals.volume
     // Several lifts down on the same day is a recovery
     // signal, not a programming one, and it is visible in
     // data already collected — the app simply never looked
@@ -1445,6 +1450,7 @@ export default function ProgramsPage() {
       dayName: selected?.name ?? 'Session',
       seconds: elapsed,
       sets: doneSets,
+      reps: totals.reps,
       volume: Math.round(volume),
       fatigue: fatigue.text,
       improvements,
@@ -5502,6 +5508,7 @@ function WorkoutComplete({
     dayName: string
     seconds: number
     sets: number
+    reps: number
     volume: number
     fatigue: string | null
     improvements: string[]
@@ -5524,6 +5531,11 @@ function WorkoutComplete({
    * button here would make an optional thing look like a step.
    */
   const [weight, setWeight] = useState('')
+  /* Three sheets, one at a time. The primary screen celebrates; these
+     three are where the analysis lives. */
+  const [showRecords, setShowRecords] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
+  const [showShare, setShowShare] = useState(false)
   const [weighing, setWeighing] = useState(false)
   const lb = Number(weight)
   const weightOk = weight.trim() !== '' && !isNaN(lb) && lb > 0 && lb < 1000
@@ -5541,149 +5553,368 @@ function WorkoutComplete({
     }
     onDone()
   }
+  /* One tile. The number is the thing; the label only has to be findable. */
   const stat = (value: string, label: string) => (
-    <div className="flex-1">
-      <p className="font-display font-extrabold text-2xl text-white tabular-nums">{value}</p>
-      <p className="text-ink-3 text-caption font-display font-bold uppercase tracking-[0.15em] mt-0.5">{label}</p>
+    <div className="flex-1 min-w-0 rounded-card bg-white/[0.04] border border-white/[0.06] px-2 py-card text-center">
+      <p className="font-display font-extrabold text-metric text-white tabular-nums leading-none">{value}</p>
+      <p className="text-ink-3 text-label font-body mt-2">{label}</p>
     </div>
   )
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/70">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-surface-base">
       <motion.div
-        initial={{ scale: 0.92, opacity: 0, y: 16 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="w-full max-w-sm text-center px-7 py-8 rounded-card bg-surface-raised border border-brand-orange/40 shadow-[0_10px_60px_rgba(247,107,22,0.25)]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-full flex flex-col items-center justify-center px-6 py-10"
+        style={{
+          paddingTop: 'max(2.5rem, env(safe-area-inset-top))',
+          paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))',
+        }}
       >
-        {/* Two moments that only happen once, said in the line that was
-            already there rather than as a second screen to dismiss. */}
-        <p className="font-display font-bold text-caption uppercase tracking-[0.25em] text-brand-orange">
-          {summary.firstEver ? 'First one done' : summary.weekDone ? "That's the week" : 'Session complete'}
-        </p>
-        <h2 className="font-display font-extrabold text-3xl text-white tracking-tight mt-2">
-          {summary.dayName}
-        </h2>
+        <div className="w-full max-w-sm text-center">
+          {/* The logo, small. It is the only piece of branding on a screen
+              that belongs to the client's achievement, and a second hero
+              element above the checkmark would compete with it. */}
+          <Image
+            src="/AJMfit-logo.png"
+            alt="AJM Fit"
+            width={192}
+            height={64}
+            className="h-16 w-auto mx-auto object-contain"
+            priority
+          />
 
-        {/* Minutes and sets. Volume used to sit here as a third tile and
-            does not any more: 14,200 lb lifted reads as an achievement and is
-            mostly a property of the program — it goes up when a day gains a
-            set. A number shown because it exists rather than because it
-            means something. */}
-        <div className="flex items-start gap-3 mt-6 mb-6">
-          {stat(`${mins}`, mins === 1 ? 'Minute' : 'Minutes')}
-          {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
-        </div>
+          {/* The mark of the thing being celebrated. Scales in once, settles,
+              and does not loop — globals.css already disables transforms
+              under prefers-reduced-motion, so this lands instantly for anyone
+              who has asked for that. */}
+          <motion.div
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.1 }}
+            className="mt-10 mx-auto w-[84px] h-[84px] rounded-full bg-brand-blue flex items-center justify-center"
+          >
+            <svg className="w-11 h-11 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+          </motion.div>
 
-        {/* Did it all land? The session says so while training; saying it once
-            more here is the difference between finishing a workout in a
-            basement gym and wondering all evening whether it counted. */}
-        {pendingSets > 0 ? (
-          <div className="flex items-center justify-center gap-2 mb-5 px-3 py-2.5 rounded-control bg-state-warning/10 border border-state-warning/25">
-            <span className="w-2 h-2 rounded-full bg-state-warning shrink-0" />
-            <p className="text-state-warning text-caption font-body">
+          <h2 className="font-display font-extrabold text-4xl text-white tracking-tight mt-7 text-balance">
+            Workout Complete
+          </h2>
+          <p className="text-ink-3 text-heading font-body mt-1.5">{summary.dayName}</p>
+
+          {/* Reps, sets, minutes. Volume is deliberately not a fourth: 14,200
+              lb reads as an achievement and is mostly a property of the
+              program, going up whenever a day gains a set. It is in the
+              session details, where it is a figure rather than a headline. */}
+          <div className="flex items-stretch gap-2.5 mt-8">
+            {stat(`${summary.reps}`, 'Total Reps')}
+            {stat(`${summary.sets}`, summary.sets === 1 ? 'Set' : 'Sets')}
+            {stat(durationLabel(summary.seconds) ?? '—', 'Duration')}
+          </div>
+
+          {/* The one thing worth reading twice, or — far more often — a line
+              that does not mention records at all. Most sessions set none,
+              and most of those are the sessions that actually build somebody,
+              so this slot must never read as a consolation prize. */}
+          {prHeadline(summary.records) ? (
+            <button
+              onClick={() => setShowRecords(true)}
+              className="w-full mt-7 min-h-taplg px-card rounded-card bg-brand-orange flex items-center justify-center gap-3 text-white active:scale-[0.98] transition-transform duration-150"
+            >
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
+              </svg>
+              <span className="font-display font-bold text-heading">{prHeadline(summary.records)}</span>
+              <svg className="w-5 h-5 shrink-0 ml-auto opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+              </svg>
+            </button>
+          ) : (
+            <p className="mt-7 text-ink-2 text-heading font-body">{encouragement(summary.dayName + summary.seconds)}</p>
+          )}
+
+          {/* Said plainly, because a client who trained in a basement and
+              closed the app wondering whether it counted is the failure this
+              line exists to prevent. */}
+          {pendingSets > 0 ? (
+            <p className="mt-5 text-state-warning text-label font-body">
               {pendingSets} {pendingSets === 1 ? 'set is' : 'sets are'} still waiting for signal. They&rsquo;ll sync on their own.
             </p>
-          </div>
-        ) : (
-          <p className="text-ink-4 text-caption font-body mb-5">All sets saved.</p>
-        )}
+          ) : null}
 
-        {/* Records first: the one thing worth reading twice. */}
-        {summary.records.length > 0 && (
-          <div className="text-left mb-4 px-3 py-3 rounded-control bg-state-warning/[0.10] border border-state-warning/25">
-            <p className="text-state-warning text-caption font-display font-bold uppercase tracking-[0.15em] mb-2">
-              {summary.records.length === 1 ? 'Personal record' : `${summary.records.length} personal records`}
-            </p>
-            <ul className="space-y-1.5">
-              {summary.records.map((r) => (
-                <li key={r.exerciseName} className="text-ink text-label font-body leading-relaxed">
-                  <span className="text-white font-semibold">{r.exerciseName}</span> &mdash; {r.text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {/* The weigh-in stays, and it is the one deliberate departure from
+              "two buttons and nothing else". It is a single optional field,
+              and this is the only moment a client is standing still with the
+              app already open — the place that used to ask, behind a More
+              menu under an empty chart, has never been used by anybody. */}
+          {askWeight && (
+            <div className="flex items-center gap-3 mt-7 px-card min-h-taplg py-2 rounded-card bg-white/[0.04] border border-white/[0.06] text-left">
+              <label htmlFor="weigh-in" className="text-ink-2 text-label font-body flex-1">
+                Weigh in?
+                <span className="text-ink-4"> optional</span>
+              </label>
+              <input
+                id="weigh-in"
+                type="number"
+                inputMode="decimal"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="—"
+                aria-label="Bodyweight in pounds"
+                className="w-20 px-2.5 min-h-tap rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-body font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <span className="text-ink-3 text-label font-body">lbs</span>
+            </div>
+          )}
 
-        {/* Did I progress? The question the old screen could not answer,
-            using a comparison it had already made on every exercise. */}
-        {summary.improvements.length > 0 && (
-          <div className="text-left mb-4 px-3 py-3 rounded-control bg-brand-orange/[0.08] border border-brand-orange/20">
-            <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.15em] mb-2">
-              Up on last time
-            </p>
-            <ul className="space-y-1">
-              {summary.improvements.slice(0, 4).map((line) => (
-                <li key={line} className="text-ink text-label font-body">{line}</li>
-              ))}
-              {summary.improvements.length > 4 && (
-                <li className="text-ink-3 text-label font-body">+ {summary.improvements.length - 4} more</li>
-              )}
-            </ul>
-          </div>
-        )}
+          <button
+            onClick={() => void finish()}
+            disabled={weighing}
+            className="w-full mt-8 h-14 rounded-card bg-brand-blue text-white text-heading font-display font-bold hover:bg-brand-bluedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+          >
+            {weighing ? 'Saving…' : weightOk ? 'Save & finish' : 'Done'}
+          </button>
 
-        {/* Said once, here, and nowhere else. A client who has just finished is
-            receptive to "take it easy"; the same sentence on every exercise
-            during the session would read as nagging. */}
-        {summary.fatigue && (
-          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08]">
-            {summary.fatigue}
-          </p>
-        )}
+          <button
+            onClick={() => setShowShare(true)}
+            className="w-full mt-3 h-14 rounded-card border border-white/[0.14] text-white text-heading font-display font-bold flex items-center justify-center gap-2.5 hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-200"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0L8 8m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+            </svg>
+            Share
+          </button>
 
-        {summary.firstEver && (
-          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-brand-blue/[0.08] border border-brand-blue/20">
-            That&rsquo;s your first session logged. Everything from here gets measured against it.
-          </p>
-        )}
+          {/* Everything the old screen said at once, one tap away. The lifts
+              that beat last week, the recovery signal, the volume and what is
+              next are all still here — they were just never the headline. */}
+          {(summary.improvements.length > 0 ||
+            summary.fatigue ||
+            summary.nextUp ||
+            summary.volume > 0 ||
+            summary.firstEver ||
+            summary.weekDone) && (
+            <button
+              onClick={() => setShowDetails(true)}
+              className="mt-5 min-h-tap px-4 text-ink-3 text-label font-body hover:text-ink-2 transition-colors duration-200"
+            >
+              Session details &rsaquo;
+            </button>
+          )}
+        </div>
+      </motion.div>
 
-        {summary.weekDone && !summary.firstEver && (
-          <p className="text-left text-ink-2 text-label font-body leading-relaxed mb-4 px-3 py-2.5 rounded-control bg-state-success/[0.08] border border-state-success/20">
-            Every session this week done. Rest is part of it &mdash; the next one will keep.
-          </p>
+      <AnimatePresence>
+        {showRecords && (
+          <RecordSheet records={summary.records} onClose={() => setShowRecords(false)} />
         )}
-
-        {/* Closes the loop rather than ending on a full stop. */}
-        {summary.nextUp && (
-          <p className="text-ink-3 text-label font-body mb-5">
-            Next up: <span className="text-ink-2 font-semibold">{summary.nextUp}</span>
-          </p>
+        {showDetails && (
+          <SessionDetailSheet summary={summary} onClose={() => setShowDetails(false)} />
         )}
-
-        {/* The weigh-in. Offered here because this is the one moment a client
-            is already standing still with the app open, and because the place
-            that used to ask — behind a More menu, under an empty chart, six
-            fields deep — has never been used by anybody. */}
-        {askWeight && (
-          <div className="flex items-center gap-3 mb-4 px-3.5 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-left">
-            <label htmlFor="weigh-in" className="text-ink-2 text-body font-body flex-1">
-              Weigh in?
-              <span className="block text-ink-4 text-caption font-body mt-0.5">Optional</span>
-            </label>
-            <input
-              id="weigh-in"
-              type="number"
-              inputMode="decimal"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="—"
-              aria-label="Bodyweight in pounds"
-              className="w-20 px-2.5 py-2 rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-            <span className="text-ink-3 text-label font-body">lbs</span>
-          </div>
+        {showShare && (
+          <ShareSheet
+            input={{
+              dayName: summary.dayName,
+              reps: summary.reps,
+              sets: summary.sets,
+              /* Quoted from the screen, never recomputed - see share-card. */
+              duration: durationLabel(summary.seconds) ?? '',
+              recordCount: summary.records.length,
+            }}
+            onClose={() => setShowShare(false)}
+          />
         )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
+/**
+ * A shared bottom sheet, so the three that follow cannot drift apart.
+ *
+ * Native-feeling: slides from the bottom, dims what is behind, closes on the
+ * backdrop. One grab handle, no title bar — the content says what it is.
+ */
+function Sheet({
+  label,
+  onClose,
+  children,
+}: {
+  label: string
+  onClose: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end sm:items-center sm:justify-center">
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} aria-hidden="true" />
+      <motion.div
+        initial={{ y: 48, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 24, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+        className="relative w-full sm:max-w-sm max-h-[85vh] overflow-y-auto bg-surface-raised border-t sm:border border-white/[0.12] rounded-t-card sm:rounded-card px-card pb-card"
+        style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+        role="dialog"
+        aria-label={label}
+      >
+        <div className="sticky top-0 -mx-card px-card pt-3 pb-2 bg-surface-raised">
+          <div className="w-10 h-1 rounded-full bg-white/20 mx-auto" aria-hidden="true" />
+        </div>
+        {children}
         <button
-          onClick={() => void finish()}
-          disabled={weighing}
-          className="w-full py-3.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-orangedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+          onClick={onClose}
+          className="w-full mt-5 h-taplg rounded-control bg-white/[0.08] text-white text-label font-display font-bold uppercase tracking-wide active:scale-[0.98] transition-transform duration-150"
         >
-          {weighing ? 'Saving…' : weightOk ? 'Save & finish' : 'Done'}
+          Close
         </button>
       </motion.div>
     </div>
+  )
+}
+
+/**
+ * What each record actually was.
+ *
+ * The figures all existed already — judgeSet returns the kind, the new value
+ * and the one it beat — and none of them survived past a single line of
+ * prose on the old screen. The unit changes with the kind, which is why
+ * recordDetail does the wording rather than a template here: a rep record
+ * improves by reps, and "+4 lb" about four extra repetitions is the kind of
+ * wrong that makes a client stop trusting the rest of the numbers.
+ */
+function RecordSheet({
+  records,
+  onClose,
+}: {
+  records: Array<{ exerciseName: string } & RecordHit>
+  onClose: () => void
+}) {
+  return (
+    <Sheet label="Personal records" onClose={onClose}>
+      <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.18em] mt-2">
+        {records.length === 1 ? 'Personal record' : `${records.length} personal records`}
+      </p>
+
+      <div className="mt-4 space-y-2.5">
+        {records.map((r) => {
+          const d = recordDetail(r)
+          return (
+            <div key={`${r.exerciseName}-${r.kind}`} className="rounded-card bg-white/[0.04] border border-white/[0.07] px-card py-base">
+              <p className="text-white text-heading font-body font-semibold leading-tight">{d.exercise}</p>
+              <p className="text-brand-orange text-label font-body mt-0.5">{d.kindLabel}</p>
+
+              <div className="flex items-end gap-3 mt-3">
+                <div>
+                  <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">Previous</p>
+                  <p className="text-ink-3 text-label font-body tabular-nums mt-0.5">{d.previous}</p>
+                </div>
+                <svg className="w-4 h-4 text-ink-4 mb-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0-5-5m5 5-5 5" />
+                </svg>
+                <div>
+                  <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-wide">New</p>
+                  <p className="text-white text-heading font-display font-bold tabular-nums mt-0.5">{d.now}</p>
+                </div>
+                {d.improvement && (
+                  <span className="ml-auto mb-1 text-state-success text-label font-display font-bold tabular-nums">
+                    {d.improvement}
+                  </span>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </Sheet>
+  )
+}
+
+/**
+ * Everything the old completion screen said at once.
+ *
+ * None of it was wrong — the lifts that beat last week, the recovery signal,
+ * the volume, what comes next — it was just all competing with the thing the
+ * client had actually come to see. One tap away is not hidden.
+ */
+function SessionDetailSheet({
+  summary,
+  onClose,
+}: {
+  summary: {
+    dayName: string
+    seconds: number
+    reps: number
+    sets: number
+    volume: number
+    fatigue: string | null
+    improvements: string[]
+    nextUp: string | null
+    firstEver: boolean
+    weekDone: boolean
+  }
+  onClose: () => void
+}) {
+  return (
+    <Sheet label="Session details" onClose={onClose}>
+      <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em] mt-2">
+        {summary.dayName}
+      </p>
+
+      {summary.firstEver && (
+        <p className="mt-4 text-ink-2 text-body font-body leading-relaxed px-card py-base rounded-card bg-brand-blue/[0.08] border border-brand-blue/20">
+          That&rsquo;s your first session logged. Everything from here gets measured against it.
+        </p>
+      )}
+
+      {summary.weekDone && !summary.firstEver && (
+        <p className="mt-4 text-ink-2 text-body font-body leading-relaxed px-card py-base rounded-card bg-state-success/[0.08] border border-state-success/20">
+          Every session this week done. Rest is part of it &mdash; the next one will keep.
+        </p>
+      )}
+
+      {summary.improvements.length > 0 && (
+        <div className="mt-5">
+          <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em]">Up on last time</p>
+          <ul className="mt-2 space-y-1.5">
+            {summary.improvements.map((line) => (
+              <li key={line} className="text-ink text-body font-body leading-relaxed">{line}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Said once, here. The same sentence on every exercise during a session
+          would read as nagging; a client who has just finished is receptive. */}
+      {summary.fatigue && (
+        <p className="mt-5 text-ink-2 text-body font-body leading-relaxed px-card py-base rounded-card bg-white/[0.04] border border-white/[0.08]">
+          {summary.fatigue}
+        </p>
+      )}
+
+      {summary.volume > 0 && (
+        <div className="mt-5">
+          <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em]">Total volume</p>
+          <p className="text-white text-heading font-display font-bold tabular-nums mt-1">
+            {summary.volume.toLocaleString()} lb
+          </p>
+          {/* Why it is down here and not a headline tile. */}
+          <p className="text-ink-4 text-label font-body mt-1">
+            Weight moved across every logged set. It rises whenever a day gains a set, so it tracks the
+            program as much as you.
+          </p>
+        </div>
+      )}
+
+      {summary.nextUp && (
+        <p className="mt-5 text-ink-3 text-body font-body">
+          Next up: <span className="text-ink-2 font-semibold">{summary.nextUp}</span>
+        </p>
+      )}
+    </Sheet>
   )
 }
