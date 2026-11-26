@@ -1422,16 +1422,19 @@ export default function ProgramsPage() {
       }
     }
 
-    // What they train next, so the session closes with a loop rather than a
-    // full stop. The day just finished counts towards the rotation.
-    const nextUp = (() => {
-      if (!selected || selectedDay === null) return null
+    /* What they train next, so the session closes with a loop rather than a
+       full stop. The day just finished counts towards the rotation.
+       Kept as an INDEX as well as a name, because Done now moves the week on
+       to it — see the rotation advance further down. */
+    const nextIndex = (() => {
+      if (!selected || selectedDay === null) return -1
       for (let step = 1; step <= weeklyPlan.length; step++) {
         const i = (selectedDay + step) % weeklyPlan.length
-        if (weeklyPlan[i].exercises.length > 0) return weeklyPlan[i].name
+        if (weeklyPlan[i].exercises.length > 0) return i
       }
-      return null
+      return -1
     })()
+    const nextUp = nextIndex >= 0 ? weeklyPlan[nextIndex].name : null
 
     // Counted before the history reloads, so "first ever" means first before
     // this one rather than first including it.
@@ -1458,6 +1461,20 @@ export default function ProgramsPage() {
       nextUp,
     })
     setSessionRecords([])
+
+    /* Move the week on.
+       The "Today — Upper / Start Upper" banner at the top of the program is
+       driven by todayIndex, which is worked out from logged history when the
+       program loads and was never recalculated after a session. So finishing
+       Upper and going back to the week showed Upper again, with a filled
+       button offering to do it a second time.
+       Advanced locally rather than by re-reading the rotation: the write that
+       would change the answer is the session just saved, and waiting on a
+       round trip to find out what to train next is a spinner where a name
+       should be. The next load recomputes it from the database as usual. */
+    const finishedDay = selectedDay
+    setWeeklyPlan((prev) => prev.map((d, i) => (i === finishedDay ? { ...d, completed: true } : d)))
+    if (nextIndex >= 0) setTodayIndex(nextIndex)
 
     setWorkoutStartTime((prev) => {
       const next = { ...prev }
@@ -2302,7 +2319,20 @@ export default function ProgramsPage() {
               await saveBodyMetric(userId, { weight_lb: lb })
               setWeighedToday(true)
             }}
-            onDone={() => setWorkoutSummary(null)}
+            /* Done goes back to the week, not back to the session.
+               It used to only clear the summary, which left the client
+               standing on the day they had just finished — its set rows now
+               emptied, its Start button offering to do it again. A finished
+               session should end somewhere that points forward, and the week
+               view is where the next day is, marked. */
+            onDone={() => {
+              setWorkoutSummary(null)
+              setSelectedDay(null)
+              setView('preview')
+              // Instant rather than smooth: the modal has just closed and a
+              // long smooth scroll from the bottom of a workout reads as lag.
+              window.scrollTo({ top: 0, behavior: 'auto' })
+            }}
           />
         )}
         {blockReview && !reviewDismissed && (
