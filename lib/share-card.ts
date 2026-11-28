@@ -85,6 +85,21 @@ export interface ShareInput {
    * guessing at them would be worse than counting plainly and saying so.
    * Bodyweight work contributes no volume, which is the one case the data
    * does distinguish: a weight of zero.
+   *
+   * AND IT IS STAYING THIS WAY. Decided 28 Nov 2026, after costing a
+   * warm-up toggle — the one of the four that would have been cheap.
+   *
+   * The reason is not the friction, though a tap per warm-up on the screen a
+   * client uses mid-set with a sweaty thumb is a real cost. It is that an
+   * optional flag is only as good as how reliably somebody remembers it. A
+   * week they tapped it diligently reads lower than a week they did not, so
+   * the figure starts moving for reasons that have nothing to do with
+   * training. A consistently slightly-generous number is MORE useful than an
+   * inconsistently accurate one, because the only thing this number is for is
+   * comparing somebody to themselves.
+   *
+   * The trigger to revisit is a client questioning a figure. Then there is a
+   * reason, and a specific one.
    */
   volume: number
 }

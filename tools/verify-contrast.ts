@@ -266,12 +266,27 @@ console.log('\nAND NO STOCK TAILWIND STATUS COLOURS ON THE DARK SCREENS\n')
    of them were spread across the studio and the portal, so "green" was
    emerald-400 in one file, green-500 in another and the token in a third — and
    changing what success looks like meant finding all three.
-   Scoped to the DARK screens on purpose. The nutrition screens and the coach
-   brief are still light-themed inside a dark app, and their emerald-700 on
-   white is a legitimate choice for that surface that the token would break:
-   #22C55E on white is 2.28:1. That whole situation is in the report; it is a
-   theme problem rather than a palette one and is not something a sweep should
-   quietly half-do. */
+   Scoped to the DARK screens on purpose, and the list below is a DECISION
+   rather than a backlog item.
+
+   The nutrition screens, the food search and the coach brief are light-themed
+   inside a dark app. That looks like an oversight and reads like one in a
+   list of findings, so here is why it is staying, decided 28 Nov 2026:
+
+   In the ninety days to that date the whole product recorded 36 days of food
+   logging, and 24 of them were Anthony's own. The four clients who logged
+   anything managed 5, 4, 4 and 2 days, and two of the four stopped in
+   October. Repainting five screens is several hours on a feature four
+   clients have touched since August, and it would not address why they
+   stopped. Nobody has reported the white, either — and the gold PR label
+   was reported within a day of shipping, which is the control that makes
+   that silence mean something.
+
+   Their emerald-700 on white is also correct FOR THAT SURFACE, and the
+   semantic token would break it: #22C55E on white is 2.28:1. So a sweep
+   cannot simply extend here; converting these screens is a theme change, and
+   the right trigger for it is nutrition becoming something sold rather than
+   something used. */
 const LIGHT_SCREENS = [
   'app/studio/nutrition',
   'app/studio/setup-nutrition',
