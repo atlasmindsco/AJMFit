@@ -141,7 +141,11 @@ export async function GET(request: Request) {
   // cron_runs is empty while the endpoints themselves answer correctly. Two
   // daily jobs work on every plan. The review's own route still exists for
   // running it by hand.
-  if (new Date().getUTCDay() === 1) {
+  //
+  // Not on a dry run. The review writes: it applies new calorie targets to
+  // clients. A dry run on a Monday used to do that for real while promising
+  // to "decide everything, send nothing".
+  if (!dryRun && new Date().getUTCDay() === 1) {
     try {
       const review = await runNutritionReview(admin)
       await admin.from('cron_runs').insert({
@@ -161,6 +165,10 @@ export async function GET(request: Request) {
   }
 
   if (!unreadRows.length && !pendingRows.length && !checkInRows.length && !quietIds.length) {
+    // A dry run leaves no trace, or cron_runs would show a digest that never ran.
+    if (dryRun) {
+      return NextResponse.json({ ok: true, dryRun: true, wouldSend: null, reason: 'nothing waiting' })
+    }
     await heartbeat('nothing waiting')
     return NextResponse.json({ ok: true, sent: false, reason: 'nothing waiting' })
   }
