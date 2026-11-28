@@ -39,6 +39,9 @@ const INK = {
   grey: '#9AA6B8',
   blue: '#1A7BFF',
   orange: '#F76B16',
+  // Achievement gold, matching the app's PR surfaces. The card's one
+  // coloured bar is a record, and a record is gold everywhere else now.
+  gold: '#D4AF37',
 }
 
 const loadLogo = (): Promise<HTMLImageElement | null> =>
@@ -156,10 +159,10 @@ async function draw(canvas: HTMLCanvasElement, format: ShareFormat, input: Share
 
   if (card.achievement) {
     const barH = 118
-    c.fillStyle = INK.orange
+    c.fillStyle = INK.gold
     roundRect(c, pad, y, W - pad * 2, barH, 30)
     c.fill()
-    c.fillStyle = INK.white
+    c.fillStyle = INK.bg
     c.font = '800 50px Arial, Helvetica, sans-serif'
     c.fillText(card.achievement, cx, y + 76)
     y += barH + 56

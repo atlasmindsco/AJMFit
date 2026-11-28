@@ -34,6 +34,17 @@ const config: Config = {
           success: '#22C55E',
           warning: '#F59E0B',
           danger: '#EF4444',
+          /* Achievement gold. Its own token rather than reusing `warning`,
+             which is the colour of "something needs your attention" — a
+             personal record is the opposite of that, and a trophy drawn in
+             the same amber as a sync warning is the app saying two different
+             things in one colour.
+             A customer asked for this directly: "I love how the trophy pops
+             up when you hit a PR, so it would be cool if the little PR
+             section with the trophy — just the label — would be gold too."
+             #D4AF37 against the studio's #111 reads at about 8.9:1, which
+             clears AA for the small uppercase label it carries. */
+          gold: '#D4AF37',
         },
         // Studio text, four measured tiers. See the note in app/globals.css:
         // the thirteen hand-picked white alphas these replace put 370 of 636

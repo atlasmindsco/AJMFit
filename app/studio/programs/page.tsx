@@ -3181,28 +3181,35 @@ export default function ProgramsPage() {
                                     className="overflow-hidden"
                                   >
                                     <div className="px-3 pb-3 pt-1 border-t border-white/[0.06]">
-                                      {/* PR banner */}
+                                      {/* The record, in gold.
+
+                                          Because a record is an achievement.
+                                            The label and the trophy were grey, and the
+                                            celebration that fires the moment a record
+                                            falls was amber — so the app congratulated
+                                            you in one colour and then filed the result
+                                            in another. A customer noticed and asked for
+                                            exactly this: the trophy and the label, gold.
+
+                                            Only those two. The figures stay white
+                                            because they are what you read, and a card
+                                            where everything is gold has no hierarchy —
+                                            it just looks like a warning. */}
                                       {pr && (
-                                        <div className={`flex items-center justify-between rounded-control px-3 py-2 mt-2 mb-2 ${isNewPR ? 'bg-state-warning/15 border border-state-warning/30' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
+                                        <div className={`flex items-center justify-between rounded-control px-3 min-h-tap py-2 mt-2 mb-2 ${isNewPR ? 'bg-brand-gold/[0.12] border border-brand-gold/35' : 'bg-white/[0.03] border border-white/[0.06]'}`}>
                                           <div className="flex items-center gap-2">
-                                            <svg className={`w-4 h-4 ${isNewPR ? 'text-state-warning' : 'text-ink-4'}`} viewBox="0 0 24 24" fill="currentColor">
+                                            <svg className="w-5 h-5 text-brand-gold shrink-0" viewBox="0 0 24 24" fill="currentColor">
                                               <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                             </svg>
-                                            {isNewPR ? (
-                                              <span className="text-state-warning text-caption font-display font-bold uppercase tracking-wide">
-                                                New PR!
-                                              </span>
-                                            ) : (
-                                              <span className="text-ink-3 text-caption font-display font-bold uppercase tracking-wide">
-                                                Current PR
-                                              </span>
-                                            )}
+                                            <span className="text-brand-gold text-label font-display font-bold uppercase tracking-wide">
+                                              {isNewPR ? 'New PR!' : 'Current PR'}
+                                            </span>
                                           </div>
-                                          <div className="text-right">
-                                            <span className={`text-label font-display font-bold ${isNewPR ? 'text-state-warning' : 'text-ink-2'}`}>
+                                          <div className="text-right min-w-0">
+                                            <span className="text-white text-label font-display font-bold tabular-nums">
                                               {isNewPR ? `${bestEnteredWeight} lbs` : `${pr.weight} lbs × ${pr.reps}`}
                                             </span>
-                                            <span className="text-ink-4 text-caption font-body ml-2">{pr.date}</span>
+                                            <span className="text-ink-3 text-caption font-body ml-2">{pr.date}</span>
                                           </div>
                                         </div>
                                       )}
@@ -3925,8 +3932,8 @@ export default function ProgramsPage() {
 
                                         return (
                                           <div key={si} className={`rounded-control mb-1 ${isActive && !filled ? 'bg-white/[0.04] px-1.5 py-1.5' : ''}`}>
-                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_44px]' : 'grid-cols-[32px_1fr_44px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-state-warning/[0.06]' : ''}`}>
-                                              <span className={`text-label font-display font-bold text-center ${setBeatsPR ? 'text-state-warning' : 'text-ink-4'}`}>{si + 1}</span>
+                                            <div className={`grid ${needsWeight ? 'grid-cols-[32px_1fr_1fr_44px]' : 'grid-cols-[32px_1fr_44px]'} gap-2 items-center rounded-control px-1 py-0.5 ${setBeatsPR ? 'bg-brand-gold/[0.08]' : ''}`}>
+                                              <span className={`text-label font-display font-bold text-center ${setBeatsPR ? 'text-brand-gold' : 'text-ink-4'}`}>{si + 1}</span>
                                               {/* The suggestion is a PLACEHOLDER, not a value.
                                                   It used to be a real value, which meant tapping
                                                   in put the caret inside "115" and typing gave
@@ -3961,8 +3968,8 @@ export default function ProgramsPage() {
                                               />
                                               <div className="flex items-center justify-center">
                                                 {setBeatsPR ? (
-                                                  <div className="w-6 h-6 rounded-full bg-state-warning/20 flex items-center justify-center">
-                                                    <svg className="w-3.5 h-3.5 text-state-warning" viewBox="0 0 24 24" fill="currentColor">
+                                                  <div className="w-6 h-6 rounded-full bg-brand-gold/20 flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-brand-gold" viewBox="0 0 24 24" fill="currentColor">
                                                       <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
                                                     </svg>
                                                   </div>
@@ -4897,7 +4904,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 15 }}
-        className="relative text-center px-9 py-7 rounded-card bg-surface-raised border-2 border-state-warning/50 shadow-[0_10px_60px_rgba(245,158,11,0.4)]"
+        className="relative text-center px-9 py-7 rounded-card bg-surface-raised border-2 border-brand-gold/50 shadow-[0_10px_60px_rgba(212,175,55,0.35)]"
       >
         <button
           onClick={onDone}
@@ -4915,7 +4922,7 @@ function PRCelebration({ name, weight, onDone }: { name: string; weight: number;
         >
           🏆
         </motion.div>
-        <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-state-warning">New PR!</p>
+        <p className="font-display font-extrabold text-2xl uppercase tracking-tight text-brand-gold">New PR!</p>
         <p className="text-white font-body font-semibold text-label mt-1">{name}</p>
         <p className="text-ink-2 font-display font-bold text-lg mt-0.5">{weight} lbs</p>
       </motion.div>
@@ -5718,7 +5725,7 @@ function WorkoutComplete({
           {prHeadline(summary.records) ? (
             <button
               onClick={() => setShowRecords(true)}
-              className="w-full mt-7 min-h-taplg px-card rounded-card bg-brand-orange flex items-center justify-center gap-3 text-white active:scale-[0.98] transition-transform duration-150"
+              className="w-full mt-7 min-h-taplg px-card rounded-card bg-brand-gold flex items-center justify-center gap-3 text-surface-base active:scale-[0.98] transition-transform duration-150"
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M5 3h14l-1.5 5H6.5L5 3Zm1.5 5v2a5.5 5.5 0 0 0 11 0V8h-11ZM12 16a5.5 5.5 0 0 1-5.08-3.39A6.5 6.5 0 0 0 12 15.5a6.5 6.5 0 0 0 5.08-2.89A5.5 5.5 0 0 1 12 16Zm0 2a1 1 0 0 1 1 1v2h-2v-2a1 1 0 0 1 1-1Z" />
@@ -5890,7 +5897,7 @@ function RecordSheet({
 }) {
   return (
     <Sheet label="Personal records" onClose={onClose}>
-      <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.18em] mt-2">
+      <p className="text-brand-gold text-caption font-display font-bold uppercase tracking-[0.18em] mt-2">
         {records.length === 1 ? 'Personal record' : `${records.length} personal records`}
       </p>
 
@@ -5900,7 +5907,7 @@ function RecordSheet({
           return (
             <div key={`${r.exerciseName}-${r.kind}`} className="rounded-card bg-white/[0.04] border border-white/[0.07] px-card py-base">
               <p className="text-white text-heading font-body font-semibold leading-tight">{d.exercise}</p>
-              <p className="text-brand-orange text-label font-body mt-0.5">{d.kindLabel}</p>
+              <p className="text-brand-gold text-label font-body mt-0.5">{d.kindLabel}</p>
 
               <div className="flex items-end gap-3 mt-3">
                 <div>
