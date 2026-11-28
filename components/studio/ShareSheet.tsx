@@ -57,6 +57,15 @@ const loadLogo = (): Promise<HTMLImageElement | null> =>
     img.src = '/AJMfit-logo.png'
   })
 
+/** Cut a name to fit its column, with an ellipsis so the cut is visible. */
+function ellipsize(c: CanvasRenderingContext2D, text: string, maxW: number): string {
+  if (maxW <= 0) return ''
+  if (c.measureText(text).width <= maxW) return text
+  let cut = text
+  while (cut.length > 1 && c.measureText(cut + '…').width > maxW) cut = cut.slice(0, -1)
+  return cut.trimEnd() + '…'
+}
+
 /**
  * The biggest this text can be drawn and still fit between the margins.
  *
@@ -86,7 +95,7 @@ function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number,
 }
 
 async function draw(canvas: HTMLCanvasElement, format: ShareFormat, input: ShareInput) {
-  const card = buildShareCard(input)
+  const card = buildShareCard(input, format)
   const { width: W, height: H } = format
   canvas.width = W
   canvas.height = H
@@ -121,6 +130,9 @@ async function draw(canvas: HTMLCanvasElement, format: ShareFormat, input: Share
     hasHero: Boolean(card.hero),
     hasAchievement: Boolean(card.achievement),
     heroFont,
+    // The "+2 more" line takes a row of its own, reserved by buildShareCard,
+    // so what is drawn is exactly what the layout was told to expect.
+    rows: card.exercises.length + (card.more ? 1 : 0),
   })
 
   const logo = await loadLogo()
@@ -215,6 +227,56 @@ async function draw(canvas: HTMLCanvasElement, format: ShareFormat, input: Share
     c.fillText(card.achievement, cx, L.barY + L.barH * 0.645)
   }
 
+  /* THE WORK.
+     Anthony asked for this: the volume figure is the size of a session and
+     the exercise list is the evidence for it. Name left, top set right, a
+     hairline between — the way a training log is written down everywhere
+     else, so it needs no explaining to the people who will see it.
+     Left- and right-aligned rather than centred, because a centred list of
+     different-length names has no edge for the eye to follow, and the whole
+     point of a list is that it can be scanned. */
+  if (card.exercises.length > 0 && L.listY !== null && L.listHeadY !== null) {
+    c.textAlign = 'center'
+    c.fillStyle = INK.grey
+    c.font = `700 ${tall ? 28 : 26}px Arial, Helvetica, sans-serif`
+    c.fillText('THE WORK', cx, L.listHeadY)
+
+    card.exercises.forEach((ex, i) => {
+      const rowY = L.listY! + i * L.listRowH
+
+      // The hairline sits above each row but the first.
+      if (i > 0) {
+        c.strokeStyle = INK.cardLine
+        c.lineWidth = 2
+        c.beginPath()
+        c.moveTo(pad, rowY - L.listRowH * 0.62)
+        c.lineTo(W - pad, rowY - L.listRowH * 0.62)
+        c.stroke()
+      }
+
+      /* The detail is measured first and the name gets whatever is left.
+         A long name must lose its tail rather than run into "225 lb × 5",
+         because the figure is the part somebody is posting. */
+      c.font = `700 ${tall ? 32 : 29}px Arial, Helvetica, sans-serif`
+      const detailW = c.measureText(ex.detail).width
+      c.textAlign = 'right'
+      c.fillStyle = INK.white
+      c.fillText(ex.detail, W - pad, rowY)
+
+      c.textAlign = 'left'
+      c.fillStyle = INK.grey
+      c.font = `400 ${tall ? 32 : 29}px Arial, Helvetica, sans-serif`
+      c.fillText(ellipsize(c, ex.name, W - pad * 2 - detailW - 28), pad, rowY)
+    })
+
+    if (card.more) {
+      c.textAlign = 'center'
+      c.fillStyle = INK.grey
+      c.font = `400 ${tall ? 28 : 26}px Arial, Helvetica, sans-serif`
+      c.fillText(card.more, cx, L.listY + card.exercises.length * L.listRowH - L.listRowH * 0.2)
+    }
+  }
+
   c.fillStyle = INK.grey
   c.font = '400 34px Arial, Helvetica, sans-serif'
   c.fillText(card.site, cx, L.siteY)
@@ -262,7 +324,7 @@ export default function ShareSheet({
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean }
 
       if (nav.canShare?.({ files: [file] })) {
-        await nav.share({ files: [file], text: shareText(buildShareCard(input)) })
+        await nav.share({ files: [file], text: shareText(buildShareCard(input, format)) })
       } else {
         // Desktop, mostly. Saving the PNG is the useful thing it can do.
         const url = URL.createObjectURL(b)

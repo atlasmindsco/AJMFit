@@ -6,7 +6,7 @@
  * specific ways: nothing on it may be untrue, and nothing on it may embarrass
  * them.
  */
-import { buildShareCard, shareFilename, shareLayout, shareText, heroStartFont, SHARE_FORMATS } from '@/lib/share-card'
+import { buildShareCard, shareFilename, shareLayout, maxExerciseRows, shareText, heroStartFont, SHARE_FORMATS } from '@/lib/share-card'
 
 let failed = 0
 const ok = (cond: boolean, label: string, extra = '') => {
@@ -21,6 +21,11 @@ const input = (over: Partial<Parameters<typeof buildShareCard>[0]> = {}) => ({
   duration: '1h 12m',
   recordCount: 2,
   volume: 7340,
+  exercises: [
+    { name: 'Barbell Bench Press', detail: '225 lb × 5' },
+    { name: 'Incline Dumbbell Press', detail: '70 lb × 10' },
+    { name: 'Dips', detail: '3 × 12' },
+  ],
   ...over,
 })
 
@@ -143,6 +148,115 @@ ok(shrunk.clearance > full.clearance, 'and leaves more room, never less')
 const bw = shareLayout(story, { hasHero: false, hasAchievement: true, heroFont: 150 })
 ok(bw.heroY === null && bw.heroLabelY === null, 'no hero means no hero position to draw at')
 ok(bw.tilesY < full.tilesY, 'and the tiles move up into the space', bw.tilesY + ' vs ' + full.tilesY)
+
+console.log('\nNOTHING SITS ON TOP OF ANYTHING ELSE\n')
+/* TWO BUGS IN A ROW CAME FROM THE SAME MISREADING, so it is a check now
+   rather than a comment. Canvas text grows UPWARDS from its baseline: a 64px
+   heading occupies about 46px above the number the layout stores and hangs
+   about 14px below it. Advance to the next thing by a plain gap and the two
+   overlap.
+   First the blue tick landed on "Workout Complete". The fix for that pushed
+   "Push Day" up into the heading's descenders one line further down. Both
+   were arithmetically consistent and both were invisible until a card was
+   actually drawn — which is exactly the kind of bug a test should be holding,
+   because the next person to resize this type will not be looking for it. */
+const CAPH = 0.72
+const DESCH = 0.22
+for (const f of SHARE_FORMATS) {
+  for (const hasAchievement of [true, false]) {
+    const rows = maxExerciseRows(f, { hasHero: true, hasAchievement })
+    const L = shareLayout(f, { hasHero: true, hasAchievement, heroFont: heroStartFont(f), rows })
+    const tag = f.key + (hasAchievement ? ' + PR' : '')
+
+    const tickBottom = L.tickY + L.tickR * 2
+    const headingTop = L.headingY - L.headingFont * CAPH
+    ok(headingTop > tickBottom, tag + ': the tick clears the heading', Math.round(headingTop - tickBottom) + 'px')
+
+    const headingBottom = L.headingY + L.headingFont * DESCH
+    const subTop = L.subY - L.subFont * CAPH
+    ok(subTop > headingBottom, tag + ': the heading clears the day name', Math.round(subTop - headingBottom) + 'px')
+
+    const subBottom = L.subY + L.subFont * DESCH
+    const heroTop = L.heroY! - heroStartFont(f) * 0.78
+    ok(heroTop > subBottom, tag + ': the day name clears the volume figure', Math.round(heroTop - subBottom) + 'px')
+
+    const heroBottom = L.heroLabelY! + 34 * DESCH
+    ok(L.tilesY > heroBottom, tag + ': the volume label clears the tiles', Math.round(L.tilesY - heroBottom) + 'px')
+
+    const tilesBottom = L.tilesY + L.tileH
+    const firstAfterTiles = hasAchievement ? L.barY : L.listHeadY! - 28 * CAPH
+    ok(firstAfterTiles > tilesBottom, tag + ': the tiles clear what follows them', Math.round(firstAfterTiles - tilesBottom) + 'px')
+
+    if (hasAchievement) {
+      const barBottom = L.barY + L.barH
+      const listTop = L.listHeadY! - 28 * CAPH
+      ok(listTop > barBottom, tag + ': the PR bar clears the list', Math.round(listTop - barBottom) + 'px')
+    }
+
+    const lastRow = L.listY! + (rows - 1) * L.listRowH + 32 * DESCH
+    const footTop = L.siteY - 34 * CAPH
+    ok(footTop > lastRow, tag + ': the last exercise clears the footer', Math.round(footTop - lastRow) + 'px')
+  }
+}
+
+console.log('\nTHE WORK IS LISTED, AND THE LIST IS TRUE\n')
+/* Anthony asked for the exercises on the card. The volume figure is the size
+   of a session; this is the evidence for it, and evidence that overstates is
+   worse than none — the person posting it knows exactly what they did, and so
+   does anybody who trains with them. */
+const work = buildShareCard(input(), story)
+console.log('        ' + work.exercises.map((e) => e.name + ' ' + e.detail).join('  ·  '))
+ok(work.exercises.length === 3, 'all three exercises are on it', String(work.exercises.length))
+ok(work.exercises[0].detail === '225 lb × 5', 'a loaded set reads as weight by reps', work.exercises[0].detail)
+ok(work.exercises[2].detail === '3 × 12', 'and bodyweight reads as sets by reps', work.exercises[2].detail)
+ok(work.more === null, 'nothing is hidden when it all fits', String(work.more))
+
+console.log('\nA LONG SESSION SAYS THAT IT WAS TRIMMED\n')
+/* Six of eight shown silently would understate the session. The card has to
+   either show it or admit it. */
+const many = Array.from({ length: 12 }, (_, i) => ({ name: 'Exercise ' + (i + 1), detail: '100 lb × 8' }))
+for (const f of SHARE_FORMATS) {
+  const c = buildShareCard(input({ exercises: many }), f)
+  const accounted = c.exercises.length + (c.more ? Number(c.more.replace(/\D/g, '')) : 0)
+  ok(c.more !== null, f.key + ': a trimmed list says so', String(c.more))
+  ok(accounted === 12, f.key + ': every exercise is either shown or counted', accounted + ' of 12')
+  ok(c.exercises.length > 0, f.key + ': and it still shows some of them', String(c.exercises.length))
+}
+/* THE STORY IS 570px TALLER AND HOLDS THE SAME SIX, which is not what I
+   assumed when writing this check — it asserted the story held more and
+   failed. Instagram covers roughly the top and bottom 250px of a story with
+   its own header and reply bar, so a 1920 frame has about 1420 usable, while
+   the 1350 post has all of it. The extra height is rented, not owned.
+   That is exactly why the cap is derived instead of written down: a guess
+   would have been wrong in the direction that pushes text off a post. */
+const worst = { hasHero: true, hasAchievement: true }
+ok(maxExerciseRows(story, worst) >= 6, 'the story holds six in the worst case', String(maxExerciseRows(story, worst)))
+ok(maxExerciseRows(post, worst) >= 6, 'and so does the post, despite being 570px shorter', String(maxExerciseRows(post, worst)))
+/* Six covers the library: its longest day is eight exercises and the median
+   is five, so a trimmed card is the exception rather than the rule. */
+ok(maxExerciseRows(story, worst) <= 10, 'and nothing turns the card into a spreadsheet', String(maxExerciseRows(story, worst)))
+/* And a card with no PR bar has room the bar would have taken. */
+ok(
+  maxExerciseRows(post, { hasHero: true, hasAchievement: false }) >=
+    maxExerciseRows(post, { hasHero: true, hasAchievement: true }),
+  'and a card without a PR bar holds at least as many'
+)
+
+console.log('\nA NAME TOO LONG FOR THE ROW IS CUT, NOT RUN OVER\n')
+const longName = buildShareCard(input({ exercises: [{ name: 'Barbell Bench Press - Medium Grip Variation', detail: '225 lb × 5' }] }), story)
+ok(longName.exercises[0].name.length <= 26, 'trimmed to fit the column', longName.exercises[0].name.length + ' chars')
+ok(longName.exercises[0].name.endsWith('…'), 'and says it was trimmed', longName.exercises[0].name)
+ok(longName.exercises[0].detail === '225 lb × 5', 'the figure is never the part that gets cut', longName.exercises[0].detail)
+
+console.log('\nAND A SESSION WITH NOTHING LOGGED HAS NO LIST\n')
+/* Not an empty box with a heading over it. */
+for (const [label, list] of [
+  ['nothing logged', []],
+  ['a blank name', [{ name: '   ', detail: '100 lb × 5' }]],
+] as Array<[string, Array<{ name: string; detail: string }>]>) {
+  const c = buildShareCard(input({ exercises: list }), story)
+  ok(c.exercises.length === 0 && c.more === null, label, JSON.stringify(c.exercises))
+}
 
 console.log('\nTHE FILENAME IS SAFE AND MEANS SOMETHING\n')
 for (const [day, want] of [

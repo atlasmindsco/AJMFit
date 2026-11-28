@@ -5,7 +5,7 @@ import TravelSwitch from '@/components/studio/TravelSwitch'
 import { useSessionChrome } from '@/components/studio/SessionChrome'
 import { pickDay } from '@/lib/active-workout'
 import Image from 'next/image'
-import { sessionTotals, prHeadline, recordDetail, encouragement } from '@/lib/session-summary'
+import { sessionTotals, exerciseLines, prHeadline, recordDetail, encouragement, type ExerciseLine } from '@/lib/session-summary'
 import { durationLabel } from '@/lib/coach-training'
 import ShareSheet from '@/components/studio/ShareSheet'
 import { filterLibrary, MUSCLE_GROUPS, EQUIPMENT_FILTERS } from '@/lib/builder-rules'
@@ -626,6 +626,8 @@ export default function ProgramsPage() {
     records: Array<{ exerciseName: string } & RecordHit>
     /** The next training day in the rotation. */
     nextUp: string | null
+    /** What was actually done, for the share card. */
+    exercises: ExerciseLine[]
     /**
      * Two moments that only happen once, and were passing unmarked.
      *
@@ -1466,6 +1468,20 @@ export default function ProgramsPage() {
       improvements,
       records: sessionRecordList,
       nextUp,
+      /* The work itself, in program order, named by what was actually done —
+         a swapped slot reports the substitute, because the card must not
+         credit somebody with a lift they did not perform. exerciseLines drops
+         anything with nothing ticked. */
+      exercises: exerciseLines(
+        (selected?.exercises ?? []).map((ex) => {
+          const key = `${selectedDay}-${ex.name}`
+          return {
+            name: swappedExercises[key] ?? ex.name,
+            rows: setLogs[key] ?? [],
+            timed: isTimedPrescription(ex.reps) ? (timedLogs[key] ?? null) : null,
+          }
+        })
+      ),
     })
     setSessionRecords([])
 
@@ -5851,6 +5867,8 @@ function WorkoutComplete({
     improvements: string[]
     records: Array<{ exerciseName: string } & RecordHit>
     nextUp: string | null
+    /** What was actually done, for the share card. */
+    exercises: ExerciseLine[]
     firstEver: boolean
     weekDone: boolean
   }
@@ -6066,6 +6084,7 @@ function WorkoutComplete({
                  shows nothing at all when it is zero rather than posting a
                  bodyweight day as "0 LBS" — see lib/share-card.ts. */
               volume: summary.volume,
+              exercises: summary.exercises,
             }}
             onClose={() => setShowShare(false)}
           />
@@ -6195,6 +6214,8 @@ function SessionDetailSheet({
     fatigue: string | null
     improvements: string[]
     nextUp: string | null
+    /** What was actually done, for the share card. */
+    exercises: ExerciseLine[]
     firstEver: boolean
     weekDone: boolean
   }

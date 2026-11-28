@@ -13,6 +13,10 @@
  * the client is looking at.
  */
 
+import type { ExerciseLine } from '@/lib/session-summary'
+
+export type { ExerciseLine }
+
 export interface ShareFormat {
   key: 'story' | 'post'
   label: string
@@ -47,6 +51,17 @@ export interface ShareCard {
    */
   hero: { value: string; label: string } | null
   stats: ShareStat[]
+  /**
+   * The work, trimmed to what fits. Empty for a session with nothing logged,
+   * in which case the card simply has no list rather than an empty box.
+   */
+  exercises: ExerciseLine[]
+  /**
+   * "+2 more", or null when the whole session is shown. Never omitted
+   * silently: a card showing six of eight exercises without saying so is
+   * understating somebody's session, which is its own kind of untrue.
+   */
+  more: string | null
   /** The PR line, or null. Never a consolation message — see below. */
   achievement: string | null
   site: string
@@ -54,6 +69,8 @@ export interface ShareCard {
 
 /** Longest day name the card can show before it stops looking designed. */
 const MAX_DAY = 24
+/** Longest exercise name before it is cut. Measured, not guessed — see below. */
+const MAX_EXERCISE = 26
 
 export interface ShareInput {
   dayName: string
@@ -102,6 +119,12 @@ export interface ShareInput {
    * reason, and a specific one.
    */
   volume: number
+  /**
+   * What was actually done, in program order, already filtered to the
+   * exercises that were logged. See exerciseLines in lib/session-summary.ts
+   * for why an untouched exercise is not in here.
+   */
+  exercises: ExerciseLine[]
 }
 
 /**
@@ -118,7 +141,7 @@ export interface ShareInput {
  * having set a record, in front of the client's friends. The card simply
  * leaves that row out.
  */
-export function buildShareCard(input: ShareInput): ShareCard {
+export function buildShareCard(input: ShareInput, format: ShareFormat = SHARE_FORMATS[0]): ShareCard {
   const day = input.dayName.trim()
   const subheading = day.length > MAX_DAY ? day.slice(0, MAX_DAY - 1).trimEnd() + '…' : day || 'Session'
 
@@ -128,6 +151,30 @@ export function buildShareCard(input: ShareInput): ShareCard {
      same place as a bodyweight day — no hero row. */
   const volume = Number.isFinite(input.volume) ? Math.max(0, Math.round(input.volume)) : 0
 
+  /* THE WORK, TRIMMED TO WHAT THE CARD CAN HOLD.
+     The cap comes from the layout rather than from taste: maxExerciseRows()
+     works out how many lines are left after the hero figure and the PR bar
+     have taken their space, which differs between the two formats and
+     between a session that set a record and one that did not.
+     A trimmed list says so. Six of eight exercises shown silently would
+     understate the session, and understating it is as wrong as inflating it
+     when the person posting it knows exactly what they did. */
+  const room = maxExerciseRows(format, { hasHero: volume > 0, hasAchievement: input.recordCount > 0 })
+  /* `?? []` rather than trusting the type. Everything else on this card
+     degrades to something sayable when its input is missing, and a thrown
+     error here is not a missing list — it is no card at all, at the one
+     moment somebody wanted to post. */
+  const all = (input.exercises ?? []).filter((e) => e?.name?.trim().length > 0)
+  /* When it has to trim, "+2 more" takes the last row rather than being
+     squeezed in underneath — so the row count the layout was given stays the
+     row count the card draws, and nothing creeps toward the footer. */
+  const trimmed = all.length > room
+  const shown = all.slice(0, trimmed ? Math.max(0, room - 1) : room).map((e) => ({
+    name: e.name.length > MAX_EXERCISE ? e.name.slice(0, MAX_EXERCISE - 1).trimEnd() + '…' : e.name,
+    detail: e.detail,
+  }))
+  const hidden = all.length - shown.length
+
   return {
     heading: 'Workout Complete',
     subheading,
@@ -136,6 +183,8 @@ export function buildShareCard(input: ShareInput): ShareCard {
        than printed as a zero. A bodyweight day is not a day that moved no
        weight; it is a day the number does not describe. */
     hero: volume > 0 ? { value: `${volume.toLocaleString('en-US')} LBS`, label: 'Total Volume' } : null,
+    exercises: shown,
+    more: hidden > 0 ? `+${hidden} more` : null,
     stats: [
       { value: String(Math.max(0, Math.round(input.reps))), label: 'Total Reps' },
       { value: String(Math.max(0, Math.round(input.sets))), label: input.sets === 1 ? 'Set' : 'Sets' },
@@ -189,6 +238,11 @@ export interface ShareLayout {
   tileH: number
   barY: number
   barH: number
+  /** Baseline of the "THE WORK" label, or null when nothing was logged. */
+  listHeadY: number | null
+  /** Baseline of the first exercise row; each next one is listRowH lower. */
+  listY: number | null
+  listRowH: number
   siteY: number
   /** Pixels between the lowest element and the top of the footer text. */
   clearance: number
@@ -196,50 +250,112 @@ export interface ShareLayout {
 
 /** The wordmark's own proportions. Hard-coded because a layout cannot wait. */
 const LOGO_ASPECT = 346 / 520
+/** No block may come closer than this to the footer. */
+const MIN_FOOTER_CLEARANCE = 40
 /** Cap height of the footer, for measuring clearance against its baseline. */
 const FOOTER_CAP = 26
 
 export function shareLayout(
   format: ShareFormat,
-  opts: { hasHero: boolean; hasAchievement: boolean; heroFont: number }
+  opts: { hasHero: boolean; hasAchievement: boolean; heroFont: number; rows?: number }
 ): ShareLayout {
   const tall = format.key === 'story'
-  /* Story starts at 330 because Instagram draws its own interface over roughly
-     the top and bottom 250px of a story. The post has no such furniture and
-     starts near the top. */
-  const start = tall ? 330 : 120
-  const logoW = tall ? 260 : 200
-  const tickR = tall ? 72 : 54
+  /* EVERY BLOCK CAME DOWN TO MAKE ROOM FOR THE EXERCISE LIST, and the two
+     that came down hardest are the two that were saying the least.
+     The wordmark is 520x346, so it is never the thin strip it looks like,
+     and the blue tick had grown to a 144px circle restating in a picture what
+     "Workout Complete" says underneath it in 72px type. Neither carried any
+     information the list does. Shrinking them bought the six rows; shrinking
+     the type instead would have bought the same space and made the card
+     harder to read, which is the opposite of the point.
+
+     THE STORY'S FOOTER MOVED UP 100px, and that is a fix rather than a
+     trade. Instagram draws its reply bar over roughly the bottom 250px of a
+     story and its own header over the top 250. The ajmfit.com credit was
+     sitting at 1780 — inside that bar, on every story anybody has posted. It
+     is at 1670 now, which is the first row that is actually visible. */
+  const start = tall ? 268 : 80
+  const logoW = tall ? 190 : 160
+  const tickR = tall ? 44 : 38
+
+  /* A BASELINE IS NOT THE TOP OF THE TEXT, AND THIS COST TWO BUGS IN A ROW.
+     Canvas text grows upwards from its baseline: a 64px heading occupies the
+     46px above the number stored for it, and hangs about 14px below. Advance
+     by a plain gap and whatever is above gets overlapped. The blue tick landed
+     on "Workout Complete"; the fix for that pushed "Push Day" into the
+     heading's descenders one line further down. Both looked perfectly correct
+     as arithmetic and both were only visible on a rendered card.
+
+     So nothing below is a hand-tuned gap any more. `after()` advances from one
+     baseline to the next by what the two fonts actually occupy plus the space
+     that is wanted BETWEEN them, which is the number a person can reason
+     about. Resizing any of this type can no longer quietly reintroduce the
+     collision, and the gaps now mean what they say. */
+  const CAP = 0.72
+  const DESC = 0.22
+  /** Baseline-to-baseline for `gap` pixels of real space between two lines. */
+  const after = (fromFont: number, toFont: number, gap: number) =>
+    fromFont * DESC + gap + toFont * CAP
+  /** Top-of-a-block to the first baseline under it. */
+  const under = (toFont: number, gap: number) => gap + toFont * CAP
 
   let y = start
   const logoY = y
-  y += LOGO_ASPECT * logoW + (tall ? 110 : 70)
+  y += LOGO_ASPECT * logoW + (tall ? 52 : 46)
   const tickY = y
-  y += tickR * 2 + (tall ? 76 : 52)
+  y += tickR * 2
+
+  const headingFont = tall ? 64 : 56
+  const subFont = tall ? 42 : 38
+  const heroLabelFont = tall ? 34 : 30
+
+  y += under(headingFont, tall ? 34 : 30)
   const headingY = y
-  y += tall ? 58 : 52
+  y += after(headingFont, subFont, tall ? 12 : 10)
   const subY = y
-  y += tall ? 88 : 72
 
   let heroY: number | null = null
   let heroLabelY: number | null = null
   if (opts.hasHero) {
-    /* 0.78 of the font size approximates the cap height, which is what puts a
-       baseline where the eye expects the top of the number to be. */
-    heroY = y + opts.heroFont * 0.78
-    heroLabelY = heroY + (tall ? 50 : 44)
-    y = heroLabelY + (tall ? 70 : 52)
+    /* The hero uses 0.78 rather than CAP: it is digits, which sit slightly
+       taller than the cap height of letters in this face. */
+    heroY = y + after(subFont, opts.heroFont, tall ? 30 : 24) - opts.heroFont * CAP + opts.heroFont * 0.78
+    heroLabelY = heroY + after(opts.heroFont, heroLabelFont, tall ? 14 : 12)
+    y = heroLabelY + heroLabelFont * DESC + (tall ? 34 : 28)
+  } else {
+    y = subY + subFont * DESC + (tall ? 34 : 28)
   }
 
   const tilesY = y
-  const tileH = tall ? 190 : 168
-  y += tileH + (tall ? 64 : 44)
+  const tileH = tall ? 168 : 140
+  y += tileH + (tall ? 32 : 30)
 
   const barY = y
-  const barH = tall ? 118 : 104
-  const lowest = opts.hasAchievement ? barY + barH : tilesY + tileH
+  const barH = tall ? 108 : 90
+  if (opts.hasAchievement) y = barY + barH + (tall ? 28 : 26)
 
-  const siteY = format.height - (tall ? 150 : 84)
+  /* THE WORK.
+     Last of the blocks, under the PR bar rather than above it: the bar is the
+     headline and this is the evidence for it. A row is a name on the left and
+     its top set on the right, which is how a training log is written down
+     everywhere else.
+     How many rows there is room for is not decided here — see
+     maxExerciseRows, which asks this function. */
+  const rows = Math.max(0, Math.floor(opts.rows ?? 0))
+  const listRowH = tall ? 46 : 42
+  let listHeadY: number | null = null
+  let listY: number | null = null
+  if (rows > 0) {
+    const listHeadFont = tall ? 28 : 26
+    const listRowFont = tall ? 32 : 29
+    listHeadY = y + under(listHeadFont, tall ? 20 : 16)
+    listY = listHeadY + after(listHeadFont, listRowFont, tall ? 22 : 18)
+    y = listY + (rows - 1) * listRowH + (tall ? 14 : 12)
+  }
+
+  const lowest = rows > 0 ? y : opts.hasAchievement ? barY + barH : tilesY + tileH
+
+  const siteY = format.height - (tall ? 250 : 62)
 
   /* THE STACK IS CENTRED IN WHAT IS LEFT, NOT PINNED TO THE TOP.
      The card is four blocks tall with a volume figure and a PR bar, and two
@@ -270,15 +386,18 @@ export function shareLayout(
     tickY: px(tickY),
     tickR,
     headingY: px(headingY),
-    headingFont: tall ? 72 : 64,
+    headingFont,
     subY: px(subY),
-    subFont: tall ? 46 : 42,
+    subFont,
     heroY: heroY === null ? null : px(heroY),
     heroLabelY: heroLabelY === null ? null : px(heroLabelY),
     tilesY: px(tilesY),
     tileH,
     barY: px(barY),
     barH,
+    listHeadY: listHeadY === null ? null : px(listHeadY),
+    listY: listY === null ? null : px(listY),
+    listRowH,
     // The footer is anchored to the bottom edge and does not move with the
     // stack, so it is the one position the shift must not be applied to.
     siteY: Math.round(siteY),
@@ -286,9 +405,36 @@ export function shareLayout(
   }
 }
 
+/**
+ * How many exercises there is room for, by asking the layout rather than by
+ * picking a number.
+ *
+ * The two formats have very different budgets — the 4:5 post is 570px shorter
+ * than the 9:16 story — and a card that set a record has already spent 174px
+ * on the gold bar. A fixed cap would either waste a third of the story or
+ * push the post's footer off the bottom, and the second of those ends up on
+ * somebody's Instagram.
+ *
+ * Capped at 10 regardless. Past about ten rows the card stops being a result
+ * and becomes a spreadsheet, and the longest day in the library is eight.
+ */
+export function maxExerciseRows(
+  format: ShareFormat,
+  opts: { hasHero: boolean; hasAchievement: boolean }
+): number {
+  const heroFont = heroStartFont(format)
+  let best = 0
+  for (let rows = 1; rows <= 10; rows++) {
+    const L = shareLayout(format, { ...opts, heroFont, rows })
+    if (L.clearance < MIN_FOOTER_CLEARANCE) break
+    best = rows
+  }
+  return best
+}
+
 /** The largest the hero figure is ever set, before it is shrunk to fit. */
 export function heroStartFont(format: ShareFormat): number {
-  return format.key === 'story' ? 150 : 124
+  return format.key === 'story' ? 128 : 104
 }
 
 /** What the file is called when it lands in somebody's camera roll. */

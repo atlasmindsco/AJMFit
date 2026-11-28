@@ -78,6 +78,84 @@ export function sessionTotals(rows: CountedSet[]): SessionTotals {
   return { reps, sets, volume: Math.round(volume) }
 }
 
+/** One exercise, as it reads on the share card and the detail sheet. */
+export interface ExerciseLine {
+  /** What they actually did, so a swapped slot names the substitute. */
+  name: string
+  /** The top set, worded for the kind of work it was. */
+  detail: string
+}
+
+export interface CountedExercise {
+  name: string
+  rows: CountedSet[]
+  /** A run or a row: a duration was logged instead of sets. */
+  timed?: string | null
+}
+
+/**
+ * What was actually done, exercise by exercise.
+ *
+ * Anthony asked for this on the share card, and he is right that it is the
+ * part worth posting: "7,340 lbs" is the size of a session and the exercise
+ * list is the evidence. Nobody doubts a list of lifts.
+ *
+ * TWO RULES, BOTH ABOUT NOT LYING ON SOMEBODY'S STORY.
+ *
+ * An exercise with nothing ticked is left out entirely. The program said to
+ * do it; the client did not. A plan is not an achievement, and a card listing
+ * eight exercises when five were done is the one thing that would make a
+ * friend who trains with them call it out.
+ *
+ * The TOP set, not the last and not an average. It is what a lifter quotes,
+ * it is the honest high-water mark of the session, and it cannot be gamed by
+ * a light final set. Ties go to the one with more reps, because 225x5 is a
+ * better set than 225x3 and should be the one shown.
+ *
+ * The wording differs by kind on purpose, because each is the idiom for its
+ * own kind of work: "225 lb × 5" is how a loaded set is written down and
+ * "3 × 12" is how pull-ups are. Writing both the same way would be tidier and
+ * would read wrong to the only people who will see it.
+ */
+export function exerciseLines(exercises: CountedExercise[]): ExerciseLine[] {
+  const out: ExerciseLine[] = []
+  for (const ex of exercises) {
+    const name = ex.name.trim()
+    if (!name) continue
+
+    // Timed work logs a duration and has no sets to rank.
+    if (ex.timed != null && String(ex.timed).trim() !== '') {
+      out.push({ name, detail: String(ex.timed).trim() })
+      continue
+    }
+
+    let sets = 0
+    let topWeight = 0
+    let topReps = 0
+    let bestReps = 0
+    for (const row of ex.rows) {
+      if (!row.logged) continue
+      const r = Number(row.reps)
+      if (!Number.isFinite(r) || r <= 0) continue
+      sets++
+      if (r > bestReps) bestReps = r
+      const w = Number(row.weight)
+      if (!Number.isFinite(w) || w <= 0) continue
+      if (w > topWeight || (w === topWeight && r > topReps)) {
+        topWeight = w
+        topReps = r
+      }
+    }
+
+    if (sets === 0) continue
+    out.push({
+      name,
+      detail: topWeight > 0 ? `${topWeight} lb × ${topReps}` : `${sets} × ${bestReps}`,
+    })
+  }
+  return out
+}
+
 /** The label on the orange card. Null when there is nothing to celebrate. */
 export function prHeadline(records: Array<{ exerciseName: string } & RecordHit>): string | null {
   const n = records.length

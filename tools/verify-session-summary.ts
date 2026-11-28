@@ -13,6 +13,7 @@ import {
   recordKindLabel,
   recordDetail,
   encouragement,
+  exerciseLines,
   type CountedSet,
 } from '@/lib/session-summary'
 import type { RecordHit } from '@/lib/records'
@@ -163,6 +164,45 @@ for (const [label, run] of [
   }
   ok(!got.startsWith('THREW'), label, got)
 }
+
+
+console.log('\nWHAT WAS ACTUALLY DONE, EXERCISE BY EXERCISE\n')
+/* This goes on the card that leaves the product, so the bar is that a friend
+   who trained with them could not call any line of it wrong. */
+const row = (weight: number | string | null, reps: number | string | null, logged = true) => ({ weight, reps, logged })
+
+const lines = exerciseLines([
+  { name: 'Barbell Squat', rows: [row(135, 10), row(225, 5), row(185, 8)] },
+  { name: 'Pull Ups', rows: [row(0, 12), row(0, 10), row('', 8)] },
+  { name: 'Leg Press', rows: [row(400, 10, false), row(400, 10, false)] },
+  { name: 'Treadmill', rows: [], timed: '20 min' },
+])
+for (const l of lines) console.log('        ' + l.name.padEnd(16) + l.detail)
+
+ok(lines.length === 3, 'an exercise with nothing ticked is left off entirely', lines.length + ' of 4 kept')
+ok(!lines.some((l) => l.name === 'Leg Press'), 'specifically the one that was planned and not done')
+ok(lines[0].detail === '225 lb × 5', 'the TOP set, not the last one', lines[0].detail)
+ok(lines[1].detail === '3 × 12', 'bodyweight is sets by best reps, with no weight invented', lines[1].detail)
+ok(lines[2].detail === '20 min', 'and timed work quotes its duration', lines[2].detail)
+
+console.log('\nTHE TOP SET IS THE HONEST HIGH-WATER MARK\n')
+/* It cannot be gamed by a light last set, and a tie goes to the one with more
+   reps because 225x5 beats 225x3 and is the one worth showing. */
+ok(exerciseLines([{ name: 'A', rows: [row(225, 5), row(95, 20)] }])[0].detail === '225 lb × 5', 'a light final set does not replace it')
+ok(exerciseLines([{ name: 'A', rows: [row(225, 3), row(225, 5)] }])[0].detail === '225 lb × 5', 'a tie on weight goes to the better set')
+ok(exerciseLines([{ name: 'A', rows: [row(225, 5), row(225, 3)] }])[0].detail === '225 lb × 5', 'whichever order they were logged in')
+
+console.log('\nAND NOTHING ODD REACHES THE CARD\n')
+for (const [label, ex] of [
+  ['a row with no reps', { name: 'A', rows: [row(225, 0)] }],
+  ['a row with junk in the boxes', { name: 'A', rows: [row('abc', 'xyz')] }],
+  ['an unnamed exercise', { name: '   ', rows: [row(225, 5)] }],
+  ['no rows at all', { name: 'A', rows: [] }],
+] as Array<[string, Parameters<typeof exerciseLines>[0][number]]>) {
+  const out = exerciseLines([ex])
+  ok(out.length === 0, label + ' produces no line', JSON.stringify(out))
+}
+ok(!/NaN|undefined|null/.test(JSON.stringify(exerciseLines([{ name: 'A', rows: [row(null, null)] }]))), 'and no NaN ever reaches it')
 
 console.log(failed === 0 ? '\nAll session-summary checks passed.' : `\n${failed} CHECK${failed === 1 ? '' : 'S'} FAILED`)
 process.exit(failed === 0 ? 0 : 1)
