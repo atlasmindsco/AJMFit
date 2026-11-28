@@ -104,7 +104,7 @@ export default function InstallHint() {
           {suggestion.canPromptDirectly && (
             <button
               onClick={() => void install()}
-              className="mt-base h-tap px-card rounded-control bg-brand-blue text-white text-caption font-display font-bold uppercase tracking-wide active:scale-95 transition-transform duration-150"
+              className="mt-base h-tap px-card rounded-control bg-brand-bluefill text-white text-caption font-display font-bold uppercase tracking-wide active:scale-95 transition-transform duration-150"
             >
               Add to home screen
             </button>

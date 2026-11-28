@@ -144,7 +144,7 @@ export default function StudioSettingsPage() {
           value={timezone}
           onChange={(e) => save(e.target.value)}
           disabled={saving}
-          className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50 disabled:opacity-50"
+          className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blueink disabled:opacity-50"
         >
           {zones.map((tz) => (
             <option key={tz} value={tz}>
@@ -292,7 +292,7 @@ function NotificationPrefs({ userId }: { userId: string }) {
           <select
             value={prefs.send_hour}
             onChange={(e) => write({ ...prefs, send_hour: Number(e.target.value) })}
-            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50"
+            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blueink"
           >
             {Array.from({ length: 24 }, (_, h) => (
               <option key={h} value={h}>

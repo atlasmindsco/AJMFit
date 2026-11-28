@@ -77,7 +77,7 @@ export default function CoachNotes({ userId }: { userId: string }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Right shoulder — watch overhead work"
-          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/50"
+          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange"
         />
         <button
           onClick={() => void add()}

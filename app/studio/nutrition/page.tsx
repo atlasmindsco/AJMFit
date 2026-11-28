@@ -1093,7 +1093,7 @@ export default function NutritionPage() {
                                           }
                                           runTypedLookup(next)
                                         }}
-                                        className="w-full px-3 py-2 pr-9 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                        className="w-full px-3 py-2 pr-9 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blueink"
                                       />
                                       {typedLookupActive && (
                                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-brand-blue/20 border-t-brand-blue rounded-full animate-spin" />
@@ -1127,7 +1127,7 @@ export default function NutritionPage() {
                                             applyServing(formatServing(n, servingUnit))
                                           }
                                         }}
-                                        className="w-20 shrink-0 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        className="w-20 shrink-0 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-center focus:outline-none focus:border-brand-blueink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                       />
                                       {/* Opens a readable list rather than the
                                           phone's scrolling wheel of truncated
@@ -1135,7 +1135,7 @@ export default function NutritionPage() {
                                       <button
                                         type="button"
                                         onClick={() => setUnitSheetOpen(true)}
-                                        className="flex-1 min-w-0 flex items-center justify-between gap-2 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-left hover:border-brand-navy/25 focus:outline-none focus:border-brand-blue/50 transition-colors duration-150"
+                                        className="flex-1 min-w-0 flex items-center justify-between gap-2 px-2.5 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body text-left hover:border-brand-navy/25 focus:outline-none focus:border-brand-blueink transition-colors duration-150"
                                       >
                                         <span className="truncate text-brand-navy">{UNITS[servingUnit].label}</span>
                                         <svg className="w-3.5 h-3.5 text-brand-slate shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1156,7 +1156,7 @@ export default function NutritionPage() {
                                           }}
                                           className={`px-2 py-0.5 rounded text-caption font-body transition-colors duration-150 ${
                                             Number(servingAmount) === q
-                                              ? 'bg-brand-blue text-white'
+                                              ? 'bg-brand-bluefill text-white'
                                               : 'bg-brand-navy/[0.05] text-brand-slate hover:bg-brand-navy/[0.1]'
                                           }`}
                                         >
@@ -1176,7 +1176,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, calories: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blueink"
                                     />
                                   </label>
                                 </div>
@@ -1192,7 +1192,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, protein: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blueink"
                                     />
                                   </label>
                                   <label className="block">
@@ -1206,7 +1206,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, carbs: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blueink"
                                     />
                                   </label>
                                   <label className="block">
@@ -1220,7 +1220,7 @@ export default function NutritionPage() {
                                         macroFieldsTouchedRef.current = true
                                         setAddForm((prev) => ({ ...prev, fats: e.target.value }))
                                       }}
-                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blue/50"
+                                      className="w-full px-3 py-2 text-body bg-white border border-brand-navy/10 rounded-control font-body focus:outline-none focus:border-brand-blueink"
                                     />
                                   </label>
                                 </div>
@@ -1228,7 +1228,7 @@ export default function NutritionPage() {
                                   <button
                                     onClick={() => handleAddFood(meal.id)}
                                     disabled={submitting || !addForm.name.trim()}
-                                    className="px-4 py-2 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-bluedark disabled:opacity-50 transition-colors duration-200"
+                                    className="px-4 py-2 bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-bluefillhover disabled:opacity-50 transition-colors duration-200"
                                   >
                                     {submitting ? 'Adding...' : 'Add Food'}
                                   </button>
@@ -1282,7 +1282,7 @@ export default function NutritionPage() {
                                 <button
                                   onClick={() => setSearchMealId(meal.id)}
                                   disabled={analyzing !== null}
-                                  className="py-2 bg-brand-blue rounded-control text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 bg-brand-bluefill rounded-control text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluefillhover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.98] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -1435,7 +1435,7 @@ export default function NutritionPage() {
                   </button>
                   <button
                     onClick={() => adjustWater(8)}
-                    className="w-8 h-8 rounded-full bg-brand-blue text-white font-display font-bold text-lg hover:bg-brand-bluedark transition-colors duration-200"
+                    className="w-8 h-8 rounded-full bg-brand-bluefill text-white font-display font-bold text-lg hover:bg-brand-bluefillhover transition-colors duration-200"
                     aria-label="Add 8 oz"
                   >
                     +

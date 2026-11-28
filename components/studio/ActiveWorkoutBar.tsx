@@ -124,7 +124,7 @@ export default function ActiveWorkoutBar({
 
         <button
           onClick={() => router.push('/studio/programs')}
-          className="h-11 px-5 shrink-0 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
+          className="h-11 px-5 shrink-0 rounded-control bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.1em] hover:bg-brand-bluefillhover active:scale-95 transition-all duration-150"
         >
           Resume
         </button>

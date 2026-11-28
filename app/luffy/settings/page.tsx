@@ -9,7 +9,7 @@ import { fetchCoachSettings, saveCoachSettings, DEFAULT_COACH_SETTINGS, type Coa
 type Tab = 'profile' | 'business' | 'notifications' | 'billing'
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30'
+  'w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange'
 const labelCls = 'text-ink-4 text-caption font-display uppercase tracking-wide block mb-2'
 
 const TIERS = [

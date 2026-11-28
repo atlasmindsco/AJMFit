@@ -17,7 +17,7 @@ export default function ResumeSession({ title = 'Sign in to continue' }: { title
         </p>
         <Link
           href="/members"
-          className="inline-block w-full py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-bluedark transition-colors duration-200"
+          className="inline-block w-full py-3 bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-control hover:bg-brand-bluefillhover transition-colors duration-200"
         >
           Go to Login
         </Link>

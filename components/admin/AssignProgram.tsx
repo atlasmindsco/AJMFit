@@ -114,7 +114,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
-          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body focus:outline-none focus:border-brand-blue/50"
+          className="flex-1 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body focus:outline-none focus:border-brand-blueink"
         >
           <option value="">Choose a program…</option>
           {custom.length > 0 && (
@@ -147,7 +147,7 @@ export default function AssignProgram({ userId }: { userId: string }) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional note sent with it — why this program, what to focus on"
-        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+        className="w-full mt-2 px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
       />
 
       {done && <p className="text-state-success text-label font-body mt-2">{done}</p>}

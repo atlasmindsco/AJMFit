@@ -152,7 +152,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                 <select
                   value={draft.eatingPattern}
                   onChange={(e) => setDraft((p) => ({ ...p, eatingPattern: e.target.value as EatingPattern }))}
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink"
                 >
                   {EATING_PATTERNS.map((p) => (
                     <option key={p.value} value={p.value}>
@@ -190,7 +190,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                   value={draft.allergenNotes}
                   onChange={(e) => setDraft((p) => ({ ...p, allergenNotes: e.target.value }))}
                   placeholder="Kiwi, sulphites"
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink"
                 />
 
                 <label className="block font-display font-semibold text-caption uppercase tracking-[0.15em] text-brand-navy/60 mb-1.5">
@@ -200,7 +200,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                   value={draft.dislikes}
                   onChange={(e) => setDraft((p) => ({ ...p, dislikes: e.target.value }))}
                   placeholder="Tofu, cottage cheese"
-                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40"
+                  className="w-full px-3 py-2.5 mb-4 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink"
                 />
 
                 <div className="flex gap-2">
@@ -280,7 +280,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                 aria-pressed={slot === s.value}
                 className={`px-4 py-2.5 rounded-control text-label font-display font-bold uppercase tracking-wide border transition-colors ${
                   slot === s.value
-                    ? 'bg-brand-blue border-brand-blue text-white shadow-sm'
+                    ? 'bg-brand-bluefill border-brand-blue text-white shadow-sm'
                     : 'bg-white border-brand-navy/15 text-brand-navy hover:border-brand-navy/35 hover:bg-brand-navy/[0.04]'
                 }`}
               >

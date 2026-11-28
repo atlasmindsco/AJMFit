@@ -377,7 +377,7 @@ export default function ClientDashboard() {
 
             <Link
               href={`/studio/programs?day=${today.index}`}
-              className="block w-full text-center py-4 bg-brand-blue text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center py-4 bg-brand-bluefill text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluefillhover active:scale-[0.98] transition-transform duration-200"
             >
               Start Workout
             </Link>
@@ -387,7 +387,7 @@ export default function ClientDashboard() {
             <p className="font-display font-extrabold text-lg text-white mt-2 leading-tight">{myProgram.name}</p>
             <Link
               href="/studio/programs"
-              className="block w-full text-center mt-4 py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center mt-4 py-3 bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluefillhover active:scale-[0.98] transition-transform duration-200"
             >
               Start Training
             </Link>
@@ -399,7 +399,7 @@ export default function ClientDashboard() {
             </p>
             <Link
               href="/studio/programs"
-              className="block w-full text-center py-3 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+              className="block w-full text-center py-3 bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluefillhover active:scale-[0.98] transition-transform duration-200"
             >
               Pick Your Program
             </Link>

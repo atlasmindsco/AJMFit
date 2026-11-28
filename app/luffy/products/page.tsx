@@ -97,7 +97,7 @@ export default function ProductsAdmin() {
     await load()
   }
 
-  const field = 'w-full px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50'
+  const field = 'w-full px-3 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink'
   const label = 'block text-ink-3 text-caption font-display font-bold uppercase tracking-wide mb-1.5'
 
   return (
@@ -115,7 +115,7 @@ export default function ProductsAdmin() {
       {!draft && (
         <button
           onClick={() => setDraft({ ...EMPTY, sort_order: items.length })}
-          className="w-full mb-4 py-3.5 rounded-card bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.99] transition-all"
+          className="w-full mb-4 py-3.5 rounded-card bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluefillhover active:scale-[0.99] transition-all"
         >
           + Add a product
         </button>
@@ -189,7 +189,7 @@ export default function ProductsAdmin() {
             <button onClick={() => { setDraft(null); setError('') }} className="px-5 py-3 rounded-control bg-white/[0.06] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:bg-white/[0.1] transition-colors">
               Cancel
             </button>
-            <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark disabled:opacity-50 transition-colors">
+            <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-control bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluefillhover disabled:opacity-50 transition-colors">
               {saving ? 'Saving…' : draft.id ? 'Save changes' : 'Add product'}
             </button>
           </div>

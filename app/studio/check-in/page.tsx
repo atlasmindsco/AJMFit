@@ -308,7 +308,7 @@ export default function CheckInPage() {
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="185"
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blueink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
 
@@ -320,7 +320,7 @@ export default function CheckInPage() {
             inputMode="numeric"
             value={workouts}
             onChange={(e) => setWorkouts(e.target.value)}
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blueink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
         <div>
@@ -341,7 +341,7 @@ export default function CheckInPage() {
             rows={2}
             value={win}
             onChange={(e) => setWin(e.target.value)}
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
             placeholder="Squatted 185 for the first time"
           />
         </div>
@@ -353,7 +353,7 @@ export default function CheckInPage() {
             rows={2}
             value={obstacle}
             onChange={(e) => setObstacle(e.target.value)}
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
             placeholder="Travelled Thursday and Friday, missed both sessions"
           />
         </div>

@@ -285,7 +285,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search foods, e.g. chicken noodle soup"
-                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                className="w-full pl-9 pr-9 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy placeholder:text-[#94A3B8] focus:outline-none focus:border-brand-blueink focus:ring-2 focus:ring-brand-blue/20"
                 aria-label="Search foods"
               />
               {query && (
@@ -342,7 +342,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   <button
                     onClick={() => setUnitSheetOpen(true)}
                     disabled={choices.length < 2}
-                    className="mt-1.5 w-full flex items-center justify-between gap-3 px-3 py-3 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-left hover:border-brand-navy/20 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-60 transition-colors duration-150"
+                    className="mt-1.5 w-full flex items-center justify-between gap-3 px-3 py-3 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-left hover:border-brand-navy/20 focus:outline-none focus:border-brand-blueink focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-60 transition-colors duration-150"
                   >
                     <span className="min-w-0">
                       <span className="block text-base font-body text-brand-navy truncate">{choice?.label ?? '—'}</span>
@@ -379,7 +379,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                       step={choice?.unit === 'g' ? 1 : 0.25}
                       value={qtyText}
                       onChange={(e) => setQtyText(e.target.value)}
-                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy text-center focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                      className="flex-1 px-3 py-2.5 bg-[#FAFBFD] border border-brand-navy/[0.08] rounded-control text-body font-body text-brand-navy text-center focus:outline-none focus:border-brand-blueink focus:ring-2 focus:ring-brand-blue/20"
                       aria-label={`Amount in ${choice?.unit ?? 'servings'}`}
                     />
                     <button
@@ -400,7 +400,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                           onClick={() => setQtyText(String(n))}
                           className={`px-2.5 py-1 rounded-full text-label font-body border transition-colors duration-150 ${
                             qty === n
-                              ? 'bg-brand-blue text-white border-brand-blue'
+                              ? 'bg-brand-bluefill text-white border-brand-blue'
                               : 'bg-white text-brand-slate border-brand-navy/10 hover:bg-[#FAFBFD]'
                           }`}
                         >
@@ -445,7 +445,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
               <button
                 onClick={handleAdd}
                 disabled={saving || qty <= 0}
-                className="w-full py-3 bg-brand-blue text-white font-display font-bold text-label uppercase tracking-wide rounded-control hover:bg-brand-bluedark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
+                className="w-full py-3 bg-brand-bluefill text-white font-display font-bold text-label uppercase tracking-wide rounded-control hover:bg-brand-bluefillhover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue active:scale-[0.99] disabled:opacity-50 transition-colors duration-200"
               >
                 {saving ? 'Adding…' : `Add to ${meal.name}`}
               </button>

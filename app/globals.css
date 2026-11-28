@@ -106,9 +106,35 @@ body {
   animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---- Reduced motion ----
+ *
+ * This used to switch off exactly one animation, `.animate-fade-up`, while
+ * the app ran six. The ones it missed are the ones that matter: `ping` and
+ * `pulse` never stop. A client who has asked their phone to reduce motion —
+ * commonly for migraine or vestibular reasons — had a green dot pulsing at
+ * them for as long as the screen was open, and a marquee scrolling on the
+ * marketing site. "Reduce motion" is a medical setting on a fitness app, so
+ * the default here is now off-unless-necessary rather than on-unless-named.
+ *
+ * Spinners are the deliberate exception. A loading spinner that stops
+ * spinning reads as a frozen app, which is worse than the motion; it is
+ * slowed instead, which keeps the "still working" signal without the
+ * flicker. Framer Motion's own transforms are already handled: it reads
+ * this same media query and the components here opt into that.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* The one thing that must keep moving, because stopped means broken. */
+  .animate-spin {
+    animation: spin 1.8s linear infinite !important;
   }
 }
 

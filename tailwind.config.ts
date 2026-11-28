@@ -18,6 +18,23 @@ const config: Config = {
           // different hue family than the brand and made the primary CTA drift
           // off-palette on the most-clicked element in the product.
           bluedark: '#0F5FE0',
+          /* THE PRIMARY BUTTON'S FILL, which is not the brand blue.
+             White on #1A7BFF measures 3.95:1. WCAG AA asks 4.5:1 of
+             anything under 18.66px bold, so the same button component was
+             compliant or not depending on which size class it had been
+             given: Share and Done at 20px passed on the technicality that
+             WCAG calls that large text, Start at 16px failed. Nobody can be
+             expected to track that, and 3.95:1 is hard to read in a gym
+             either way.
+             #0F5FE0 takes white to 5.62:1 and #0B4CB8 to 7.66:1, and they
+             are the same hue — the button goes one step deeper, not a
+             different colour. `blue` is untouched and stays what it always
+             was: the brand hue, for tints, borders, accent strokes and the
+             progress strip, where the ratio is measured the other way round
+             and is fine. A dot or an icon circle also keeps `blue`: a
+             graphic owes 3:1, not 4.5:1, and passes. */
+          bluefill: '#0F5FE0',
+          bluefillhover: '#0B4CB8',
           /* Brand blue as TEXT on a dark surface, which the brand blue itself
              cannot do. #1A7BFF was chosen for buttons, where it is a
              background with white on top, and it is excellent at that. Used
@@ -37,6 +54,29 @@ const config: Config = {
           orange: '#F76B16',
           orangedark: '#D8590C',
           slate: '#64748B',
+          /* Achievement gold. Its own token rather than reusing `warning`,
+             which is the colour of "something needs your attention" — a
+             personal record is the opposite of that, and a trophy drawn in
+             the same amber as a sync warning is the app saying two different
+             things in one colour.
+             A customer asked for this directly: "I love how the trophy pops
+             up when you hit a PR, so it would be cool if the little PR
+             section with the trophy — just the label — would be gold too."
+             #D4AF37 reads 8.98:1 on #111 and 8.10:1 on #1C1C1C.
+
+             IT LIVES UNDER `brand`, AND THAT IS NOT A DETAIL. It spent a
+             release under `state` while all twelve usages in the app said
+             `brand-gold`. Tailwind does not warn about a class that names a
+             colour it has never heard of — it simply emits no rule, so the
+             label and the trophy rendered with no colour of their own and
+             inherited whatever was above them: a dim navy, barely visible on
+             black. The PR row shipped looking broken and every check passed,
+             because nothing checked that a colour class resolves to a real
+             token. tools/verify-tokens.ts does now.
+             It is also the right home on the merits: gold is not a state. A
+             record is not a status the app reports, it is the thing the
+             client came for. */
+          gold: '#D4AF37',
         },
         // Dark surfaces for the client studio and trainer portal. These were
         // previously hand-written per component as six different near-blacks
@@ -50,17 +90,8 @@ const config: Config = {
           success: '#22C55E',
           warning: '#F59E0B',
           danger: '#EF4444',
-          /* Achievement gold. Its own token rather than reusing `warning`,
-             which is the colour of "something needs your attention" — a
-             personal record is the opposite of that, and a trophy drawn in
-             the same amber as a sync warning is the app saying two different
-             things in one colour.
-             A customer asked for this directly: "I love how the trophy pops
-             up when you hit a PR, so it would be cool if the little PR
-             section with the trophy — just the label — would be gold too."
-             #D4AF37 against the studio's #111 reads at about 8.9:1, which
-             clears AA for the small uppercase label it carries. */
-          gold: '#D4AF37',
+          // Achievement gold is NOT here. It is `brand.gold` — see the note
+          // on it. A personal record is not a state the app is reporting.
         },
         /* THE INTENSITY TECHNIQUES, AND WHY THEY ARE NOT STATE COLOURS.
            Drop sets, rest-pause and partials are three choices of equal
@@ -72,25 +103,24 @@ const config: Config = {
            the same red as a failed save and a partials badge in the same amber
            as a sync warning, which is the mistake the gold note above exists to
            describe — one colour saying two unrelated things.
-           The hues are unchanged here, deliberately: recolouring a badge a
-           client recognises is a product decision rather than a tidy-up, and
-           it is written up rather than taken. What changes is that they are
-           now DECLARED as a scale of their own, so the collision is visible in
-           the palette instead of hidden in three string literals, and
-           tools/verify-contrast.ts measures them — which immediately found
-           that rest-pause, the only one of the three with a hue of its own,
-           was also the only one that could not be read: purple-500 (#A855F7)
-           measures 4.31:1 on #1C1C1C, under AA for the 13px badge it is set
-           in. That one IS changed, to #C084FC at 6.45:1, because lightening
-           it trades against nothing — there is no semantic colour it has to
-           stay distinct from and no second meaning it carries. Changing the
-           other two would mean choosing new hues for a drop set and a
-           partial, which is the product decision this note declines to take
-           on its own. */
+           They have their own hues now, chosen from the arc the semantic
+           palette leaves empty. Red sits at 0°, amber at 38°, gold at 46° and
+           green at 142°, so roughly 180° to 340° is free, and these three are
+           spread across it: cyan, violet, pink.
+           What is given up is that red and amber FELT intense, which suited a
+           drop set. That feeling is exactly what made them wrong — it is the
+           same feeling the app uses for a failed save. These three are peers,
+           not a severity ladder, and the only job of the colour is to tell
+           them apart.
+           Measuring them also caught that the old purple-500 (#A855F7) was
+           4.31:1 on #1C1C1C, under AA for the 13px badge it is set in, which
+           nobody had noticed in the years it shipped. All three now clear it
+           on both studio surfaces, and tools/verify-contrast.ts asserts both
+           that they pass and that none of them equals a state colour. */
         technique: {
-          drop: '#EF4444',
+          drop: '#22D3EE',
           restpause: '#C084FC',
-          partial: '#F59E0B',
+          partial: '#F472B6',
         },
         // Studio text, four measured tiers. See the note in app/globals.css:
         // the thirteen hand-picked white alphas these replace put 370 of 636

@@ -134,7 +134,7 @@ export default function MessagesPage() {
                   <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search clients..." className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control pl-10 pr-4 py-2.5 text-body text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/30" />
+                  <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search clients..." className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control pl-10 pr-4 py-2.5 text-body text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange" />
                 </div>
               </div>
               <div className="overflow-y-auto max-h-[540px]">
@@ -186,7 +186,7 @@ export default function MessagesPage() {
                     ) : (
                       messages.map((msg) => (
                         <div key={msg.id} className={`flex ${msg.from_trainer ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[75%] px-4 py-3 rounded-card ${msg.from_trainer ? 'bg-brand-blue text-white rounded-br-md' : 'bg-white/[0.06] text-ink rounded-bl-md'}`}>
+                          <div className={`max-w-[75%] px-4 py-3 rounded-card ${msg.from_trainer ? 'bg-brand-bluefill text-white rounded-br-md' : 'bg-white/[0.06] text-ink rounded-bl-md'}`}>
                             <p className="text-body font-body leading-relaxed">{msg.body}</p>
                             <p className={`text-caption font-body mt-1 ${msg.from_trainer ? 'text-ink-3' : 'text-ink-4'}`}>{formatMsgTime(msg.created_at)}</p>
                           </div>
@@ -198,8 +198,8 @@ export default function MessagesPage() {
 
                   <div className="px-6 py-4 border-t border-white/[0.06]">
                     <div className="flex items-center gap-3">
-                      <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} type="text" placeholder="Type a message..." className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/30" />
-                      <button onClick={send} disabled={!input.trim() || sending} className="w-10 h-10 rounded-control bg-brand-orange flex items-center justify-center hover:bg-brand-orangedark active:scale-95 transition-all duration-200 disabled:opacity-30">
+                      <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} type="text" placeholder="Type a message..." className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-ink-2 font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-orange" />
+                      <button onClick={send} disabled={!input.trim() || sending} aria-label="Send message" className="w-10 h-10 rounded-control bg-brand-orange flex items-center justify-center hover:bg-brand-orangedark active:scale-95 transition-all duration-200 disabled:opacity-30">
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                         </svg>

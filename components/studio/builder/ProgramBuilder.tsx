@@ -216,7 +216,7 @@ export default function ProgramBuilder({
           value={day.name}
           onChange={(e) => setDay(openDay, { ...day, name: e.target.value })}
           placeholder="Name this day"
-          className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+          className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
         />
         {/* Workout rows store the day's NAME, so a rename without a migration
             would orphan every session logged under the old one. It does
@@ -369,7 +369,7 @@ export default function ProgramBuilder({
         value={program.name}
         onChange={(e) => setProgram((p) => ({ ...p, name: e.target.value }))}
         placeholder="Name your program"
-        className="w-full px-3 py-3 mb-4 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+        className="w-full px-3 py-3 mb-4 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-lg font-display font-bold placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
       />
 
       <div className="space-y-2">

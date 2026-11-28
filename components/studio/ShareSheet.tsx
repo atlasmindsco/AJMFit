@@ -336,7 +336,7 @@ export default function ShareSheet({
         <button
           onClick={() => void share()}
           disabled={busy || !preview}
-          className="w-full mt-4 h-taplg rounded-card bg-brand-blue text-white text-heading font-display font-bold active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
+          className="w-full mt-4 h-taplg rounded-card bg-brand-bluefill text-white text-heading font-display font-bold active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
         >
           {busy ? 'Preparing…' : 'Share'}
         </button>

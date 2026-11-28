@@ -185,13 +185,13 @@ export default function LuffyNutritionPage() {
                       type="number"
                       value={edits[r.id] ?? String(Math.round(Number(r.new_cal)))}
                       onChange={(ev) => setEdits((p) => ({ ...p, [r.id]: ev.target.value }))}
-                      className="w-24 px-3 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blue/50"
+                      className="w-24 px-3 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body focus:outline-none focus:border-brand-blueink"
                     />
                   )}
                   <button
                     onClick={() => decide(r, 'approve')}
                     disabled={busy === r.id}
-                    className="px-4 py-2 rounded-control bg-brand-blue text-white font-display font-bold text-label uppercase tracking-wide hover:bg-brand-bluedark disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 rounded-control bg-brand-bluefill text-white font-display font-bold text-label uppercase tracking-wide hover:bg-brand-bluefillhover disabled:opacity-50 transition-colors"
                   >
                     {busy === r.id ? '…' : r.new_cal !== null ? 'Approve' : 'Acknowledge'}
                   </button>

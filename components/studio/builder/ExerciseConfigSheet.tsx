@@ -90,7 +90,7 @@ export default function ExerciseConfigSheet({
               key={r}
               onClick={() => { setReps(r); setCustomReps(false) }}
               className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
-                !customReps && reps === r ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
+                !customReps && reps === r ? 'bg-brand-bluefill text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
               {r}
@@ -99,7 +99,7 @@ export default function ExerciseConfigSheet({
           <button
             onClick={() => setCustomReps(true)}
             className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
-              customReps ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
+              customReps ? 'bg-brand-bluefill text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
             }`}
           >
             Other
@@ -110,7 +110,7 @@ export default function ExerciseConfigSheet({
             value={reps}
             onChange={(e) => setReps(e.target.value)}
             placeholder={hold ? "e.g. 75 sec" : "e.g. 5, or 20 min"}
-            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
           />
         )}
 
@@ -121,7 +121,7 @@ export default function ExerciseConfigSheet({
               key={s}
               onClick={() => setRest(s)}
               className={`px-3.5 py-2.5 rounded-control text-body font-body transition-colors duration-150 ${
-                rest === s ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
+                rest === s ? 'bg-brand-bluefill text-white' : 'bg-white/[0.05] text-ink-2 hover:text-white'
               }`}
             >
               {restLabel(s)}
@@ -135,7 +135,7 @@ export default function ExerciseConfigSheet({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. pause at the bottom"
-            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="mt-2 w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
           />
         </details>
 
@@ -145,7 +145,7 @@ export default function ExerciseConfigSheet({
             buttons instead: one keeps, one does not, and both say which. */}
         <button
           onClick={commit}
-          className="w-full mt-6 py-3.5 rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
+          className="w-full mt-6 py-3.5 rounded-control bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluefillhover active:scale-[0.98] transition-all duration-200"
         >
           Save
         </button>

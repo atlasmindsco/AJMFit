@@ -15,7 +15,7 @@ import {
 } from '@/lib/body-metrics'
 
 const inputCls =
-  'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+  'w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
 
 const labelCls = 'text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]'
 

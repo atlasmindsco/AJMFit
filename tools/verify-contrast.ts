@@ -40,6 +40,8 @@ const WHITE = '#FFFFFF'
 const OFFWHITE = '#F4F6F9'
 
 const BLUE = '#1A7BFF'
+const BLUEFILL = '#0F5FE0'
+const BLUEFILLHOVER = '#0B4CB8'
 const BLUEINK = '#4D9AFF'
 const ORANGE = '#F76B16'
 const GOLD = '#D4AF37'
@@ -98,33 +100,50 @@ for (const [sname, surface] of [['base', BASE], ['raised', RAISED], ['overlay', 
   ok(good.level !== 'fail', `brand-blueink clears it on ${sname}`, `${good.ratio}:1 ${good.level}`)
 }
 
-console.log('\nTHE PRIMARY BUTTON, WHICH IS A SEPARATE AND LARGER PROBLEM\n')
-/* WHITE ON THE BRAND BLUE FILL IS 3.95:1. Not fixed here, and not hidden.
-   That is the most-clicked element in the product — Start, Log Set, Save,
-   Share, the marketing CTA — and at the sizes it is actually set in, it
-   passes only because of how WCAG defines large text:
+console.log('\nTHE PRIMARY BUTTON\n')
+/* WHITE ON THE BRAND BLUE WAS 3.95:1, on the most-clicked element in the
+   product — Start, Log Set, Save, Share, the marketing CTA. At the sizes it
+   is actually set in, it passed only on a technicality:
 
-     16px bold (`text-base`, the Start button)  → small text, needs 4.5 → FAILS
-     20px bold (`text-heading`, Share and Done) → large text, needs 3.0 → passes
+     16px bold (`text-base`, the Start button)  → small text, needs 4.5 → FAILED
+     20px bold (`text-heading`, Share and Done) → large text, needs 3.0 → passed
 
-   So the same button component is compliant or not depending on which size
-   class it was given, which is not a thing anyone can be expected to track.
-   The fix is one line — make the fill #0F5FE0, the shade already in the
-   palette as `bluedark`, which takes white to 5.63:1 — but it changes the
-   colour of the primary button on every screen including the marketing site,
-   and that is a brand decision rather than a code one. It is in the report,
-   with the numbers.
-   These assertions pin the problem so it cannot quietly drift further, and
-   will need updating the day the fill changes. */
-ok(judge(WHITE, BLUE, 16, true)!.level === 'fail', 'white on brand-blue at 16px bold fails AA', `${judge(WHITE, BLUE, 16, true)!.ratio}:1 — needs 4.5`)
-ok(judge(WHITE, BLUE, 20, true)!.level !== 'fail', 'and passes at 20px bold only because that counts as large', `${judge(WHITE, BLUE, 20, true)!.ratio}:1 — needs 3.0`)
-ok(judge(WHITE, '#0F5FE0', 16, true)!.level !== 'fail', 'the one-line fix, for the record: white on brand-bluedark', `${judge(WHITE, '#0F5FE0', 16, true)!.ratio}:1`)
+   The same button component was compliant or not depending on which size
+   class somebody had given it, which nobody can be expected to track.
+   Fixed by giving the fill its own token at #0F5FE0 rather than by
+   recolouring the brand: `blue` is unchanged and still does everything else
+   it did. The separation is the point — a colour can be perfectly good as a
+   tint, a border and a graphic while being unusable under white text, and
+   one token cannot be both. */
+ok(judge(WHITE, BLUE, 16, true)!.level === 'fail', 'white on brand-blue at 16px bold fails AA, which is why it is no longer a fill', `${judge(WHITE, BLUE, 16, true)!.ratio}:1 — needs 4.5`)
+ok(judge(WHITE, BLUEFILL, 16, true)!.level !== 'fail', 'white on brand-bluefill, the colour buttons use now', `${judge(WHITE, BLUEFILL, 16, true)!.ratio}:1`)
+ok(judge(WHITE, BLUEFILLHOVER, 16, true)!.level !== 'fail', 'and on its hover', `${judge(WHITE, BLUEFILLHOVER, 16, true)!.ratio}:1`)
+/* A dot, a progress bar or an icon circle keeps the brand blue: a graphic
+   that carries meaning owes 3:1, not 4.5:1, and it clears that comfortably
+   against both studio surfaces. Only text on a fill was ever the problem. */
+ok(ratio(BLUE, BASE)! >= 3, 'the brand blue stays fine as a graphic on #111', `${ratio(BLUE, BASE)!.toFixed(2)}:1 — needs 3.0`)
+ok(ratio(BLUE, RAISED)! >= 3, 'and on #1C1C1C', `${ratio(BLUE, RAISED)!.toFixed(2)}:1`)
+
+console.log('\nAND THE FOCUS INDICATOR, WHICH KEYBOARD USERS NAVIGATE BY\n')
+/* Every input in the app cancels the global focus ring with
+   `focus:outline-none` and substitutes a border colour. That is a legitimate
+   pattern and it was being done with brand-blue at 50% opacity, which lands
+   at 1.92:1 against the field it outlines — a focus indicator owes 3:1, so
+   the thing telling a keyboard user where they are was effectively invisible.
+   Measured as the blend, because both the border and the field are
+   translucent whites over the card. */
+const FIELD = over(WHITE, 0.04, RAISED)!
+const RESTING = over(WHITE, 0.08, FIELD)!
+const OLDFOCUS = over(BLUE, 0.5, FIELD)!
+ok(ratio(OLDFOCUS, FIELD)! < 3, 'the old focus border was under 3:1, as documented', `${ratio(OLDFOCUS, FIELD)!.toFixed(2)}:1`)
+ok(ratio(BLUEINK, FIELD)! >= 3, 'brand-blueink at full strength clears it', `${ratio(BLUEINK, FIELD)!.toFixed(2)}:1`)
+ok(ratio(BLUEINK, RESTING)! >= 3, 'and is distinguishable from the resting border, not just from the field', `${ratio(BLUEINK, RESTING)!.toFixed(2)}:1`)
 
 console.log('\nTHE SEMANTIC COLOURS, AS TEXT ON THE STUDIO SURFACES\n')
 for (const [name, hex] of [
   ['state-success', SUCCESS],
   ['state-warning', WARNING],
-  ['state-gold', GOLD],
+  ['brand-gold', GOLD],
   ['state-danger', DANGER],
   ['brand-orange', ORANGE],
   ['brand-blueink', BLUEINK],
@@ -158,9 +177,9 @@ console.log('\nTHE INTENSITY TECHNIQUES ARE A CATEGORICAL SCALE\n')
    collision is in the palette rather than in three string literals.
    The collision itself is not fixed here and is in the report — recolouring a
    badge a client recognises is a product decision, not a tidy-up. */
-const T_DROP = '#EF4444'
+const T_DROP = '#22D3EE'
 const T_RESTPAUSE = '#C084FC'
-const T_PARTIAL = '#F59E0B'
+const T_PARTIAL = '#F472B6'
 for (const [name, hex] of [['drop', T_DROP], ['restpause', T_RESTPAUSE], ['partial', T_PARTIAL]] as Array<[string, string]>) {
   for (const [sname, surface] of [['base', BASE], ['raised', RAISED]] as Array<[string, string]>) {
     const v = judge(hex, surface, 13, true)!
@@ -170,9 +189,17 @@ for (const [name, hex] of [['drop', T_DROP], ['restpause', T_RESTPAUSE], ['parti
 /* Stated as assertions so nobody has to take the comment's word for it, and so
    that the day somebody recolours one of them this check turns red and sends
    them to the note above. */
-ok(T_DROP === DANGER, 'technique-drop is the SAME VALUE as state-danger', 'a drop set is drawn in the colour of a failure')
-ok(T_PARTIAL === WARNING, 'technique-partial is the SAME VALUE as state-warning', 'partials are drawn in the colour of a sync warning')
-ok(T_RESTPAUSE !== DANGER && T_RESTPAUSE !== WARNING && T_RESTPAUSE !== SUCCESS, 'only rest-pause has a hue of its own')
+/* The collision is gone, and this is what keeps it gone. Drop set used to be
+   #EF4444 and partials #F59E0B — the danger and warning values to the digit,
+   so a drop-set badge was drawn in the colour of a failed save. */
+const SEMANTIC = [['state-danger', DANGER], ['state-warning', WARNING], ['state-success', SUCCESS], ['brand-gold', GOLD], ['brand-blue', BLUE]] as Array<[string, string]>
+for (const [tname, thex] of [['drop', T_DROP], ['restpause', T_RESTPAUSE], ['partial', T_PARTIAL]] as Array<[string, string]>) {
+  const clash = SEMANTIC.find(([, shex]) => shex.toLowerCase() === thex.toLowerCase())
+  ok(!clash, `technique-${tname} is nobody else's colour`, clash ? `IDENTICAL to ${clash[0]}` : thex)
+}
+/* And distinct from each other, which is the only thing a categorical scale
+   is actually for. */
+ok(new Set([T_DROP, T_RESTPAUSE, T_PARTIAL]).size === 3, 'and the three are distinct from each other')
 
 console.log('\nTHE SHARE CARD, WHICH IS THE ONE IMAGE THAT LEAVES THE PRODUCT\n')
 /* It gets its own section because it gets looked at under the worst conditions

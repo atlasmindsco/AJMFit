@@ -65,7 +65,7 @@ export default function FeedbackButton() {
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
                 placeholder="What's on your mind?"
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-3 py-2 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange/40"
+                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-3 py-2 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange"
               />
               <div className="flex justify-end gap-2 mt-3">
                 <button onClick={() => setOpen(false)} className="px-3 py-1.5 text-ink-3 text-label font-body hover:text-ink-2">Cancel</button>

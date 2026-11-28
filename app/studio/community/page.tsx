@@ -90,8 +90,8 @@ export default function CommunityPage() {
                   <button key={c} onClick={() => setDraft({ ...draft, category: c })} className={`px-3 py-1.5 rounded-control text-caption font-display font-bold uppercase tracking-wide ${draft.category === c ? 'bg-brand-orange text-white' : 'bg-white/[0.04] text-ink-3'}`}>{c}</button>
                 ))}
               </div>
-              <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-body text-white font-body mb-2 focus:outline-none focus:border-brand-orange/40" />
-              <textarea value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} rows={3} placeholder="Share something…" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange/40" />
+              <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Title" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-body text-white font-body mb-2 focus:outline-none focus:border-brand-orange" />
+              <textarea value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} rows={3} placeholder="Share something…" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-control px-4 py-2.5 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange" />
               <div className="flex justify-end mt-3">
                 <button onClick={submitPost} disabled={posting || !draft.title.trim()} className="px-5 py-2 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide rounded-control disabled:opacity-40">{posting ? 'Posting…' : 'Post'}</button>
               </div>
@@ -132,8 +132,8 @@ export default function CommunityPage() {
                       </div>
                     ))}
                     <div className="flex gap-2">
-                      <input value={commentText} onChange={(e) => setCommentText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitComment(p.id) }} placeholder="Write a comment…" className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-control px-3 py-2 text-body text-white font-body focus:outline-none focus:border-brand-orange/40" />
-                      <button onClick={() => submitComment(p.id)} disabled={!commentText.trim()} className="px-3 py-2 bg-brand-blue text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">Send</button>
+                      <input value={commentText} onChange={(e) => setCommentText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitComment(p.id) }} placeholder="Write a comment…" className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-control px-3 py-2 text-body text-white font-body focus:outline-none focus:border-brand-orange" />
+                      <button onClick={() => submitComment(p.id)} disabled={!commentText.trim()} className="px-3 py-2 bg-brand-bluefill text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">Send</button>
                     </div>
                   </div>
                 )}

@@ -180,7 +180,7 @@ export default function ClientMessagesPage() {
                   <div className="max-w-[75%]">
                     <div className={`px-3.5 py-2.5 text-caption font-body leading-relaxed ${
                       isClient
-                        ? 'bg-brand-blue text-white rounded-card rounded-br-md'
+                        ? 'bg-brand-bluefill text-white rounded-card rounded-br-md'
                         : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
                     }`}>
                       {msg.body}
@@ -212,6 +212,7 @@ export default function ClientMessagesPage() {
             <button
               onClick={send}
               disabled={!input.trim() || sending}
+              aria-label="Send message"
               className="w-9 h-9 rounded-full bg-brand-blue flex items-center justify-center hover:bg-brand-bluedark active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
             >
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">

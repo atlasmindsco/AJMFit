@@ -59,8 +59,8 @@ export default function ProgramLibrary() {
 
       {showNew && (
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-card p-5 space-y-3">
-          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body focus:outline-none focus:border-brand-orange/30" />
-          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange/30" />
+          <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Program name (e.g. Muscle Builder)" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body focus:outline-none focus:border-brand-orange" />
+          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} placeholder="Description" className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-4 py-2.5 text-body text-white font-body resize-none focus:outline-none focus:border-brand-orange" />
           <div className="grid grid-cols-3 gap-3">
             <select value={draft.level} onChange={(e) => setDraft({ ...draft, level: e.target.value })} className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-label text-ink font-body">{LEVELS.map((l) => <option key={l}>{l}</option>)}</select>
             <input type="number" value={draft.days_per_week} onChange={(e) => setDraft({ ...draft, days_per_week: Number(e.target.value) })} placeholder="Days/wk" className="bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-label text-ink font-body" />
@@ -106,7 +106,7 @@ export default function ProgramLibrary() {
                   <option value="">Assign to client…</option>
                   {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-brand-blue text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">Assign</button>
+                <button onClick={() => assign(p.id)} disabled={!assignTo[p.id]} className="px-4 py-2 bg-brand-bluefill text-white text-label font-display font-bold uppercase rounded-control disabled:opacity-40">Assign</button>
               </div>
             </div>
           )

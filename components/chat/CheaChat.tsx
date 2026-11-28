@@ -211,7 +211,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                 <div className="max-w-[75%]">
                   <div className={`px-3.5 py-2.5 text-caption font-body leading-relaxed whitespace-pre-wrap ${
                     isUser
-                      ? 'bg-brand-blue text-white rounded-card rounded-br-md'
+                      ? 'bg-brand-bluefill text-white rounded-card rounded-br-md'
                       : isDark
                         ? 'bg-white/[0.08] text-ink rounded-card rounded-bl-md'
                         : 'bg-white text-brand-navy rounded-card rounded-bl-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
@@ -235,7 +235,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
                             router.push(l.route)
                             onNavigate?.()
                           }}
-                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-brand-blue text-white text-caption font-body font-semibold hover:bg-brand-bluedark active:scale-95 transition-all duration-200"
+                          className="group inline-flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-full bg-brand-bluefill text-white text-caption font-body font-semibold hover:bg-brand-bluefillhover active:scale-95 transition-all duration-200"
                         >
                           {l.label}
                           <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -272,7 +272,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
             onKeyDown={handleKeyDown}
             placeholder="Message Kid Striker..."
             disabled={isStreaming}
-            className={`flex-1 rounded-full px-4 py-2 text-body font-body focus:outline-none transition-colors duration-200 ${
+            className={`flex-1 rounded-full px-4 py-2 text-body font-body focus:outline-none focus:border focus:border-brand-blueink transition-colors duration-200 ${
               isDark
                 ? 'bg-white/[0.06] text-ink-2 placeholder:text-ink-4 focus:bg-white/[0.08]'
                 : 'bg-[#F5F6F8] text-brand-navy placeholder:text-brand-slate/50 focus:bg-[#ECEEF2]'
@@ -281,6 +281,7 @@ export default function CheaChat({ portal, onNavigate }: CheaChatProps) {
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isStreaming}
+            aria-label="Send message"
             className="w-9 h-9 rounded-full bg-brand-blue flex items-center justify-center hover:bg-brand-bluedark active:scale-95 transition-all duration-200 disabled:opacity-30 shrink-0"
           >
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">

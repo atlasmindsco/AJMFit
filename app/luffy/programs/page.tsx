@@ -138,7 +138,7 @@ export default function ProgramsPage() {
                 placeholder="Search 873 exercises..."
                 value={libSearch}
                 onChange={(e) => setLibSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-control font-body text-body text-white placeholder:text-ink-4 focus:outline-none focus:border-brand-orange/40 transition-colors duration-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-control font-body text-body text-white placeholder:text-ink-4 focus:outline-none focus:border-brand-orange transition-colors duration-200"
               />
             </div>
 
@@ -172,7 +172,7 @@ export default function ProgramsPage() {
                     onClick={() => setLibEquipment(e)}
                     className={`px-2.5 py-1 rounded-control text-caption font-display font-semibold uppercase tracking-wide transition-all duration-150 capitalize ${
                       libEquipment === e
-                        ? 'bg-brand-blue text-white'
+                        ? 'bg-brand-bluefill text-white'
                         : 'bg-white/[0.04] text-ink-4 hover:text-ink-2'
                     }`}
                   >

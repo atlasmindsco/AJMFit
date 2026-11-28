@@ -310,7 +310,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.currentWeight || ''}
                     onChange={(e) => handleChange('currentWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="180"
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.goalWeight || ''}
                     onChange={(e) => handleChange('goalWeight', parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="170"
                   />
                 </div>
@@ -344,7 +344,7 @@ export default function SetupNutritionPage() {
                           setHeightFeet(feet)
                           handleChange('height', feet * 12 + (heightInches || 0))
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="5"
                         min="0"
                       />
@@ -359,7 +359,7 @@ export default function SetupNutritionPage() {
                           setHeightInches(inches)
                           handleChange('height', (heightFeet || 0) * 12 + inches)
                         }}
-                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                        className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                         placeholder="10"
                         min="0"
                         max="11"
@@ -378,7 +378,7 @@ export default function SetupNutritionPage() {
                     type="number"
                     value={setup.age || ''}
                     onChange={(e) => handleChange('age', parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy placeholder:text-brand-navy/30 focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                     placeholder="25"
                   />
                 </div>
@@ -391,7 +391,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.sex}
                     onChange={(e) => handleChange('sex', e.target.value as Sex)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -409,7 +409,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.jobActivity ?? 'sedentary'}
                     onChange={(e) => handleChange('jobActivity', e.target.value as JobActivity)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     {JOB_ACTIVITY_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -426,7 +426,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.trainingDaysPerWeek ?? 3}
                     onChange={(e) => handleChange('trainingDaysPerWeek', parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => (
                       <option key={d} value={d}>
@@ -449,7 +449,7 @@ export default function SetupNutritionPage() {
                   <select
                     value={setup.goal}
                     onChange={(e) => handleChange('goal', e.target.value as FitnessGoal)}
-                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blue/40 focus:ring-1 focus:ring-brand-blue/20 transition-colors"
+                    className="w-full px-4 py-3 bg-brand-offwhite border border-brand-navy/[0.08] rounded-control font-body text-body text-brand-navy focus:outline-none focus:border-brand-blueink focus:ring-1 focus:ring-brand-blue/20 transition-colors"
                   >
                     <option value="lose_fat">Lose Fat</option>
                     <option value="build_muscle">Build Muscle</option>

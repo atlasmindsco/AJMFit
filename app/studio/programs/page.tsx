@@ -171,7 +171,7 @@ const selectAllOnFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string; ring: string; bg: string; border: string; text: string; hint: string }> = {
   dropset: {
     label: 'Drop Set',
-    color: '#EF4444',
+    color: '#22D3EE',
     ring: 'ring-technique-drop/30',
     bg: 'bg-technique-drop/[0.06]',
     border: 'border-technique-drop/15',
@@ -189,7 +189,7 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
   },
   partial: {
     label: 'Partials',
-    color: '#F59E0B',
+    color: '#F472B6',
     ring: 'ring-technique-partial/30',
     bg: 'bg-technique-partial/[0.06]',
     border: 'border-technique-partial/15',
@@ -2435,8 +2435,13 @@ export default function ProgramsPage() {
              and a client who reads it as metadata never reads it. Blue is
              already what this app uses for "the app is telling you
              something": the Today eyebrow, the primary button, the active
-             exercise border. #1A7BFF on #1C1C1C reads at 5.2:1, which clears
-             AA for this size. */
+             exercise border.
+             `blueink` rather than `blue`, and that distinction is the whole
+             point of the token: the brand blue measures 4.32:1 on this
+             surface, under AA, and #4D9AFF measures 5.99:1. An earlier
+             version of this comment claimed 5.2:1 for the brand blue, which
+             was an estimate nobody had run. tools/verify-contrast.ts runs
+             it. */
           const item = (label: string, body: string) => (
             <div>
               <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-[0.15em]">{label}</p>
@@ -2536,7 +2541,7 @@ export default function ProgramsPage() {
 
                   <button
                     onClick={() => { setSelectedDay(todayIndex); setView('workout') }}
-                    className="w-full mt-5 py-4 bg-brand-blue text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                    className="w-full mt-5 py-4 bg-brand-bluefill text-white text-base font-display font-bold uppercase tracking-[0.1em] rounded-control hover:bg-brand-bluefillhover active:scale-[0.98] transition-transform duration-200"
                   >
                     Start {weeklyPlan[todayIndex].name}
                   </button>
@@ -2832,7 +2837,7 @@ export default function ProgramsPage() {
                     <button
                       onClick={() => void keepSwapsInProgram()}
                       disabled={keepingSwaps}
-                      className="mt-3 px-3.5 py-2 rounded-control bg-brand-blue text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/85 disabled:opacity-40 active:scale-[0.98] transition-all duration-200"
+                      className="mt-3 px-3.5 py-2 rounded-control bg-brand-bluefill text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/85 disabled:opacity-40 active:scale-[0.98] transition-all duration-200"
                     >
                       {keepingSwaps ? 'Saving…' : 'Keep these changes'}
                     </button>
@@ -3393,7 +3398,7 @@ export default function ProgramsPage() {
                                                     }}
                                                     className={`px-2 py-1 rounded text-caption font-display font-bold transition-colors duration-150 ${
                                                       customSec === sec
-                                                        ? 'bg-brand-blue text-white'
+                                                        ? 'bg-brand-bluefill text-white'
                                                         : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                     }`}
                                                   >
@@ -3502,7 +3507,7 @@ export default function ProgramsPage() {
                                                       })()
                                                     }, 500)
                                                   }}
-                                                  className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                  className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                                 <span className="text-ink-3 text-label font-body">
                                                   minutes
@@ -3552,7 +3557,7 @@ export default function ProgramsPage() {
                                                         })
                                                       }, 500)
                                                     }}
-                                                    className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-24 px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-base font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     aria-label="Distance in miles, optional"
                                                   />
                                                   <span className="text-ink-3 text-label font-body">
@@ -3851,7 +3856,7 @@ export default function ProgramsPage() {
                                                   }}
                                                   className={`h-11 min-w-11 px-3 rounded-control text-label font-display font-bold transition-colors duration-150 ${
                                                     rirByExercise[logKey] === q.key
-                                                      ? 'bg-brand-blue text-white'
+                                                      ? 'bg-brand-bluefill text-white'
                                                       : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
                                                   }`}
                                                 >
@@ -4105,7 +4110,7 @@ export default function ProgramsPage() {
                                                   value={log.weight}
                                                   onFocus={selectAllOnFocus}
                                                   onChange={(e) => handleLogChange('weight', e.target.value)}
-                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
+                                                  className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blueink transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.weight ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                   aria-label={`Set ${si + 1} weight in pounds`}
                                                 />
                                               )}
@@ -4116,7 +4121,7 @@ export default function ProgramsPage() {
                                                 value={log.reps}
                                                 onFocus={selectAllOnFocus}
                                                 onChange={(e) => handleLogChange('reps', e.target.value)}
-                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
+                                                className={`w-full px-3 py-3 bg-white/[0.04] border border-white/[0.08] rounded-control min-h-taplg text-body font-body text-center focus:outline-none focus:border-brand-blueink transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${numberTone} ${suggested.reps ? 'placeholder:text-ink-3' : 'placeholder:text-ink-4'}`}
                                                 aria-label={`Set ${si + 1} ${hold ? 'seconds held' : explosive ? 'efforts' : 'reps'}`}
                                               />
                                               <div className="flex items-center justify-center">
@@ -4170,7 +4175,7 @@ export default function ProgramsPage() {
                                                    at 14px in a 40px box. 48px and the label
                                                    step, because this is tapped with shaking
                                                    hands at the end of a heavy set. */
-                                                className="w-full mt-snug h-taplg rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
+                                                className="w-full mt-snug h-taplg rounded-control bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.12em] hover:bg-brand-bluefillhover active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:active:scale-100"
                                               >
                                                 Log set {si + 1}
                                               </button>
@@ -4189,7 +4194,7 @@ export default function ProgramsPage() {
                                                     onClick={() => handleLogChange('reps', String(secs))}
                                                     className={`px-3 py-1.5 rounded-control text-caption font-display font-bold transition-colors duration-150 ${
                                                       shownReps === String(secs)
-                                                        ? 'bg-brand-blue text-white'
+                                                        ? 'bg-brand-bluefill text-white'
                                                         : 'bg-white/[0.05] text-ink-2 hover:text-white'
                                                     }`}
                                                   >
@@ -4336,7 +4341,7 @@ export default function ProgramsPage() {
                                                 }}
                                                 className={`h-11 min-w-11 px-3 rounded-control text-label font-display font-bold transition-colors duration-150 ${
                                                   on
-                                                    ? 'bg-brand-blue text-white'
+                                                    ? 'bg-brand-bluefill text-white'
                                                     : isTarget
                                                       ? 'bg-white/[0.04] text-ink-2 ring-1 ring-brand-blue/40'
                                                       : 'bg-white/[0.04] text-ink-3 hover:text-ink-2'
@@ -4474,7 +4479,7 @@ export default function ProgramsPage() {
                                                     value={iLog.weight}
                                                     onFocus={selectAllOnFocus}
                                                     onChange={(e) => handleIntensityChange('weight', e.target.value)}
-                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-body font-body text-center placeholder:text-white/15 focus:outline-none transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-control text-white text-body font-body text-center placeholder:text-white/15 focus:outline-none focus:border-brand-blueink transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                     style={{ borderColor: iLog.done ? `${meta.color}55` : undefined }}
                                                   />
                                                   <div className="flex items-center justify-center">
@@ -4564,7 +4569,7 @@ export default function ProgramsPage() {
                       {focusIndex < selected.exercises.length - 1 ? (
                         <button
                           onClick={() => goToExercise(focusIndex + 1)}
-                          className="flex-1 min-w-0 px-card h-taplg rounded-control bg-brand-blue text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-[0.98] transition-all duration-200"
+                          className="flex-1 min-w-0 px-card h-taplg rounded-control bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-wide hover:bg-brand-bluefillhover active:scale-[0.98] transition-all duration-200"
                         >
                           <span className="block truncate">
                             Next: {swappedExercises[`${selectedDay}-${selected.exercises[focusIndex + 1].name}`] ?? selected.exercises[focusIndex + 1].name}
@@ -4653,7 +4658,7 @@ export default function ProgramsPage() {
                           }
                         }
                       }}
-                      className="w-full py-4 bg-brand-blue text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluedark active:scale-[0.98] transition-transform duration-200"
+                      className="w-full py-4 bg-brand-bluefill text-white text-label font-display font-bold uppercase tracking-[0.12em] rounded-card hover:bg-brand-bluefillhover active:scale-[0.98] transition-transform duration-200"
                     >
                       Start Workout
                     </button>
@@ -4759,7 +4764,7 @@ export default function ProgramsPage() {
                               onChange={(e) => setRenaming({ id: p.id, name: e.target.value })}
                               onKeyDown={(e) => { if (e.key === 'Enter') void commitRename(); if (e.key === 'Escape') setRenaming(null) }}
                               onBlur={() => void commitRename()}
-                              className="w-full px-2.5 py-1.5 rounded-control bg-white/[0.06] border border-brand-blue/40 text-white text-body font-display font-bold focus:outline-none"
+                              className="w-full px-2.5 py-1.5 rounded-control bg-white/[0.06] border border-brand-blue/40 text-white text-body font-display font-bold focus:outline-none focus:border-brand-blueink"
                               aria-label="Program name"
                             />
                           ) : (
@@ -4800,7 +4805,7 @@ export default function ProgramsPage() {
                               )
                             }
                           }}
-                          className="shrink-0 px-3 py-2 rounded-control bg-brand-blue text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-bluedark active:scale-95 transition-all duration-150"
+                          className="shrink-0 px-3 py-2 rounded-control bg-brand-bluefill text-white text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-bluefillhover active:scale-95 transition-all duration-150"
                         >
                           Use
                         </button>
@@ -5444,7 +5449,7 @@ function SwapSheet({
               key={r.key}
               onClick={() => setReason(r.key)}
               className={`px-3 py-2 rounded-control text-label font-body transition-colors duration-150 ${
-                reason === r.key ? 'bg-brand-blue text-white' : 'bg-white/[0.06] text-ink-2 hover:text-white'
+                reason === r.key ? 'bg-brand-bluefill text-white' : 'bg-white/[0.06] text-ink-2 hover:text-white'
               }`}
             >
               {r.label}
@@ -5520,7 +5525,7 @@ function SwapSheet({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${library.length} exercises`}
-              className="w-full px-3 min-h-taplg py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+              className="w-full px-3 min-h-taplg py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
               aria-label="Search exercises"
             />
 
@@ -5537,7 +5542,7 @@ function SwapSheet({
                     onClick={() => setGroup(on ? null : g.key)}
                     aria-pressed={on}
                     className={`shrink-0 px-3 h-tap rounded-control text-caption font-display font-bold transition-colors duration-150 ${
-                      on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
+                      on ? 'bg-brand-bluefill text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
                     }`}
                   >
                     {g.label}
@@ -5553,7 +5558,7 @@ function SwapSheet({
             <select
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              className="w-full px-3 h-tap rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
+              className="w-full px-3 h-tap rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blueink"
               aria-label="Equipment"
             >
               {EQUIPMENT_FILTERS.map((f) => (
@@ -5998,7 +6003,7 @@ function WorkoutComplete({
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="—"
                 aria-label="Bodyweight in pounds"
-                className="w-20 px-2.5 min-h-tap rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-body font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-20 px-2.5 min-h-tap rounded-control bg-white/[0.06] border border-white/[0.10] text-white text-body font-body text-center placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="text-ink-3 text-label font-body">lbs</span>
             </div>
@@ -6007,7 +6012,7 @@ function WorkoutComplete({
           <button
             onClick={() => void finish()}
             disabled={weighing}
-            className="w-full mt-8 h-14 rounded-card bg-brand-blue text-white text-heading font-display font-bold hover:bg-brand-bluedark active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+            className="w-full mt-8 h-14 rounded-card bg-brand-bluefill text-white text-heading font-display font-bold hover:bg-brand-bluefillhover active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
           >
             {weighing ? 'Saving…' : weightOk ? 'Save & finish' : 'Done'}
           </button>

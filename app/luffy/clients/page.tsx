@@ -656,7 +656,7 @@ export default function ClientsPage() {
               onChange={(e) => setDeclineNote(e.target.value)}
               placeholder="Optional personal note (included in the email, in your words)"
               rows={2}
-              className="w-full px-3.5 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50 resize-none"
+              className="w-full px-3.5 py-2.5 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink resize-none"
             />
             <div className="flex justify-end gap-2 mt-4">
               <button

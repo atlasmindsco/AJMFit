@@ -108,19 +108,19 @@ export default function SchedulePage() {
         <motion.div custom={0} variants={fadeIn} initial="hidden" animate="visible" className="bg-white/[0.03] border border-white/[0.06] rounded-card p-6 h-fit">
           <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white mb-5">Schedule a Session</h2>
           <div className="space-y-3">
-            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30">
+            <select value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange">
               <option value="">Select client…</option>
               {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <div className="grid grid-cols-2 gap-3">
-              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
-              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30 [color-scheme:dark]" />
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange [color-scheme:dark]" />
+              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange [color-scheme:dark]" />
             </div>
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30">
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, zoom: e.target.value !== 'Live Training' })} className="w-full bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange">
               {SESSION_TYPES.map((t) => <option key={t}>{t}</option>)}
             </select>
             <div className="flex items-center gap-2">
-              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange/30" />
+              <input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })} className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-control px-3 py-2.5 text-body text-ink font-body focus:outline-none focus:border-brand-orange" />
               <span className="text-ink-3 text-label font-body">minutes</span>
             </div>
             <label className="flex items-center gap-2.5 px-1 py-1 cursor-pointer select-none">

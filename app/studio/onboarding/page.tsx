@@ -24,7 +24,7 @@ import { fetchMyOnboarding, saveMyOnboarding, type OnboardingAnswers } from '@/l
 import { fetchMyTier } from '@/lib/scheduling'
 
 const inputCls =
-  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/60 transition-colors'
+  'w-full px-4 py-3 bg-[#222] border border-white/[0.10] rounded-control text-white text-body font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink transition-colors'
 const labelCls = 'block text-ink-2 text-label font-display font-bold uppercase tracking-[0.12em] mb-2'
 const hintCls = 'text-ink-3 text-label font-body mb-2.5'
 

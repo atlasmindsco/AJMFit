@@ -103,7 +103,7 @@ export default function ExercisePickerSheet({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search 873 exercises"
-            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blue/50"
+            className="w-full px-3 py-3 rounded-control bg-white/[0.04] border border-white/[0.08] text-white text-base font-body placeholder:text-ink-4 focus:outline-none focus:border-brand-blueink"
           />
 
           {/* Six buttons over seventeen muscles. */}
@@ -115,7 +115,7 @@ export default function ExercisePickerSheet({
                   key={g.key}
                   onClick={() => setGroup(on ? null : g.key)}
                   className={`shrink-0 px-3 py-2 rounded-control text-label font-display font-bold transition-colors duration-150 ${
-                    on ? 'bg-brand-blue text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
+                    on ? 'bg-brand-bluefill text-white' : 'bg-white/[0.05] text-ink-2 hover:text-ink'
                   }`}
                 >
                   {g.label}
@@ -128,7 +128,7 @@ export default function ExercisePickerSheet({
             <select
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blueink"
             >
               {EQUIPMENT_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -137,7 +137,7 @@ export default function ExercisePickerSheet({
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blue/50"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-control bg-white/[0.04] border border-white/[0.08] text-ink text-body font-body focus:outline-none focus:border-brand-blueink"
             >
               {TYPE_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
