@@ -25,7 +25,9 @@ import {
   SHARE_FORMATS,
   buildShareCard,
   shareFilename,
+  shareLayout,
   shareText,
+  heroStartFont,
   type ShareFormat,
   type ShareInput,
 } from '@/lib/share-card'
@@ -54,6 +56,24 @@ const loadLogo = (): Promise<HTMLImageElement | null> =>
     img.onerror = () => resolve(null)
     img.src = '/AJMfit-logo.png'
   })
+
+/**
+ * The biggest this text can be drawn and still fit between the margins.
+ *
+ * The hero figure is a number nobody can predict the width of: "950 LBS" and
+ * "142,500 LBS" differ by four characters, and at the size this is set the
+ * difference is most of the card. Hard-coding one size means either a small
+ * number looks timid or a big one runs off the edge, and the edge is the one
+ * that ends up on somebody's story.
+ */
+function fitFont(c: CanvasRenderingContext2D, text: string, maxW: number, start: number): number {
+  let size = start
+  for (;;) {
+    c.font = `800 ${size}px Arial, Helvetica, sans-serif`
+    if (c.measureText(text).width <= maxW || size <= 48) return size
+    size -= 4
+  }
+}
 
 function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   c.beginPath()
@@ -87,90 +107,117 @@ async function draw(canvas: HTMLCanvasElement, format: ShareFormat, input: Share
 
   const cx = W / 2
   const pad = 90
-  // The post is shorter, so everything sits a little tighter in it.
   const tall = format.key === 'story'
-  let y = tall ? 300 : 180
+
+  /* WHERE THINGS GO IS NOT DECIDED HERE.
+     It is shareLayout() in lib/share-card.ts, so that every combination of the
+     two formats, the optional hero figure and the optional PR bar can be
+     checked to fit before anybody posts one. The only measurement this file
+     contributes is how wide the hero figure comes out, which needs a canvas. */
+  const heroFont = card.hero
+    ? fitFont(c, card.hero.value, W - pad * 2, heroStartFont(format))
+    : heroStartFont(format)
+  const L = shareLayout(format, {
+    hasHero: Boolean(card.hero),
+    hasAchievement: Boolean(card.achievement),
+    heroFont,
+  })
 
   const logo = await loadLogo()
   if (logo && logo.width > 0) {
-    const lw = 300
-    const lh = (logo.height / logo.width) * lw
-    c.drawImage(logo, cx - lw / 2, y, lw, lh)
-    y += lh + (tall ? 150 : 110)
+    const lh = (logo.height / logo.width) * L.logoW
+    c.drawImage(logo, cx - L.logoW / 2, L.logoY, L.logoW, lh)
   } else {
+    // A missing logo must not cost somebody their post.
     c.fillStyle = INK.white
     c.font = '800 64px Arial, Helvetica, sans-serif'
     c.textAlign = 'center'
-    c.fillText('AJM FIT', cx, y + 60)
-    y += 60 + (tall ? 150 : 110)
+    c.fillText('AJM FIT', cx, L.logoY + 60)
   }
 
-  // The tick.
-  const r = 72
+  // The tick, scaled whole rather than redrawn per format.
+  const r = L.tickR
+  const k = r / 72
+  const tickMid = L.tickY + r
   c.fillStyle = INK.blue
   c.beginPath()
-  c.arc(cx, y + r, r, 0, Math.PI * 2)
+  c.arc(cx, tickMid, r, 0, Math.PI * 2)
   c.fill()
   c.strokeStyle = INK.white
-  c.lineWidth = 14
+  c.lineWidth = 14 * k
   c.lineCap = 'round'
   c.lineJoin = 'round'
   c.beginPath()
-  c.moveTo(cx - 32, y + r + 2)
-  c.lineTo(cx - 10, y + r + 26)
-  c.lineTo(cx + 34, y + r - 26)
+  c.moveTo(cx - 32 * k, tickMid + 2 * k)
+  c.lineTo(cx - 10 * k, tickMid + 26 * k)
+  c.lineTo(cx + 34 * k, tickMid - 26 * k)
   c.stroke()
-  y += r * 2 + (tall ? 96 : 72)
 
+  /* "Workout Complete" is no longer the biggest thing on the card.
+     It was, at 86px, which meant the card's largest words were the two the
+     client already knows — they were there. The figure below says something
+     they do not know by heart, so it takes the size and this takes a step
+     back to being the caption it always was. */
   c.textAlign = 'center'
   c.fillStyle = INK.white
-  c.font = '800 86px Arial, Helvetica, sans-serif'
-  c.fillText(card.heading, cx, y)
-  y += 62
+  c.font = `800 ${L.headingFont}px Arial, Helvetica, sans-serif`
+  c.fillText(card.heading, cx, L.headingY)
 
   c.fillStyle = INK.grey
-  c.font = '400 46px Arial, Helvetica, sans-serif'
-  c.fillText(card.subheading, cx, y)
-  y += tall ? 110 : 88
+  c.font = `400 ${L.subFont}px Arial, Helvetica, sans-serif`
+  c.fillText(card.subheading, cx, L.subY)
+
+  /* THE HERO FIGURE.
+     A client's words: the thing worth posting was how much they moved, not how
+     many times they moved it. Reps and sets describe the shape of a session;
+     volume describes the size of it, and it is the one number on here that
+     goes up over months.
+     Absent entirely on a bodyweight day — see buildShareCard. The block
+     collapses rather than printing a zero, and the three tiles carry the card
+     on their own. */
+  if (card.hero && L.heroY !== null && L.heroLabelY !== null) {
+    c.fillStyle = INK.white
+    c.font = `800 ${heroFont}px Arial, Helvetica, sans-serif`
+    c.fillText(card.hero.value, cx, L.heroY)
+    c.fillStyle = INK.orange
+    c.font = `700 ${tall ? 34 : 30}px Arial, Helvetica, sans-serif`
+    c.fillText(card.hero.label.toUpperCase(), cx, L.heroLabelY)
+  }
 
   // Three tiles, matching the screen.
   const gap = 24
   const tileW = (W - pad * 2 - gap * 2) / 3
-  const tileH = 190
   card.stats.forEach((s, i) => {
     const x = pad + i * (tileW + gap)
     c.fillStyle = INK.card
-    roundRect(c, x, y, tileW, tileH, 28)
+    roundRect(c, x, L.tilesY, tileW, L.tileH, 28)
     c.fill()
     c.strokeStyle = INK.cardLine
     c.lineWidth = 2
-    roundRect(c, x, y, tileW, tileH, 28)
+    roundRect(c, x, L.tilesY, tileW, L.tileH, 28)
     c.stroke()
 
     c.fillStyle = INK.white
     // The duration is the long one; shrink only that, rather than all three.
-    c.font = `800 ${s.value.length > 5 ? 50 : 66}px Arial, Helvetica, sans-serif`
-    c.fillText(s.value, x + tileW / 2, y + 100)
+    c.font = `800 ${s.value.length > 5 ? 50 : 62}px Arial, Helvetica, sans-serif`
+    c.fillText(s.value, x + tileW / 2, L.tilesY + L.tileH * 0.52)
     c.fillStyle = INK.grey
-    c.font = '400 30px Arial, Helvetica, sans-serif'
-    c.fillText(s.label, x + tileW / 2, y + 148)
+    c.font = `400 ${tall ? 30 : 28}px Arial, Helvetica, sans-serif`
+    c.fillText(s.label, x + tileW / 2, L.tilesY + L.tileH * 0.78)
   })
-  y += tileH + (tall ? 70 : 56)
 
   if (card.achievement) {
-    const barH = 118
     c.fillStyle = INK.gold
-    roundRect(c, pad, y, W - pad * 2, barH, 30)
+    roundRect(c, pad, L.barY, W - pad * 2, L.barH, 30)
     c.fill()
     c.fillStyle = INK.bg
-    c.font = '800 50px Arial, Helvetica, sans-serif'
-    c.fillText(card.achievement, cx, y + 76)
-    y += barH + 56
+    c.font = `800 ${tall ? 50 : 46}px Arial, Helvetica, sans-serif`
+    c.fillText(card.achievement, cx, L.barY + L.barH * 0.645)
   }
 
   c.fillStyle = INK.grey
   c.font = '400 34px Arial, Helvetica, sans-serif'
-  c.fillText(card.site, cx, H - (tall ? 140 : 90))
+  c.fillText(card.site, cx, L.siteY)
 }
 
 export default function ShareSheet({

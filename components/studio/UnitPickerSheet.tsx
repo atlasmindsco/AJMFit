@@ -77,7 +77,7 @@ export default function UnitPickerSheet({
                 }`}
               >
                 <div className="min-w-0 flex-1">
-                  <p className={`font-body text-base ${on ? 'text-brand-blue font-semibold' : 'text-brand-navy'}`}>
+                  <p className={`font-body text-base ${on ? 'text-brand-blueink font-semibold' : 'text-brand-navy'}`}>
                     {o.label}
                   </p>
                   {(o.detail || o.calories) && (

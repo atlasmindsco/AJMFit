@@ -146,7 +146,7 @@ export default function BarcodeScanner({ onDetect, onClose }: Props) {
 
         <div className="px-5 py-3 text-center">
           {error ? (
-            <p className="text-red-300 text-label font-body">{error}</p>
+            <p className="text-state-danger text-label font-body">{error}</p>
           ) : status === 'starting' ? (
             <p className="text-ink-2 text-label font-body">Starting camera...</p>
           ) : (

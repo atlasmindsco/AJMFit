@@ -87,7 +87,7 @@ export default function MembershipPaywall() {
             and direct access to Coach Anthony. No charge today, cancel anytime during the trial.
           </p>
 
-          {error && <p className="mt-4 text-red-300 text-body font-body">{error}</p>}
+          {error && <p className="mt-4 text-state-danger text-body font-body">{error}</p>}
 
           <button
             onClick={start}

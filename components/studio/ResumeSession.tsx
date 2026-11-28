@@ -23,7 +23,7 @@ export default function ResumeSession({ title = 'Sign in to continue' }: { title
         </Link>
         <p className="text-brand-slate text-label font-body mt-6">
           Don&rsquo;t have an account?{' '}
-          <Link href="/apply" className="text-brand-blue underline">
+          <Link href="/apply" className="text-brand-blueink underline">
             Apply for coaching
           </Link>
         </p>

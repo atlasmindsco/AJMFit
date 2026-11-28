@@ -316,7 +316,7 @@ export default function ProgramsPage() {
                       <span className="px-2 py-1 bg-brand-orange/15 text-brand-orange font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.level}
                       </span>
-                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blue font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
+                      <span className="px-2 py-1 bg-brand-blue/15 text-brand-blueink font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">
                         {selectedExercise.category}
                       </span>
                       <span className="px-2 py-1 bg-white/[0.06] text-ink-3 font-display font-semibold text-caption uppercase tracking-[0.1em] rounded-control">

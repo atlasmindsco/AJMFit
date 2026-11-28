@@ -244,7 +244,7 @@ export default function CoachCheckInsPage() {
                   {brief.draft && !(drafts[c.id] ?? '').trim() && (
                     <button
                       onClick={() => setDrafts((d) => ({ ...d, [c.id]: brief.draft! + ' ' }))}
-                      className="mt-3 px-3 py-1.5 rounded-control bg-brand-blue/15 text-brand-blue text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-150"
+                      className="mt-3 px-3 py-1.5 rounded-control bg-brand-blue/15 text-brand-blueink text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-150"
                     >
                       Start from these facts
                     </button>

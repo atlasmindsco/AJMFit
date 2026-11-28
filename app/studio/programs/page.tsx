@@ -172,28 +172,28 @@ const TECHNIQUE_META: Record<IntensityTechnique, { label: string; color: string;
   dropset: {
     label: 'Drop Set',
     color: '#EF4444',
-    ring: 'ring-red-500/30',
-    bg: 'bg-red-500/[0.06]',
-    border: 'border-red-500/15',
-    text: 'text-red-400',
+    ring: 'ring-technique-drop/30',
+    bg: 'bg-technique-drop/[0.06]',
+    border: 'border-technique-drop/15',
+    text: 'text-technique-drop',
     hint: 'After your last working set, immediately reduce weight and rep to failure.',
   },
   restpause: {
     label: 'Rest-Pause',
-    color: '#A855F7',
-    ring: 'ring-purple-500/30',
-    bg: 'bg-purple-500/[0.06]',
-    border: 'border-purple-500/15',
-    text: 'text-purple-400',
+    color: '#C084FC',
+    ring: 'ring-technique-restpause/30',
+    bg: 'bg-technique-restpause/[0.06]',
+    border: 'border-technique-restpause/15',
+    text: 'text-technique-restpause',
     hint: 'After your last working set, rest 10-15s, then rep to failure. Keep the weight.',
   },
   partial: {
     label: 'Partials',
     color: '#F59E0B',
-    ring: 'ring-amber-500/30',
-    bg: 'bg-amber-500/[0.06]',
-    border: 'border-amber-500/15',
-    text: 'text-amber-400',
+    ring: 'ring-technique-partial/30',
+    bg: 'bg-technique-partial/[0.06]',
+    border: 'border-technique-partial/15',
+    text: 'text-technique-partial',
     hint: 'After your last working set, drop the ROM to half reps. Pump until you physically cannot move.',
   },
 }
@@ -2174,7 +2174,7 @@ export default function ProgramsPage() {
                   </svg>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">Rest</p>
+                  <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-wide">Rest</p>
                   <p className="text-white font-display font-bold text-metric leading-none tabular-nums">
                     {Math.floor(activeTimer.remaining / 60)}:{(activeTimer.remaining % 60).toString().padStart(2, '0')}
                   </p>
@@ -2392,7 +2392,19 @@ export default function ProgramsPage() {
           const prog = blockProgress(block.assigned_at, block.block_weeks)
           return (
             <div className="bg-surface-raised rounded-card border border-white/[0.10] p-5 mb-4">
-              <div className="flex items-baseline justify-between mb-2.5">
+              {/* An orange eyebrow, and the two cards below it carry a blue one.
+                  Three cards stacked with the same border, the same padding and
+                  the same grey label read as one undifferentiated block — a
+                  client scanning this screen could not tell which of them was
+                  telling them where they are and which was telling them what to
+                  do. Colour does that work before any of the words are read:
+                  orange is progress, blue is instruction, green is live. The bar
+                  below was already orange, so this names what it belongs to
+                  rather than introducing a new colour. */}
+              <p className="text-brand-orange text-caption font-display font-bold uppercase tracking-[0.18em]">
+                Block progress
+              </p>
+              <div className="flex items-baseline justify-between mb-2.5 mt-1.5">
                 <p className="font-display font-bold text-white text-label">
                   Week {prog.week} of {prog.totalWeeks}
                 </p>
@@ -2417,9 +2429,17 @@ export default function ProgramsPage() {
             between a program and a list of workouts. */}
         {(() => {
           const p = PROGRESSION[(programGoal ?? 'muscle') as ProgressionGoal]
+          /* Blue, because these two are the only coaching on the screen.
+             They were the same grey as every other label in the product,
+             which made the one piece of guidance here look like metadata —
+             and a client who reads it as metadata never reads it. Blue is
+             already what this app uses for "the app is telling you
+             something": the Today eyebrow, the primary button, the active
+             exercise border. #1A7BFF on #1C1C1C reads at 5.2:1, which clears
+             AA for this size. */
           const item = (label: string, body: string) => (
             <div>
-              <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.15em]">{label}</p>
+              <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-[0.15em]">{label}</p>
               <p className="text-ink-2 text-label font-body mt-1 leading-relaxed">{body}</p>
             </div>
           )
@@ -2448,7 +2468,7 @@ export default function ProgramsPage() {
                       them. Once something is logged for today, the same
                       banner is the NEXT one — so it says so, and the button
                       below it stops reading as a second helping. */}
-                  <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-[0.18em]">
+                  <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-[0.18em]">
                     {trainedToday ? 'Next up' : 'Today'}
                   </p>
                   <p className="font-display font-extrabold text-2xl text-white mt-1.5 leading-tight">
@@ -2568,7 +2588,12 @@ export default function ProgramsPage() {
                             className={`w-full flex items-center gap-4 p-3 rounded-card text-left group ${
                               isRest
                                 ? 'bg-surface-overlay border border-white/[0.06] cursor-default'
-                                : 'bg-[#222] border border-white/[0.10] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
+                                : workoutStartTime[i]
+                                  // The row carries the green too, not just the
+                                  // badge. A badge is read after the row has
+                                  // been found; a border is what finds it.
+                                  ? 'bg-[#222] border border-state-success/40 cursor-pointer'
+                                  : 'bg-[#222] border border-white/[0.10] hover:bg-[#222] hover:border-white/[0.12] cursor-pointer'
                             }`}
                           >
                             {/* Thumbnail or rest icon */}
@@ -2602,24 +2627,85 @@ export default function ProgramsPage() {
                             {/* Info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className={`font-display font-bold text-label ${isRest ? 'text-ink-4' : 'text-white group-hover:text-brand-blue'} transition-colors duration-200`}>
+                                <p className={`font-display font-bold text-label ${isRest ? 'text-ink-4' : 'text-white group-hover:text-brand-blueink'} transition-colors duration-200`}>
                                   {day.name}
                                 </p>
-                                {i === todayIndex && (
-                                  <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue text-badge font-display font-bold uppercase tracking-wide shrink-0">
+                                {/* GREEN MEANS LIVE RIGHT NOW.
+                                    A session left open had no mark anywhere on
+                                    this list. The week showed a blue "Today"
+                                    and a green tick for done, and a day with
+                                    a workout actually running looked exactly
+                                    like a day that had not been started — so
+                                    the way back into it was to guess. Two of
+                                    fifteen clients in production have had a
+                                    session sitting open for over a week.
+                                    It takes precedence over "Today", because
+                                    which day it is matters less than the fact
+                                    that one of them is mid-set.
+
+                                    AND IT IGNORES `completed`, WHICH IS THE
+                                    WHOLE POINT. The first version read
+                                    `&& !day.completed`, which looks like
+                                    sensible tidiness and silently switched the
+                                    badge off for the only shape of session
+                                    that actually goes stale: sets logged, Done
+                                    never pressed. A day counts as completed the
+                                    moment anything is logged against it, so
+                                    both of the week-old open sessions in
+                                    production are marked done AND still
+                                    running. That is exactly the client this
+                                    indicator exists for, and the first version
+                                    showed them nothing. Caught by looking at
+                                    the real screen, not by reading the code —
+                                    the logic reads fine. */}
+                                {!isRest && Boolean(workoutStartTime[i]) ? (
+                                  <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-state-success/15 text-state-success text-badge font-display font-bold uppercase tracking-wide shrink-0">
+                                    <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
+                                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-state-success" />
+                                    </span>
+                                    In progress
+                                  </span>
+                                ) : i === todayIndex ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blueink text-badge font-display font-bold uppercase tracking-wide shrink-0">
                                     Today
                                   </span>
-                                )}
+                                ) : null}
                               </div>
                               <p className="text-ink-4 text-label font-body">
                                 Day {i + 1}{day.duration ? ` \u2022 ${day.duration}` : ''}
                               </p>
                             </div>
 
-                            {/* Status */}
-                            {day.completed ? (
+                            {/* Status.
+                                The tick inside the green circle is dark, not
+                                white. White on #22C55E measures 2.28:1 — under
+                                even the 3:1 WCAG asks of a graphic that
+                                carries meaning, and this tick is the only
+                                thing on the row saying the day is done. The
+                                near-black reads at 8.29:1 against the same
+                                green, which is the pattern the gold PR bar
+                                already uses. Caught by
+                                tools/verify-contrast.ts, not by eye: on a
+                                bright screen a white tick looks crisp.
+
+                                A running session outranks the tick. A day is
+                                marked completed as soon as anything is logged
+                                against it, so a session that was logged and
+                                never ended is BOTH — and a green tick reading
+                                "done" on a workout that is still running is
+                                the app telling the client the opposite of what
+                                they need to know. The live dot takes the slot
+                                while the session is open and the tick comes
+                                back when they press Done. */}
+                            {!isRest && workoutStartTime[i] ? (
+                              <span className="relative flex h-2.5 w-2.5 shrink-0 mr-1.5" aria-label="Session still running">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-state-success opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-state-success" />
+                              </span>
+                            ) : day.completed ? (
                               <div className="w-7 h-7 rounded-full bg-state-success flex items-center justify-center shrink-0">
-                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <svg className="w-4 h-4 text-surface-base" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                 </svg>
                               </div>
@@ -2984,8 +3070,32 @@ export default function ProgramsPage() {
                           // came up gold — a trophy for existing.
                           const isNewPR = pr != null && bestEnteredWeight > pr.weight
 
+                          /* WHAT STATE THIS CARD IS IN, AND SHOWING IT.
+                             Every exercise card was the same #222 with the same
+                             white border whether it was finished, skipped, half
+                             logged or never touched. While a session is running
+                             that costs nothing, because only the focused
+                             exercise is on screen — but browsing a day, which
+                             is how a client checks what they did and plans what
+                             is left, the list gave no answer to "where did I get
+                             to" except opening each card in turn.
+                             The progress strip at the top of a live session
+                             already uses exactly these three colours for
+                             exactly these three states. This is that same
+                             language applied to the cards themselves rather
+                             than a new one invented for them: green is done,
+                             blue is the one you are on, grey is not yet. */
+                          const cardState = exerciseProgress.find((p) => p.name === exercise.name)
+                          const isFocused = sessionActive && selected?.exercises[focusIndex]?.name === exercise.name
+                          const cardTone = cardState?.skipped
+                            ? 'bg-[#1E1E1E] border-white/[0.06]'
+                            : cardState?.complete
+                              ? 'bg-[#222] border-state-success/30'
+                              : isFocused
+                                ? 'bg-[#222] border-brand-blue/40'
+                                : 'bg-[#222] border-white/[0.10]'
                           return (
-                            <div key={exercise.name} className="rounded-card bg-[#222] border border-white/[0.10] overflow-hidden transition-colors duration-200">
+                            <div key={exercise.name} className={`rounded-card border overflow-hidden transition-colors duration-200 ${cardTone}`}>
                               {/* Exercise row */}
                               <div className="flex items-center gap-3 p-3">
                                 {/* Thumbnail, tap for exercise detail */}
@@ -3059,7 +3169,7 @@ export default function ProgramsPage() {
                                       </span>
                                     )}
                                     {isSwapped && (
-                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
+                                      <span className="text-badge font-display font-bold px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blueink shrink-0">
                                         Swapped
                                       </span>
                                     )}
@@ -3099,7 +3209,7 @@ export default function ProgramsPage() {
                                       conversation — coaching must not compete
                                       with execution. */}
                                   {exercise.note && (
-                                    <p className="text-brand-blue text-body font-body mt-1 leading-relaxed">
+                                    <p className="text-brand-blueink text-body font-body mt-1 leading-relaxed">
                                       {exercise.note}
                                     </p>
                                   )}
@@ -3183,6 +3293,26 @@ export default function ProgramsPage() {
                                     onClick={() => setExpandedWorkoutExercise(isOpen ? null : exercise.name)}
                                     className="text-right shrink-0 flex flex-col items-end"
                                   >
+                                    {/* How far through this one the client got,
+                                        on the collapsed row. The green border
+                                        says "finished" from across the list;
+                                        this says "three of five", which is the
+                                        thing a client actually wants when they
+                                        come back to a day they stopped
+                                        halfway through. Nothing at all when
+                                        nothing has been logged — an untouched
+                                        exercise should not carry a status. */}
+                                    {cardState && cardState.done > 0 && (
+                                      <span
+                                        className={`text-badge font-display font-bold uppercase tracking-wide mb-0.5 ${
+                                          cardState.complete ? 'text-state-success' : 'text-brand-blueink'
+                                        }`}
+                                      >
+                                        {cardState.complete
+                                          ? 'Done'
+                                          : `${cardState.done} of ${cardState.total}`}
+                                      </span>
+                                    )}
                                     <p className="text-brand-orange text-label font-display font-bold">
                                       {intensityEnabled ? `${workingSetCount}+2` : `${totalSets}X`} / Rest
                                     </p>
@@ -3577,7 +3707,7 @@ export default function ProgramsPage() {
                                         if (!coaching || !(treatAsBeginner || firstTime)) return null
                                         return (
                                           <div className="mt-2 mb-3 px-3 py-2.5 rounded-control bg-brand-blue/[0.07] border border-brand-blue/20">
-                                            <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide mb-1.5">
+                                            <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-wide mb-1.5">
                                               {firstTime && !treatAsBeginner ? 'First time on this one' : 'Get these right'}
                                             </p>
                                             <ul className="space-y-1">
@@ -4756,7 +4886,7 @@ export default function ProgramsPage() {
                         </span>
                       ))}
                       {selectedExerciseDB.secondaryMuscles.map((m) => (
-                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blue text-caption font-display font-bold uppercase tracking-wide capitalize">
+                        <span key={m} className="px-2.5 py-1 rounded-control bg-brand-blue/15 text-brand-blueink text-caption font-display font-bold uppercase tracking-wide capitalize">
                           {m}
                         </span>
                       ))}
@@ -4814,7 +4944,7 @@ export default function ProgramsPage() {
                               </div>
                               <div>
                                 <p className="text-ink-2 font-body font-semibold text-label capitalize">{m}</p>
-                                <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">Secondary</p>
+                                <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-wide">Secondary</p>
                               </div>
                             </div>
                           ))}
@@ -4909,15 +5039,31 @@ export default function ProgramsPage() {
                         {w.duration_seconds ? ` · ${formatDuration(w.duration_seconds)}` : ''}
                       </p>
                     </div>
-                    {w.ended_at ? (
-                      <span className="shrink-0 text-badge font-display font-bold uppercase tracking-wide text-state-success bg-state-success/10 px-2 py-0.5 rounded-full">
-                        Done
-                      </span>
-                    ) : (
-                      <span className="shrink-0 text-badge font-display font-bold uppercase tracking-wide text-state-warning bg-state-warning/10 px-2 py-0.5 rounded-full">
-                        Active
-                      </span>
-                    )}
+                    {/* Volume sits in its own right-hand column rather than on
+                        the end of the meta line, and the reason is the list
+                        rather than the row: right-aligned, the figures stack
+                        into a column you can run your eye down, which is the
+                        only way a history list answers "am I moving more than
+                        I was". On the end of the sentence it would be a fourth
+                        clause nobody reads.
+                        Absent on a bodyweight session — the row says nothing
+                        rather than claiming a zero. */}
+                    <div className="shrink-0 flex flex-col items-end gap-1">
+                      {w.ended_at ? (
+                        <span className="text-badge font-display font-bold uppercase tracking-wide text-state-success bg-state-success/10 px-2 py-0.5 rounded-full">
+                          Done
+                        </span>
+                      ) : (
+                        <span className="text-badge font-display font-bold uppercase tracking-wide text-state-warning bg-state-warning/10 px-2 py-0.5 rounded-full">
+                          Active
+                        </span>
+                      )}
+                      {w.volume > 0 && (
+                        <span className="text-ink-2 text-caption font-display font-bold tabular-nums">
+                          {w.volume.toLocaleString()} <span className="text-ink-4">lb</span>
+                        </span>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -4936,7 +5082,7 @@ export default function ProgramsPage() {
             </p>
             <a
               href="/studio/messages"
-              className="mt-4 inline-block text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:underline"
+              className="mt-4 inline-block text-brand-blueink text-label font-display font-bold uppercase tracking-wide hover:underline"
             >
               Message Coach →
             </a>
@@ -5359,7 +5505,7 @@ function SwapSheet({
                 >
                   <span className="text-white text-label font-body">{alt}</span>
                   {picked && (
-                    <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="w-4 h-4 text-brand-blueink shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                   )}
@@ -5439,7 +5585,7 @@ function SwapSheet({
                       </span>
                     </span>
                     {picked && (
-                      <svg className="w-4 h-4 text-brand-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <svg className="w-4 h-4 text-brand-blueink shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                       </svg>
                     )}
@@ -5579,7 +5725,7 @@ function DemoSheet({
             <ul className="space-y-2">
               {coaching.cues.map((cue, i) => (
                 <li key={i} className="flex gap-2.5 text-white text-body font-body leading-relaxed">
-                  <span className="text-brand-blue shrink-0">&bull;</span>
+                  <span className="text-brand-blueink shrink-0">&bull;</span>
                   {cue}
                 </li>
               ))}
@@ -5593,7 +5739,7 @@ function DemoSheet({
 
         {data && data.instructions.length > 0 && (
           <details className="mt-4">
-            <summary className="text-brand-blue text-label font-body cursor-pointer">
+            <summary className="text-brand-blueink text-label font-body cursor-pointer">
               {coaching ? 'Full step-by-step' : 'Step-by-step'} ({data.instructions.length} steps)
             </summary>
             <ol className="space-y-2 mt-2">
@@ -5911,6 +6057,10 @@ function WorkoutComplete({
               /* Quoted from the screen, never recomputed - see share-card. */
               duration: durationLabel(summary.seconds) ?? '',
               recordCount: summary.records.length,
+              /* The figure the card leads on. Already rounded pounds; the card
+                 shows nothing at all when it is zero rather than posting a
+                 bodyweight day as "0 LBS" — see lib/share-card.ts. */
+              volume: summary.volume,
             }}
             onClose={() => setShowShare(false)}
           />

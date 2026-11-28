@@ -427,7 +427,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <p className="font-display font-bold text-base text-brand-blue">{preview.protein}g</p>
+                      <p className="font-display font-bold text-base text-brand-blueink">{preview.protein}g</p>
                       <p className="text-brand-slate text-caption font-body uppercase tracking-wide">Protein</p>
                     </div>
                     <div>
@@ -488,7 +488,7 @@ export default function FoodSearchSheet({ meal, userId, onClose, onAdded }: Prop
                           {hit.brand ? `, ${hit.brand}` : ''}
                         </p>
                       </div>
-                      <span className="w-8 h-8 rounded-full bg-brand-blue/[0.08] text-brand-blue flex items-center justify-center shrink-0" aria-hidden="true">
+                      <span className="w-8 h-8 rounded-full bg-brand-blue/[0.08] text-brand-blueink flex items-center justify-center shrink-0" aria-hidden="true">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>

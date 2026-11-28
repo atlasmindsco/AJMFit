@@ -30,16 +30,16 @@ import { fetchAllSubscriptions } from '@/lib/admin'
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'bg-brand-orange/15 text-brand-orange'
-  if (tier.includes('Accelerator')) return 'bg-brand-blue/15 text-brand-blue'
+  if (tier.includes('Accelerator')) return 'bg-brand-blue/15 text-brand-blueink'
   return 'bg-white/[0.06] text-ink-2'
 }
 
 function getStatusBadge(status: UserStatus) {
   const map: Record<UserStatus, { label: string; className: string }> = {
-    pending: { label: 'Pending', className: 'bg-amber-500/15 text-amber-400' },
-    active: { label: 'Active', className: 'bg-emerald-500/15 text-emerald-400' },
+    pending: { label: 'Pending', className: 'bg-state-warning/15 text-state-warning' },
+    active: { label: 'Active', className: 'bg-state-success/15 text-state-success' },
     paused: { label: 'Paused', className: 'bg-white/[0.06] text-ink-3' },
-    cancelled: { label: 'Cancelled', className: 'bg-red-500/15 text-red-400' },
+    cancelled: { label: 'Cancelled', className: 'bg-state-danger/15 text-state-danger' },
   }
   return map[status]
 }
@@ -361,7 +361,7 @@ export default function ClientsPage() {
                           <button
                             onClick={() => handleAccept(client)}
                             disabled={processing === client.id}
-                            className="px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-caption font-display font-bold uppercase tracking-wide rounded-control hover:bg-emerald-500/25 transition-colors duration-200 disabled:opacity-50"
+                            className="px-3 py-1.5 bg-state-success/15 border border-state-success/25 text-state-success text-caption font-display font-bold uppercase tracking-wide rounded-control hover:bg-state-success/25 transition-colors duration-200 disabled:opacity-50"
                           >
                             {processing === client.id ? '...' : 'Accept'}
                           </button>
@@ -385,7 +385,7 @@ export default function ClientsPage() {
                               }}
                               disabled={processing === client.id}
                               title="Send them a fresh set-password link"
-                              className="px-2.5 py-1.5 rounded-control bg-brand-blue/15 border border-brand-blue/25 text-brand-blue text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-control bg-brand-blue/15 border border-brand-blue/25 text-brand-blueink text-caption font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 transition-colors duration-200 disabled:opacity-50"
                             >
                               {processing === client.id ? '...' : 'Resend invite'}
                             </button>
@@ -588,7 +588,7 @@ export default function ClientsPage() {
               <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
                 <h2 className="font-display font-bold text-heading uppercase tracking-[0.15em] text-white">New Applications</h2>
                 {pendingApplications.length > 0 && (
-                  <span className="text-caption font-display font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-400">
+                  <span className="text-caption font-display font-bold px-2 py-0.5 rounded bg-state-warning/15 text-state-warning">
                     {pendingApplications.length}
                   </span>
                 )}

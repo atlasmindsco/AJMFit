@@ -381,7 +381,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
                 <ul className="space-y-1.5">
                   {s.rules.map((r) => (
                     <li key={r} className="flex gap-2 text-brand-slate text-label font-body leading-relaxed">
-                      <span className="text-brand-blue shrink-0">•</span>
+                      <span className="text-brand-blueink shrink-0">•</span>
                       <span>{r}</span>
                     </li>
                   ))}
@@ -395,7 +395,7 @@ export default function FoodGuide({ tab, onTab }: { tab: FoodGuideTab; onTab: (t
             <ul className="space-y-1.5">
               {OFF_PLAN_GUIDANCE.map((g) => (
                 <li key={g} className="flex gap-2 text-brand-navy/70 text-label font-body leading-relaxed">
-                  <span className="text-brand-blue shrink-0">•</span>
+                  <span className="text-brand-blueink shrink-0">•</span>
                   <span>{g}</span>
                 </li>
               ))}
@@ -446,7 +446,7 @@ function MealCard({
       </div>
       <div className="flex items-center gap-3 mt-2.5">
         <span className="font-display font-bold text-brand-navy text-label">{meal.calories} cal</span>
-        <span className="text-brand-blue text-label font-body font-semibold">{meal.protein}g protein</span>
+        <span className="text-brand-blueink text-label font-body font-semibold">{meal.protein}g protein</span>
       </div>
 
       {/* How much of each thing. The card used to give a name and a macro line

@@ -129,7 +129,7 @@ export default function StartFrom({
                   Switch to one you already built, or edit it.
                 </span>
               </span>
-              <span className="text-brand-blue shrink-0">&rsaquo;</span>
+              <span className="text-brand-blueink shrink-0">&rsaquo;</span>
             </button>
           )}
 

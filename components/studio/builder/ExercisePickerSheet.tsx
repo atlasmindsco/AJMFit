@@ -161,7 +161,7 @@ export default function ExercisePickerSheet({
                 <button
                   onClick={onRequest}
                   disabled={requested}
-                  className="mt-4 px-4 py-2.5 rounded-control bg-brand-blue/15 border border-brand-blue/30 text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 disabled:opacity-50 active:scale-[0.98] transition-all duration-150"
+                  className="mt-4 px-4 py-2.5 rounded-control bg-brand-blue/15 border border-brand-blue/30 text-brand-blueink text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/25 disabled:opacity-50 active:scale-[0.98] transition-all duration-150"
                 >
                   {requested ? 'Sent to Anthony ✓' : `Ask Anthony to add "${search.trim().slice(0, 28)}"`}
                 </button>
@@ -203,7 +203,7 @@ export default function ExercisePickerSheet({
                         Added
                       </span>
                     ) : (
-                      <span className="shrink-0 w-8 h-8 rounded-full bg-brand-blue/15 text-brand-blue flex items-center justify-center font-display font-bold text-lg">
+                      <span className="shrink-0 w-8 h-8 rounded-full bg-brand-blue/15 text-brand-blueink flex items-center justify-center font-display font-bold text-lg">
                         +
                       </span>
                     )}

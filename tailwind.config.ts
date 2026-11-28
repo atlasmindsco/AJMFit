@@ -18,6 +18,22 @@ const config: Config = {
           // different hue family than the brand and made the primary CTA drift
           // off-palette on the most-clicked element in the product.
           bluedark: '#0F5FE0',
+          /* Brand blue as TEXT on a dark surface, which the brand blue itself
+             cannot do. #1A7BFF was chosen for buttons, where it is a
+             background with white on top, and it is excellent at that. Used
+             as text on the studio's #1C1C1C it measures 4.32:1 — under the
+             4.5:1 that WCAG AA asks for anything that is not 24px, or 18.66px
+             bold. Every "Today" eyebrow, every blue caption and every blue
+             link in the client app was below the line, which is part of what
+             a client meant by "hard to see some of the words": raising the
+             font sizes helped and could not fix it, because the colour was
+             short, not the size.
+             #4D9AFF is the same hue lifted until it clears: 5.99:1 on #1C1C1C
+             and 6.64:1 on #111111. It is for text and icons only — a button
+             still uses `blue`, where the ratio is measured the other way
+             round. lib/contrast.ts does the arithmetic and
+             tools/verify-contrast.ts fails the build if either drifts. */
+          blueink: '#4D9AFF',
           orange: '#F76B16',
           orangedark: '#D8590C',
           slate: '#64748B',
@@ -45,6 +61,36 @@ const config: Config = {
              #D4AF37 against the studio's #111 reads at about 8.9:1, which
              clears AA for the small uppercase label it carries. */
           gold: '#D4AF37',
+        },
+        /* THE INTENSITY TECHNIQUES, AND WHY THEY ARE NOT STATE COLOURS.
+           Drop sets, rest-pause and partials are three choices of equal
+           standing — a categorical scale, where the only job of the colour is
+           to tell them apart. They had been written inline as Tailwind's stock
+           red-500, purple-500 and amber-500, which put two of the three on
+           exactly the values this product uses for danger and warning:
+           #EF4444 and #F59E0B to the digit. So a drop-set badge was drawn in
+           the same red as a failed save and a partials badge in the same amber
+           as a sync warning, which is the mistake the gold note above exists to
+           describe — one colour saying two unrelated things.
+           The hues are unchanged here, deliberately: recolouring a badge a
+           client recognises is a product decision rather than a tidy-up, and
+           it is written up rather than taken. What changes is that they are
+           now DECLARED as a scale of their own, so the collision is visible in
+           the palette instead of hidden in three string literals, and
+           tools/verify-contrast.ts measures them — which immediately found
+           that rest-pause, the only one of the three with a hue of its own,
+           was also the only one that could not be read: purple-500 (#A855F7)
+           measures 4.31:1 on #1C1C1C, under AA for the 13px badge it is set
+           in. That one IS changed, to #C084FC at 6.45:1, because lightening
+           it trades against nothing — there is no semantic colour it has to
+           stay distinct from and no second meaning it carries. Changing the
+           other two would mean choosing new hues for a drop set and a
+           partial, which is the product decision this note declines to take
+           on its own. */
+        technique: {
+          drop: '#EF4444',
+          restpause: '#C084FC',
+          partial: '#F59E0B',
         },
         // Studio text, four measured tiers. See the note in app/globals.css:
         // the thirteen hand-picked white alphas these replace put 370 of 636

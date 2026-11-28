@@ -144,8 +144,8 @@ export default function CoachingAssessmentPage() {
   if (done) {
     return (
       <motion.div variants={fadeIn} initial="hidden" animate="visible" className="max-w-xl mx-auto text-center py-16">
-        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
-          <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-state-success/10 flex items-center justify-center">
+          <svg className="w-8 h-8 text-state-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
           </svg>
         </div>

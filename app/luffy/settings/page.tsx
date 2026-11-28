@@ -66,7 +66,7 @@ export default function SettingsPage() {
 
   const SaveBar = (
     <div className="mt-6 flex items-center justify-end gap-3">
-      {saved && <span className="text-emerald-400 text-label font-body">Saved ✓</span>}
+      {saved && <span className="text-state-success text-label font-body">Saved ✓</span>}
       <button onClick={save} disabled={saving || loading} className="px-6 py-2.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
         {saving ? 'Saving…' : 'Save Changes'}
       </button>

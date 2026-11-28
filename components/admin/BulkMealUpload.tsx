@@ -247,7 +247,7 @@ export default function BulkMealUpload({
                 </div>
 
                 <div className="shrink-0 text-right">
-                  {row.status === 'uploading' && <span className="text-brand-blue text-caption font-body">uploading…</span>}
+                  {row.status === 'uploading' && <span className="text-brand-blueink text-caption font-body">uploading…</span>}
                   {row.status === 'done' && <span className="text-state-success text-caption font-body">done</span>}
                   {row.status === 'failed' && <span className="text-state-danger text-caption font-body">{row.message ?? 'failed'}</span>}
                   {row.status === 'ready' && !running && (

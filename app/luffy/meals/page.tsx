@@ -136,7 +136,7 @@ export default function MealImagesAdmin() {
                         <button
                           onClick={() => inputs.current[meal.id]?.click()}
                           disabled={busy === meal.id}
-                          className="text-brand-blue hover:text-white text-caption font-display font-bold uppercase tracking-wide disabled:opacity-40 transition-colors"
+                          className="text-brand-blueink hover:text-white text-caption font-display font-bold uppercase tracking-wide disabled:opacity-40 transition-colors"
                         >
                           {busy === meal.id ? 'Uploading…' : url ? 'Replace' : 'Add photo'}
                         </button>

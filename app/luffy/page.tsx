@@ -26,7 +26,7 @@ interface Stats {
 
 function getTierColor(tier: string) {
   if (tier.includes('Full')) return 'text-brand-orange'
-  if (tier.includes('Accelerator')) return 'text-brand-blue'
+  if (tier.includes('Accelerator')) return 'text-brand-blueink'
   return 'text-ink-2'
 }
 

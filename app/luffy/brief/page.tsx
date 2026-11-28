@@ -410,7 +410,7 @@ export default function BriefPage() {
                   <p className="text-label text-brand-slate mt-2 leading-relaxed">
                     Context-aware AI chat powered by GPT-4o-mini. Answers training and nutrition questions instantly. Standalone AI fitness apps charge $10-$30/mo, AJM FIT includes it in every tier.
                   </p>
-                  <div className="mt-4 text-label font-semibold text-brand-blue">AI fitness market: $16.9B (2025) projected $35B+ by 2030</div>
+                  <div className="mt-4 text-label font-semibold text-brand-blueink">AI fitness market: $16.9B (2025) projected $35B+ by 2030</div>
                 </div>
                 <div className="bg-white rounded-card p-7 border border-brand-offwhite shadow-[0_1px_3px_rgba(27,45,80,0.06),0_8px_24px_rgba(27,45,80,0.04)]">
                   <div className="text-2xl mb-3">Community</div>
@@ -418,7 +418,7 @@ export default function BriefPage() {
                   <p className="text-label text-brand-slate mt-2 leading-relaxed">
                     Community features drive 60-80% adherence rates vs. 10-25% for budget apps. Forums, points/leaderboards, live Q&As, and monthly challenges create accountability that no competitor offers.
                   </p>
-                  <div className="mt-4 text-label font-semibold text-brand-blue">Justifies $20-$50/mo in additional perceived value</div>
+                  <div className="mt-4 text-label font-semibold text-brand-blueink">Justifies $20-$50/mo in additional perceived value</div>
                 </div>
               </div>
             </section>

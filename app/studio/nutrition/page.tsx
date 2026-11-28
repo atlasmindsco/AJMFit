@@ -806,7 +806,7 @@ export default function NutritionPage() {
             are out.
           </p>
         </div>
-        <span className="shrink-0 text-brand-blue font-display font-bold text-label uppercase tracking-wide">
+        <span className="shrink-0 text-brand-blueink font-display font-bold text-label uppercase tracking-wide">
           Open
         </span>
       </button>
@@ -897,25 +897,25 @@ export default function NutritionPage() {
                                               <div className="flex gap-1">
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 0.5)}
-                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blueink rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   0.5x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 1)}
-                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blueink rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   1x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 1.5)}
-                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blueink rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   1.5x
                                                 </button>
                                                 <button
                                                   onClick={() => applyQuantityMultiplier(item, 2)}
-                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blue rounded hover:bg-brand-blue/20 font-semibold"
+                                                  className="px-2 py-1 text-label bg-brand-blue/10 text-brand-blueink rounded hover:bg-brand-blue/20 font-semibold"
                                                 >
                                                   2x
                                                 </button>
@@ -943,7 +943,7 @@ export default function NutritionPage() {
                                             item.calories
                                           )}
                                         </td>
-                                        <td className="px-3 py-2 text-right text-brand-blue hidden sm:table-cell">
+                                        <td className="px-3 py-2 text-right text-brand-blueink hidden sm:table-cell">
                                           {editingId === item.id ? (
                                             <input
                                               type="number"
@@ -1012,7 +1012,7 @@ export default function NutritionPage() {
                                                     fats: item.fats.toString(),
                                                   })
                                                 }}
-                                                className="text-brand-blue hover:text-brand-bluedark text-label font-semibold"
+                                                className="text-brand-blueink hover:text-brand-bluedark text-label font-semibold"
                                               >
                                                 Edit
                                               </button>
@@ -1182,7 +1182,7 @@ export default function NutritionPage() {
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 mb-2">
                                   <label className="block">
-                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-blue mb-1">Protein (g)</span>
+                                    <span className="block text-caption font-display font-bold uppercase tracking-wide text-brand-blueink mb-1">Protein (g)</span>
                                     <input
                                       type="number"
                                       inputMode="decimal"
@@ -1323,7 +1323,7 @@ export default function NutritionPage() {
                                     setScanningMealId(meal.id)
                                   }}
                                   disabled={analyzing !== null}
-                                  className="py-2 border border-dashed border-brand-blue/30 rounded-control text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                  className="py-2 border border-dashed border-brand-blue/30 rounded-control text-brand-blueink text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/[0.04] transition-colors duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
                                 >
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.5v15m3-15v15m3-15v15m3-15v15m3-15v15m3-15v15M21 4.5v15" />
@@ -1335,7 +1335,7 @@ export default function NutritionPage() {
                                     macroFieldsTouchedRef.current = false
                                     setAddingToMeal(meal.id)
                                   }}
-                                  className="py-2 border border-dashed border-brand-navy/15 rounded-control text-brand-slate text-label font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blue transition-colors duration-200"
+                                  className="py-2 border border-dashed border-brand-navy/15 rounded-control text-brand-slate text-label font-display font-bold uppercase tracking-wide hover:border-brand-blue/30 hover:text-brand-blueink transition-colors duration-200"
                                 >
                                   + Manual
                                 </button>
@@ -1442,7 +1442,7 @@ export default function NutritionPage() {
                   </button>
                 </div>
                 <div className="text-right">
-                  <span className="font-display font-extrabold text-2xl text-brand-blue">{waterOz}</span>
+                  <span className="font-display font-extrabold text-2xl text-brand-blueink">{waterOz}</span>
                   <span className="text-brand-slate text-body font-body"> / {WATER_GOAL_OZ} oz</span>
                 </div>
               </div>

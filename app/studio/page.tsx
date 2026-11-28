@@ -491,7 +491,7 @@ export default function ClientDashboard() {
         >
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-control bg-brand-blue/15 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-5 h-5 text-brand-blueink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
               </svg>
             </div>
@@ -500,7 +500,7 @@ export default function ClientDashboard() {
               <p className="text-ink-3 text-label font-body mt-0.5">Choose your goal, days per week, and gym or home. Your program is ready in seconds.</p>
             </div>
           </div>
-          <span className="shrink-0 text-brand-blue font-display font-bold text-label uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
+          <span className="shrink-0 text-brand-blueink font-display font-bold text-label uppercase tracking-[0.12em] group-hover:translate-x-0.5 transition-transform">
             Choose →
           </span>
         </Link>

@@ -100,7 +100,7 @@ export default function ActiveWorkoutBar({
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="text-brand-blue text-caption font-display font-bold uppercase tracking-wide">
+          <p className="text-brand-blueink text-caption font-display font-bold uppercase tracking-wide">
             Workout in progress
           </p>
           <p className="text-white text-label font-body truncate">

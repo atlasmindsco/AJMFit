@@ -309,7 +309,7 @@ export default function ClientPortalLayout({
                 href={tab.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-200 ${
-                  isActive ? 'text-brand-blue' : 'text-ink-3 active:text-ink-2'
+                  isActive ? 'text-brand-blueink' : 'text-ink-3 active:text-ink-2'
                 }`}
               >
                 {icon(tab.d)}

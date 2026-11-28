@@ -133,7 +133,7 @@ export default function SchedulePage() {
               Welcome call
             </h2>
             {onboardingDone && (
-              <span className="text-label font-body font-medium text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">
+              <span className="text-label font-body font-medium text-state-success bg-state-success/10 px-2.5 py-1 rounded-full">
                 Booked
               </span>
             )}

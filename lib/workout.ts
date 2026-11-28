@@ -122,9 +122,30 @@ export interface WorkoutHistoryRow {
   duration_seconds: number | null
   ended_at: string | null
   set_count: number
+  /**
+   * Pounds moved in that session, by the same rule as the completion screen:
+   * weight × reps for every logged set, bodyweight work contributing nothing.
+   * See sessionTotals in lib/session-summary.ts — the definition lives there
+   * and a second one here would eventually disagree with it, which is how a
+   * client ends up with a history row that contradicts the screen they saw
+   * on the day.
+   */
+  volume: number
 }
 
-/** The client's recent workouts (most recent first), with a set count each. */
+/**
+ * The client's recent workouts (most recent first), with a set count and the
+ * volume of each.
+ *
+ * PAGINATION IS NOT OPTIONAL HERE. PostgREST returns at most 1000 rows per
+ * request and says nothing about having stopped. The progress page calls this
+ * with limit 300, and 300 sessions is several thousand sets, so the single
+ * unpaged query this used to run silently dropped everything past the first
+ * thousand — which read as a zero set count on the oldest sessions rather
+ * than as an error. Volume would have been wrong the same way, and a wrong
+ * volume is worse than a missing one: it is a number the client will compare
+ * against next month's.
+ */
 export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<WorkoutHistoryRow[]> {
   const { data: workouts, error } = await db
     .from('workouts')
@@ -137,10 +158,27 @@ export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<W
   if (rows.length === 0) return []
 
   const ids = rows.map((w) => w.id)
-  const { data: sets } = await db.from('workout_sets').select('workout_id').in('workout_id', ids)
   const counts = new Map<string, number>()
-  for (const s of (sets ?? []) as { workout_id: string }[]) {
-    counts.set(s.workout_id, (counts.get(s.workout_id) ?? 0) + 1)
+  const volumes = new Map<string, number>()
+  const PAGE = 1000
+  for (let from = 0; ; from += PAGE) {
+    const { data: page } = await db
+      .from('workout_sets')
+      .select('workout_id, weight, reps')
+      .in('workout_id', ids)
+      .range(from, from + PAGE - 1)
+    const batch = (page ?? []) as Array<{ workout_id: string; weight: number | null; reps: number | null }>
+    for (const s of batch) {
+      counts.set(s.workout_id, (counts.get(s.workout_id) ?? 0) + 1)
+      const w = Number(s.weight)
+      const r = Number(s.reps)
+      // Same guards as sessionTotals: a bodyweight set has no load to count,
+      // and a null in either column must not turn into a NaN total.
+      if (Number.isFinite(w) && w > 0 && Number.isFinite(r) && r > 0) {
+        volumes.set(s.workout_id, (volumes.get(s.workout_id) ?? 0) + w * r)
+      }
+    }
+    if (batch.length < PAGE) break
   }
   return rows.map((w) => ({
     id: w.id,
@@ -150,6 +188,7 @@ export async function fetchWorkoutHistory(userId: string, limit = 12): Promise<W
     duration_seconds: w.duration_seconds,
     ended_at: w.ended_at,
     set_count: counts.get(w.id) ?? 0,
+    volume: Math.round(volumes.get(w.id) ?? 0),
   }))
 }
 

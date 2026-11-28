@@ -6,7 +6,7 @@
  * specific ways: nothing on it may be untrue, and nothing on it may embarrass
  * them.
  */
-import { buildShareCard, shareFilename, shareText, SHARE_FORMATS } from '@/lib/share-card'
+import { buildShareCard, shareFilename, shareLayout, shareText, heroStartFont, SHARE_FORMATS } from '@/lib/share-card'
 
 let failed = 0
 const ok = (cond: boolean, label: string, extra = '') => {
@@ -20,6 +20,7 @@ const input = (over: Partial<Parameters<typeof buildShareCard>[0]> = {}) => ({
   sets: 24,
   duration: '1h 12m',
   recordCount: 2,
+  volume: 7340,
   ...over,
 })
 
@@ -39,6 +40,35 @@ ok(card.stats[0].value === '186' && card.stats[0].label === 'Total Reps', 'reps'
 ok(card.stats[1].value === '24', 'sets', card.stats[1].value)
 ok(card.stats[2].value === '1h 12m', 'duration, verbatim', card.stats[2].value)
 ok(card.site === 'ajmfit.com', 'the site')
+
+console.log('\nVOLUME IS THE FIGURE THE CARD LEADS ON\n')
+/* A client asked for this: the number they wanted to post was how much they
+   had moved, not how many times they had moved it. Reps and sets describe the
+   shape of a session; volume describes the size of it. */
+const hero = buildShareCard(input({ volume: 7340 })).hero!
+ok(hero !== null, 'there is a hero figure at all')
+ok(hero.value === '7,340 LBS', 'with thousands separated, because 7340 is slower to read', hero.value)
+ok(hero.label === 'Total Volume', 'and labelled for what it is', hero.label)
+ok(buildShareCard(input({ volume: 950 })).hero!.value === '950 LBS', 'no separator where none is needed')
+ok(buildShareCard(input({ volume: 7340.6 })).hero!.value === '7,341 LBS', 'rounded to the pound')
+ok(buildShareCard(input({ volume: 142500 })).hero!.value === '142,500 LBS', 'and a big one still reads')
+
+console.log('\nBUT A BODYWEIGHT DAY DOES NOT POST A ZERO\n')
+/* Pull-ups, dips, push-ups, a run. The data knows the weight was zero; it does
+   not know the session was nothing. "0 LBS" in letters an inch high, on
+   somebody's story, is the app telling their friends they did nothing — so the
+   row is absent instead, and reps and sets carry the card. */
+for (const [label, v] of [
+  ['no load logged', 0],
+  ['a negative slipped through', -40],
+  ['NaN from a blank weight box', NaN],
+  ['Infinity, which would print as a maths symbol', Infinity],
+] as Array<[string, number]>) {
+  const c = buildShareCard(input({ volume: v }))
+  ok(c.hero === null, label, JSON.stringify(c.hero))
+  ok(!/0 LBS|NaN|∞/.test(JSON.stringify(c)), 'and nothing on the card says it', JSON.stringify(c.hero))
+}
+ok(buildShareCard(input({ volume: 0 })).stats.length === 3, 'the three tiles still carry it')
 
 console.log('\nDURATION IS QUOTED, NEVER RECALCULATED\n')
 /* The card takes an already-formatted string on purpose. Two formatters
@@ -80,6 +110,40 @@ for (const [label, over] of [
 }
 ok(buildShareCard(input({ sets: 1 })).stats[1].label === 'Set', 'one set is singular')
 
+console.log('\nAND THE CARD FITS, IN EVERY COMBINATION IT CAN BE IN\n')
+/* The 4:5 post had fifteen pixels of real clearance between the bottom of the
+   PR bar and the top of 'ajmfit.com' once the volume figure went in, and
+   nobody noticed because the 9:16 story looked fine. The trap is the wordmark:
+   520x346, so two thirds as tall as it is wide, which reads as a thin strip on
+   screen and is 200px of vertical budget at the width it was being drawn.
+   Cropped text on somebody's story, with their name on it, is not a cosmetic
+   bug. So every combination is measured. */
+const MIN_CLEARANCE = 60
+for (const f of SHARE_FORMATS) {
+  for (const hasHero of [true, false]) {
+    for (const hasAchievement of [true, false]) {
+      const L = shareLayout(f, { hasHero, hasAchievement, heroFont: heroStartFont(f) })
+      const what = f.key + (hasHero ? ' + volume' : ' bodyweight') + (hasAchievement ? ' + PR' : '')
+      ok(L.clearance >= MIN_CLEARANCE, what, L.clearance + 'px above the footer')
+      ok(L.logoY > 0 && L.siteY < f.height, what + ': nothing off the top or bottom edge')
+    }
+  }
+}
+/* The story keeps clear of Instagram's own interface, which covers roughly the
+   top and bottom 250px of a story and would otherwise sit on the wordmark. */
+const story9 = shareLayout(story, { hasHero: true, hasAchievement: true, heroFont: heroStartFont(story) })
+ok(story9.logoY >= 250, "the story starts below Instagram's top furniture", story9.logoY + 'px down')
+ok(story9.siteY <= story.height - 120, 'and its footer stays above the bottom furniture', (story.height - story9.siteY) + 'px up')
+/* A shrunk hero figure must not lift the rest of the card into it. */
+const shrunk = shareLayout(story, { hasHero: true, hasAchievement: true, heroFont: 48 })
+const full = shareLayout(story, { hasHero: true, hasAchievement: true, heroFont: 150 })
+ok(shrunk.tilesY < full.tilesY, 'a narrower number pulls the tiles up rather than overlapping them', shrunk.tilesY + ' vs ' + full.tilesY)
+ok(shrunk.clearance > full.clearance, 'and leaves more room, never less')
+/* A bodyweight day drops the whole hero block rather than leaving a hole. */
+const bw = shareLayout(story, { hasHero: false, hasAchievement: true, heroFont: 150 })
+ok(bw.heroY === null && bw.heroLabelY === null, 'no hero means no hero position to draw at')
+ok(bw.tilesY < full.tilesY, 'and the tiles move up into the space', bw.tilesY + ' vs ' + full.tilesY)
+
 console.log('\nTHE FILENAME IS SAFE AND MEANS SOMETHING\n')
 for (const [day, want] of [
   ['Push Day', 'ajmfit-push-day-story.png'],
@@ -101,7 +165,7 @@ ok(shareText(none).length > 0 && !shareText(none).includes('PR'), 'and says noth
 
 console.log('\nNOTHING ODD THROWS\n')
 for (const [label, run] of [
-  ['everything empty', () => JSON.stringify(buildShareCard({ dayName: '', reps: 0, sets: 0, duration: '', recordCount: 0 })).length],
+  ['everything empty', () => JSON.stringify(buildShareCard({ dayName: '', reps: 0, sets: 0, duration: '', recordCount: 0, volume: 0 })).length],
   ['enormous numbers', () => buildShareCard(input({ reps: 1e9 })).stats[0].value.length],
   ['unicode day name', () => buildShareCard(input({ dayName: '💪 Push' })).subheading.length],
 ] as Array<[string, () => number]>) {

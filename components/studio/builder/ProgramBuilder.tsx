@@ -322,7 +322,7 @@ export default function ProgramBuilder({
 
         <button
           onClick={() => setPicking(true)}
-          className="w-full mt-3 py-3.5 rounded-card bg-brand-blue/[0.12] border border-brand-blue/30 text-brand-blue text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/20 active:scale-[0.99] transition-all duration-200"
+          className="w-full mt-3 py-3.5 rounded-card bg-brand-blue/[0.12] border border-brand-blue/30 text-brand-blueink text-label font-display font-bold uppercase tracking-wide hover:bg-brand-blue/20 active:scale-[0.99] transition-all duration-200"
         >
           + Add exercise
         </button>

@@ -55,7 +55,7 @@ export default function FeedbackButton() {
       {open && (
         <div className="fixed bottom-[calc(160px+env(safe-area-inset-bottom))] md:bottom-20 left-4 md:left-6 z-50 w-[calc(100vw-2rem)] max-w-[320px] rounded-card border border-white/[0.12] bg-surface-overlay shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4">
           {done ? (
-            <p className="text-emerald-400 text-body font-body py-6 text-center">Thanks! Feedback sent. 🙌</p>
+            <p className="text-state-success text-body font-body py-6 text-center">Thanks! Feedback sent. 🙌</p>
           ) : (
             <>
               <p className="text-white font-display font-bold text-label">Beta feedback</p>

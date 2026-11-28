@@ -66,7 +66,7 @@ export default function OnboardingChecklist({ state }: { state: ChecklistState }
         </p>
         <p className="font-display font-bold text-white text-base mt-1">{next.label}</p>
         {next.coach ? (
-          <p className="text-brand-blue text-label font-body mt-1">
+          <p className="text-brand-blueink text-label font-body mt-1">
             Waiting on Anthony &mdash; nothing for you to do here.
           </p>
         ) : (

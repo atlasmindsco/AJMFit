@@ -127,14 +127,14 @@ export default function SchedulePage() {
               <input type="checkbox" checked={form.zoom} onChange={(e) => setForm({ ...form, zoom: e.target.checked })} className="w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-brand-orange cursor-pointer" />
               <span className="text-ink-2 text-label font-body">Generate a Zoom link for this session</span>
             </label>
-            {error && <p className="text-red-400/80 text-label font-body">{error}</p>}
+            {error && <p className="text-state-danger/80 text-label font-body">{error}</p>}
             <button onClick={add} disabled={creating || !form.user_id || !form.date || !form.time} className="w-full py-2.5 bg-brand-orange text-white text-label font-display font-bold uppercase tracking-wide rounded-control hover:bg-brand-orangedark active:scale-[0.98] transition-all duration-200 disabled:opacity-40">
               {creating ? (form.zoom ? 'Creating Zoom link…' : 'Adding…') : 'Add Session'}
             </button>
           </div>
 
           {CALENDLY && (
-            <a href={CALENDLY} target="_blank" rel="noreferrer" className="block mt-4 text-center text-brand-blue text-label font-body hover:underline">Open Calendly booking →</a>
+            <a href={CALENDLY} target="_blank" rel="noreferrer" className="block mt-4 text-center text-brand-blueink text-label font-body hover:underline">Open Calendly booking →</a>
           )}
         </motion.div>
 
@@ -154,14 +154,14 @@ export default function SchedulePage() {
                       <p className="text-white text-body font-body font-medium truncate">{s.clientName}</p>
                       <p className="text-ink-4 text-label font-body">{s.type} · {s.duration_min} min · {fmt(s.starts_at)}</p>
                       {s.join_url && (
-                        <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-brand-blue text-label font-body hover:underline">
+                        <a href={s.join_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-brand-blueink text-label font-body hover:underline">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                           Join Zoom
                         </a>
                       )}
                     </div>
                     <div className="flex gap-1.5 shrink-0">
-                      <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-control bg-emerald-500/10 text-emerald-400 text-caption font-display font-bold uppercase hover:bg-emerald-500/20">Done</button>
+                      <button onClick={() => setSessionStatus(s.id, 'completed').then(load)} title="Mark done" className="px-2.5 py-1.5 rounded-control bg-state-success/10 text-state-success text-caption font-display font-bold uppercase hover:bg-state-success/20">Done</button>
                       <button onClick={() => cancel(s)} title="Cancel" className="px-2.5 py-1.5 rounded-control bg-white/[0.06] text-ink-3 text-caption font-display font-bold uppercase hover:bg-white/[0.1]">Cancel</button>
                     </div>
                   </div>
@@ -176,7 +176,7 @@ export default function SchedulePage() {
                 {past.slice(0, 10).map((s) => (
                   <div key={s.id} className="flex items-center justify-between p-2.5 rounded-control">
                     <p className="text-ink-2 text-body font-body">{s.clientName} · {s.type}</p>
-                    <span className={`text-caption font-display uppercase ${s.status === 'completed' ? 'text-emerald-400/70' : s.status === 'cancelled' ? 'text-ink-4' : 'text-ink-3'}`}>{s.status} · {fmt(s.starts_at)}</span>
+                    <span className={`text-caption font-display uppercase ${s.status === 'completed' ? 'text-state-success/70' : s.status === 'cancelled' ? 'text-ink-4' : 'text-ink-3'}`}>{s.status} · {fmt(s.starts_at)}</span>
                   </div>
                 ))}
               </div>
