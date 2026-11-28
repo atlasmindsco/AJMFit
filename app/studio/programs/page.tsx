@@ -6052,6 +6052,13 @@ function WorkoutComplete({
             summary.fatigue ||
             summary.nextUp ||
             summary.volume > 0 ||
+            /* The exercise list belongs in this gate, and leaving it out
+               would have hidden the sheet exactly where it is most useful: a
+               bodyweight session that set no record and triggered no fatigue
+               note has volume 0 and nothing else to say, so the button would
+               not have appeared — on the one session whose only content IS
+               the list of what was done. */
+            summary.exercises.length > 0 ||
             summary.firstEver ||
             summary.weekDone) && (
             <button
@@ -6256,6 +6263,38 @@ function SessionDetailSheet({
         <p className="mt-5 text-ink-2 text-body font-body leading-relaxed px-card py-base rounded-card bg-white/[0.04] border border-white/[0.08]">
           {summary.fatigue}
         </p>
+      )}
+
+      {/* WHAT WAS ACTUALLY DONE, immediately above the figure that sums it.
+          The same list the share card carries and the same rules behind it —
+          an exercise with nothing ticked is absent, and the figure is the top
+          set. Here it answers a different question, though: on the card it is
+          evidence for somebody else, and here it is the client checking their
+          own session before they close the app.
+          So this one does NOT trim. The card has 1080 pixels and a fixed
+          height; this sheet scrolls, so there is no honest reason to hide a
+          row, and a client looking for the exercise they were unsure about
+          would find "+2 more" exactly where they were looking.
+          Names wrap rather than truncate for the same reason — `min-w-0` on
+          the name and a `shrink-0` figure, so a long library name takes two
+          lines instead of becoming "Barbell Bench Press - Med…". */}
+      {summary.exercises.length > 0 && (
+        <div className="mt-5">
+          <p className="text-ink-4 text-caption font-display font-bold uppercase tracking-[0.18em]">The work</p>
+          <ul className="mt-2">
+            {summary.exercises.map((ex, i) => (
+              <li
+                key={`${ex.name}-${i}`}
+                className="flex items-baseline justify-between gap-4 py-2.5 border-b border-white/[0.06] last:border-b-0"
+              >
+                <span className="text-ink text-body font-body min-w-0">{ex.name}</span>
+                <span className="text-white text-body font-display font-bold tabular-nums shrink-0">
+                  {ex.detail}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {summary.volume > 0 && (
