@@ -2856,11 +2856,34 @@ export default function ProgramsPage() {
                             group.exercises[group.exercises.length - 1].exercise.name === exercise.name
                           const intensityEnabled = intensityOn[logKey] ?? false
                           const selectedTechnique = intensityChoice[logKey] ?? null
-                          const workingSetCount = intensityEnabled ? Math.max(1, exercise.sets - 1) : exercise.sets
+                          /**
+                           * How many sets this exercise has TODAY.
+                           *
+                           * The prescription, or more if the client has added
+                           * some. Derived from the length of the logged array
+                           * rather than held in its own piece of state, and
+                           * that is the whole trick: the array is what gets
+                           * written to the database and what the resume
+                           * rehydrate grows back from `set_number`. So an
+                           * added set survives leaving the workout, locking
+                           * the phone and coming back, without anything
+                           * needing to remember that it was added.
+                           *
+                           * It also keeps the distinction the program cares
+                           * about. Nothing is written to the plan: a set
+                           * beyond `exercise.sets` is an extra today and the
+                           * prescription is unchanged tomorrow, which is
+                           * derivable from set_number alone and needed no new
+                           * column to say so.
+                           */
+                          const loggedRowCount = setLogs[logKey]?.length ?? 0
+                          const totalSets = Math.max(exercise.sets, loggedRowCount)
+                          const extraSets = totalSets - exercise.sets
+                          const workingSetCount = intensityEnabled ? Math.max(1, totalSets - 1) : totalSets
                           const fullLogs = setLogs[logKey] ?? Array.from({ length: exercise.sets }, emptyRow)
-                          // Ensure backing array always holds `exercise.sets` rows so data isn't lost when toggling intensity on/off.
-                          const backingLogs = fullLogs.length < exercise.sets
-                            ? [...fullLogs, ...Array.from({ length: exercise.sets - fullLogs.length }, emptyRow)]
+                          // Ensure backing array always holds every row so data isn't lost when toggling intensity on/off.
+                          const backingLogs = fullLogs.length < totalSets
+                            ? [...fullLogs, ...Array.from({ length: totalSets - fullLogs.length }, emptyRow)]
                             : fullLogs
                           // A run is not a set of anything. Timed work gets a
                           // duration field instead of weight-by-reps rows, so
@@ -3104,7 +3127,7 @@ export default function ProgramsPage() {
                                         in a larger form. */}
                                     {!isOpen && (
                                       <p className="text-ink-3 text-label font-body">
-                                        Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${exercise.sets} sets`}
+                                        Reps: {exercise.reps} &middot; {intensityEnabled ? `${workingSetCount} + 2 intensity` : `${totalSets} sets${extraSets > 0 ? ` (${exercise.sets} + ${extraSets})` : ''}`}
                                       </p>
                                     )}
                                     {/* The PR badge is gone, not enlarged.
@@ -3161,7 +3184,7 @@ export default function ProgramsPage() {
                                     className="text-right shrink-0 flex flex-col items-end"
                                   >
                                     <p className="text-brand-orange text-label font-display font-bold">
-                                      {intensityEnabled ? `${workingSetCount}+2` : `${exercise.sets}X`} / Rest
+                                      {intensityEnabled ? `${workingSetCount}+2` : `${totalSets}X`} / Rest
                                     </p>
                                     <svg className={`w-4 h-4 text-ink-4 mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                       <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -4059,6 +4082,68 @@ export default function ProgramsPage() {
                                           </div>
                                         )
                                       })}
+
+                                      {/* A fourth set on a three-set exercise.
+                                          There was no way to log one. The rows were
+                                          capped at the prescription, so a client who
+                                          had another one in them either left it
+                                          unrecorded or overwrote a set they had
+                                          already done.
+
+                                          Secondary on purpose: Log Set is the thing
+                                          being pressed fifteen times a session and
+                                          this is the thing being pressed occasionally,
+                                          so it is a quiet full-width row rather than
+                                          another filled button competing with it.
+
+                                          Nothing is written to the program. The extra
+                                          exists in today's session only, and tomorrow
+                                          the prescription is what it always was. */}
+                                      {!timed && sessionActive && (
+                                        <div className="flex items-center gap-2 mt-2">
+                                          <button
+                                            onClick={() => {
+                                              const rows = [...backingLogs]
+                                              const last = rows[rows.length - 1]
+                                              rows.push({
+                                                // Carry the last weight forward: an
+                                                // extra set is almost always the same
+                                                // load again, and starting from an
+                                                // empty box means typing it twice.
+                                                // Reps stay empty - that is the part
+                                                // nobody can predict.
+                                                weight: last?.weight ?? '',
+                                                reps: '',
+                                                logged: false,
+                                              })
+                                              setSetLogs((prev) => ({ ...prev, [logKey]: rows }))
+                                            }}
+                                            className="flex-1 h-tap rounded-control border border-white/[0.10] text-ink-2 text-label font-display font-bold uppercase tracking-wide hover:text-white hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-150"
+                                          >
+                                            + Add set
+                                          </button>
+
+                                          {/* Only an added set, and only an empty one.
+                                              Removing something already logged is a
+                                              different act and needs asking about; a
+                                              row added by mistake and never filled in
+                                              is just a tidy-up. */}
+                                          {extraSets > 0 && !backingLogs[backingLogs.length - 1]?.logged && (
+                                            <button
+                                              onClick={() => {
+                                                setSetLogs((prev) => ({
+                                                  ...prev,
+                                                  [logKey]: backingLogs.slice(0, backingLogs.length - 1),
+                                                }))
+                                              }}
+                                              className="h-tap px-card rounded-control border border-white/[0.10] text-ink-4 text-label font-display font-bold uppercase tracking-wide hover:text-state-danger active:scale-[0.98] transition-all duration-150"
+                                              aria-label="Remove the set just added"
+                                            >
+                                              Undo
+                                            </button>
+                                          )}
+                                        </div>
+                                      )}
 
                                       {/* How hard was that?
                                           One optional tap per exercise, not per set. The program
